@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useMemo } from 'react';
 import { 
   FileText, 
   ImageIcon, 
@@ -39,12 +40,12 @@ type ServiceUnit = {
 
 const ALL_UNITS: ServiceUnit[] = [
   { id: 'pdf-word', name: 'PDF to Word Master', desc: 'Preserves complex layout reconstruction.', icon: FileText, tag: 'DOCX', cat: 'Document', complexity: 'WASM' },
-  { id: 'pdf-excel', name: 'PDF to Excel Grid', desc: 'Neural table boundary detection.', icon: Table, tag: 'XLSX', cat: 'Document', complexity: 'SMART' },
+  { id: 'pdf-excel', name: 'PDF to Excel Grid', desc: 'Smart table boundary detection.', icon: Table, tag: 'XLSX', cat: 'Document', complexity: 'SMART' },
   { id: 'word-pdf', name: 'Word to PDF Pro', desc: 'High-fidelity OOXML transformation.', icon: FileText, tag: 'PDF', cat: 'Document', complexity: 'WASM' },
   { id: 'pdf-merge', name: 'PDF Unit Merger', desc: 'Combine multiple document streams.', icon: Layers, tag: 'PDF', cat: 'Document', complexity: 'WASM' },
   { id: 'img-webp', name: 'Image to WebP Node', desc: 'Lossless web node optimization.', icon: ImageIcon, tag: 'WEBP', cat: 'Image', complexity: 'WASM' },
   { id: 'bg-remove', name: 'Smart BG Removal', desc: 'Automated subject isolation.', icon: Wand2, tag: 'PNG', cat: 'Image', complexity: 'AI' },
-  { id: 'img-upscale', name: 'Neural Upscaler', desc: 'Super-resolution pixel mapping.', icon: Zap, tag: '4K', cat: 'Image', complexity: 'AI' },
+  { id: 'img-upscale', name: 'Smart Upscaler', desc: 'Super-resolution pixel mapping.', icon: Zap, tag: '4K', cat: 'Image', complexity: 'AI' },
   { id: 'heic-jpg', name: 'HEIC Developer', desc: 'Mobile-to-web format bridge.', icon: ImageIcon, tag: 'JPG', cat: 'Image', complexity: 'WASM' },
   { id: 'vid-gif', name: 'Video to Smart GIF', desc: 'Frame-accurate temporal mapping.', icon: Video, tag: 'GIF', cat: 'Video', complexity: 'WASM' },
   { id: 'vid-compress', name: 'Video Compressor', desc: 'Crush size without frame loss.', icon: Monitor, tag: 'MP4', cat: 'Video', complexity: '4K' },
