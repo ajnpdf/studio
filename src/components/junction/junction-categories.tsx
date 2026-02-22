@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,7 +12,7 @@ const categories = [
   {
     id: 'Document',
     title: 'PDF Services Unit',
-    count: '14 Units',
+    count: '20+ Units',
     desc: 'Advanced OOXML reconstruction, OCR layers, and archival processing.',
     icon: FileText,
     color: 'text-blue-400',
@@ -20,7 +21,7 @@ const categories = [
   {
     id: 'Image',
     title: 'Image Mastery',
-    count: '12 Units',
+    count: '15+ Units',
     desc: 'RAW development, smart upscaling, and vector transformations.',
     icon: ImageIcon,
     color: 'text-indigo-400',
@@ -29,7 +30,7 @@ const categories = [
   {
     id: 'Video',
     title: 'Video Lab Unit',
-    count: '8 Units',
+    count: '8+ Units',
     desc: 'Hardware transcode, frame trimming, and codec surgery.',
     icon: Video,
     color: 'text-purple-400',
@@ -38,7 +39,7 @@ const categories = [
   {
     id: 'Audio',
     title: 'Audio Engine',
-    count: '7 Units',
+    count: '10+ Units',
     desc: 'Compression, waveform precision, and dynamic normalization.',
     icon: Music,
     color: 'text-pink-400',

@@ -21,7 +21,12 @@ import {
   ArrowRight,
   ShieldCheck,
   Cpu,
-  Monitor
+  Monitor,
+  Presentation,
+  BookOpen,
+  FileJson,
+  FileCode,
+  ShieldAlert
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -39,26 +44,42 @@ type ServiceUnit = {
 };
 
 const ALL_UNITS: ServiceUnit[] = [
+  // PDF CORE UNITS (20+)
   { id: 'pdf-word', name: 'PDF to Word Master', desc: 'Preserves complex layout reconstruction.', icon: FileText, tag: 'DOCX', cat: 'Document', complexity: 'WASM' },
   { id: 'pdf-excel', name: 'PDF to Excel Grid', desc: 'Smart table boundary detection.', icon: Table, tag: 'XLSX', cat: 'Document', complexity: 'SMART' },
-  { id: 'word-pdf', name: 'Word to PDF Pro', desc: 'High-fidelity OOXML transformation.', icon: FileText, tag: 'PDF', cat: 'Document', complexity: 'WASM' },
+  { id: 'pdf-ppt', name: 'PDF to PowerPoint', desc: 'Slide-accurate vector reconstruction.', icon: Presentation, tag: 'PPTX', cat: 'Document', complexity: 'WASM' },
+  { id: 'pdf-epub', name: 'PDF to EPUB Reader', desc: 'Fluid layout ebook synthesis.', icon: BookOpen, tag: 'EPUB', cat: 'Document', complexity: 'SMART' },
+  { id: 'pdf-json', name: 'PDF to Data JSON', desc: 'Semantic text-to-object mapping.', icon: FileJson, tag: 'JSON', cat: 'Data', complexity: 'AI' },
+  { id: 'pdf-xml', name: 'PDF to Structural XML', desc: 'Tag-based content hierarchy.', icon: FileCode, tag: 'XML', cat: 'Data', complexity: 'SMART' },
+  { id: 'pdf-html', name: 'PDF to HTML Node', desc: 'Responsive web-ready rendering.', icon: Code2, tag: 'HTML', cat: 'Document', complexity: 'WASM' },
+  { id: 'pdf-pdfa', name: 'PDF to Archival A-1b', desc: 'ISO-standard long-term preservation.', icon: ShieldCheck, tag: 'PDF/A', cat: 'Document', complexity: 'SMART' },
+  { id: 'pdf-md', name: 'PDF to Markdown', desc: 'Clean MD formatting for developers.', icon: Type, tag: 'MD', cat: 'Document', complexity: 'AI' },
+  { id: 'pdf-rtf', name: 'PDF to RTF Layer', desc: 'Cross-platform legacy interop.', icon: FileText, tag: 'RTF', cat: 'Document', complexity: 'WASM' },
+  { id: 'pdf-txt', name: 'PDF to Pure Text', desc: 'High-speed OCR character extraction.', icon: Type, tag: 'TXT', cat: 'Document', complexity: 'WASM' },
+  { id: 'pdf-svg', name: 'PDF to Vector SVG', desc: 'Extract vector paths for design.', icon: Layers, tag: 'SVG', cat: 'Image', complexity: 'SMART' },
+  { id: 'pdf-tiff', name: 'PDF to Multi-TIFF', desc: 'Print-optimized raster output.', icon: ImageIcon, tag: 'TIFF', cat: 'Image', complexity: 'WASM' },
+  { id: 'pdf-png', name: 'PDF to PNG Frames', desc: 'High-res alpha-preserved images.', icon: ImageIcon, tag: 'PNG', cat: 'Image', complexity: 'WASM' },
+  { id: 'pdf-jpg', name: 'PDF to JPEG Grid', desc: 'Compressed proof-quality pages.', icon: ImageIcon, tag: 'JPG', cat: 'Image', complexity: 'WASM' },
   { id: 'pdf-merge', name: 'PDF Unit Merger', desc: 'Combine multiple document streams.', icon: Layers, tag: 'PDF', cat: 'Document', complexity: 'WASM' },
+  { id: 'pdf-split', name: 'PDF Page Splitter', desc: 'Deconstruct document into segments.', icon: Scissors, tag: 'PDF', cat: 'Document', complexity: 'WASM' },
+  { id: 'pdf-redact', name: 'Smart Redactor', desc: 'Neural PII detection and masking.', icon: ShieldAlert, tag: 'SECURE', cat: 'Document', complexity: 'AI' },
+  { id: 'ocr-layer', name: 'Smart OCR Engine', desc: 'Image to searchable text layer.', icon: Scan, tag: 'PDF', cat: 'Document', complexity: 'AI' },
+  { id: 'word-pdf', name: 'Word to PDF Pro', desc: 'High-fidelity OOXML transformation.', icon: FileText, tag: 'PDF', cat: 'Document', complexity: 'WASM' },
+
+  // IMAGE & MEDIA UNITS
   { id: 'img-webp', name: 'Image to WebP Node', desc: 'Lossless web node optimization.', icon: ImageIcon, tag: 'WEBP', cat: 'Image', complexity: 'WASM' },
   { id: 'bg-remove', name: 'Smart BG Removal', desc: 'Automated subject isolation.', icon: Wand2, tag: 'PNG', cat: 'Image', complexity: 'AI' },
   { id: 'img-upscale', name: 'Smart Upscaler', desc: 'Super-resolution pixel mapping.', icon: Zap, tag: '4K', cat: 'Image', complexity: 'AI' },
   { id: 'heic-jpg', name: 'HEIC Developer', desc: 'Mobile-to-web format bridge.', icon: ImageIcon, tag: 'JPG', cat: 'Image', complexity: 'WASM' },
+  { id: 'raw-dev', name: 'RAW Developer', desc: 'Professional camera development.', icon: ImageIcon, tag: 'JPG', cat: 'Image', complexity: '4K' },
   { id: 'vid-gif', name: 'Video to Smart GIF', desc: 'Frame-accurate temporal mapping.', icon: Video, tag: 'GIF', cat: 'Video', complexity: 'WASM' },
   { id: 'vid-compress', name: 'Video Compressor', desc: 'Crush size without frame loss.', icon: Monitor, tag: 'MP4', cat: 'Video', complexity: '4K' },
   { id: 'vid-audio', name: 'Audio Extractor', desc: 'Extract high-bitrate master tracks.', icon: Music, tag: 'MP3', cat: 'Video', complexity: 'WASM' },
   { id: 'aud-trim', name: 'Audio Surgery', desc: 'Precise waveform manipulation.', icon: Scissors, tag: 'WAV', cat: 'Audio', complexity: 'WASM' },
   { id: 'aud-norm', name: 'Loudness Engine', desc: 'LUFS broadcast normalization.', icon: Zap, tag: 'MP3', cat: 'Audio', complexity: 'SMART' },
-  { id: 'ocr-layer', name: 'Smart OCR Engine', desc: 'Image to searchable text layer.', icon: Scan, tag: 'PDF', cat: 'Document', complexity: 'AI' },
   { id: 'csv-json', name: 'Data Transformer', desc: 'Schema-mapped data conversion.', icon: Code2, tag: 'JSON', cat: 'Data', complexity: 'WASM' },
   { id: 'zip-7z', name: 'Archive Hub', desc: 'High-ratio LZMA2 compression.', icon: Box, tag: '7Z', cat: 'Archive', complexity: 'WASM' },
-  { id: 'raw-dev', name: 'RAW Developer', desc: 'Professional camera development.', icon: ImageIcon, tag: 'JPG', cat: 'Image', complexity: '4K' },
-  { id: 'html-pdf', name: 'HTML to PDF Node', desc: 'Web-to-document rendering.', icon: Code2, tag: 'PDF', cat: 'Document', complexity: 'WASM' },
   { id: 'cad-vector', name: 'CAD to SVG Unit', desc: 'DXF to vector path conversion.', icon: Layers, tag: 'SVG', cat: 'Image', complexity: 'SMART' },
-  { id: 'md-pdf', name: 'Markdown Master', desc: 'Clean PDF rendering from MD.', icon: Type, tag: 'PDF', cat: 'Document', complexity: 'WASM' },
 ];
 
 export function ServicesGrid({ query, category }: { query: string, category: string }) {
