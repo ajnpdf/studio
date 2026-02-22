@@ -1,4 +1,3 @@
-
 'use client';
 
 import { PDFConverter } from './converters/pdf-converter';
@@ -51,13 +50,15 @@ class ConversionEngine {
     pptx: PPTConverter, ppt: PPTConverter,
     odt: ODTConverter, ods: ODTConverter, odp: ODTConverter,
     jpg: ImageConverter, jpeg: ImageConverter, png: ImageConverter, webp: ImageConverter,
+    gif: ImageConverter, heic: ImageConverter, heif: ImageConverter, avif: ImageConverter, 
+    bmp: ImageConverter, tiff: ImageConverter, tif: ImageConverter,
     cr2: RawConverter, nef: RawConverter, arw: RawConverter, dng: RawConverter,
     mp4: VideoConverter, mov: VideoConverter, avi: VideoConverter, mkv: VideoConverter,
     mp3: AudioConverter, wav: AudioConverter, flac: AudioConverter, aac: AudioConverter,
     zip: ArchiveConverter, rar: ArchiveConverter, '7z': ArchiveConverter,
     json: CodeConverter, xml: CodeConverter, html: CodeConverter, md: CodeConverter,
     epub: EbookConverter, mobi: EbookConverter, azw: EbookConverter, fb2: EbookConverter,
-    psd: DesignConverter, ai: DesignConverter, svg: DesignConverter,
+    psd: DesignConverter, ai: DesignConverter, svg: ImageConverter,
     stl: CADConverter, obj: CADConverter, dxf: CADConverter
   };
 
