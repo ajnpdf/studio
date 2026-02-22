@@ -36,8 +36,8 @@ const navItems = [
 ];
 
 const toolItems = [
-  { icon: FileText, label: 'PDF Tools', href: '/dashboard/tools/pdf', description: 'Edit and manage PDFs' },
-  { icon: ImageIcon, label: 'Image Tools', href: '/dashboard/tools/image', description: 'Optimize and transform' },
+  { icon: FileText, label: 'PDF Tools', href: '/dashboard/pdf-editor', description: 'Edit and manage PDFs' },
+  { icon: ImageIcon, label: 'Image Tools', href: '/dashboard/image-editor', description: 'Optimize and transform' },
   { icon: Video, label: 'Video Tools', href: '/dashboard/tools/video', description: 'Cut and compress clips' },
   { icon: Music, label: 'Audio Tools', href: '/dashboard/tools/audio', description: 'Track manipulation' },
   { icon: Box, label: 'Batch Processing', href: '/dashboard/tools/batch', description: 'Multiple file operations' },
