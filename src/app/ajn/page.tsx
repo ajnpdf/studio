@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { Button } from '@/components/ui/button';
@@ -9,25 +9,67 @@ import {
   Network, 
   Cpu, 
   ShieldCheck, 
-  Grid2X2,
   Lock,
   Upload,
   CheckCircle2,
-  Workflow
+  Workflow,
+  Search,
+  Command,
+  ArrowRight,
+  Zap,
+  BrainCircuit,
+  FileText,
+  ImageIcon,
+  Video,
+  Music,
+  X,
+  Layers
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+
+const ALL_SERVICES = [
+  { id: 'pdf-docx', name: 'PDF to Word Mastery', desc: 'Reconstruct layouts via Neural OCR', cat: 'Document', icon: FileText, tag: 'WASM' },
+  { id: 'pdf-xlsx', name: 'PDF to Excel Grid', desc: 'Neural table detection & extraction', cat: 'Document', icon: Layers, tag: 'AI' },
+  { id: 'img-webp', name: 'Universal WebP Transcode', desc: 'Lossless compression for web nodes', cat: 'Image', icon: ImageIcon, tag: 'WASM' },
+  { id: 'vid-gif', name: 'Video to Neural GIF', desc: 'Frame-accurate temporal mapping', cat: 'Video', icon: Video, tag: 'FFmpeg' },
+  { id: 'aud-trim', name: 'Audio Waveform Surgery', desc: 'Precise sample-level trimming', cat: 'Audio', icon: Music, tag: 'WASM' },
+  { id: 'ocr-search', name: 'Searchable PDF Layer', desc: 'Inject invisible semantic text', cat: 'Specialized', icon: BrainCircuit, tag: 'Neural' },
+  { id: 'bg-remove', name: 'Neural BG Removal', desc: 'AI-driven subject isolation', cat: 'Image', icon: ImageIcon, tag: 'AI' },
+  { id: 'vid-4k', name: '4K Lab Transcode', desc: 'Hardware accelerated rendering', cat: 'Video', icon: Video, tag: 'FFmpeg' },
+];
 
 /**
  * AJN Core - Neural Gateway
- * High-fidelity, dynamic minimalist junction.
+ * Enhanced with Global Service Search and Immersive Processing.
  */
 export default function AJNPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [fileMeta, setFileMeta] = useState<{ name: string; size: string } | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const filteredServices = ALL_SERVICES.filter(s => 
+    s.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    s.cat.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.desc.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setShowSearch((prev) => !prev);
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -55,7 +97,6 @@ export default function AJNPage() {
     setIsProcessing(true);
     setProgress(0);
 
-    // Neural Scan Animation Sequence
     for (let i = 0; i <= 100; i += 2) {
       setProgress(i);
       await new Promise(r => setTimeout(r, 40));
@@ -76,7 +117,7 @@ export default function AJNPage() {
       <NightSky />
       
       {/* HUD HEADER */}
-      <header className="fixed top-0 left-0 right-0 h-20 border-b border-white/5 bg-background/20 backdrop-blur-xl z-50 px-8 flex items-center justify-between">
+      <header className="fixed top-0 left-0 right-0 h-20 border-b border-white/5 bg-background/20 backdrop-blur-xl z-[60] px-8 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="p-2 bg-white rounded-lg shadow-2xl transition-all group-hover:scale-110 group-hover:rotate-6">
             <Network className="w-5 h-5 text-black" />
@@ -85,6 +126,20 @@ export default function AJNPage() {
         </Link>
         
         <div className="flex items-center gap-6">
+          <div className="hidden lg:flex items-center relative group">
+            <Search className="absolute left-3 w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+            <input 
+              readOnly
+              onClick={() => setShowSearch(true)}
+              placeholder="Search services..." 
+              className="h-9 w-64 bg-white/5 border border-white/10 rounded-xl pl-10 pr-12 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/10 transition-all outline-none"
+            />
+            <div className="absolute right-3 flex items-center gap-1 opacity-40">
+              <Command className="w-2.5 h-2.5" />
+              <span className="text-[8px] font-black">K</span>
+            </div>
+          </div>
+
           <Link href="/junction">
             <Button variant="outline" className="h-9 border-white/10 bg-white/5 hover:bg-white hover:text-black font-black text-[10px] uppercase tracking-widest rounded-xl transition-all gap-2 px-4 shadow-2xl">
               <Workflow className="w-3.5 h-3.5" /> Junction Network
@@ -98,6 +153,66 @@ export default function AJNPage() {
         </div>
       </header>
 
+      {/* GLOBAL SEARCH OVERLAY */}
+      {showSearch && (
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] px-6 bg-background/80 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="w-full max-w-2xl bg-[#0d1225] border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in slide-in-from-top-4 duration-500">
+            <div className="p-6 border-b border-white/5 relative flex items-center">
+              <Search className="absolute left-8 w-5 h-5 text-primary" />
+              <Input 
+                autoFocus
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Find a neural service (e.g. 'PDF to DOCX', 'Upscale')..." 
+                className="h-14 pl-14 pr-12 bg-transparent border-none text-lg font-bold placeholder:opacity-30 focus-visible:ring-0"
+              />
+              <button onClick={() => setShowSearch(false)} className="absolute right-8 p-2 hover:bg-white/5 rounded-xl transition-colors">
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
+            
+            <ScrollArea className="max-h-[60vh]">
+              <div className="p-4 space-y-6">
+                {filteredServices.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-2">
+                    {filteredServices.map((s) => (
+                      <Link key={s.id} href={`/junction/units?cat=${s.cat}`} onClick={() => setShowSearch(false)}>
+                        <div className="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/5 transition-all group cursor-pointer border border-transparent hover:border-white/5">
+                          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <s.icon className="w-6 h-6 text-primary" />
+                          </div>
+                          <div className="flex-1 overflow-hidden">
+                            <div className="flex items-center gap-3">
+                              <h4 className="text-sm font-black uppercase tracking-tighter text-white/90">{s.name}</h4>
+                              <Badge className="bg-primary/20 text-primary border-none text-[8px] font-black">{s.tag}</Badge>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest truncate">{s.desc}</p>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-white/10 group-hover:text-primary transition-colors" />
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-20 text-center space-y-4 opacity-40">
+                    <Search className="w-12 h-12 mx-auto text-muted-foreground" />
+                    <p className="text-[10px] font-black uppercase tracking-widest">No matching neural logic found</p>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+            
+            <div className="p-4 bg-black/40 border-t border-white/5 flex items-center justify-between">
+              <div className="flex gap-4">
+                <span className="flex items-center gap-1.5 text-[8px] font-black text-muted-foreground uppercase"><Command className="w-2 h-2" /> + K to toggle</span>
+                <span className="flex items-center gap-1.5 text-[8px] font-black text-muted-foreground uppercase"><Zap className="w-2 h-2" /> Global Node Active</span>
+              </div>
+              <p className="text-[8px] font-black text-white/20 uppercase tracking-widest">AJN DIRECTORY v1.0</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* DYNAMIC BACKGROUND */}
       <div className={cn(
         "fixed inset-0 pointer-events-none transition-all duration-1000 z-0",
@@ -109,10 +224,9 @@ export default function AJNPage() {
       </div>
 
       <main className="relative z-10 flex flex-col items-center justify-center min-h-screen p-6">
-        
         <div className={cn(
           "w-full max-w-4xl transition-all duration-700 flex flex-col items-center gap-12",
-          isProcessing ? "scale-95 opacity-40 blur-sm" : "scale-100"
+          isProcessing || showSearch ? "scale-95 opacity-40 blur-sm" : "scale-100"
         )}>
           <div className={cn("transition-all duration-700", isDragging ? "scale-110" : "scale-100")}>
             <LogoAnimation />
@@ -204,3 +318,5 @@ export default function AJNPage() {
     </div>
   );
 }
+
+import { ScrollArea } from '@/components/ui/scroll-area';
