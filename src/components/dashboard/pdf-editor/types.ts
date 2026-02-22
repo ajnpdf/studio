@@ -1,4 +1,3 @@
-
 export type PDFTool = 
   | 'select' 
   | 'edit-text' 
@@ -10,11 +9,14 @@ export type PDFTool =
   | 'underline' 
   | 'strikethrough' 
   | 'comment'
-  | 'signature';
+  | 'signature'
+  | 'form-field'
+  | 'link'
+  | 'redact';
 
 export interface PDFElement {
   id: string;
-  type: 'text' | 'image' | 'shape' | 'signature';
+  type: 'text' | 'image' | 'shape' | 'signature' | 'form-field' | 'link' | 'markup';
   x: number;
   y: number;
   width: number;
@@ -25,8 +27,18 @@ export interface PDFElement {
   color?: string;
   bold?: boolean;
   italic?: boolean;
+  underline?: boolean;
   opacity?: number;
   rotation?: number;
+  zIndex: number;
+  // Signature specific
+  signatureType?: 'draw' | 'type' | 'upload';
+  signatureData?: string;
+  // Form field specific
+  fieldType?: 'text' | 'checkbox' | 'radio' | 'dropdown';
+  isRequired?: boolean;
+  // Link specific
+  url?: string;
 }
 
 export interface PDFPage {
@@ -34,6 +46,16 @@ export interface PDFPage {
   pageNumber: number;
   rotation: number;
   elements: PDFElement[];
+  isScanned?: boolean;
+  ocrEnabled?: boolean;
+}
+
+export interface PDFVersion {
+  id: string;
+  versionNumber: number;
+  timestamp: string;
+  editorName: string;
+  summary: string;
 }
 
 export interface PDFDocument {
@@ -41,4 +63,5 @@ export interface PDFDocument {
   name: string;
   totalPages: number;
   pages: PDFPage[];
+  versions: PDFVersion[];
 }
