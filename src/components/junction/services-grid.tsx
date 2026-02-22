@@ -12,21 +12,12 @@ import {
   Scissors, 
   Zap, 
   Scan, 
-  Repeat, 
   Table, 
-  Type, 
-  Box, 
   Code2, 
-  HardDrive, 
   ArrowRight,
   ShieldCheck,
   Cpu,
-  Monitor,
   Presentation,
-  BookOpen,
-  FileJson,
-  FileCode,
-  ShieldAlert,
   Merge,
   RotateCw,
   Lock,
@@ -63,7 +54,7 @@ export const ALL_UNITS: ServiceUnit[] = [
   { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine PDFs in the order you want with the easiest PDF merger available.', icon: Merge, tag: 'CORE', cat: 'Document', complexity: 'WASM' },
   { id: 'split-pdf', name: 'Split PDF', desc: 'Separate one page or a whole set for easy conversion into independent PDF files.', icon: Scissors, tag: 'CORE', cat: 'Document', complexity: 'WASM' },
   { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce file size while optimizing for maximal PDF quality.', icon: Zap, tag: 'SMART', cat: 'Document', complexity: 'SMART' },
-  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Sort pages of your PDF file however you like. Delete or add PDF pages at your convenience.', icon: Layout, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
+  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Sort pages of your PDF file however you like. Delete or add PDF pages.', icon: Layout, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
   { id: 'remove-pages', name: 'Remove Pages', desc: 'Delete unwanted pages from your document instantly.', icon: Trash2, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
   { id: 'extract-pages', name: 'Extract Pages', desc: 'Pick specific pages and save them as a separate PDF.', icon: ExternalLink, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
   
@@ -76,15 +67,15 @@ export const ALL_UNITS: ServiceUnit[] = [
 
   // --- CONVERT FROM PDF ---
   { id: 'pdf-word', name: 'PDF to Word', desc: 'Easily convert your PDF files into easy to edit DOC and DOCX documents.', icon: FileText, tag: 'DOCX', cat: 'Document', complexity: 'WASM' },
-  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Pull data straight from PDFs into Excel spreadsheets in a few short seconds.', icon: Table, tag: 'XLSX', cat: 'Document', complexity: 'SMART' },
+  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Pull data straight from PDFs into Excel spreadsheets.', icon: Table, tag: 'XLSX', cat: 'Document', complexity: 'SMART' },
   { id: 'pdf-pptx', name: 'PDF to PowerPoint', desc: 'Turn your PDF files into easy to edit PPT and PPTX slideshows.', icon: Presentation, tag: 'PPTX', cat: 'Document', complexity: 'WASM' },
   { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Convert each PDF page into a JPG or extract all images contained in a PDF.', icon: ImageIcon, tag: 'JPG', cat: 'Document', complexity: 'WASM' },
-  { id: 'pdf-pdfa', name: 'PDF to PDF/A', desc: 'Transform your PDF to PDF/A, the ISO-standardized version for long-term archiving.', icon: ShieldCheck, tag: 'ISO', cat: 'Document', complexity: 'SMART' },
+  { id: 'pdf-pdfa', name: 'PDF to PDF/A', desc: 'ISO-standardized version for long-term archiving.', icon: ShieldCheck, tag: 'ISO', cat: 'Document', complexity: 'SMART' },
 
   // --- EDIT & ANNOTATE ---
   { id: 'edit-pdf', name: 'Edit PDF', desc: 'Add text, images, shapes or freehand annotations to a PDF document.', icon: Wand2, tag: 'MASTER', cat: 'Document', complexity: 'WASM' },
   { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Rotate your PDFs the way you need them. Even multiple PDFs at once.', icon: RotateCw, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
-  { id: 'page-numbers', name: 'Page Numbers', desc: 'Add page numbers into PDFs with ease. Choose positions and typography.', icon: Hash, tag: 'TOOL', cat: 'Document', complexity: 'SMART' },
+  { id: 'page-numbers', name: 'Page Numbers', desc: 'Add page numbers into PDFs with ease.', icon: Hash, tag: 'TOOL', cat: 'Document', complexity: 'SMART' },
   { id: 'watermark-pdf', name: 'Add Watermark', desc: 'Stamp an image or text over your PDF in seconds.', icon: Printer, tag: 'BRAND', cat: 'Document', complexity: 'SMART' },
   { id: 'crop-pdf', name: 'Crop PDF', desc: 'Crop margins or select specific areas for one or all pages.', icon: Crop, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
 
@@ -96,7 +87,7 @@ export const ALL_UNITS: ServiceUnit[] = [
   // --- INTELLIGENCE & REPAIR ---
   { id: 'repair-pdf', name: 'Repair PDF', desc: 'Repair a damaged PDF and recover data from corrupt PDF files.', icon: Hammer, tag: 'TOOL', cat: 'Document', complexity: 'SMART' },
   { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Easily convert scanned PDF into searchable and selectable documents.', icon: Scan, tag: 'AI', cat: 'Document', complexity: 'AI' },
-  { id: 'compare-pdf', name: 'Compare PDF', desc: 'Side-by-side document comparison to spot changes between versions.', icon: FileSearch, tag: 'PRO', cat: 'Document', complexity: 'AI' },
+  { id: 'compare-pdf', name: 'Compare PDF', desc: 'Side-by-side document comparison to spot changes.', icon: FileSearch, tag: 'PRO', cat: 'Document', complexity: 'AI' },
   { id: 'redact-pdf', name: 'Redact PDF', desc: 'Permanently remove sensitive information from a PDF.', icon: ShieldAlert, tag: 'SECURE', cat: 'Document', complexity: 'AI' },
   { id: 'translate-pdf', name: 'Translate PDF', desc: 'Easily translate PDF files powered by AI while keeping layout intact.', icon: Languages, tag: 'AI', cat: 'Document', complexity: 'AI' },
   { id: 'scan-pdf', name: 'Scan to PDF', desc: 'Capture document scans from your mobile device directly to your browser.', icon: Camera, tag: 'MOBILE', cat: 'Document', complexity: 'SMART' },

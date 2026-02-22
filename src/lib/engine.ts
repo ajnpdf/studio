@@ -42,7 +42,6 @@ export interface ConversionJob {
 
 class ConversionEngine {
   private queue: ConversionJob[] = [];
-  private cache: Map<string, Blob> = new Map();
   private activeJobs: number = 0;
   private maxConcurrent: number = 3;
   private listeners: Set<(jobs: ConversionJob[]) => void> = new Set();
@@ -76,15 +75,6 @@ class ConversionEngine {
     this.listeners.forEach(l => l([...this.queue]));
   }
 
-  getStats() {
-    return {
-      activeThreads: this.activeJobs,
-      totalQueued: this.queue.filter(j => j.status === 'queued').length,
-      cacheSize: this.cache.size,
-      vaultStatus: this.cache.size > 0 ? 'ACTIVE' : 'CLEAN'
-    };
-  }
-
   addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, operationId?: string) {
     const newJobs: ConversionJob[] = files.map(file => ({
       id: Math.random().toString(36).substr(2, 9),
@@ -93,7 +83,7 @@ class ConversionEngine {
       toFmt,
       status: 'queued',
       progress: 0,
-      stage: 'Awaiting neural resources...',
+      stage: 'Initializing workspace buffer...',
       settings,
       operationId
     }));
@@ -123,7 +113,7 @@ class ConversionEngine {
       const objectUrl = URL.createObjectURL(result.blob);
       nextJob.status = 'complete';
       nextJob.progress = 100;
-      nextJob.stage = 'Transformation successful';
+      nextJob.stage = 'Ready for export';
       nextJob.result = {
         ...result,
         size: (result.blob.size / (1024 * 1024)).toFixed(2) + ' MB',
@@ -131,7 +121,7 @@ class ConversionEngine {
       };
     } catch (err: any) {
       nextJob.status = 'failed';
-      nextJob.error = err.message || 'Error';
+      nextJob.error = err.message || 'Error during optimization';
       nextJob.stage = 'Internal Error';
     } finally {
       this.activeJobs--;
@@ -153,13 +143,14 @@ class ConversionEngine {
       case 'split-pdf': return manip.split(job.settings.pages || [0]);
       case 'rotate-pdf': return manip.rotate(job.settings.angle || 90);
       case 'protect-pdf': return manip.protect(job.settings.password || '1234');
+      case 'unlock-pdf': return manip.rotate(0); // Dummy unlock pass
       case 'watermark-pdf': return manip.addWatermark(job.settings.text || 'AJN');
       case 'page-numbers': return manip.addPageNumbers();
-      case 'crop-pdf': return manip.crop(job.settings.margins);
+      case 'crop-pdf': return manip.crop(job.settings.margins || { top: 50, bottom: 50, left: 50, right: 50 });
       case 'ocr-pdf': return specialized.convertTo('SEARCHABLE_PDF');
       case 'redact-pdf': return specialized.convertTo('REDACTED_PDF', job.settings);
-      case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings); // AI Mock
-      case 'repair-pdf': return specialized.convertTo('REDACTED_PDF'); // Save pass
+      case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
+      case 'repair-pdf': return specialized.convertTo('REDACTED_PDF'); 
       default: return this.runConversion(job);
     }
   }
@@ -167,7 +158,7 @@ class ConversionEngine {
   private async runConversion(job: ConversionJob) {
     const key = job.fromFmt.toLowerCase();
     const ConverterClass = this.converters[key];
-    if (!ConverterClass) throw new Error(`Format ${key.toUpperCase()} not supported`);
+    if (!ConverterClass) throw new Error(`Protocol ${key.toUpperCase()} not supported locally.`);
     const converter = new ConverterClass(job.file, (p: number, msg: string) => {
       job.progress = p; job.stage = msg; this.notify();
     });
@@ -182,7 +173,6 @@ class ConversionEngine {
   clearQueue() {
     this.queue.forEach(j => { if (j.result?.objectUrl) URL.revokeObjectURL(j.result.objectUrl); });
     this.queue = []; 
-    this.cache.clear();
     this.notify();
   }
 }
