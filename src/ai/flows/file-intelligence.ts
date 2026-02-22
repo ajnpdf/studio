@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview Comprehensive file intelligence flows for SUFW.
+ * @fileOverview Comprehensive file intelligence flows for AJN.
  *
  * - fileIntelligence - Handles summarization, categorization, and analysis.
  */
@@ -28,7 +28,7 @@ const fileIntelligencePrompt = ai.definePrompt({
   name: 'fileIntelligencePrompt',
   input: {schema: IntelligenceInputSchema},
   output: {schema: IntelligenceOutputSchema},
-  prompt: `You are an expert AI intelligence agent for SUFW (Smart Universal File Workspace).
+  prompt: `You are an expert AI intelligence agent for AJN (All-in-one Junction Network).
   You are performing the task: {{toolId}}.
   
   CONTEXT:

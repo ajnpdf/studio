@@ -38,7 +38,7 @@ export function SmartHelper() {
       <CardHeader className="bg-primary/5 pb-4">
         <div className="flex items-center gap-2 mb-1">
           <Sparkles className="w-5 h-5 text-primary" />
-          <CardTitle className="text-lg">AI Smart Assistant</CardTitle>
+          <CardTitle className="text-lg">AJN Smart Assistant</CardTitle>
         </div>
         <CardDescription>Tell us what you want to do with your file.</CardDescription>
       </CardHeader>

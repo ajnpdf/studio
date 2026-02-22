@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Cloud Edit Pro | Intelligent File Management',
-  description: 'The ultimate cloud-based file conversion and editing platform powered by AI.',
+  title: 'AJN – All-in-one Junction Network | Intelligent File Management',
+  description: 'The ultimate all-in-one cloud-based file junction for conversion and editing powered by AI.',
 };
 
 export default function RootLayout({

@@ -12,10 +12,10 @@ export function Footer() {
               <div className="p-2 bg-brand-gradient rounded-xl shadow-lg">
                 <Cloud className="w-6 h-6 text-white" />
               </div>
-              <span className="font-bold text-2xl tracking-tight text-gradient">SUFW</span>
+              <span className="font-bold text-2xl tracking-tight text-gradient">AJN</span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              The ultimate real-time intelligent file operating system in the cloud. Convert, edit, and optimize anything.
+              AJN – All-in-one Junction Network. The ultimate real-time intelligent file operating system in the cloud. Convert, edit, and optimize anything.
             </p>
             <div className="flex gap-4">
               <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/20"><Twitter className="w-4 h-4"/></Button>
@@ -28,11 +28,11 @@ export function Footer() {
           <div>
             <h4 className="font-bold mb-6">Product</h4>
             <ul className="space-y-4 text-sm text-muted-foreground">
-              <li><Link href="#" className="hover:text-primary transition-colors">Converter</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">PDF Editor</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">Image Optimizer</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">Video Tools</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">Developer API</Link></li>
+              <li><Link href="/dashboard/convert" className="hover:text-primary transition-colors">Converter</Link></li>
+              <li><Link href="/dashboard/pdf-editor" className="hover:text-primary transition-colors">PDF Editor</Link></li>
+              <li><Link href="/dashboard/image-editor" className="hover:text-primary transition-colors">Image Optimizer</Link></li>
+              <li><Link href="/dashboard/tools/video" className="hover:text-primary transition-colors">Video Tools</Link></li>
+              <li><Link href="/dashboard/api" className="hover:text-primary transition-colors">Developer API</Link></li>
             </ul>
           </div>
 
@@ -59,7 +59,7 @@ export function Footer() {
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-center pt-10 border-t border-border/50 gap-6">
-          <p className="text-sm text-muted-foreground">© 2026 Smart Universal File Workspace (SUFW). All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">© 2026 AJN – All-in-one Junction Network. All rights reserved.</p>
           <div className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:text-primary transition-colors">
             <Globe className="w-4 h-4" />
             <span>English (US)</span>

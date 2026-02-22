@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Cloud, Zap, Shield, HardDrive, FileText, ImageIcon, Video, Music } from 'lucide-react';
@@ -38,7 +37,7 @@ export function BrandPanel() {
         <div className="p-2.5 bg-brand-gradient rounded-xl shadow-2xl">
           <Cloud className="w-8 h-8 text-white" />
         </div>
-        <span className="font-black text-3xl tracking-tighter text-gradient">SUFW</span>
+        <span className="font-black text-3xl tracking-tighter text-gradient">AJN</span>
       </div>
 
       <div className="flex-1 flex flex-col justify-center space-y-12 z-10">
@@ -46,10 +45,10 @@ export function BrandPanel() {
           <h2 className="text-4xl font-black leading-tight tracking-tight">
             Every File.<br />
             Every Format.<br />
-            <span className="text-primary">One Workspace.</span>
+            <span className="text-primary">One Junction.</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-xs leading-relaxed">
-            The ultimate real-time intelligent file operating system in the cloud.
+            AJN – All-in-one Junction Network. The ultimate real-time intelligent file operating system.
           </p>
         </div>
 
@@ -102,7 +101,7 @@ export function BrandPanel() {
 
       <div className="pt-8 mt-auto border-t border-white/5 z-10">
         <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">
-          Join the Movement
+          Join the Junction
         </p>
         <p className="text-lg font-black tracking-tight">
           {counter.toLocaleString()} users trusted us today

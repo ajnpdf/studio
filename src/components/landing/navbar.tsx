@@ -26,14 +26,14 @@ export function Navbar() {
           <div className="p-2 bg-brand-gradient rounded-xl shadow-lg group-hover:rotate-12 transition-transform">
             <Cloud className="w-6 h-6 text-white" />
           </div>
-          <span className="font-bold text-2xl tracking-tight text-gradient">SUFW</span>
+          <span className="font-bold text-2xl tracking-tight text-gradient">AJN</span>
         </Link>
         
         <div className="hidden lg:flex items-center gap-8 text-sm font-bold tracking-wide">
           <Link href="#features" className="hover:text-primary transition-colors">TOOLS</Link>
           <Link href="#pricing" className="hover:text-primary transition-colors">PRICING</Link>
           <Link href="#faq" className="hover:text-primary transition-colors">FAQ</Link>
-          <Link href="/api-docs" className="hover:text-primary transition-colors">API</Link>
+          <Link href="/dashboard/api" className="hover:text-primary transition-colors">API</Link>
         </div>
 
         <div className="flex items-center gap-4">
@@ -61,7 +61,7 @@ export function Navbar() {
             <Link href="#features" onClick={() => setMobileMenuOpen(false)}>TOOLS</Link>
             <Link href="#pricing" onClick={() => setMobileMenuOpen(false)}>PRICING</Link>
             <Link href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</Link>
-            <Link href="/api-docs" onClick={() => setMobileMenuOpen(false)}>API</Link>
+            <Link href="/dashboard/api" onClick={() => setMobileMenuOpen(false)}>API</Link>
           </div>
         </div>
       )}

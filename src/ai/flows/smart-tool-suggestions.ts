@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview Provides AI-driven tool recommendations based on file type and desired modifications.
+ * @fileOverview Provides AI-driven tool recommendations based on file type and desired modifications for AJN.
  *
  * - smartToolSuggestions - A function that handles the smart tool suggestion process.
  * - SmartToolSuggestionsInput - The input type for the smartToolSuggestions function.
@@ -58,7 +58,7 @@ const smartToolSuggestionsPrompt = ai.definePrompt({
   name: 'smartToolSuggestionsPrompt',
   input: {schema: SmartToolSuggestionsInputSchema},
   output: {schema: SmartToolSuggestionsOutputSchema},
-  prompt: `You are an intelligent assistant for Cloud Edit Pro, designed to help users find the most relevant tools for their file editing and conversion needs.
+  prompt: `You are an intelligent assistant for AJN – All-in-one Junction Network, designed to help users find the most relevant tools for their file editing and conversion needs.
 
 Based on the user's file type and their desired modification (if provided), suggest a list of relevant tools. For each tool, provide a name, a brief description, and indicate if it is highly recommended given the context.
 

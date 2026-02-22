@@ -6,7 +6,7 @@ const testimonials = [
     name: "Sarah Jenkins",
     role: "Creative Director",
     company: "Studio 9",
-    text: "The easiest way to handle client assets. Being able to convert RAW images and PDFs in one place is a game changer.",
+    text: "AJN is the easiest way to handle client assets. Being able to convert RAW images and PDFs in one place is a game changer.",
     stars: 5,
     img: "https://picsum.photos/seed/sarah/100/100"
   },
@@ -14,7 +14,7 @@ const testimonials = [
     name: "Marcus Thorne",
     role: "DevOps Engineer",
     company: "CloudFlow",
-    text: "We integrated their API into our CMS and it's been rock solid. 99.9% uptime isn't just a marketing claim.",
+    text: "We integrated AJN's API into our CMS and it's been rock solid. 99.9% uptime isn't just a marketing claim.",
     stars: 5,
     img: "https://picsum.photos/seed/marcus/100/100"
   },
@@ -22,7 +22,7 @@ const testimonials = [
     name: "Elena Rodriguez",
     role: "Project Manager",
     company: "Innovate Inc.",
-    text: "Saved us hours of work converting legacy documentation to web-ready formats. The compression is pixel perfect.",
+    text: "Saved us hours of work converting legacy documentation to web-ready formats via AJN. The compression is pixel perfect.",
     stars: 5,
     img: "https://picsum.photos/seed/elena/100/100"
   }

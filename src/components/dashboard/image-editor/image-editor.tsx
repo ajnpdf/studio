@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -49,7 +48,7 @@ export function ImageEditor({ initialFileId }: { initialFileId: string | null })
     flipH: false,
     flipV: false,
     watermarkType: 'text',
-    watermarkText: 'SUFW Workspace',
+    watermarkText: 'AJN Workspace',
     watermarkPosition: 'bottom-right',
     watermarkOpacity: 50,
     removeBg: false,
@@ -86,7 +85,7 @@ export function ImageEditor({ initialFileId }: { initialFileId: string | null })
           </Link>
           <div className="space-y-0.5">
             <h1 className="text-sm font-black tracking-tighter uppercase">{image.name}</h1>
-            <p className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase">Image Intelligent Studio</p>
+            <p className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase">AJN Intelligent Studio</p>
           </div>
         </div>
 

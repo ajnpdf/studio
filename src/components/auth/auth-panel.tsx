@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -43,9 +42,9 @@ export function AuthPanel() {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-black tracking-tighter">Welcome to SUFW</h1>
+        <h1 className="text-3xl font-black tracking-tighter">Welcome to AJN</h1>
         <p className="text-muted-foreground text-sm font-medium">
-          Start your journey with an intelligent cloud workspace.
+          Start your journey with an intelligent cloud junction network.
         </p>
       </div>
 
@@ -120,7 +119,7 @@ export function AuthPanel() {
           <form onSubmit={(e) => handleAuth(e, 'signup')} className="space-y-4">
             <div className="space-y-1.5">
               <Label className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest ml-1">Work Email</Label>
-              <Input name="email" type="email" placeholder="alex@sufw.io" required className="h-11 bg-white/5 border-white/10" />
+              <Input name="email" type="email" placeholder="alex@ajn.io" required className="h-11 bg-white/5 border-white/10" />
             </div>
             <div className="space-y-1.5">
               <Label className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest ml-1">Choose Password</Label>
