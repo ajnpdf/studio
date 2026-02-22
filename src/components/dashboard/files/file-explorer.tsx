@@ -6,9 +6,11 @@ import { FolderTree } from './folder-tree';
 import { FileGridContent } from './file-grid-content';
 import { FileDetailPanel } from './file-detail-panel';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Search, Plus, Filter, LayoutGrid, List, ArrowUpDown } from 'lucide-react';
+import { Search, Plus, LayoutGrid, List, ArrowUpDown, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
+import { useUser, useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy } from 'firebase/firestore';
 
 export interface WorkspaceFile {
   id: string;
@@ -19,23 +21,39 @@ export interface WorkspaceFile {
   date: string;
   tags: string[];
   versions: number;
+  uploadDate?: string;
+  fileType?: string;
 }
-
-const MOCK_FILES: WorkspaceFile[] = [
-  { id: '1', name: 'Brand_Logo_v2.png', type: 'image', format: 'PNG', size: '2.4 MB', date: '2 hours ago', tags: ['branding', 'design'], versions: 3 },
-  { id: '2', name: 'Project_Proposal_Final.pdf', type: 'pdf', format: 'PDF', size: '12.8 MB', date: '5 hours ago', tags: ['client', 'legal'], versions: 5 },
-  { id: '3', name: 'Marketing_Ad_Q1.mp4', type: 'video', format: 'MP4', size: '45.1 MB', date: 'Yesterday', tags: ['marketing', 'video'], versions: 1 },
-  { id: '4', name: 'Interview_Recording.mp3', type: 'audio', format: 'MP3', size: '8.2 MB', date: '2 days ago', tags: ['audio', 'interview'], versions: 2 },
-  { id: '5', name: 'Financials_2025.xlsx', type: 'doc', format: 'XLSX', size: '1.5 MB', date: '3 days ago', tags: ['finance', 'internal'], versions: 4 },
-  { id: '6', name: 'Product_Shoot_Hero.jpg', type: 'image', format: 'JPG', size: '5.6 MB', date: '4 days ago', tags: ['photography', 'raw'], versions: 1 },
-  { id: '7', name: 'Terms_and_Conditions.docx', type: 'doc', format: 'DOCX', size: '0.8 MB', date: '5 days ago', tags: ['legal', 'draft'], versions: 2 },
-  { id: '8', name: 'Website_Background.webp', type: 'image', format: 'WEBP', size: '1.2 MB', date: '1 week ago', tags: ['web', 'assets'], versions: 1 },
-];
 
 export function FileExplorer() {
   const [selectedFile, setSelectedFile] = useState<WorkspaceFile | null>(null);
   const [activeFolder, setActiveFolder] = useState('My Files');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  
+  const { user } = useUser();
+  const firestore = useFirestore();
+
+  const filesQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    // Query files within the user's isolated workspace
+    // Assuming workspaceId is the same as userId for personal space
+    return query(
+      collection(firestore, 'workspaces', user.uid, 'files'),
+      orderBy('uploadDate', 'desc')
+    );
+  }, [firestore, user]);
+
+  const { data: dbFiles, isLoading } = useCollection<WorkspaceFile>(filesQuery);
+
+  // Map Firestore data to the component's internal interface if needed
+  const files: WorkspaceFile[] = (dbFiles || []).map(f => ({
+    ...f,
+    type: (f.fileType?.split('/')[0] as any) || 'doc',
+    format: f.format || f.name.split('.').pop()?.toUpperCase() || 'UNK',
+    date: f.uploadDate ? new Date(f.uploadDate).toLocaleDateString() : 'N/A',
+    tags: f.tags || [],
+    versions: f.versions || 1,
+  }));
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -66,7 +84,7 @@ export function FileExplorer() {
                 variant="ghost" 
                 size="icon" 
                 onClick={() => setViewMode('grid')}
-                className={`h-7 w-7 ${viewMode === 'grid' ? "bg-primary text-white" : "text-muted-foreground"}`}
+                className={cn("h-7 w-7", viewMode === 'grid' ? "bg-primary text-white" : "text-muted-foreground")}
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
               </Button>
@@ -74,7 +92,7 @@ export function FileExplorer() {
                 variant="ghost" 
                 size="icon" 
                 onClick={() => setViewMode('list')}
-                className={`h-7 w-7 ${viewMode === 'list' ? "bg-primary text-white" : "text-muted-foreground"}`}
+                className={cn("h-7 w-7", viewMode === 'list' ? "bg-primary text-white" : "text-muted-foreground")}
               >
                 <List className="w-3.5 h-3.5" />
               </Button>
@@ -90,12 +108,19 @@ export function FileExplorer() {
           </div>
         </header>
 
-        <FileGridContent 
-          files={MOCK_FILES} 
-          viewMode={viewMode} 
-          selectedFileId={selectedFile?.id || null}
-          onSelectFile={setSelectedFile} 
-        />
+        {isLoading ? (
+          <div className="flex-1 flex flex-col items-center justify-center space-y-4 opacity-40">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <p className="text-[10px] font-black uppercase tracking-widest">Synchronizing Vault...</p>
+          </div>
+        ) : (
+          <FileGridContent 
+            files={files} 
+            viewMode={viewMode} 
+            selectedFileId={selectedFile?.id || null}
+            onSelectFile={setSelectedFile} 
+          />
+        )}
       </div>
 
       {/* RIGHT — Detail Panel */}
@@ -106,3 +131,5 @@ export function FileExplorer() {
     </div>
   );
 }
+
+import { cn } from '@/lib/utils';

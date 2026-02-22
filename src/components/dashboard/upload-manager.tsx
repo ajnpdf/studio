@@ -5,10 +5,12 @@ import { useState } from 'react';
 import { UploadZone } from './upload-zone';
 import { FileMetadataCard } from './file-metadata-card';
 import { Button } from '@/components/ui/button';
-import { LayoutGrid, List, Trash2, ShieldCheck, Lock, AlertTriangle } from 'lucide-react';
+import { LayoutGrid, List, Trash2, ShieldCheck, Lock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { TierGateModal } from './tier-gate-modal';
+import { useUser, useFirestore, useDoc, useMemoFirebase, setDocumentNonBlocking } from '@/firebase';
+import { doc } from 'firebase/firestore';
 
 export type FileState = 'uploading' | 'scanning' | 'analyzing' | 'ready' | 'error';
 
@@ -37,13 +39,24 @@ export function UploadManager() {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [gateOpen, setGateOpen] = useState(false);
-  const [gateReason, setGateReason] = useState<'size' | 'task'>('size');
+  const [gateReason, setGateReason] = useState<'size' | 'task' | 'storage' | 'ai'>('size');
 
-  // Mock tier limits - in production these come from useTierLimits hook
-  const TIER_FILE_SIZE_LIMIT = 50 * 1024 * 1024; // 50MB for Free
+  const { user } = useUser();
+  const firestore = useFirestore();
+
+  const userProfileRef = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return doc(firestore, 'userProfiles', user.uid);
+  }, [firestore, user]);
+
+  const { data: profile } = useDoc(userProfileRef);
+
+  // Dynamic tier limits from database
+  const TIER_FILE_SIZE_LIMIT = (profile?.tier === 'BUSINESS' ? 10000 : profile?.tier === 'PRO' ? 2000 : 50) * 1024 * 1024;
 
   const handleFilesAdded = (newFiles: File[]) => {
-    // Check size limit immediately per security architecture
+    if (!user) return;
+
     const validFiles: File[] = [];
     const oversizedFiles: File[] = [];
 
@@ -70,21 +83,23 @@ export function UploadManager() {
   };
 
   const simulateProcessing = async (id: string) => {
-    // 1. Uploading State (TLS 1.3 Simulation)
+    if (!firestore || !user) return;
+
+    // 1. Uploading State
     for (let i = 0; i <= 100; i += 20) {
       setFiles(prev => prev.map(f => f.id === id ? { ...f, progress: i } : f));
       await new Promise(r => setTimeout(r, 150));
     }
 
-    // 2. Scanning State (AV + Magic Bytes)
+    // 2. Scanning State
     setFiles(prev => prev.map(f => f.id === id ? { ...f, state: 'scanning' } : f));
     await new Promise(r => setTimeout(r, 1200));
 
-    // 3. Analyzing State (Metadata Extraction)
+    // 3. Analyzing State
     setFiles(prev => prev.map(f => f.id === id ? { ...f, state: 'analyzing' } : f));
     await new Promise(r => setTimeout(r, 800));
 
-    // 4. Ready State
+    // 4. Ready State & Firestore Persistence
     setFiles(prev => prev.map(f => {
       if (f.id === id) {
         const type = f.file.type;
@@ -99,14 +114,27 @@ export function UploadManager() {
           }
         };
 
-        if (type.startsWith('image/')) {
-          mockMeta.dimensions = '1920 x 1080 px';
-        } else if (type.startsWith('video/')) {
-          mockMeta.duration = '00:03:45';
-          mockMeta.dimensions = '1080p';
-        } else if (type === 'application/pdf') {
-          mockMeta.pages = Math.floor(Math.random() * 50) + 1;
-        }
+        if (type.startsWith('image/')) mockMeta.dimensions = '1920 x 1080 px';
+        else if (type.startsWith('video/')) { mockMeta.duration = '00:03:45'; mockMeta.dimensions = '1080p'; }
+        else if (type === 'application/pdf') mockMeta.pages = Math.floor(Math.random() * 50) + 1;
+
+        // Persist file metadata to Firestore (Simulation of a successful cloud upload trigger)
+        const fileRef = doc(firestore, 'workspaces', user.uid, 'files', id);
+        setDocumentNonBlocking(fileRef, {
+          id,
+          name: f.file.name,
+          workspaceId: user.uid,
+          workspaceOwnerId: user.uid,
+          workspaceMemberIds: [user.uid],
+          isFolder: false,
+          fileType: type,
+          sizeBytes: f.file.size,
+          uploadDate: new Date().toISOString(),
+          modifiedDate: new Date().toISOString(),
+          format: mockMeta.format,
+          tags: ['auto-tagged', type.split('/')[0]],
+          versions: 1
+        }, { merge: true });
 
         return { ...f, state: 'ready', metadata: mockMeta };
       }

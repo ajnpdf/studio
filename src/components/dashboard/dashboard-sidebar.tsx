@@ -23,13 +23,16 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useUser, useDoc, useFirestore, useAuth, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 
 const navItems = [
   { icon: Files, label: 'My Files', href: '/dashboard/files', description: 'Manage your assets' },
@@ -59,7 +62,22 @@ const supportItems = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
+  const { user } = useUser();
+  const firestore = useFirestore();
+  const auth = useAuth();
+
+  const userProfileRef = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return doc(firestore, 'userProfiles', user.uid);
+  }, [firestore, user]);
+
+  const { data: profile } = useDoc(userProfileRef);
+
+  const handleSignOut = () => {
+    signOut(auth).then(() => router.push('/login'));
+  };
 
   const NavLink = ({ item }: { item: any }) => (
     <TooltipProvider delayDuration={0}>
@@ -100,6 +118,10 @@ export function DashboardSidebar() {
     </TooltipProvider>
   );
 
+  const storageUsed = profile?.storageUsedBytes || 0;
+  const storageLimit = (profile?.storageLimitGb || 1) * 1024 * 1024 * 1024;
+  const storagePercent = Math.round((storageUsed / storageLimit) * 100) || 0;
+
   return (
     <aside className={cn(
       "border-r border-white/5 bg-sidebar/40 backdrop-blur-xl text-sidebar-foreground flex flex-col h-screen fixed left-0 top-0 z-40 transition-all duration-300",
@@ -109,13 +131,13 @@ export function DashboardSidebar() {
       <div className="p-6 border-b border-white/5">
         <div className={cn("flex items-center gap-3 mb-6 transition-all", collapsed && "justify-center")}>
           <Avatar className="h-10 w-10 border-2 border-primary/20">
-            <AvatarImage src="https://picsum.photos/seed/alex/100/100" />
-            <AvatarFallback>AD</AvatarFallback>
+            <AvatarImage src={user?.photoURL || "https://picsum.photos/seed/alex/100/100"} />
+            <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
           </Avatar>
           {!collapsed && (
             <div className="overflow-hidden">
-              <p className="font-bold text-sm truncate">Alex Doe</p>
-              <Badge variant="secondary" className="h-4 text-[10px] bg-primary/20 text-primary border-none px-1.5 font-bold">BUSINESS</Badge>
+              <p className="font-bold text-sm truncate">{user?.displayName || profile?.displayName || 'User'}</p>
+              <Badge variant="secondary" className="h-4 text-[10px] bg-primary/20 text-primary border-none px-1.5 font-bold uppercase">{profile?.tier || 'FREE'}</Badge>
             </div>
           )}
         </div>
@@ -123,11 +145,13 @@ export function DashboardSidebar() {
         {!collapsed && (
           <div className="space-y-2">
             <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
-              <span>Team Storage</span>
-              <span>12%</span>
+              <span>Storage Used</span>
+              <span>{storagePercent}%</span>
             </div>
-            <Progress value={12} className="h-1.5 bg-white/5" />
-            <p className="text-[10px] text-muted-foreground/40 text-right">124 GB of 1 TB used</p>
+            <Progress value={storagePercent} className="h-1.5 bg-white/5" />
+            <p className="text-[10px] text-muted-foreground/40 text-right">
+              {(storageUsed / (1024 * 1024 * 1024)).toFixed(2)} GB of {profile?.storageLimitGb || 1} GB used
+            </p>
           </div>
         )}
       </div>
@@ -166,7 +190,10 @@ export function DashboardSidebar() {
         >
           {collapsed ? <ChevronRight className="w-5 h-5" /> : <div className="flex items-center gap-3"><ChevronLeft className="w-5 h-5" /> <span>Collapse Sidebar</span></div>}
         </button>
-        <button className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-red-400 hover:bg-red-400/10 transition-all">
+        <button 
+          onClick={handleSignOut}
+          className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-red-400 hover:bg-red-400/10 transition-all"
+        >
           <LogOut className="w-5 h-5 shrink-0" />
           {!collapsed && <span>Sign Out</span>}
         </button>
