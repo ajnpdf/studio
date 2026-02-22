@@ -9,7 +9,7 @@ import { Slider } from '@/components/ui/slider';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowRight, Wand2, Search, Settings2, Clock, Loader2 } from 'lucide-react';
+import { ArrowRight, Wand2, Search, Settings2, Clock, Loader2, AlertCircle } from 'lucide-react';
 import { ConversionSettings } from './conversion-engine';
 
 interface Props {
@@ -27,6 +27,8 @@ const conversionTargets: Record<string, string[]> = {
     'TIFF', 'SVG', 'PDF/A', 'ODT', 'CSV', 'XML', 
     'JSON', 'Markdown'
   ],
+  'DOCX': ['PDF', 'TXT', 'HTML', 'RTF', 'EPUB', 'ODT', 'JPG', 'PNG'],
+  'DOC': ['DOCX', 'PDF', 'TXT', 'HTML'],
   'JPG': ['PNG', 'WebP', 'AVIF', 'BMP', 'TIFF', 'PDF', 'SVG'],
   'PNG': ['JPG', 'WebP', 'AVIF', 'SVG', 'PDF'],
   'MP4': ['MOV', 'AVI', 'MKV', 'WebM', 'MP3', 'WAV'],
@@ -77,29 +79,40 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
               <Wand2 className="w-3 h-3" /> Intelligent Parameters
             </h4>
 
-            {file.format === 'PDF' && (
+            {file.format === 'DOC' && (
+              <div className="p-4 bg-yellow-500/5 border border-yellow-500/20 rounded-2xl flex items-start gap-3 animate-in fade-in">
+                <AlertCircle className="w-4 h-4 text-yellow-500 shrink-0 mt-0.5" />
+                <p className="text-[10px] text-yellow-500 font-bold leading-relaxed">
+                  Legacy DOC format detected. Complex layouts may be simplified during neural reconstruction.
+                </p>
+              </div>
+            )}
+
+            {(file.format === 'PDF' || file.format === 'DOCX') && (
               <div className="space-y-6 animate-in slide-in-from-top-2">
                 <div className="space-y-3">
-                  <Label className="text-[9px] font-black uppercase tracking-widest">Compression Tier</Label>
+                  <Label className="text-[9px] font-black uppercase tracking-widest">Processing Tier</Label>
                   <RadioGroup defaultValue="medium" className="grid grid-cols-3 gap-3">
                     {['low', 'medium', 'high'].map(q => (
                       <Label key={q} className="flex flex-col items-center justify-between gap-2 p-3 border border-white/10 rounded-xl cursor-pointer hover:bg-white/5 transition-colors [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/10">
                         <RadioGroupItem value={q} className="sr-only" />
                         <span className="text-[10px] font-black uppercase tracking-widest">{q}</span>
                         <span className="text-[8px] font-bold text-muted-foreground uppercase">
-                          {q === 'low' ? 'Light' : q === 'high' ? 'Deep' : 'Balanced'}
+                          {q === 'low' ? 'Draft' : q === 'high' ? 'High-Fi' : 'Standard'}
                         </span>
                       </Label>
                     ))}
                   </RadioGroup>
                 </div>
-                <div className="flex items-center gap-3 p-4 bg-primary/5 border border-primary/10 rounded-2xl">
-                  <Checkbox id="ocr" checked={settings.ocr} onCheckedChange={(v) => setSettings({...settings, ocr: !!v})} />
-                  <div className="grid gap-1">
-                    <Label htmlFor="ocr" className="text-[10px] font-black uppercase tracking-widest cursor-pointer">Enable OCR Engine</Label>
-                    <p className="text-[9px] text-muted-foreground font-medium">Reconstruct editable text layers from scans.</p>
+                {file.format === 'PDF' && (
+                  <div className="flex items-center gap-3 p-4 bg-primary/5 border border-primary/10 rounded-2xl">
+                    <Checkbox id="ocr" checked={settings.ocr} onCheckedChange={(v) => setSettings({...settings, ocr: !!v})} />
+                    <div className="grid gap-1">
+                      <Label htmlFor="ocr" className="text-[10px] font-black uppercase tracking-widest cursor-pointer">Enable OCR Engine</Label>
+                      <p className="text-[9px] text-muted-foreground font-medium">Reconstruct editable text layers from scans.</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
@@ -117,7 +130,7 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
 
         <div className="p-6 bg-white/5 border-t border-white/5 space-y-4">
           <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-muted-foreground">
-            <span className="flex items-center gap-2"><Clock className="w-3 h-3" /> Est. Latency: 4-12s</span>
+            <span className="flex items-center gap-2"><Clock className="w-3 h-3" /> Est. Latency: 5-15s</span>
             <span>Neural V2.5 Active</span>
           </div>
           <Button 
