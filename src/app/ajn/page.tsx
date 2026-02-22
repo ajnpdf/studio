@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
@@ -23,7 +24,11 @@ import {
   FileCode,
   BrainCircuit,
   Wand2,
-  Activity
+  Activity,
+  Cpu,
+  Lock,
+  Globe,
+  Gauge
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -38,6 +43,19 @@ const ALL_SERVICES = [
   { id: 'bg-remove', name: 'Smart BG Removal', desc: 'AI-driven subject isolation', cat: 'Image', icon: Wand2, tag: 'Smart' },
   { id: 'vid-gif', name: 'Video to Smart GIF', desc: 'Frame-accurate temporal mapping', cat: 'Video', icon: Video, tag: 'FFmpeg' },
   { id: 'aud-trim', name: 'Audio Waveform Surgery', desc: 'Precise sample-level trimming', cat: 'Audio', icon: Music, tag: 'WASM' },
+];
+
+const TICKER_SERVICES = [
+  "4K VIDEO TRANSCODE", "SMART LAYOUT RECONSTRUCTION", "RAW CAMERA DEVELOPMENT", 
+  "SVG VECTOR MASTERING", "BATCH DOCUMENT SIGNING", "UNIVERSAL WASM ENGINE", 
+  "HIGH-FIDELITY AUDIO NORMALIZATION", "CROSS-NODE FILE MAPPING"
+];
+
+const FEATURES = [
+  { icon: Cpu, title: "Local WASM Core", desc: "Process sensitive data 100% locally in your browser sandbox." },
+  { icon: Gauge, title: "Smart Concurrency", desc: "Parallel processing slots for high-volume batch workloads." },
+  { icon: Lock, title: "Vault Security", desc: "End-to-end 256-bit encryption for every session file." },
+  { icon: Globe, title: "Universal Interop", desc: "Seamless transformation across 300+ professional formats." }
 ];
 
 export default function AJNPage() {
@@ -175,14 +193,28 @@ export default function AJNPage() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
       </div>
 
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center p-4 md:p-6 mt-16 md:mt-20">
+      <main className="relative z-10 flex-1 flex flex-col items-center p-4 md:p-6 mt-24 md:mt-32">
+        {/* SERVICE TICKER MARQUEE */}
+        <div className="w-full overflow-hidden mb-12 relative group">
+          <div className="flex animate-marquee whitespace-nowrap gap-12 items-center">
+            {[...TICKER_SERVICES, ...TICKER_SERVICES].map((s, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <span className="text-[9px] md:text-[11px] font-black text-white/40 tracking-[0.3em] uppercase group-hover:text-white/80 transition-colors">{s}</span>
+              </div>
+            ))}
+          </div>
+          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#020617] to-transparent z-10" />
+          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#020617] to-transparent z-10" />
+        </div>
+
         <div className={cn(
           "w-full max-w-4xl transition-all duration-700 flex flex-col items-center gap-8 md:gap-12",
           isProcessing || showSearch ? "scale-95 opacity-40 blur-sm" : "scale-100"
         )}>
           
           {/* LARGE GLOBAL SEARCH BOX */}
-          <div className="w-full max-w-2xl relative group animate-in fade-in slide-in-from-top-4 duration-1000 delay-200">
+          <div className="w-full max-w-2xl relative group animate-in fade-in slide-in-from-top-4 duration-1000">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-[2.5rem] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
             <div className="relative flex items-center bg-[#0d1225]/80 backdrop-blur-3xl border border-white/10 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all hover:border-primary/40">
               <Search className="absolute left-6 md:left-8 w-6 h-6 text-primary" />
@@ -199,7 +231,7 @@ export default function AJNPage() {
             </div>
           </div>
 
-          {/* AJN ANIMATION - NOW BELOW SEARCH */}
+          {/* AJN ANIMATION */}
           <div className={cn("transition-all duration-700", isDragging ? "scale-110" : "scale-100")}>
             <LogoAnimation />
           </div>
@@ -231,6 +263,19 @@ export default function AJNPage() {
               <span className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 md:w-3.5 md:h-3.5" /> Scanned</span>
             </div>
           </div>
+
+          {/* PROFESSIONAL CAPABILITIES GRID */}
+          <section className="w-full max-w-5xl py-12 md:py-24 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+            {FEATURES.map((f, i) => (
+              <div key={i} className="p-6 md:p-8 rounded-[2rem] bg-white/[0.02] border border-white/5 hover:border-primary/20 transition-all group">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <f.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                </div>
+                <h3 className="text-xs md:text-sm font-black uppercase tracking-widest text-white mb-3">{f.title}</h3>
+                <p className="text-[10px] md:text-xs text-muted-foreground font-bold leading-relaxed uppercase tracking-wider opacity-60">{f.desc}</p>
+              </div>
+            ))}
+          </section>
         </div>
 
         {/* PROCESSING OVERLAY */}
@@ -270,6 +315,16 @@ export default function AJNPage() {
           AJN JUNCTION • GLOBAL NODE • 2025
         </footer>
       </main>
+
+      <style jsx global>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          animation: marquee 40s linear infinite;
+        }
+      `}</style>
     </div>
   );
 }
