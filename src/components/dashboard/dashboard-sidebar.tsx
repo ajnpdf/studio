@@ -1,3 +1,4 @@
+
 "use client";
 
 import { 
@@ -70,7 +71,8 @@ export function DashboardSidebar() {
 
   const userProfileRef = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return doc(firestore, 'userProfiles', user.uid);
+    // FIX: Collection name should be 'users' to match rules and backend.json
+    return doc(firestore, 'users', user.uid);
   }, [firestore, user]);
 
   const { data: profile } = useDoc(userProfileRef);
@@ -118,9 +120,10 @@ export function DashboardSidebar() {
     </TooltipProvider>
   );
 
-  const storageUsed = profile?.storageUsedBytes || 0;
-  const storageLimit = (profile?.storageLimitGb || 1) * 1024 * 1024 * 1024;
-  const storagePercent = Math.round((storageUsed / storageLimit) * 100) || 0;
+  // FIX: Field names aligned with backend.json (storageUsed, storageLimit)
+  const storageUsed = profile?.storageUsed || 0;
+  const storageLimit = profile?.storageLimit || (50 * 1024 * 1024); // Default 50MB
+  const storagePercent = Math.min(100, Math.round((storageUsed / storageLimit) * 100)) || 0;
 
   return (
     <aside className={cn(
