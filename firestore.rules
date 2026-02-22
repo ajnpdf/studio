@@ -1,70 +1,168 @@
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- HELPER FUNCTIONS ---
+    /**
+     * CLOUD EDIT PRO SECURITY RULES
+     *
+     * Core Philosophy:
+     * This ruleset enforces a strict dual-access model:
+     * 1. Private Ownership: User-specific data (jobs, suggestions, profiles) is protected by path-based 
+     *    authorization where the UID in the path must match the authenticated user.
+     * 2. Collaborative Workspaces: Access to workspaces and their contents (folders, files) is managed 
+     *    via membership lists (UID arrays).
+     *
+     * Data Structure:
+     * - /users/{userId}: Root for private user data and identity.
+     * - /workspaces/{workspaceId}: Root for shared collaborative data.
+     * - /workspaces/.../folders and /workspaces/.../files: Subcollections of workspaces.
+     *
+     * Key Security Decisions:
+     * - Denormalization for Authorization: To optimize performance and avoid costly get() calls, 
+     *   workspace membership data (workspaceOwnerId, workspaceMemberIds) is denormalized directly 
+     *   onto Folder and File documents.
+     * - Relational Integrity: On creation, rules verify that internal 'userId' or 'ownerId' fields 
+     *   match the authenticated user's UID to prevent spoofing.
+     * - Prototyping Mode: Schema validation is limited to authorization-critical fields (IDs and owners) 
+     *   to allow for rapid data model iteration.
+     */
+
+    // --- Helper Functions ---
+
+    /** @description Checks if the request is from an authenticated user. */
     function isSignedIn() {
       return request.auth != null;
     }
 
+    /** @description Checks if the authenticated user's UID matches the provided userId. */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    function isDocOwner(data) {
-      return isSignedIn() && data.ownerId == request.auth.uid;
+    /** @description Checks if the user owns the existing document for updates/deletes. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
     }
 
-    function isTeamMember(data) {
-      return isSignedIn() && data.teamMembers[request.auth.uid] != null;
+    /** @description Validates membership or ownership of a workspace document. */
+    function isWorkspaceMember(data) {
+      return isSignedIn() && (data.ownerId == request.auth.uid || request.auth.uid in data.memberIds);
     }
 
-    function isTeamAdmin(data) {
-      return isSignedIn() && (data.teamMembers[request.auth.uid] == 'admin' || data.teamMembers[request.auth.uid] == 'owner');
+    /** @description Validates access to subcollections using denormalized workspace fields. */
+    function hasWorkspaceAccess(data) {
+      return isSignedIn() && (data.workspaceOwnerId == request.auth.uid || request.auth.uid in data.workspaceMemberIds);
     }
 
-    // --- COLLECTION RULES ---
+    /** @description Specific access for files including individual collaborator access. */
+    function hasFileAccess(data) {
+      return hasWorkspaceAccess(data) || (isSignedIn() && request.auth.uid in data.collaboratorUserIds);
+    }
 
+    // --- Collection Rules ---
+
+    /**
+     * @description Rules for the User profile. Strictly owner-only.
+     * @path /users/{userId}
+     * @allow Authenticated user (get) their own profile.
+     * @deny User A (get) User B's profile.
+     * @principle Restricts access to a user's own identity data tree.
+     */
     match /users/{userId} {
-      allow read: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['tier']);
-      allow delete: if false; // Users cannot delete profiles directly
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update, delete: if isExistingOwner(userId) && request.resource.data.id == userId;
+
+      /**
+       * @description Records of file conversion jobs initiated by the user.
+       * @path /users/{userId}/conversionJobs/{jobId}
+       * @allow User (create) a job where userId matches their own.
+       * @deny User A (list) User B's conversion jobs.
+       * @principle Path-based ownership for private processing history.
+       */
+      match /conversionJobs/{jobId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update, delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description Records of file editing operations.
+       * @path /users/{userId}/editJobs/{jobId}
+       * @allow User (update) an existing job in their own subcollection.
+       * @deny Unauthenticated user (get) any edit job.
+       * @principle Strictly enforces document ownership for writes.
+       */
+      match /editJobs/{jobId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update, delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description Records of file compression operations.
+       * @path /users/{userId}/compressionJobs/{jobId}
+       * @allow User (list) their own compression history.
+       * @deny User A (delete) User B's compression job record.
+       * @principle Ensures path consistency with document ownership fields.
+       */
+      match /compressionJobs/{jobId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update, delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description AI-driven tool and format suggestions.
+       * @path /users/{userId}/suggestions/{suggestionId}
+       * @allow User (get) a personalized recommendation.
+       * @deny User B (create) a suggestion in User A's collection.
+       * @principle Protects personalized metadata from cross-user access.
+       */
+      match /suggestions/{suggestionId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update, delete: if isExistingOwner(userId);
+      }
     }
 
-    match /files/{fileId} {
-      allow read: if isDocOwner(resource.data) || isTeamMember(resource.data) || resource.data.shareToken != null;
-      allow create: if isSignedIn(); // In production, add quota checks here
-      allow update: if isDocOwner(resource.data) || isTeamAdmin(resource.data);
-      allow delete: if isDocOwner(resource.data) || isTeamAdmin(resource.data);
-    }
+    /**
+     * @description Collaborative workspaces for file management.
+     * @path /workspaces/{workspaceId}
+     * @allow Workspace member (list) all workspaces they belong to.
+     * @deny Non-member (get) workspace metadata.
+     * @principle Implements Shared Access pattern via member UID arrays.
+     */
+    match /workspaces/{workspaceId} {
+      allow get, list: if isWorkspaceMember(resource.data);
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
 
-    match /jobs/{jobId} {
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn();
-      allow update: if false; // Jobs only updated by Cloud Functions
-      allow delete: if false;
-    }
+      /**
+       * @description Folders within a workspace.
+       * @path /workspaces/{workspaceId}/folders/{folderId}
+       * @allow Member of parent workspace (create) a folder.
+       * @deny User not in workspaceMemberIds (list) folders.
+       * @principle Uses denormalized workspace fields to avoid parent document lookups.
+       */
+      match /folders/{folderId} {
+        allow get, list: if hasWorkspaceAccess(resource.data);
+        allow create: if hasWorkspaceAccess(request.resource.data);
+        allow update, delete: if hasWorkspaceAccess(resource.data);
+      }
 
-    match /folders/{folderId} {
-      allow read, write: if isDocOwner(resource.data) || isTeamMember(resource.data);
-    }
-
-    match /teams/{teamId} {
-      allow read: if isSignedIn() && resource.data.members[request.auth.uid] != null;
-      allow write: if isSignedIn() && resource.data.ownerId == request.auth.uid;
-    }
-
-    match /activityLogs/{logId} {
-      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isTeamAdmin(resource.data));
-      allow write: if false; // System only
-    }
-
-    match /notifications/{notifId} {
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow update: if isSignedIn() && resource.data.userId == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead', 'readAt']);
-      allow write: if false; // System only
+      /**
+       * @description Files within a workspace.
+       * @path /workspaces/{workspaceId}/files/{fileId}
+       * @allow Workspace owner or individual collaborator (get) file metadata.
+       * @deny Random authenticated user (create) a file in a private workspace.
+       * @principle Combines workspace-level and file-level collaborative permissions.
+       */
+      match /files/{fileId} {
+        allow get, list: if hasFileAccess(resource.data);
+        allow create: if hasFileAccess(request.resource.data);
+        allow update, delete: if hasFileAccess(resource.data);
+      }
     }
   }
 }

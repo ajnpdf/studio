@@ -1,131 +1,530 @@
-
 {
   "entities": {
     "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
-      "description": "Represents a user account, tier, and quotas.",
       "type": "object",
+      "description": "Represents an authenticated user of the Cloud Edit Pro application. This entity stores user-specific data relevant to the application's internal logic, such as ownership and collaboration, and assumes authentication is handled by an external system.",
       "properties": {
-        "uid": { "type": "string" },
-        "email": { "type": "string", "format": "email" },
-        "displayName": { "type": "string" },
-        "photoURL": { "type": "string", "format": "uri" },
-        "tier": { "type": "string", "enum": ["free", "pro", "business"] },
-        "storageUsed": { "type": "number" },
-        "storageLimit": { "type": "number" },
-        "dailyTasksUsed": { "type": "number" },
-        "dailyTasksLimit": { "type": "number" },
-        "dailyTasksReset": { "type": "string", "format": "date-time" },
-        "monthlyAiCredits": { "type": "number" },
-        "aiCreditsUsed": { "type": "number" },
-        "aiCreditsReset": { "type": "string", "format": "date-time" },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "lastActiveAt": { "type": "string", "format": "date-time" },
-        "settings": {
-          "type": "object",
-          "properties": {
-            "defaultSaveToWorkspace": { "type": "boolean" },
-            "emailNotifications": { "type": "boolean" },
-            "theme": { "type": "string", "enum": ["light", "dark"] }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address, used for identification.",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's preferred display name."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the user account was created.",
+          "format": "date-time"
+        },
+        "lastLoginAt": {
+          "type": "string",
+          "description": "Timestamp of the user's last login.",
+          "format": "date-time"
+        },
+        "workspaceIds": {
+          "type": "array",
+          "description": "References to Workspaces the user is a member of. (Relationship: User N:N Workspace)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "displayName",
+        "createdAt"
+      ]
+    },
+    "Workspace": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Workspace",
+      "type": "object",
+      "description": "Represents a collaborative space where users can organize and manage files and folders. Each workspace has an owner and can have multiple members.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Workspace entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the workspace."
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Reference to the User who owns this workspace. (Relationship: User 1:N Workspace)"
+        },
+        "memberIds": {
+          "type": "array",
+          "description": "References to Users who are members of this workspace. (Relationship: User N:N Workspace)",
+          "items": {
+            "type": "string"
           }
         },
-        "teamId": { "type": "string" }
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the workspace was created.",
+          "format": "date-time"
+        },
+        "lastModifiedAt": {
+          "type": "string",
+          "description": "Timestamp when the workspace was last modified (e.g., name change, member added).",
+          "format": "date-time"
+        }
       },
-      "required": ["uid", "email", "tier", "storageUsed", "storageLimit", "createdAt"]
+      "required": [
+        "id",
+        "name",
+        "ownerId",
+        "createdAt",
+        "lastModifiedAt"
+      ]
+    },
+    "Folder": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Folder",
+      "type": "object",
+      "description": "Represents a folder within a workspace, used to organize files hierarchically.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Folder entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the folder."
+        },
+        "workspaceId": {
+          "type": "string",
+          "description": "Reference to the Workspace this folder belongs to. (Relationship: Workspace 1:N Folder)"
+        },
+        "parentId": {
+          "type": "string",
+          "description": "Reference to the parent Folder if this is a subfolder. Null for root folders. (Relationship: Folder 1:N Folder)"
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Reference to the User who owns this folder. (Relationship: User 1:N Folder)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the folder was created.",
+          "format": "date-time"
+        },
+        "lastModifiedAt": {
+          "type": "string",
+          "description": "Timestamp when the folder was last modified (e.g., name change, contents modified).",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "workspaceId",
+        "ownerId",
+        "createdAt",
+        "lastModifiedAt"
+      ]
     },
     "File": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "File",
-      "description": "Metadata for a stored file.",
       "type": "object",
+      "description": "Represents a digital file stored and managed within Cloud Edit Pro, which can be converted, edited, or compressed.",
       "properties": {
-        "fileId": { "type": "string" },
-        "ownerId": { "type": "string" },
-        "teamId": { "type": "string" },
-        "fileName": { "type": "string" },
-        "originalName": { "type": "string" },
-        "fileSize": { "type": "number" },
-        "mimeType": { "type": "string" },
-        "format": { "type": "string" },
-        "storagePath": { "type": "string" },
-        "downloadURL": { "type": "string", "format": "uri" },
-        "thumbnailURL": { "type": "string", "format": "uri" },
-        "folderId": { "type": "string" },
-        "tags": { "type": "array", "items": { "type": "string" } },
-        "metadata": {
-          "type": "object",
-          "properties": {
-            "width": { "type": "number" },
-            "height": { "type": "number" },
-            "pages": { "type": "number" },
-            "duration": { "type": "number" },
-            "bitrate": { "type": "number" },
-            "dpi": { "type": "number" },
-            "colorMode": { "type": "string" },
-            "isPasswordProtected": { "type": "boolean" }
-          }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the File entity."
         },
-        "status": { "type": "string", "enum": ["uploading", "scanning", "ready", "deleted"] },
-        "virusScanResult": { "type": "string", "enum": ["clean", "infected", "pending"] },
-        "isShared": { "type": "boolean" },
-        "shareToken": { "type": "string" },
-        "shareExpiresAt": { "type": "string", "format": "date-time" },
-        "sharePassword": { "type": "string" },
-        "shareAllowDownload": { "type": "boolean" },
-        "autoDeleteAt": { "type": "string", "format": "date-time" },
-        "parentFileId": { "type": "string" },
-        "versionNumber": { "type": "number" },
-        "versions": { "type": "array", "items": { "type": "object" } },
-        "downloadCount": { "type": "number" },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "updatedAt": { "type": "string", "format": "date-time" },
-        "isDeleted": { "type": "boolean" },
-        "teamMembers": { "type": "object", "description": "Denormalized team member map for rules." }
+        "name": {
+          "type": "string",
+          "description": "The current display name of the file, which can be user-editable."
+        },
+        "originalName": {
+          "type": "string",
+          "description": "The name of the file at the time of upload."
+        },
+        "mimeType": {
+          "type": "string",
+          "description": "The MIME type of the file (e.g., 'image/jpeg', 'application/pdf')."
+        },
+        "sizeBytes": {
+          "type": "number",
+          "description": "The original size of the file in bytes upon initial upload."
+        },
+        "currentSizeBytes": {
+          "type": "number",
+          "description": "The current size of the file in bytes, reflecting any changes due to editing or compression."
+        },
+        "uploadUrl": {
+          "type": "string",
+          "description": "The URI pointing to the stored location of the file's content.",
+          "format": "uri"
+        },
+        "thumbnailUrl": {
+          "type": "string",
+          "description": "The URI pointing to a generated thumbnail image of the file, if applicable.",
+          "format": "uri"
+        },
+        "workspaceId": {
+          "type": "string",
+          "description": "Reference to the Workspace this file belongs to. (Relationship: Workspace 1:N File)"
+        },
+        "folderId": {
+          "type": "string",
+          "description": "Reference to the Folder this file is located in. Null if in the root of a workspace. (Relationship: Folder 1:N File)"
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Reference to the User who owns this file. (Relationship: User 1:N File)"
+        },
+        "uploadedAt": {
+          "type": "string",
+          "description": "Timestamp when the file was initially uploaded.",
+          "format": "date-time"
+        },
+        "lastModifiedAt": {
+          "type": "string",
+          "description": "Timestamp when the file's content or metadata was last modified.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current processing status of the file (e.g., 'uploaded', 'processing', 'ready', 'error')."
+        },
+        "collaboratorUserIds": {
+          "type": "array",
+          "description": "References to Users currently collaborating on this file in real-time. (Relationship: User N:N File)",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["fileId", "ownerId", "fileName", "fileSize", "format", "status"]
+      "required": [
+        "id",
+        "name",
+        "originalName",
+        "mimeType",
+        "sizeBytes",
+        "currentSizeBytes",
+        "uploadUrl",
+        "workspaceId",
+        "ownerId",
+        "uploadedAt",
+        "lastModifiedAt",
+        "status"
+      ]
     },
-    "Job": {
-      "title": "Job",
-      "description": "Processing job metadata.",
+    "ConversionJob": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ConversionJob",
       "type": "object",
+      "description": "Records details of a file conversion operation, tracking its progress and linking source and output files.",
       "properties": {
-        "jobId": { "type": "string" },
-        "userId": { "type": "string" },
-        "teamId": { "type": "string" },
-        "type": { "type": "string" },
-        "status": { "type": "string" },
-        "progress": { "type": "number" },
-        "queuedAt": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ConversionJob entity."
+        },
+        "sourceFileId": {
+          "type": "string",
+          "description": "Reference to the original File before conversion. (Relationship: File 1:N ConversionJob)"
+        },
+        "outputFileId": {
+          "type": "string",
+          "description": "Reference to the newly created File after successful conversion. (Relationship: File 1:N ConversionJob)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who initiated this conversion job. (Relationship: User 1:N ConversionJob)"
+        },
+        "sourceFormat": {
+          "type": "string",
+          "description": "The original format of the source file (e.g., 'PDF', 'JPG')."
+        },
+        "targetFormat": {
+          "type": "string",
+          "description": "The desired format for the output file (e.g., 'DOCX', 'PNG')."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the conversion job (e.g., 'pending', 'in-progress', 'completed', 'failed')."
+        },
+        "startTime": {
+          "type": "string",
+          "description": "Timestamp when the conversion job started.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "Timestamp when the conversion job was completed or failed.",
+          "format": "date-time"
+        }
       },
-      "required": ["jobId", "userId", "type", "status", "queuedAt"]
+      "required": [
+        "id",
+        "sourceFileId",
+        "outputFileId",
+        "userId",
+        "sourceFormat",
+        "targetFormat",
+        "status",
+        "startTime"
+      ]
+    },
+    "EditJob": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "EditJob",
+      "type": "object",
+      "description": "Records details of a specific editing operation performed on a file, such as cropping, resizing, or applying filters.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the EditJob entity."
+        },
+        "fileId": {
+          "type": "string",
+          "description": "Reference to the File that was edited. (Relationship: File 1:N EditJob)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who performed this edit. (Relationship: User 1:N EditJob)"
+        },
+        "editType": {
+          "type": "string",
+          "description": "The type of editing operation performed (e.g., 'crop', 'resize', 'apply_filter', 'trim_audio', 'merge_pdf')."
+        },
+        "detailsJson": {
+          "type": "string",
+          "description": "A JSON string containing operation-specific parameters (e.g., crop coordinates, new dimensions, filter name, trim start/end times)."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the edit job (e.g., 'pending', 'in-progress', 'completed', 'failed')."
+        },
+        "startTime": {
+          "type": "string",
+          "description": "Timestamp when the edit job started.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "Timestamp when the edit job was completed or failed.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "fileId",
+        "userId",
+        "editType",
+        "detailsJson",
+        "status",
+        "startTime"
+      ]
+    },
+    "CompressionJob": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CompressionJob",
+      "type": "object",
+      "description": "Records details of a file compression operation, including the algorithm used and size changes.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the CompressionJob entity."
+        },
+        "fileId": {
+          "type": "string",
+          "description": "Reference to the File that was compressed. (Relationship: File 1:N CompressionJob)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who initiated this compression job. (Relationship: User 1:N CompressionJob)"
+        },
+        "compressionAlgorithm": {
+          "type": "string",
+          "description": "The algorithm used for compression (e.g., 'lossy-jpeg', 'gzip-pdf')."
+        },
+        "originalSizeBytes": {
+          "type": "number",
+          "description": "The size of the file in bytes before compression."
+        },
+        "compressedSizeBytes": {
+          "type": "number",
+          "description": "The size of the file in bytes after compression, if completed."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the compression job (e.g., 'pending', 'in-progress', 'completed', 'failed')."
+        },
+        "startTime": {
+          "type": "string",
+          "description": "Timestamp when the compression job started.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "Timestamp when the compression job was completed or failed.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "fileId",
+        "userId",
+        "compressionAlgorithm",
+        "originalSizeBytes",
+        "status",
+        "startTime"
+      ]
+    },
+    "Suggestion": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Suggestion",
+      "type": "object",
+      "description": "Stores AI-driven recommendations provided to users for tools, formats, or other modifications.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Suggestion entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User for whom the suggestion was generated. (Relationship: User 1:N Suggestion)"
+        },
+        "fileId": {
+          "type": "string",
+          "description": "Reference to the specific File related to the suggestion, if applicable. (Relationship: File 1:N Suggestion)"
+        },
+        "suggestionType": {
+          "type": "string",
+          "description": "The category of the suggestion (e.g., 'tool_recommendation', 'format_suggestion')."
+        },
+        "suggestedAction": {
+          "type": "string",
+          "description": "A brief description of the suggested action (e.g., 'Crop image', 'Convert to PDF')."
+        },
+        "suggestionDetailsJson": {
+          "type": "string",
+          "description": "A JSON string containing detailed parameters or reasons for the suggestion, e.g., suggested crop dimensions or a list of target formats."
+        },
+        "suggestedAt": {
+          "type": "string",
+          "description": "Timestamp when the suggestion was generated.",
+          "format": "date-time"
+        },
+        "wasApplied": {
+          "type": "boolean",
+          "description": "Indicates whether the user took action based on this suggestion."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "suggestionType",
+        "suggestedAction",
+        "suggestionDetailsJson",
+        "suggestedAt",
+        "wasApplied"
+      ]
     }
   },
   "auth": {
-    "providers": ["password", "google.com"]
+    "providers": [
+      "password",
+      "anonymous"
+    ]
   },
   "firestore": {
-    "/users/{userId}": {
-      "schema": { "$ref": "#/entities/User" },
-      "description": "User profiles and quotas."
-    },
-    "/files/{fileId}": {
-      "schema": { "$ref": "#/entities/File" },
-      "description": "Flat file collection with denormalized access."
-    },
-    "/jobs/{jobId}": {
-      "schema": { "$ref": "#/entities/Job" },
-      "description": "Processing jobs."
-    },
-    "/teams/{teamId}": {
-      "schema": { "type": "object" },
-      "description": "Team workspace metadata."
-    },
-    "/activityLogs/{logId}": {
-      "schema": { "type": "object" },
-      "description": "Audit trails."
-    },
-    "/notifications/{notifId}": {
-      "schema": { "type": "object" },
-      "description": "User notifications."
-    }
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile data. Access is strictly limited to the authenticated user matching '{userId}'. This serves as the root for user-owned subcollections."
+        }
+      },
+      {
+        "path": "/workspaces/{workspaceId}",
+        "definition": {
+          "entityName": "Workspace",
+          "schema": {
+            "$ref": "#/backend/entities/Workspace"
+          },
+          "description": "Stores metadata for collaborative workspaces. Includes 'ownerId' and 'memberIds' for authorization checks. Supports listing all workspaces a user is part of via 'array-contains' queries on 'memberIds'."
+        }
+      },
+      {
+        "path": "/workspaces/{workspaceId}/folders/{folderId}",
+        "definition": {
+          "entityName": "Folder",
+          "schema": {
+            "$ref": "#/backend/entities/Folder"
+          },
+          "description": "Stores folder metadata within a specific workspace. Includes denormalized 'workspaceOwnerId' and 'workspaceMemberIds' (copied from parent Workspace) for authorization independence. Also includes its own 'ownerId'."
+        }
+      },
+      {
+        "path": "/workspaces/{workspaceId}/files/{fileId}",
+        "definition": {
+          "entityName": "File",
+          "schema": {
+            "$ref": "#/backend/entities/File"
+          },
+          "description": "Stores file metadata within a specific workspace. Includes denormalized 'workspaceOwnerId' and 'workspaceMemberIds' (copied from parent Workspace) for authorization independence. Also includes its own 'ownerId' and 'collaboratorUserIds'."
+        }
+      },
+      {
+        "path": "/users/{userId}/conversionJobs/{conversionJobId}",
+        "definition": {
+          "entityName": "ConversionJob",
+          "schema": {
+            "$ref": "#/backend/entities/ConversionJob"
+          },
+          "description": "Stores details of file conversion jobs, strictly owned by the user. Path-based authorization ensures only the initiating user can access their jobs."
+        }
+      },
+      {
+        "path": "/users/{userId}/editJobs/{editJobId}",
+        "definition": {
+          "entityName": "EditJob",
+          "schema": {
+            "$ref": "#/backend/entities/EditJob"
+          },
+          "description": "Stores details of file editing operations, strictly owned by the user. Path-based authorization ensures only the performing user can access their edit history."
+        }
+      },
+      {
+        "path": "/users/{userId}/compressionJobs/{compressionJobId}",
+        "definition": {
+          "entityName": "CompressionJob",
+          "schema": {
+            "$ref": "#/backend/entities/CompressionJob"
+          },
+          "description": "Stores details of file compression jobs, strictly owned by the user. Path-based authorization ensures only the initiating user can access their compression history."
+        }
+      },
+      {
+        "path": "/users/{userId}/suggestions/{suggestionId}",
+        "definition": {
+          "entityName": "Suggestion",
+          "schema": {
+            "$ref": "#/backend/entities/Suggestion"
+          },
+          "description": "Stores AI-driven tool and format suggestions, personalized and strictly owned by the user. Path-based authorization ensures only the user can access their suggestions."
+        }
+      }
+    ],
+    "reasoning": "This Firestore structure prioritizes robust security, scalability, and debuggability by strictly adhering to the core design principles, especially Authorization Independence and Structural Segregation.\n\n**Authorization Independence via Denormalization (CRITICAL):**\n\n1.  **Workspaces, Folders, and Files:** For any document within a `/workspaces/{workspaceId}/folders/{folderId}` or `/workspaces/{workspaceId}/files/{fileId}` path, authorization rules typically need to check membership or ownership of the parent `Workspace`. To avoid expensive and non-atomic `get()` operations in security rules, each `Folder` and `File` document will **denormalize** the parent `Workspace`'s `ownerId` into `workspaceOwnerId` and `memberIds` into `workspaceMemberIds`. This means a rule checking access to a file can look directly at `resource.data.workspaceOwnerId` or `resource.data.workspaceMemberIds` without needing to fetch the `Workspace` document. This allows for atomic writes (e.g., creating a workspace and its first folder in a batch) and greatly simplifies rules logic, making it more resilient to race conditions and easier to debug.\n\n2.  **User-specific data:** Collections like `conversionJobs`, `editJobs`, `compressionJobs`, and `suggestions` are stored directly under `/users/{userId}`. The `userId` in the path (e.g., `match /users/{userId}/conversionJobs/{conversionJobId}`) is directly compared to `request.auth.uid`. This path-based ownership makes authorization highly independent and explicit, as the ownership is inherent in the document's location.\n\n**Support for QAPs (Queries as Authorization Primitives):**\n\n1.  **User Profile Data:** The `/users/{userId}` path ensures that queries for a user's own profile data (`db.collection('users').doc(request.auth.uid)`) are intrinsically secure. List operations on `/users` are typically restricted or admin-only.\n\n2.  **Workspaces:** The `/workspaces` collection allows users to query for workspaces where they are a member or owner using `where('memberIds', 'array-contains', request.auth.uid)` or `where('ownerId', '==', request.auth.uid)`. Because `ownerId` and `memberIds` are fields on the `Workspace` document itself, these queries are efficient and directly align with security rules that check these fields.\n\n3.  **Folders and Files:** For `/workspaces/{workspaceId}/folders` and `/workspaces/{workspaceId}/files`, the `workspaceId` in the path already scopes the query. Within that scope, rules can verify `request.auth.uid` against the denormalized `workspaceOwnerId` or `workspaceMemberIds`. This allows clients to query for all files/folders within a specific workspace without requiring complex rule logic to filter results, as the rules enforce that only authorized users can read these documents.\n\n4.  **User-Owned Jobs and Suggestions:** Paths like `/users/{userId}/conversionJobs` naturally support QAPs. A user can query their own jobs (`db.collection('users').doc(request.auth.uid).collection('conversionJobs')`). The security rules ensure that `request.auth.uid` matches the `{userId}` in the path, preventing unauthorized access to other users' job history or suggestions.\n\n**Structural Segregation and Access Modeling:**\n\n*   **Private User Data:** `/users/{userId}/...` paths are used for all user-specific, private data (jobs, suggestions), ensuring strict ownership based on the authenticated user's UID.\n*   **Collaborative Data:** `Workspaces`, and by extension `Folders` and `Files`, are designed for collaboration. The `workspaces` collection is a top-level collection, with `Folders` and `Files` as subcollections. Authorization for these collaborative entities relies on denormalized `workspaceOwnerId` and `workspaceMemberIds` fields, complemented by `file.collaboratorUserIds` for specific file-level sharing. This segregation clearly distinguishes between purely private and collaborative data. This design prevents mixing security postures within a single collection and simplifies rule writing significantly."
   }
 }
