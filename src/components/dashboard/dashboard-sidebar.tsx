@@ -45,7 +45,7 @@ const toolItems = [
 ];
 
 const workspaceItems = [
-  { icon: Users, label: 'Team', href: '/dashboard/team', disabled: true, badge: 'Business', description: 'Collaborative workspaces' },
+  { icon: Users, label: 'Team', href: '/dashboard/team', disabled: false, badge: 'Business', description: 'Collaborative workspaces' },
   { icon: Wand2, label: 'API Panel', href: '/dashboard/api', description: 'Developer keys and logs' },
   { icon: Settings, label: 'Settings', href: '/dashboard/settings', description: 'Account and preferences' },
 ];
@@ -106,7 +106,7 @@ export function DashboardSidebar() {
           {!collapsed && (
             <div className="overflow-hidden">
               <p className="font-bold text-sm truncate">Alex Doe</p>
-              <Badge variant="secondary" className="h-4 text-[10px] bg-primary/20 text-primary border-none px-1.5 font-bold">FREE</Badge>
+              <Badge variant="secondary" className="h-4 text-[10px] bg-primary/20 text-primary border-none px-1.5 font-bold">BUSINESS</Badge>
             </div>
           )}
         </div>
@@ -114,11 +114,11 @@ export function DashboardSidebar() {
         {!collapsed && (
           <div className="space-y-2">
             <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
-              <span>Storage</span>
-              <span>75%</span>
+              <span>Team Storage</span>
+              <span>12%</span>
             </div>
-            <Progress value={75} className="h-1.5 bg-white/5" />
-            <p className="text-[10px] text-muted-foreground/40 text-right">2.3 GB of 50 GB used</p>
+            <Progress value={12} className="h-1.5 bg-white/5" />
+            <p className="text-[10px] text-muted-foreground/40 text-right">124 GB of 1 TB used</p>
           </div>
         )}
       </div>
