@@ -14,6 +14,7 @@ import { RawConverter } from '@/lib/converters/raw-converter';
 import { VideoConverter } from '@/lib/converters/video-converter';
 import { AudioConverter } from '@/lib/converters/audio-converter';
 import { ArchiveConverter } from '@/lib/converters/archive-converter';
+import { CodeConverter } from '@/lib/converters/code-converter';
 import { useToast } from '@/hooks/use-toast';
 
 export type ConversionState = 'idle' | 'processing' | 'complete';
@@ -29,6 +30,8 @@ export interface ConversionSettings {
   sampleRate: string;
   filename: string;
   saveToWorkspace: boolean;
+  indent: number;
+  sqlFlavor: 'mysql' | 'postgres' | 'sqlite';
 }
 
 const IMAGE_EXTS = ['JPG', 'JPEG', 'PNG', 'WEBP', 'TIFF', 'BMP', 'GIF', 'SVG', 'AVIF', 'HEIC'];
@@ -36,6 +39,7 @@ const RAW_EXTS = ['CR2', 'CR3', 'NEF', 'ARW', 'DNG', 'ORF', 'RW2', 'RAF'];
 const VIDEO_EXTS = ['MP4', 'MOV', 'AVI', 'MKV', 'WEBM', 'FLV', 'WMV', '3GP', 'TS', 'M4V'];
 const AUDIO_EXTS = ['MP3', 'WAV', 'AAC', 'M4A', 'FLAC', 'OGG', 'WMA', 'AIFF', 'AMR'];
 const ARCHIVE_EXTS = ['ZIP', 'RAR', '7Z', 'TAR', 'GZ', 'ISO', 'CAB'];
+const CODE_EXTS = ['JSON', 'XML', 'CSV', 'YAML', 'YML', 'HTML', 'MD', 'MARKDOWN', 'SQL'];
 
 export function ConversionEngine({ initialFileId }: { initialFileId: string | null }) {
   const [file, setFile] = useState<any>(null);
@@ -56,6 +60,8 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
     sampleRate: '44100',
     filename: '',
     saveToWorkspace: true,
+    indent: 2,
+    sqlFlavor: 'mysql'
   });
 
   useEffect(() => {
@@ -93,8 +99,14 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
         const converter = new WordConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat);
       } else if (fmt === 'XLSX' || fmt === 'XLS' || fmt === 'CSV' || fmt === 'ODS') {
-        const converter = new ExcelConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(settings.toFormat);
+        // Special case: CSV can go to code or excel. Routing logic handles both.
+        if (CODE_EXTS.includes(fmt) && !['PDF', 'XLSX'].includes(settings.toFormat.toUpperCase())) {
+           const converter = new CodeConverter(realFile, onProgress);
+           converterResult = await converter.convertTo(settings.toFormat, settings);
+        } else {
+           const converter = new ExcelConverter(realFile, onProgress);
+           converterResult = await converter.convertTo(settings.toFormat);
+        }
       } else if (fmt === 'PPTX' || fmt === 'PPT' || fmt === 'ODP') {
         const converter = new PPTConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat);
@@ -116,6 +128,9 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
       } else if (ARCHIVE_EXTS.includes(fmt)) {
         const converter = new ArchiveConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat);
+      } else if (CODE_EXTS.includes(fmt)) {
+        const converter = new CodeConverter(realFile, onProgress);
+        converterResult = await converter.convertTo(settings.toFormat, settings);
       } else {
         throw new Error(`Engine for ${file.format} is currently in calibration.`);
       }

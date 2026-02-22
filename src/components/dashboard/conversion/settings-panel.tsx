@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowRight, Wand2, Settings2, Clock, Loader2 } from 'lucide-react';
+import { ArrowRight, Wand2, Settings2, Clock, Loader2, Code2 } from 'lucide-react';
 import { ConversionSettings } from './conversion-engine';
 
 interface Props {
@@ -25,7 +25,15 @@ const conversionTargets: Record<string, string[]> = {
   'DOCX': ['PDF', 'TXT', 'HTML', 'RTF', 'EPUB', 'ODT', 'JPG', 'PNG'],
   'DOC': ['DOCX', 'PDF', 'TXT', 'HTML'],
   'XLSX': ['PDF', 'CSV', 'XLS', 'ODS', 'HTML', 'JSON', 'XML'],
-  'CSV': ['XLSX', 'PDF', 'JSON', 'XML', 'TXT'],
+  'CSV': ['XLSX', 'PDF', 'JSON', 'XML', 'TXT', 'SQL'],
+  'JSON': ['XML', 'CSV', 'YAML', 'SQL', 'TXT'],
+  'XML': ['JSON', 'CSV', 'TXT'],
+  'YAML': ['JSON', 'CSV', 'TXT'],
+  'YML': ['JSON', 'CSV', 'TXT'],
+  'HTML': ['PDF', 'DOCX', 'TXT', 'PNG', 'JPG'],
+  'MD': ['PDF', 'DOCX', 'HTML', 'TXT'],
+  'MARKDOWN': ['PDF', 'DOCX', 'HTML', 'TXT'],
+  'SQL': ['CSV', 'JSON', 'XML', 'TXT'],
   // Image Targets
   'JPG': ['PNG', 'WebP', 'AVIF', 'BMP', 'TIFF', 'PDF', 'SVG'],
   'PNG': ['JPG', 'WebP', 'AVIF', 'SVG', 'PDF'],
@@ -67,6 +75,7 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
   const isImage = ['JPG', 'JPEG', 'PNG', 'WEBP', 'AVIF', 'HEIC', 'BMP', 'SVG', 'GIF'].includes(file.format.toUpperCase());
   const isVideo = ['MP4', 'MOV', 'AVI', 'MKV', 'WEBM', 'FLV', 'WMV', '3GP', 'TS', 'M4V'].includes(file.format.toUpperCase());
   const isAudio = ['MP3', 'WAV', 'AAC', 'M4A', 'FLAC', 'OGG', 'WMA', 'AIFF', 'AMR'].includes(file.format.toUpperCase());
+  const isCode = ['JSON', 'XML', 'CSV', 'YAML', 'YML', 'HTML', 'MD', 'MARKDOWN', 'SQL'].includes(file.format.toUpperCase());
 
   return (
     <Card className="bg-card/40 backdrop-blur-xl border-white/5 flex flex-col h-full min-h-0 overflow-hidden">
@@ -137,6 +146,41 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
                     </SelectTrigger>
                     <SelectContent><SelectItem value="128k">128 kbps (Mobile)</SelectItem><SelectItem value="192k">192 kbps (Standard)</SelectItem><SelectItem value="320k">320 kbps (Ultra)</SelectItem></SelectContent>
                   </Select>
+                </div>
+              </div>
+            )}
+
+            {isCode && (
+              <div className="space-y-6 animate-in slide-in-from-top-2">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <Label className="text-[9px] font-black uppercase tracking-widest">Indentation</Label>
+                    <Select value={settings.indent.toString()} onValueChange={(v) => setSettings({...settings, indent: parseInt(v)})}>
+                      <SelectTrigger className="h-10 bg-white/5 border-white/10 font-black text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="2">2 Spaces</SelectItem>
+                        <SelectItem value="4">4 Spaces</SelectItem>
+                        <SelectItem value="0">Tab</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {settings.toFormat === 'SQL' && (
+                    <div className="space-y-3">
+                      <Label className="text-[9px] font-black uppercase tracking-widest">SQL Flavor</Label>
+                      <Select value={settings.sqlFlavor} onValueChange={(v: any) => setSettings({...settings, sqlFlavor: v})}>
+                        <SelectTrigger className="h-10 bg-white/5 border-white/10 font-black text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="mysql">MySQL</SelectItem>
+                          <SelectItem value="postgres">PostgreSQL</SelectItem>
+                          <SelectItem value="sqlite">SQLite</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
