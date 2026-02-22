@@ -15,7 +15,7 @@ export function Footer() {
               <span className="font-bold text-2xl tracking-tight text-gradient">AJN</span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              AJN – All-in-one Junction Network. The ultimate real-time intelligent file operating system in the cloud. Convert, edit, and optimize anything.
+              AJN – All-in-one Junction Network. Every File. One Smart Network. The ultimate real-time intelligent file operating system in the cloud.
             </p>
             <div className="flex gap-4">
               <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/20"><Twitter className="w-4 h-4"/></Button>

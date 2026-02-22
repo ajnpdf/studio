@@ -44,8 +44,7 @@ export function BrandPanel() {
         <div className="space-y-4">
           <h2 className="text-4xl font-black leading-tight tracking-tight">
             Every File.<br />
-            Every Format.<br />
-            <span className="text-primary">One Junction.</span>
+            <span className="text-primary">One Smart Network.</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-xs leading-relaxed">
             AJN – All-in-one Junction Network. The ultimate real-time intelligent file operating system.
