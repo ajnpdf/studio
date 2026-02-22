@@ -17,7 +17,8 @@ export function NightSky() {
   const [stars, setStars] = useState<Star[]>([]);
 
   useEffect(() => {
-    const generatedStars = [...Array(25)].map((_, i) => ({
+    // defer state update to after hydration to prevent mismatch
+    const generatedStars = [...Array(35)].map((_, i) => ({
       id: i,
       width: `${Math.random() * 1.5 + 0.8}px`,
       height: `${Math.random() * 1.5 + 0.8}px`,
@@ -31,21 +32,19 @@ export function NightSky() {
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-[#0a0e1f]">
-      {/* Static subtle depth layer */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(30,58,138,0.12)_0%,transparent_60%),radial-gradient(circle_at_70%_20%,rgba(59,130,246,0.08)_0%,transparent_70%)] opacity-70"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(30,58,138,0.15)_0%,transparent_60%),radial-gradient(circle_at_70%_20%,rgba(59,130,246,0.1)_0%,transparent_70%)] opacity-70"></div>
       
-      {/* Twinkling stars */}
       <div className="absolute inset-0">
         {stars.map((star) => (
           <div
             key={star.id}
-            className="absolute bg-[#f0f9ff] rounded-full opacity-30 animate-[twinkle_linear_infinite]"
+            className="absolute bg-[#f0f9ff] rounded-full opacity-30 animate-twinkle"
             style={{
               width: star.width,
               height: star.height,
               top: star.top,
               left: star.left,
-              boxShadow: '0 0 4px #e0f2fe, 0 0 10px #93c5fd, 0 0 18px rgba(147, 197, 253, 0.5)',
+              boxShadow: '0 0 4px #e0f2fe, 0 0 10px #93c5fd',
               animationDuration: star.animationDuration,
               animationDelay: star.animationDelay,
             }}
@@ -57,6 +56,9 @@ export function NightSky() {
         @keyframes twinkle {
           0%, 100% { opacity: 0.2; transform: scale(0.7); }
           50% { opacity: 1; transform: scale(1.3); }
+        }
+        .animate-twinkle {
+          animation: twinkle linear infinite;
         }
       `}</style>
     </div>

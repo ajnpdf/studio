@@ -4,28 +4,18 @@
 import { useState } from 'react';
 import { 
   Repeat, 
-  Box, 
   FileText, 
-  FileCode, 
   ImageIcon, 
   Video, 
-  Music, 
   Scan, 
-  Layers, 
-  Terminal, 
-  Search,
   ArrowRight,
   ShieldCheck,
-  Cpu,
-  Workflow,
-  X,
   Activity,
-  Code2,
   Lock,
   Zap,
-  Sparkles,
-  Database,
-  BrainCircuit
+  BrainCircuit,
+  Workflow,
+  X
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -116,7 +106,7 @@ const sectors: Sector[] = [
         stack: 'FFmpeg.wasm (SharedArrayBuffer)',
         outputMime: 'video/mp4',
         logicSteps: [
-          { label: "VASM Mount", desc: "Loading the 31MB core into the browser's virtual filesystem." },
+          { label: "WASM Mount", desc: "Loading the 31MB core into the browser's virtual filesystem." },
           { label: "Codec Selection", desc: "Mapping requested settings to libx264 or libvpx parameters." },
           { label: "Frame Recoding", desc: "Executing the parallel bitstream transcode sequence." },
           { label: "Container Muxing", desc: "Wrapping the processed tracks into the target container." }
@@ -198,7 +188,6 @@ export function ServicesCatalog() {
 
   return (
     <div className="max-w-7xl mx-auto px-8 pb-32 space-y-20 relative">
-      {/* Header */}
       <section className="text-center space-y-6 animate-in fade-in duration-1000">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-[0.3em]">
           <Activity className="w-3 h-3 animate-pulse" /> Network Infrastructure
@@ -212,10 +201,9 @@ export function ServicesCatalog() {
         </p>
       </section>
 
-      {/* Directory Controls */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-white/5 p-6 rounded-[2.5rem] border border-white/10 backdrop-blur-3xl sticky top-24 z-40">
         <div className="relative flex-1 max-w-md w-full group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <Input 
             placeholder="Search network services..." 
             value={search}
@@ -234,7 +222,6 @@ export function ServicesCatalog() {
         </Tabs>
       </div>
 
-      {/* Services Grid */}
       <div className="space-y-24">
         {filteredSectors.map((sector, sIdx) => (
           <div key={sector.id} className="space-y-10 animate-in slide-in-from-bottom-8 duration-700" style={{ animationDelay: `${sIdx * 100}ms` }}>
@@ -296,7 +283,6 @@ export function ServicesCatalog() {
         ))}
       </div>
 
-      {/* Logic Inspector Overlay */}
       {inspectingService && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-background/90 backdrop-blur-xl animate-in fade-in duration-300">
           <Card className="w-full max-w-3xl bg-card border-white/10 shadow-2xl relative overflow-hidden rounded-[3rem]">

@@ -1,3 +1,4 @@
+
 import { Navbar } from '@/components/landing/navbar';
 import { HeroZone } from '@/components/landing/hero-zone';
 import { FormatStrip } from '@/components/landing/format-strip';
@@ -9,12 +10,16 @@ import { SocialProof } from '@/components/landing/social-proof';
 import { FaqAccordion } from '@/components/landing/faq-accordion';
 import { Footer } from '@/components/landing/footer';
 
+/**
+ * AJN Production Landing Page
+ * Clean, high-fidelity entry point using superseded component structure.
+ */
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-sufw-gradient overflow-x-hidden">
       <Navbar />
       <main>
-        {/* SECTION A - Hero Zone */}
+        {/* SECTION A - Hero Zone (includes LogoAnimation) */}
         <HeroZone />
 
         {/* SECTION B - Format Support Strip */}

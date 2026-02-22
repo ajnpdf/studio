@@ -45,7 +45,6 @@ export function AIWorkspace({ tool }: { tool: AITool }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-500">
       <div className="lg:col-span-2 space-y-8">
-        {/* Upload Zone */}
         <Card className="bg-card/40 backdrop-blur-xl border-white/5 border-dashed border-2 overflow-hidden hover:border-primary/40 transition-colors cursor-pointer group">
           <CardContent className="p-12 flex flex-col items-center justify-center text-center space-y-4">
             <div className="w-16 h-16 bg-brand-gradient rounded-3xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
@@ -62,7 +61,6 @@ export function AIWorkspace({ tool }: { tool: AITool }) {
           </CardContent>
         </Card>
 
-        {/* Configuration */}
         <section className="space-y-4">
           <h3 className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
             <Wand2 className="w-3.5 h-3.5" /> Intelligence Parameters
