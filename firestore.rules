@@ -1,0 +1,128 @@
+/**
+ * Cloud Edit Pro - Firestore Security Rules
+ *
+ * Core Philosophy:
+ * This ruleset implements a membership-based security model. Data access is strictly 
+ * authorized based on user ownership or workspace membership. High-performance rules 
+ * are achieved by denormalizing authorization context (owner and member IDs) directly 
+ * into subcollection documents.
+ *
+ * Data Structure:
+ * - /userProfiles/{userId}: Private user-specific data (Tier, Storage, Stats).
+ * - /workspaces/{workspaceId}: Collaborative containers for files and activities.
+ * - /workspaces/{workspaceId}/files/{fileId}: Files and folders within a workspace.
+ * - /workspaces/{workspaceId}/activityLogs/{logId}: Audit trail for workspace actions.
+ * - /tools/{toolId}: Global read-only metadata for application features.
+ *
+ * Key Security Decisions:
+ * 1. Authorization Independence: Subcollections (Files, Logs) do not use get() on parent 
+ *    workspaces. Instead, they store 'workspaceOwnerId' and 'workspaceMemberIds' to 
+ *    ensure atomic, performant authorization checks.
+ * 2. Strict User Isolation: User profiles are only accessible by the owner.
+ * 3. Shared Workspace Access: Access to workspaces and their contents is granted 
+ *    if the user's UID is found in the 'ownerId' or the 'memberIds' list.
+ * 4. Prototyping Flexibility: Data types and full object schemas are not enforced 
+ *    to allow rapid UI iteration, while relational integrity (owner links) remains strict.
+ */
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- HELPER FUNCTIONS ---
+
+    /** @description Checks if the user is authenticated. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** @description Checks if the user's UID matches the provided userId. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** @description Checks if the user is an owner of a document that already exists. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    /** @description Checks if the user is a member or owner of the workspace document. */
+    function isWorkspaceMember(workspaceData) {
+      return isSignedIn() && (request.auth.uid == workspaceData.ownerId || request.auth.uid in workspaceData.memberIds);
+    }
+
+    /** @description Checks access for documents using denormalized workspace IDs. */
+    function isWorkspaceSubMember(data) {
+      return isSignedIn() && (request.auth.uid == data.workspaceOwnerId || request.auth.uid in data.workspaceMemberIds);
+    }
+
+    // --- COLLECTION RULES ---
+
+    /**
+     * @description Rules for the UserProfile collection. Only the owner can access their profile.
+     * @path /userProfiles/{userId}
+     * @allow (get, list, create, update) if the authenticated UID matches the {userId} path.
+     * @deny (all) if the UID is mismatched or the user is not signed in.
+     * @principle Enforces strict document ownership and validates relational integrity.
+     */
+    match /userProfiles/{userId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for Workspaces. Access is granted to owners and listed members.
+     * @path /workspaces/{workspaceId}
+     * @allow (get, list) if the user's UID is in ownerId or memberIds.
+     * @allow (create) if the user sets themselves as the owner.
+     * @deny (delete) if the user is not the designated owner.
+     * @principle Implements Shared Access (Closed Collaborators) pattern.
+     */
+    match /workspaces/{workspaceId} {
+      allow get, list: if isWorkspaceMember(resource.data);
+      allow create: if isSignedIn() && isOwner(request.resource.data.ownerId);
+      allow update: if isWorkspaceMember(resource.data);
+      allow delete: if isExistingOwner(resource.data.ownerId);
+
+      /**
+       * @description Rules for Files within a Workspace.
+       * @path /workspaces/{workspaceId}/files/{fileId}
+       * @allow (all) if user is authorized via denormalized workspace fields.
+       * @principle Authorization Independence via Denormalization (avoids parent get()).
+       */
+      match /files/{fileId} {
+        allow get, list: if isWorkspaceSubMember(resource.data);
+        allow create: if isWorkspaceSubMember(request.resource.data);
+        allow update: if isWorkspaceSubMember(resource.data);
+        allow delete: if isWorkspaceSubMember(resource.data);
+      }
+
+      /**
+       * @description Rules for Activity Logs. Immutable records of workspace actions.
+       * @path /workspaces/{workspaceId}/activityLogs/{logId}
+       * @allow (get, list) for workspace members.
+       * @allow (create) if creating user is a workspace member.
+       * @deny (update, delete) as logs are audit records.
+       */
+      match /activityLogs/{activityLogId} {
+        allow get, list: if isWorkspaceSubMember(resource.data);
+        allow create: if isWorkspaceSubMember(request.resource.data);
+        allow update, delete: if false;
+      }
+    }
+
+    /**
+     * @description Global tools configuration. Publicly readable by all authenticated users.
+     * @path /tools/{toolId}
+     * @allow (get, list) if the user is signed in.
+     * @deny (create, update, delete) Restricted to admin/system operations only.
+     * @principle Structural Segregation for public/system data.
+     */
+    match /tools/{toolId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if false;
+    }
+  }
+}

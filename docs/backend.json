@@ -1,0 +1,382 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user account in the Cloud Edit Pro application, storing personal details, subscription tier, and usage statistics.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name or full name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address, used for communication and identification.",
+          "format": "email"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "description": "URL to the user's profile avatar image.",
+          "format": "uri"
+        },
+        "tier": {
+          "type": "string",
+          "description": "The user's current subscription tier (e.g., FREE, PRO, BUSINESS)."
+        },
+        "storageLimitGb": {
+          "type": "number",
+          "description": "The total cloud storage allocated to the user in gigabytes."
+        },
+        "storageUsedBytes": {
+          "type": "number",
+          "description": "The current amount of cloud storage used by the user in bytes."
+        },
+        "dailyTasksRemaining": {
+          "type": "number",
+          "description": "The number of AI-powered tasks remaining for the user today (primarily for free tier)."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the user profile was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the user profile was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "displayName",
+        "email",
+        "tier",
+        "storageLimitGb",
+        "storageUsedBytes",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Workspace": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Workspace",
+      "type": "object",
+      "description": "Represents a user's isolated environment for file management and collaboration, containing files and activities.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Workspace entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the workspace."
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who owns this workspace. (Relationship: UserProfile 1:N Workspace)"
+        },
+        "memberIds": {
+          "type": "array",
+          "description": "An array of UserProfile IDs who are members of this workspace, enabling collaboration. (Relationship: Workspace N:N UserProfile)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the workspace was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the workspace was last updated.",
+          "format": "date-time"
+        },
+        "defaultLocale": {
+          "type": "string",
+          "description": "The default locale setting for the workspace (e.g., 'en-US')."
+        },
+        "timezone": {
+          "type": "string",
+          "description": "The timezone setting for the workspace."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "ownerId",
+        "memberIds",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "File": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "File",
+      "type": "object",
+      "description": "Represents a digital file or a folder managed within a workspace, including its metadata and storage location.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the File entity."
+        },
+        "workspaceId": {
+          "type": "string",
+          "description": "Reference to the Workspace this file belongs to. (Relationship: Workspace 1:N File)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The user-friendly name of the file or folder."
+        },
+        "isFolder": {
+          "type": "boolean",
+          "description": "Indicates if this entity represents a folder (true) or a file (false)."
+        },
+        "parentId": {
+          "type": "string",
+          "description": "Reference to the ID of the parent folder if this file/folder is nested. Null if it's a root-level item. (Relationship: File 1:N File)"
+        },
+        "storagePath": {
+          "type": "string",
+          "description": "The internal path or URI to the actual stored file in cloud storage. Applicable only if isFolder is false."
+        },
+        "fileType": {
+          "type": "string",
+          "description": "The MIME type of the file (e.g., 'image/jpeg', 'application/pdf'). Applicable only if isFolder is false."
+        },
+        "formatCategory": {
+          "type": "string",
+          "description": "A high-level category for the file type (e.g., 'Image', 'Document', 'Video', 'Audio'). Applicable only if isFolder is false."
+        },
+        "sizeBytes": {
+          "type": "number",
+          "description": "The size of the file in bytes. Applicable only if isFolder is false."
+        },
+        "thumbnailUrl": {
+          "type": "string",
+          "description": "URL to a generated thumbnail image for visual preview. Applicable only if isFolder is false.",
+          "format": "uri"
+        },
+        "uploadDate": {
+          "type": "string",
+          "description": "Timestamp when the file was originally uploaded.",
+          "format": "date-time"
+        },
+        "modifiedDate": {
+          "type": "string",
+          "description": "Timestamp when the file was last modified (e.g., edited, converted).",
+          "format": "date-time"
+        },
+        "metadata": {
+          "type": "string",
+          "description": "A JSON string containing arbitrary metadata specific to the file type (e.g., image dimensions, video duration, OCR text)."
+        }
+      },
+      "required": [
+        "id",
+        "workspaceId",
+        "name",
+        "isFolder",
+        "uploadDate",
+        "modifiedDate"
+      ]
+    },
+    "ActivityLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ActivityLog",
+      "type": "object",
+      "description": "Records significant actions performed by users within a workspace, providing an audit trail and real-time activity feed.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ActivityLog entry."
+        },
+        "workspaceId": {
+          "type": "string",
+          "description": "Reference to the Workspace where the activity occurred. (Relationship: Workspace 1:N ActivityLog)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who performed the action. (Relationship: UserProfile 1:N ActivityLog)"
+        },
+        "actionType": {
+          "type": "string",
+          "description": "The type of action performed (e.g., 'FILE_UPLOAD', 'FILE_CONVERT', 'FILE_EDIT', 'FILE_DELETE', 'TOOL_LAUNCH')."
+        },
+        "fileId": {
+          "type": "string",
+          "description": "Optional reference to the File entity that was affected by the action. (Relationship: File 1:N ActivityLog)"
+        },
+        "toolId": {
+          "type": "string",
+          "description": "Optional reference to the Tool entity that was used for the action. (Relationship: Tool 1:N ActivityLog)"
+        },
+        "description": {
+          "type": "string",
+          "description": "A human-readable description of the activity (e.g., 'PDF compressed 2 minutes ago')."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp when the activity occurred.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the activity (e.g., 'COMPLETED', 'FAILED', 'PENDING')."
+        }
+      },
+      "required": [
+        "id",
+        "workspaceId",
+        "userId",
+        "actionType",
+        "description",
+        "timestamp",
+        "status"
+      ]
+    },
+    "Tool": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Tool",
+      "type": "object",
+      "description": "Defines a specific feature or functionality offered by the Cloud Edit Pro application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Tool entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The display name of the tool (e.g., 'PDF Converter', 'Image Resizer')."
+        },
+        "category": {
+          "type": "string",
+          "description": "The category the tool belongs to (e.g., 'File Operations', 'PDF Tools', 'Image Tools')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the tool's functionality."
+        },
+        "iconClass": {
+          "type": "string",
+          "description": "A CSS class or identifier for the icon associated with the tool in the UI."
+        },
+        "isPremium": {
+          "type": "boolean",
+          "description": "Indicates if this tool is exclusive to PRO or BUSINESS subscription tiers."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "category",
+        "description",
+        "isPremium"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/userProfiles/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores user-specific data, including subscription tier, storage usage, and daily task limits. Access is restricted to the authenticated user matching `userId`.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, typically `request.auth.uid`."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/workspaces/{workspaceId}",
+        "definition": {
+          "entityName": "Workspace",
+          "schema": {
+            "$ref": "#/backend/entities/Workspace"
+          },
+          "description": "Top-level container for user files and activities, enabling collaboration. Includes `ownerId` and `memberIds` fields for robust, document-level access control.",
+          "params": [
+            {
+              "name": "workspaceId",
+              "description": "The unique ID of the workspace."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/workspaces/{workspaceId}/files/{fileId}",
+        "definition": {
+          "entityName": "File",
+          "schema": {
+            "$ref": "#/backend/entities/File"
+          },
+          "description": "Represents a digital file or folder within a specific workspace. Includes denormalized `workspaceOwnerId` and `workspaceMemberIds` (copied from the parent Workspace) for authorization independence, allowing direct access control checks without parent `get()` calls.",
+          "params": [
+            {
+              "name": "workspaceId",
+              "description": "The unique ID of the parent workspace."
+            },
+            {
+              "name": "fileId",
+              "description": "The unique ID of the file or folder."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/workspaces/{workspaceId}/activityLogs/{activityLogId}",
+        "definition": {
+          "entityName": "ActivityLog",
+          "schema": {
+            "$ref": "#/backend/entities/ActivityLog"
+          },
+          "description": "Records user actions (e.g., uploads, conversions) within a specific workspace. Includes denormalized `workspaceOwnerId` and `workspaceMemberIds` (copied from the parent Workspace) for authorization independence, enabling direct access control checks without parent `get()` calls.",
+          "params": [
+            {
+              "name": "workspaceId",
+              "description": "The unique ID of the parent workspace."
+            },
+            {
+              "name": "activityLogId",
+              "description": "The unique ID of the activity log entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/tools/{toolId}",
+        "definition": {
+          "entityName": "Tool",
+          "schema": {
+            "$ref": "#/backend/entities/Tool"
+          },
+          "description": "Defines global metadata for all available tools in the application. This collection is publicly readable by all authenticated users.",
+          "params": [
+            {
+              "name": "toolId",
+              "description": "The unique ID of the tool."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The recommended Firestore structure prioritizes **Authorization Independence** and **Structural Segregation** to ensure robust, scalable, and easily debuggable security rules. Each collection's security posture is homogeneous, and authorization logic for subcollections avoids `get()` calls.\n\n**Authorization Independence via Denormalization (CRITICAL):**\n\n*   For entities like `File` and `ActivityLog` that reside within a `Workspace` subcollection, their access rights inherently depend on the `Workspace`'s membership (owner and members). To avoid costly, non-atomic, and complex `get()` operations in security rules, the critical authorization context from the parent `Workspace` is **denormalized** directly into each `File` and `ActivityLog` document.\n*   Specifically, each `File` and `ActivityLog` document will contain `workspaceOwnerId` (a copy of the parent `Workspace.ownerId`) and `workspaceMemberIds` (a copy of the parent `Workspace.memberIds`). This allows security rules to evaluate access for these subcollection documents solely based on their own fields, such as `request.auth.uid == resource.data.workspaceOwnerId` or `request.auth.uid in resource.data.workspaceMemberIds`. This makes rules atomic, performant, and significantly easier to write and debug.\n\n**QAPs (Rules are not Filters) & Structural Segregation:**\n\n*   **User Profiles (`/userProfiles/{userId}`):** Access is strictly private, enforced by the path itself (`request.auth.uid` must match `{userId}`). This ensures that `list` operations, if ever performed, would only yield the user's own profile, adhering to QAP by design through strict path-based ownership.\n*   **Workspaces (`/workspaces/{workspaceId}`):** Workspaces use a **Membership Map** (`ownerId` and `memberIds`) directly within the document. For `list` operations on `/workspaces`, rules can query for documents where `ownerId == request.auth.uid` or `request.auth.uid in resource.data.memberIds`. The rules enforce that any returned document must satisfy this condition, preventing unauthorized `list` queries from returning restricted data. The client would first query accessible workspaces, then use those `workspaceId`s for further access.\n*   **Files and ActivityLogs (subcollections of Workspaces):** With denormalized `workspaceOwnerId` and `workspaceMemberIds`, rules for `/workspaces/{workspaceId}/files` and `/workspaces/{workspaceId}/activityLogs` can enforce `read` and `list` operations by checking `request.auth.uid == resource.data.workspaceOwnerId` or `request.auth.uid in resource.data.workspaceMemberIds`. This allows clients to `list` files/activities within a known, authorized workspace, with rules verifying access on each document, thus upholding QAP.\n*   **Tools (`/tools/{toolId}`):** This collection has a **homogeneous security posture** of being globally readable by all users. This structural segregation simplifies rules significantly, as no complex authorization logic is needed for this collection, fulfilling QAP requirements for a public dataset.\n\n**DBAC (No Custom Claims):** User roles (like `tier`) and collaboration memberships (`ownerId`, `memberIds`) are stored directly in the respective database documents. Authorization logic relies exclusively on `request.auth.uid` matching database-stored values, eliminating the need for custom claims and simplifying rule management.\n\nThis design ensures that authorization is explicit, atomic, and performed efficiently at the document level, leading to a highly secure and maintainable Firestore application."
+  }
+}
