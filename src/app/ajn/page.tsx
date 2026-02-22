@@ -22,7 +22,8 @@ import {
   Layers,
   FileCode,
   BrainCircuit,
-  Wand2
+  Wand2,
+  Activity
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -102,20 +103,6 @@ export default function AJNPage() {
         </Link>
         
         <div className="flex items-center gap-2 md:gap-6">
-          <div className="hidden lg:flex items-center relative group">
-            <Search className="absolute left-3 w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
-            <input 
-              readOnly
-              onClick={() => setShowSearch(true)}
-              placeholder="Search neural units..." 
-              className="h-9 w-48 xl:w-64 bg-white/5 border border-white/10 rounded-xl pl-10 pr-12 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/10 transition-all outline-none"
-            />
-            <div className="absolute right-3 flex items-center gap-1 opacity-40">
-              <Command className="w-2.5 h-2.5" />
-              <span className="text-[8px] font-black">K</span>
-            </div>
-          </div>
-
           <Link href="/junction">
             <Button variant="outline" className="h-8 md:h-9 border-white/10 bg-white/5 hover:bg-white hover:text-black font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-xl transition-all gap-2 px-3 md:px-4 shadow-2xl">
               <Workflow className="w-3 md:w-3.5 h-3 md:h-3.5" /> <span className="hidden sm:inline">Junction</span> Hub
@@ -199,6 +186,24 @@ export default function AJNPage() {
             <LogoAnimation />
           </div>
 
+          {/* LARGE GLOBAL SEARCH BOX */}
+          <div className="w-full max-w-2xl relative group animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200">
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-[2.5rem] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
+            <div className="relative flex items-center bg-[#0d1225]/80 backdrop-blur-3xl border border-white/10 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all hover:border-primary/40">
+              <Search className="absolute left-6 md:left-8 w-6 h-6 text-primary" />
+              <input 
+                readOnly
+                onClick={() => setShowSearch(true)}
+                placeholder="Search 300+ Neural Units..." 
+                className="w-full h-16 md:h-20 bg-transparent pl-16 md:pl-20 pr-24 text-base md:text-xl font-black uppercase tracking-widest text-white placeholder:text-muted-foreground/30 cursor-pointer outline-none"
+              />
+              <div className="absolute right-6 md:right-8 flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-xl border border-white/10">
+                <Command className="w-3 h-3 text-muted-foreground" />
+                <span className="text-[10px] font-black text-muted-foreground">K</span>
+              </div>
+            </div>
+          </div>
+
           <div 
             onClick={() => fileInputRef.current?.click()}
             className={cn(
@@ -217,7 +222,7 @@ export default function AJNPage() {
 
             <div className="text-center space-y-2 md:space-y-3 px-6 md:px-8">
               <h2 className="text-2xl md:text-4xl font-black tracking-tight text-white uppercase leading-none">Drop to Optimize</h2>
-              <p className="text-[8px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-60">Supports 300+ formats up to 10GB</p>
+              <p className="text-[8px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-60">Professional Neural Transcoding System</p>
             </div>
 
             <div className="mt-8 md:mt-12 flex flex-wrap justify-center gap-4 md:gap-8 text-[8px] md:text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em]">
