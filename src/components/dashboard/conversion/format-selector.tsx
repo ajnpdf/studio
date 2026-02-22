@@ -66,12 +66,6 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange }:
       <div className="flex flex-col md:flex-row items-center gap-4 bg-white/5 p-6 rounded-[2.5rem] border border-white/10 shadow-2xl relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent pointer-events-none" />
         
-        <div className="absolute -top-3 left-10">
-          <Badge className="bg-primary text-white border-none text-[8px] font-black uppercase tracking-[0.2em] px-3 h-6 shadow-xl shadow-primary/20">
-            Neural Routing Hub
-          </Badge>
-        </div>
-
         <div className="flex-1 w-full space-y-2 relative z-10">
           <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 ml-4">Source Format</label>
           <Select value={from} onValueChange={onFromChange}>
