@@ -1,4 +1,3 @@
-
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -10,7 +9,7 @@ import { ArrowRight } from 'lucide-react';
  */
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-sufw-gradient flex flex-col items-center justify-center p-6 overflow-hidden">
+    <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-6 overflow-hidden">
       <main className="w-full max-w-5xl flex flex-col items-center gap-16">
         {/* CENTERPIECE NEURAL ANIMATION */}
         <LogoAnimation />
