@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -15,6 +14,7 @@ import { cn } from '@/lib/utils';
 
 const languages = [
   { code: 'en', label: 'English (US)' },
+  { code: 'hi', label: 'हिन्दी' },
   { code: 'es', label: 'Español' },
   { code: 'fr', label: 'Français' },
   { code: 'de', label: 'Deutsch' },
