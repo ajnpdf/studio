@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Upload, Monitor, HardDrive, Link as LinkIcon, FileText, Video, ImageIcon, Music, Database, FileCode, CheckCircle2, ArrowRight, Activity } from 'lucide-react';
+import { Upload, Monitor, HardDrive, Link as LinkIcon, FileText, Video, ImageIcon, Music, Database, FileCode, CheckCircle2, ArrowRight, Activity, Network } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
@@ -42,7 +42,7 @@ export function HeroZone() {
             Neural Processing Network Active
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] text-white">
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] text-white uppercase">
             AJN – All-in-one <br />
             Junction Network
           </h1>
@@ -56,7 +56,7 @@ export function HeroZone() {
             </div>
             <p className="text-sm text-muted-foreground max-w-xl mx-auto font-medium leading-relaxed mt-2">
               The professional all-in-one junction for real-time conversion, intelligence, and file mastery. 
-              Used by 2M+ creators and developers.
+              Used by 2M+ experts and developers.
             </p>
           </div>
         </div>
@@ -109,8 +109,8 @@ export function HeroZone() {
                 <TabsTrigger value="device" className="gap-2 px-8 rounded-xl data-[state=active]:bg-white data-[state=active]:text-black font-black text-[10px] tracking-widest">
                   <Monitor className="w-4 h-4" /> MY DEVICE
                 </TabsTrigger>
-                <TabsTrigger value="drive" className="gap-2 px-8 rounded-xl font-black text-[10px] tracking-widest">
-                  <HardDrive className="w-4 h-4" /> CLOUD STORAGE
+                <TabsTrigger value="vault" className="gap-2 px-8 rounded-xl font-black text-[10px] tracking-widest">
+                  <HardDrive className="w-4 h-4" /> NETWORK VAULT
                 </TabsTrigger>
                 <TabsTrigger value="url" className="gap-2 px-8 rounded-xl font-black text-[10px] tracking-widest">
                   <LinkIcon className="w-4 h-4" /> PASTE URL

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -60,7 +59,7 @@ export function AudioToolsContainer({ initialFileId }: { initialFileId: string |
           </Link>
           <div className="space-y-0.5">
             <h1 className="text-sm font-black tracking-tighter uppercase">{activeAudio.name}</h1>
-            <p className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase">Cloud Audio Studio</p>
+            <p className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase">Professional Audio Studio</p>
           </div>
         </div>
 

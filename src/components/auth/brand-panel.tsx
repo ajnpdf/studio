@@ -1,6 +1,6 @@
 "use client";
 
-import { Cloud, Zap, Shield, HardDrive, FileText, ImageIcon, Video, Music, Activity } from 'lucide-react';
+import { Network, Zap, Shield, HardDrive, FileText, ImageIcon, Video, Music, Activity } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const icons = [FileText, ImageIcon, Video, Music];
@@ -35,14 +35,14 @@ export function BrandPanel() {
 
       <div className="flex items-center gap-3 mb-16 z-10">
         <div className="p-2.5 bg-white rounded-xl shadow-2xl">
-          <Cloud className="w-8 h-8 text-black" />
+          <Network className="w-8 h-8 text-black" />
         </div>
         <span className="font-black text-3xl tracking-tighter text-white">AJN</span>
       </div>
 
       <div className="flex-1 flex flex-col justify-center space-y-12 z-10">
         <div className="space-y-4">
-          <h2 className="text-4xl font-black leading-[1.1] tracking-tight text-white">
+          <h2 className="text-4xl font-black leading-[1.1] tracking-tight text-white uppercase">
             AJN – All-in-one <br />
             Junction Network
           </h2>
@@ -53,11 +53,10 @@ export function BrandPanel() {
             </p>
           </div>
           <p className="text-muted-foreground text-sm max-w-xs leading-relaxed">
-            The ultimate real-time intelligent file operating system for modern workspaces.
+            The ultimate real-time intelligent file operating system for modern professional networks.
           </p>
         </div>
 
-        {/* Morphing Illustration */}
         <div className="relative h-32 flex items-center">
           <div className="absolute inset-0 bg-white/5 rounded-3xl border border-white/10 blur-xl"></div>
           <div className="relative flex items-center gap-8 px-8">
@@ -97,8 +96,8 @@ export function BrandPanel() {
               <HardDrive className="w-5 h-5" />
             </div>
             <div>
-              <p className="font-bold text-sm text-white/90">Cloud-Native Storage</p>
-              <p className="text-xs text-muted-foreground">Access your files from any device, anywhere.</p>
+              <p className="font-bold text-sm text-white/90">Secure Network Vault</p>
+              <p className="text-xs text-muted-foreground">Access your files securely from any authorized node.</p>
             </div>
           </div>
         </div>

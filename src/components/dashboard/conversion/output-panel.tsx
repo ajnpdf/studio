@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Card, CardContent } from '@/components/ui/card';
@@ -90,7 +89,7 @@ export function OutputPanel({ state, progress, file, settings, onReset }: Props)
                 </Button>
                 <div className="grid grid-cols-2 gap-3">
                   <Button variant="outline" className="h-11 border-white/10 bg-white/5 font-bold gap-2">
-                    <Save className="w-4 h-4" /> Save to Cloud
+                    <Save className="w-4 h-4" /> Save to Vault
                   </Button>
                   <Button variant="outline" className="h-11 border-white/10 bg-white/5 font-bold gap-2" onClick={onReset}>
                     <RefreshCw className="w-4 h-4" /> Try Another
@@ -105,7 +104,7 @@ export function OutputPanel({ state, progress, file, settings, onReset }: Props)
                 </div>
                 <div className="flex gap-2">
                    <div className="flex-1 bg-white/5 border border-white/10 rounded-lg h-10 flex items-center px-4 text-[10px] font-mono text-muted-foreground truncate">
-                      https://sufw.io/share/7a82b9c1
+                      https://ajn.io/share/7a82b9c1
                    </div>
                    <Button size="icon" variant="outline" className="h-10 w-10 border-white/10 bg-white/5">
                       <ArrowRight className="w-4 h-4" />

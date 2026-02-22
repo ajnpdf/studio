@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: 'AJN – All-in-one Junction Network | Every File. One Smart Network.',
-  description: 'The ultimate all-in-one cloud-based file junction for conversion and editing. Every File. One Smart Network.',
+  description: 'The ultimate all-in-one professional junction for conversion and editing. Every File. One Smart Network.',
 };
 
 export default function RootLayout({

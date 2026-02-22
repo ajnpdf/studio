@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef } from 'react';
@@ -47,7 +46,7 @@ export function StepUpload({ files, setFiles }: { files: BatchFile[], setFiles: 
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
       <section className="text-center space-y-2">
         <h2 className="text-3xl font-black tracking-tight">Load Batch Data</h2>
-        <p className="text-muted-foreground font-medium">Select up to 500 files or an entire folder structure to begin.</p>
+        <p className="text-muted-foreground font-medium">Select up to 500 files to begin processing.</p>
       </section>
 
       <div 
@@ -65,14 +64,12 @@ export function StepUpload({ files, setFiles }: { files: BatchFile[], setFiles: 
           <Upload className="w-8 h-8 text-white" />
         </div>
         <p className="text-xl font-bold">Drop files here or click to browse</p>
-        <p className="text-xs text-muted-foreground mt-2 uppercase tracking-widest font-black">Folder Drag-and-Drop Supported</p>
+        <p className="text-xs text-muted-foreground mt-2 uppercase tracking-widest font-black">Multi-File Processing System</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <Button variant="outline" className="h-12 bg-white/5 border-white/10 gap-2 font-bold"><Folder className="w-4 h-4" /> LOCAL FOLDER</Button>
-        <Button variant="outline" className="h-12 bg-white/5 border-white/10 gap-2 font-bold"><Database className="w-4 h-4" /> GOOGLE DRIVE</Button>
-        <Button variant="outline" className="h-12 bg-white/5 border-white/10 gap-2 font-bold"><Monitor className="w-4 h-4" /> DROPBOX</Button>
-        <Button variant="outline" className="h-12 bg-white/5 border-white/10 gap-2 font-bold"><HardDrive className="w-4 h-4" /> WORKSPACE</Button>
+        <Button variant="outline" className="h-12 bg-white/5 border-white/10 gap-2 font-bold"><HardDrive className="w-4 h-4" /> NETWORK VAULT</Button>
       </div>
 
       {files.length > 0 && (

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Cloud, Github, Twitter, Linkedin, Facebook, Globe, Activity } from 'lucide-react';
+import { Network, Github, Twitter, Linkedin, Facebook, Globe, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function Footer() {
@@ -11,7 +11,7 @@ export function Footer() {
             <div className="space-y-4">
               <Link href="/" className="flex items-center gap-2 group">
                 <div className="p-2 bg-white rounded-xl shadow-lg">
-                  <Cloud className="w-6 h-6 text-black" />
+                  <Network className="w-6 h-6 text-black" />
                 </div>
                 <span className="font-bold text-2xl tracking-tight text-white">AJN</span>
               </Link>
@@ -23,7 +23,7 @@ export function Footer() {
               </div>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              AJN – All-in-one Junction Network. The ultimate real-time intelligent file operating system in the cloud.
+              AJN – All-in-one Junction Network. The ultimate real-time intelligent file operating system.
             </p>
             <div className="flex gap-4">
               <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10 text-white/60 hover:text-white"><Twitter className="w-4 h-4"/></Button>
@@ -49,7 +49,7 @@ export function Footer() {
             <ul className="space-y-4 text-sm text-muted-foreground">
               <li><Link href="#" className="hover:text-white transition-colors">Help Center</Link></li>
               <li><Link href="#" className="hover:text-white transition-colors">Format Wiki</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Cloud Security</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Network Security</Link></li>
               <li><Link href="#" className="hover:text-white transition-colors">Blog</Link></li>
               <li><Link href="#" className="hover:text-white transition-colors">Uptime Status</Link></li>
             </ul>

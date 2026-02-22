@@ -1,8 +1,7 @@
-
 "use client";
 
 import { 
-  Cloud, 
+  Network, 
   Files, 
   Wand2, 
   Users, 
@@ -132,7 +131,7 @@ export function DashboardSidebar() {
       <div className="p-6 border-b border-white/5">
         <Link href="/" className="flex items-center gap-3 group mb-6">
           <div className="p-2 bg-white rounded-lg shadow-2xl transition-transform group-hover:scale-110">
-            <Cloud className="w-5 h-5 text-black" />
+            <Network className="w-5 h-5 text-black" />
           </div>
           {!collapsed && <span className="font-black text-lg tracking-tighter text-white uppercase">AJN</span>}
         </Link>

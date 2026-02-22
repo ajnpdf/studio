@@ -1,8 +1,7 @@
-
 "use client";
 
 import { useState, useRef } from 'react';
-import { Upload, Monitor, HardDrive, Link as LinkIcon, Database, ChevronDown } from 'lucide-react';
+import { Upload, Monitor, HardDrive, Link as LinkIcon, ChevronDown } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -85,7 +84,7 @@ export function UploadZone({ onFilesAdded }: UploadZoneProps) {
         </div>
 
         {/* Decorative elements */}
-        <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-10 transition-opacity duration-1000 bg-[radial-gradient(circle_at_center,var(--primary)_0%,transparent_70%)]"></div>
+        <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-1000 bg-[radial-gradient(circle_at_center,var(--primary)_0%,transparent_70%)]"></div>
       </div>
 
       <Tabs defaultValue="device" className="w-full">
@@ -93,11 +92,8 @@ export function UploadZone({ onFilesAdded }: UploadZoneProps) {
           <TabsTrigger value="device" className="gap-2 px-6 py-2.5 rounded-xl data-[state=active]:bg-primary font-bold">
             <Monitor className="w-4 h-4" /> MY DEVICE
           </TabsTrigger>
-          <TabsTrigger value="drive" className="gap-2 px-6 py-2.5 rounded-xl font-bold">
-            <HardDrive className="w-4 h-4" /> GOOGLE DRIVE
-          </TabsTrigger>
-          <TabsTrigger value="dropbox" className="gap-2 px-6 py-2.5 rounded-xl font-bold">
-            <Database className="w-4 h-4" /> DROPBOX
+          <TabsTrigger value="vault" className="gap-2 px-6 py-2.5 rounded-xl font-bold">
+            <HardDrive className="w-4 h-4" /> NETWORK VAULT
           </TabsTrigger>
           <TabsTrigger value="url" className="gap-2 px-6 py-2.5 rounded-xl font-bold">
             <LinkIcon className="w-4 h-4" /> URL PASTE

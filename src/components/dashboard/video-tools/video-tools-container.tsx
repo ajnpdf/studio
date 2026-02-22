@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
@@ -70,7 +69,7 @@ export function VideoToolsContainer({ initialFileId }: { initialFileId: string |
           </Link>
           <div className="space-y-0.5">
             <h1 className="text-sm font-black tracking-tighter uppercase">{activeVideo.name}</h1>
-            <p className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase">Cloud Video Studio</p>
+            <p className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase">Professional Video Studio</p>
           </div>
         </div>
 
