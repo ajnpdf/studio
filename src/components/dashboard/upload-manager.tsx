@@ -5,9 +5,10 @@ import { useState } from 'react';
 import { UploadZone } from './upload-zone';
 import { FileMetadataCard } from './file-metadata-card';
 import { Button } from '@/components/ui/button';
-import { LayoutGrid, List, Trash2, CheckCircle2 } from 'lucide-react';
+import { LayoutGrid, List, Trash2, ShieldCheck, Lock, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { TierGateModal } from './tier-gate-modal';
 
 export type FileState = 'uploading' | 'scanning' | 'analyzing' | 'ready' | 'error';
 
@@ -23,15 +24,41 @@ export interface UploadedFile {
     pages?: number;
     duration?: string;
     bitrate?: string;
+    security?: {
+      avStatus: 'clean' | 'infected';
+      encryption: 'AES-256';
+      tls: '1.3';
+      magicBytesVerified: boolean;
+    };
   };
 }
 
 export function UploadManager() {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [gateOpen, setGateOpen] = useState(false);
+  const [gateReason, setGateReason] = useState<'size' | 'task'>('size');
+
+  // Mock tier limits - in production these come from useTierLimits hook
+  const TIER_FILE_SIZE_LIMIT = 50 * 1024 * 1024; // 50MB for Free
 
   const handleFilesAdded = (newFiles: File[]) => {
-    const uploadedFiles: UploadedFile[] = newFiles.map(file => ({
+    // Check size limit immediately per security architecture
+    const validFiles: File[] = [];
+    const oversizedFiles: File[] = [];
+
+    newFiles.forEach(f => {
+      if (f.size > TIER_FILE_SIZE_LIMIT) oversizedFiles.push(f);
+      else validFiles.push(f);
+    });
+
+    if (oversizedFiles.length > 0) {
+      setGateReason('size');
+      setGateOpen(true);
+      if (validFiles.length === 0) return;
+    }
+
+    const uploadedFiles: UploadedFile[] = validFiles.map(file => ({
       id: Math.random().toString(36).substring(7),
       file,
       progress: 0,
@@ -39,33 +66,37 @@ export function UploadManager() {
     }));
 
     setFiles(prev => [...prev, ...uploadedFiles]);
-
-    // Simulate the processing pipeline for each file
     uploadedFiles.forEach(fileObj => simulateProcessing(fileObj.id));
   };
 
   const simulateProcessing = async (id: string) => {
-    // 1. Uploading State
-    for (let i = 0; i <= 100; i += 10) {
+    // 1. Uploading State (TLS 1.3 Simulation)
+    for (let i = 0; i <= 100; i += 20) {
       setFiles(prev => prev.map(f => f.id === id ? { ...f, progress: i } : f));
-      await new Promise(r => setTimeout(r, 200));
+      await new Promise(r => setTimeout(r, 150));
     }
 
-    // 2. Scanning State
+    // 2. Scanning State (AV + Magic Bytes)
     setFiles(prev => prev.map(f => f.id === id ? { ...f, state: 'scanning' } : f));
-    await new Promise(r => setTimeout(r, 1500));
+    await new Promise(r => setTimeout(r, 1200));
 
-    // 3. Analyzing State
+    // 3. Analyzing State (Metadata Extraction)
     setFiles(prev => prev.map(f => f.id === id ? { ...f, state: 'analyzing' } : f));
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise(r => setTimeout(r, 800));
 
-    // 4. Ready State with mock metadata extraction
+    // 4. Ready State
     setFiles(prev => prev.map(f => {
       if (f.id === id) {
         const type = f.file.type;
         const mockMeta: UploadedFile['metadata'] = {
           format: type.split('/')[1]?.toUpperCase() || 'UNKNOWN',
           size: (f.file.size / (1024 * 1024)).toFixed(2) + ' MB',
+          security: {
+            avStatus: 'clean',
+            encryption: 'AES-256',
+            tls: '1.3',
+            magicBytesVerified: true
+          }
         };
 
         if (type.startsWith('image/')) {
@@ -89,6 +120,22 @@ export function UploadManager() {
 
   return (
     <div className="space-y-8">
+      {/* Security Protocol HUD */}
+      <div className="flex flex-wrap gap-4 p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-emerald-500" />
+          <span className="text-[10px] font-black uppercase text-emerald-500/80">TLS 1.3 Secure Upload</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Lock className="w-4 h-4 text-emerald-500" />
+          <span className="text-[10px] font-black uppercase text-emerald-500/80">AES-256 At-Rest Encryption</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-emerald-500" />
+          <span className="text-[10px] font-black uppercase text-emerald-500/80">Magic Byte Validation Active</span>
+        </div>
+      </div>
+
       <UploadZone onFilesAdded={handleFilesAdded} />
 
       {files.length > 0 && (
@@ -145,6 +192,12 @@ export function UploadManager() {
           </div>
         </div>
       )}
+
+      <TierGateModal 
+        open={gateOpen} 
+        onOpenChange={setGateOpen} 
+        reason={gateReason} 
+      />
     </div>
   );
 }
