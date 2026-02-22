@@ -1,9 +1,34 @@
 
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+
+interface Star {
+  id: number;
+  width: string;
+  height: string;
+  top: string;
+  left: string;
+  animationDuration: string;
+  animationDelay: string;
+}
 
 export function NightSky() {
+  const [stars, setStars] = useState<Star[]>([]);
+
+  useEffect(() => {
+    const generatedStars = [...Array(25)].map((_, i) => ({
+      id: i,
+      width: `${Math.random() * 1.5 + 0.8}px`,
+      height: `${Math.random() * 1.5 + 0.8}px`,
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      animationDuration: `${Math.random() * 3 + 3}s`,
+      animationDelay: `${Math.random() * 5}s`,
+    }));
+    setStars(generatedStars);
+  }, []);
+
   return (
     <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-[#0a0e1f]">
       {/* Static subtle depth layer */}
@@ -11,18 +36,18 @@ export function NightSky() {
       
       {/* Twinkling stars */}
       <div className="absolute inset-0">
-        {[...Array(25)].map((_, i) => (
+        {stars.map((star) => (
           <div
-            key={i}
+            key={star.id}
             className="absolute bg-[#f0f9ff] rounded-full opacity-30 animate-[twinkle_linear_infinite]"
             style={{
-              width: `${Math.random() * 1.5 + 0.8}px`,
-              height: `${Math.random() * 1.5 + 0.8}px`,
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
+              width: star.width,
+              height: star.height,
+              top: star.top,
+              left: star.left,
               boxShadow: '0 0 4px #e0f2fe, 0 0 10px #93c5fd, 0 0 18px rgba(147, 197, 253, 0.5)',
-              animationDuration: `${Math.random() * 3 + 3}s`,
-              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: star.animationDuration,
+              animationDelay: star.animationDelay,
             }}
           />
         ))}

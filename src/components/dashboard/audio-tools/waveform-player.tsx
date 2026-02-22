@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Play, 
@@ -22,6 +22,14 @@ export function WaveformPlayer({ audio }: { audio: any }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [progress, setProgress] = useState(15);
+  const [waveformHeights, setWaveformHeights] = useState<{ upper: number[], lower: number[] }>({ upper: [], lower: [] });
+
+  useEffect(() => {
+    setWaveformHeights({
+      upper: [...Array(120)].map(() => Math.random() * 80 + 10),
+      lower: [...Array(120)].map(() => Math.random() * 60 + 5)
+    });
+  }, []);
 
   return (
     <section className="space-y-4">
@@ -52,21 +60,21 @@ export function WaveformPlayer({ audio }: { audio: any }) {
           <div className="flex-1 flex flex-col gap-4">
             {/* Upper Channel */}
             <div className="flex-1 flex items-center gap-[2px]">
-              {[...Array(120)].map((_, i) => (
+              {waveformHeights.upper.map((height, i) => (
                 <div 
                   key={i} 
                   className={`flex-1 rounded-full transition-all duration-500 ${i < progress ? 'bg-primary' : 'bg-white/10'}`} 
-                  style={{ height: `${Math.random() * 80 + 10}%` }} 
+                  style={{ height: `${height}%` }} 
                 />
               ))}
             </div>
             {/* Lower Channel */}
             <div className="flex-1 flex items-center gap-[2px]">
-              {[...Array(120)].map((_, i) => (
+              {waveformHeights.lower.map((height, i) => (
                 <div 
                   key={i} 
                   className={`flex-1 rounded-full transition-all duration-500 ${i < progress ? 'bg-primary/60' : 'bg-white/5'}`} 
-                  style={{ height: `${Math.random() * 60 + 5}%` }} 
+                  style={{ height: `${height}%` }} 
                 />
               ))}
             </div>
