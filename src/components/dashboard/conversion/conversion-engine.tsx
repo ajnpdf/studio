@@ -17,6 +17,8 @@ import { ArchiveConverter } from '@/lib/converters/archive-converter';
 import { CodeConverter } from '@/lib/converters/code-converter';
 import { EbookConverter } from '@/lib/converters/ebook-converter';
 import { DesignConverter } from '@/lib/converters/design-converter';
+import { CADConverter } from '@/lib/converters/cad-converter';
+import { SpecializedConverter } from '@/lib/converters/specialized-converter';
 import { useToast } from '@/hooks/use-toast';
 
 export type ConversionState = 'idle' | 'processing' | 'complete';
@@ -44,6 +46,8 @@ const ARCHIVE_EXTS = ['ZIP', 'RAR', '7Z', 'TAR', 'GZ', 'ISO', 'CAB'];
 const CODE_EXTS = ['JSON', 'XML', 'CSV', 'YAML', 'YML', 'HTML', 'MD', 'MARKDOWN', 'SQL'];
 const EBOOK_EXTS = ['EPUB', 'MOBI', 'AZW', 'AZW3', 'FB2'];
 const DESIGN_EXTS = ['PSD', 'AI', 'EPS', 'CDR'];
+const CAD_EXTS = ['STL', 'OBJ', 'DXF', 'FBX', 'DWG'];
+const SPECIAL_TARGETS = ['SEARCHABLE_PDF', 'REDACTED_PDF', 'FILLABLE_PDF', 'TRANSCRIPT', 'BASE64'];
 
 export function ConversionEngine({ initialFileId }: { initialFileId: string | null }) {
   const [file, setFile] = useState<any>(null);
@@ -95,8 +99,12 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
       };
 
       const fmt = file.format.toUpperCase();
+      const target = settings.toFormat.toUpperCase();
 
-      if (fmt === 'PDF') {
+      if (SPECIAL_TARGETS.includes(target)) {
+        const converter = new SpecializedConverter(realFile, onProgress);
+        converterResult = await converter.convertTo(target, settings);
+      } else if (fmt === 'PDF') {
         const converter = new PDFConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat);
       } else if (fmt === 'DOCX' || fmt === 'DOC') {
@@ -139,6 +147,9 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
         converterResult = await converter.convertTo(settings.toFormat);
       } else if (DESIGN_EXTS.includes(fmt)) {
         const converter = new DesignConverter(realFile, onProgress);
+        converterResult = await converter.convertTo(settings.toFormat);
+      } else if (CAD_EXTS.includes(fmt)) {
+        const converter = new CADConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat);
       } else {
         throw new Error(`Engine for ${file.format} is currently in calibration.`);
