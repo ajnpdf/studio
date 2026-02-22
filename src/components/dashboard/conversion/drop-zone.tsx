@@ -62,16 +62,6 @@ export function DropZone({ onFiles }: Props) {
         
         <div className="mt-10 space-y-3 text-center relative z-10 px-8">
           <h3 className="text-4xl font-black tracking-tighter text-white uppercase leading-none">Drop assets for mastery</h3>
-          <p className="text-muted-foreground font-black uppercase text-[10px] tracking-[0.4em] opacity-60">Multi-Node Processing Hub • Max 10GB/Batch</p>
-        </div>
-
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-4 relative z-10">
-          <div className="flex items-center gap-2.5 px-5 py-2.5 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-2xl text-[9px] font-black uppercase text-white/60 tracking-widest shadow-xl transition-all hover:border-primary/40 group/pill">
-            <Zap className="w-3.5 h-3.5 text-primary animate-pulse" /> LOCAL SESSION
-          </div>
-          <div className="flex items-center gap-2.5 px-5 py-2.5 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-2xl text-[9px] font-black uppercase text-white/60 tracking-widest shadow-xl transition-all hover:border-primary/40 group/pill">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> ENCRYPTED
-          </div>
         </div>
       </div>
 
@@ -88,14 +78,12 @@ export function DropZone({ onFiles }: Props) {
                   <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
                 </div>
               </div>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <button 
                 onClick={(e) => { e.stopPropagation(); removeFile(i); }} 
-                className="h-10 w-10 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                className="h-10 w-10 flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
               >
                 <X className="w-4.5 h-4.5" />
-              </Button>
+              </button>
             </div>
           ))}
         </div>

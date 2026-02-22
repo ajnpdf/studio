@@ -96,20 +96,6 @@ export function UnitWorkspace({ defaultCategory }: Props) {
             )}
           </div>
         </div>
-
-        {/* WORKSPACE HUD OVERLAY */}
-        <div className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 flex items-center justify-between pointer-events-none z-40">
-          <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-black/60 backdrop-blur-3xl border border-white/10 rounded-2xl pointer-events-auto shadow-2xl">
-            <div className="flex items-center gap-2 px-2 md:px-3 border-r border-white/10">
-              <Cpu className="w-3 md:w-3.5 h-3 md:h-3.5 text-primary" />
-              <span className="text-[7px] md:text-[9px] font-black uppercase text-white/60">Slots: {stats.activeThreads}/3</span>
-            </div>
-            <div className="flex items-center gap-2 px-2 md:px-3">
-              <Database className="w-3 md:w-3.5 h-3 md:h-3.5 text-primary" />
-              <span className="text-[7px] md:text-[9px] font-black uppercase text-white/60">Buffer: {stats.vaultStatus}</span>
-            </div>
-          </div>
-        </div>
       </main>
     </div>
   );
