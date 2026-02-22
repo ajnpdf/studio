@@ -1,6 +1,6 @@
 "use client";
 
-import { Cloud, Zap, Shield, HardDrive, FileText, ImageIcon, Video, Music } from 'lucide-react';
+import { Cloud, Zap, Shield, HardDrive, FileText, ImageIcon, Video, Music, Activity } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const icons = [FileText, ImageIcon, Video, Music];
@@ -42,12 +42,18 @@ export function BrandPanel() {
 
       <div className="flex-1 flex flex-col justify-center space-y-12 z-10">
         <div className="space-y-4">
-          <h2 className="text-4xl font-black leading-tight tracking-tight">
-            Every File.<br />
-            <span className="text-primary">One Smart Network.</span>
+          <h2 className="text-4xl font-black leading-[1.1] tracking-tight">
+            AJN – All-in-one <br />
+            <span className="text-primary">Junction Network</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-xs leading-relaxed">
-            AJN – All-in-one Junction Network. The ultimate real-time intelligent file operating system.
+          <div className="flex items-center gap-2 opacity-80">
+            <Activity className="w-3 h-3 text-emerald-500 animate-pulse" />
+            <p className="text-[10px] font-bold tracking-widest text-foreground uppercase">
+              Every File. One Smart Network.
+            </p>
+          </div>
+          <p className="text-muted-foreground text-sm max-w-xs leading-relaxed">
+            The ultimate real-time intelligent file operating system for modern workspaces.
           </p>
         </div>
 
@@ -73,8 +79,8 @@ export function BrandPanel() {
               <Zap className="w-5 h-5" />
             </div>
             <div>
-              <p className="font-bold">Process in Seconds</p>
-              <p className="text-sm text-muted-foreground">Faster than desktop software for any size.</p>
+              <p className="font-bold text-sm">Process in Seconds</p>
+              <p className="text-xs text-muted-foreground">Faster than desktop software for any size.</p>
             </div>
           </div>
           <div className="flex items-start gap-4">
@@ -82,8 +88,8 @@ export function BrandPanel() {
               <Shield className="w-5 h-5" />
             </div>
             <div>
-              <p className="font-bold">Bank-Level Security</p>
-              <p className="text-sm text-muted-foreground">End-to-end 256-bit encryption for every user.</p>
+              <p className="font-bold text-sm">Bank-Level Security</p>
+              <p className="text-xs text-muted-foreground">End-to-end 256-bit encryption for every user.</p>
             </div>
           </div>
           <div className="flex items-start gap-4">
@@ -91,15 +97,15 @@ export function BrandPanel() {
               <HardDrive className="w-5 h-5" />
             </div>
             <div>
-              <p className="font-bold">Cloud-Native Storage</p>
-              <p className="text-sm text-muted-foreground">Access your files from any device, anywhere.</p>
+              <p className="font-bold text-sm">Cloud-Native Storage</p>
+              <p className="text-xs text-muted-foreground">Access your files from any device, anywhere.</p>
             </div>
           </div>
         </div>
       </div>
 
       <div className="pt-8 mt-auto border-t border-white/5 z-10">
-        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">
           Join the Junction
         </p>
         <p className="text-lg font-black tracking-tight">

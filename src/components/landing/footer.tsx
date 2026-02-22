@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Cloud, Github, Twitter, Linkedin, Facebook, Globe } from 'lucide-react';
+import { Cloud, Github, Twitter, Linkedin, Facebook, Globe, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function Footer() {
@@ -8,14 +8,22 @@ export function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
           <div className="space-y-6">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="p-2 bg-brand-gradient rounded-xl shadow-lg">
-                <Cloud className="w-6 h-6 text-white" />
+            <div className="space-y-4">
+              <Link href="/" className="flex items-center gap-2 group">
+                <div className="p-2 bg-brand-gradient rounded-xl shadow-lg">
+                  <Cloud className="w-6 h-6 text-white" />
+                </div>
+                <span className="font-bold text-2xl tracking-tight text-gradient">AJN</span>
+              </Link>
+              <div className="flex items-center gap-2 px-2 py-1 bg-white/5 rounded border border-white/5 w-fit">
+                <Activity className="w-2.5 h-2.5 text-emerald-500 animate-pulse" />
+                <span className="text-[9px] font-black uppercase tracking-widest text-foreground/70">
+                  Every File. One Smart Network.
+                </span>
               </div>
-              <span className="font-bold text-2xl tracking-tight text-gradient">AJN</span>
-            </Link>
+            </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              AJN – All-in-one Junction Network. Every File. One Smart Network. The ultimate real-time intelligent file operating system in the cloud.
+              AJN – All-in-one Junction Network. The ultimate real-time intelligent file operating system in the cloud.
             </p>
             <div className="flex gap-4">
               <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/20"><Twitter className="w-4 h-4"/></Button>

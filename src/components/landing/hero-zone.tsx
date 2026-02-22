@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Upload, Monitor, HardDrive, Link as LinkIcon, FileText, Video, ImageIcon, Music, Database, FileCode, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Upload, Monitor, HardDrive, Link as LinkIcon, FileText, Video, ImageIcon, Music, Database, FileCode, CheckCircle2, ArrowRight, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
@@ -33,8 +33,8 @@ export function HeroZone() {
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/10 rounded-full blur-[120px] pointer-events-none animate-pulse-slow delay-1000"></div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-5xl mx-auto space-y-8 mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-primary text-xs font-black uppercase tracking-[0.2em] mb-4">
+        <div className="max-w-5xl mx-auto space-y-6 mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-4">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
@@ -42,15 +42,23 @@ export function HeroZone() {
             Neural Processing Network Active
           </div>
           
-          <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-[0.95]">
-            Every File. <br />
-            <span className="text-gradient">One Smart Network.</span>
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] text-white">
+            AJN – All-in-one <br />
+            <span className="text-gradient">Junction Network</span>
           </h1>
           
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">
-            The professional all-in-one junction for real-time conversion, intelligence, and file mastery. 
-            Used by 2M+ creators and developers.
-          </p>
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-md border border-white/5">
+              <Activity className="w-3 h-3 text-emerald-500 animate-pulse" />
+              <p className="text-xs font-bold text-foreground/80 tracking-widest uppercase">
+                Every File. One Smart Network.
+              </p>
+            </div>
+            <p className="text-sm text-muted-foreground max-w-xl mx-auto font-medium leading-relaxed mt-2">
+              The professional all-in-one junction for real-time conversion, intelligence, and file mastery. 
+              Used by 2M+ creators and developers.
+            </p>
+          </div>
         </div>
 
         {/* Upload Zone */}
