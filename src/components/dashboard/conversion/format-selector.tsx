@@ -3,8 +3,9 @@
 import { useState, useMemo } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { ArrowRightLeft, Zap, Star } from 'lucide-react';
+import { ArrowRightLeft, Star, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 const formatMap: Record<string, { from: string[], to: string[] }> = {
   Document: {
@@ -12,11 +13,11 @@ const formatMap: Record<string, { from: string[], to: string[] }> = {
     to: ['PDF', 'DOCX', 'TXT', 'HTML', 'EPUB', 'JPG', 'PNG', 'XLSX', 'CSV', 'PPTX']
   },
   Image: {
-    from: ['JPG', 'PNG', 'WebP', 'HEIC', 'AVIF', 'BMP', 'TIFF', 'SVG'],
+    from: ['JPG', 'PNG', 'WebP', 'HEIC', 'AVIF', 'BMP', 'TIFF', 'SVG', 'CR2', 'NEF', 'ARW', 'DNG'],
     to: ['JPG', 'PNG', 'WebP', 'TIFF', 'PDF', 'SVG']
   },
   Video: {
-    from: ['MP4', 'MOV', 'AVI', 'MKV', 'WebM', 'FLV', 'WMV', '3GP', 'TS'],
+    from: ['MP4', 'MOV', 'AVI', 'MKV', 'WebM', 'FLV', 'WMV', '3GP', 'TS', 'M4V'],
     to: ['MP4', 'AVI', 'MOV', 'MKV', 'WebM', 'GIF', 'MP3', 'WAV']
   },
   Audio: {
@@ -56,20 +57,25 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange }:
   const quickPills = useMemo(() => {
     if (category === 'Document') return ['PDF to DOCX', 'PDF to JPG', 'DOCX to PDF', 'XLSX to PDF'];
     if (category === 'Image') return ['JPG to PNG', 'PNG to WebP', 'HEIC to JPG', 'SVG to PNG'];
+    if (category === 'Video') return ['MP4 to GIF', 'MP4 to MP3', 'MOV to MP4'];
     return [];
   }, [category]);
 
   return (
     <section className="space-y-6 animate-in slide-in-from-top-4 duration-500">
-      <div className="flex flex-col md:flex-row items-center gap-4 bg-white/5 p-6 rounded-[2.5rem] border border-white/10 shadow-2xl relative">
+      <div className="flex flex-col md:flex-row items-center gap-4 bg-white/5 p-6 rounded-[2.5rem] border border-white/10 shadow-2xl relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent pointer-events-none" />
+        
         <div className="absolute -top-3 left-10">
-          <Badge className="bg-primary text-white border-none text-[8px] font-black uppercase tracking-[0.2em] px-3 h-6">Neural Routing Hub</Badge>
+          <Badge className="bg-primary text-white border-none text-[8px] font-black uppercase tracking-[0.2em] px-3 h-6 shadow-xl shadow-primary/20">
+            Neural Routing Hub
+          </Badge>
         </div>
 
-        <div className="flex-1 w-full space-y-2">
-          <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-4">Source Format</label>
+        <div className="flex-1 w-full space-y-2 relative z-10">
+          <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 ml-4">Source Format</label>
           <Select value={from} onValueChange={onFromChange}>
-            <SelectTrigger className="h-14 bg-background/40 border-white/10 rounded-2xl font-black text-sm uppercase px-6">
+            <SelectTrigger className="h-14 bg-background/40 border-white/10 rounded-2xl font-black text-sm uppercase px-6 focus:ring-primary/20">
               <SelectValue placeholder="AUTO DETECT" />
             </SelectTrigger>
             <SelectContent className="bg-card/95 backdrop-blur-xl border-white/10 max-h-[300px]">
@@ -81,17 +87,17 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange }:
         <button 
           onClick={handleSwap}
           className={cn(
-            "w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all hover:bg-primary hover:text-white group mt-6",
+            "w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all hover:bg-primary hover:text-white shadow-xl group mt-6 shrink-0",
             swapping && "rotate-180"
           )}
         >
           <ArrowRightLeft className="w-5 h-5" />
         </button>
 
-        <div className="flex-1 w-full space-y-2">
-          <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-4">Target Neural Output</label>
+        <div className="flex-1 w-full space-y-2 relative z-10">
+          <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 ml-4">Target Output</label>
           <Select value={to} onValueChange={onToChange}>
-            <SelectTrigger className="h-14 bg-background/40 border-white/10 rounded-2xl font-black text-sm uppercase px-6">
+            <SelectTrigger className="h-14 bg-background/40 border-white/10 rounded-2xl font-black text-sm uppercase px-6 focus:ring-primary/20">
               <SelectValue placeholder="SELECT TARGET" />
             </SelectTrigger>
             <SelectContent className="bg-card/95 backdrop-blur-xl border-white/10 max-h-[300px]">
@@ -101,24 +107,26 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange }:
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 px-4">
-        <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-          <Star className="w-3 h-3 text-primary fill-current" /> TOP {category.toUpperCase()} TASKS:
-        </span>
-        {quickPills.map(pill => (
-          <button 
-            key={pill}
-            onClick={() => {
-              const [f, t] = pill.split(' to ');
-              onFromChange(f);
-              onToChange(t);
-            }}
-            className="px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-[9px] font-bold text-muted-foreground hover:bg-primary/20 hover:text-white transition-all uppercase tracking-widest"
-          >
-            {pill}
-          </button>
-        ))}
-      </div>
+      {quickPills.length > 0 && (
+        <div className="flex flex-wrap items-center gap-3 px-4">
+          <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+            <Star className="w-3 h-3 text-primary fill-current" /> TOP {category.toUpperCase()} TASKS:
+          </span>
+          {quickPills.map(pill => (
+            <button 
+              key={pill}
+              onClick={() => {
+                const [f, t] = pill.split(' to ');
+                onFromChange(f);
+                onToChange(t);
+              }}
+              className="px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-[9px] font-bold text-muted-foreground hover:bg-primary hover:text-white transition-all uppercase tracking-widest"
+            >
+              {pill}
+            </button>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

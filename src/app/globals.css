@@ -12,7 +12,7 @@
     --popover-foreground: 210 40% 98%;
     --primary: 217 91% 60%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 262 80% 60%;
+    --secondary: 222 47% 12%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217 32% 12%;
     --muted-foreground: 215 20% 65%;
@@ -40,7 +40,19 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body antialiased selection:bg-primary/30 selection:text-white;
+    @apply bg-background text-foreground font-body antialiased selection:bg-primary/30 selection:text-white overflow-x-hidden;
+  }
+  
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
   }
 }
 
@@ -49,22 +61,13 @@
     background: radial-gradient(circle at top center, hsl(222, 47%, 12%) 0%, hsl(222, 47%, 4%) 100%);
   }
   .bg-brand-gradient {
-    background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #D946EF 100%);
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 50%, #1D4ED8 100%);
   }
   .text-gradient {
     @apply bg-clip-text text-transparent bg-brand-gradient;
   }
   .glass-card {
     @apply bg-white/[0.03] backdrop-blur-2xl border border-white/10 shadow-2xl;
-  }
-  .animate-marquee {
-    animation: marquee 40s linear infinite;
-  }
-  .animate-orbit {
-    animation: orbit 30s linear infinite;
-  }
-  .animate-pulse-slow {
-    animation: pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
   .animate-shimmer {
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
@@ -103,4 +106,8 @@
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
 }

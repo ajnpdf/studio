@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
-import { Upload, X, FileIcon, ImageIcon, Video, Music, Monitor, Activity } from 'lucide-react';
+import { Upload, X, FileIcon, ImageIcon, Video, Music, Monitor, Activity, ShieldCheck, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -41,53 +41,60 @@ export function DropZone({ onFiles }: Props) {
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
         className={cn(
-          "relative min-h-[320px] rounded-[3rem] border-2 border-dashed flex flex-col items-center justify-center transition-all duration-500 cursor-pointer group overflow-hidden",
+          "relative min-h-[360px] rounded-[3.5rem] border-2 border-dashed flex flex-col items-center justify-center transition-all duration-700 cursor-pointer group overflow-hidden shadow-2xl",
           isDragging 
-            ? "border-primary bg-primary/5 scale-[0.99] shadow-2xl shadow-primary/20" 
-            : "border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10 shadow-xl"
+            ? "border-primary bg-primary/[0.03] scale-[0.99] shadow-primary/20" 
+            : "border-white/10 bg-white/[0.02] hover:border-primary/40 hover:bg-white/[0.04]"
         )}
       >
         <input type="file" multiple ref={inputRef} className="hidden" onChange={handleSelect} />
         
-        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity animate-shimmer pointer-events-none" />
+        {/* Animated grid background */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05)_0%,transparent_70%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
 
         <div className={cn(
-          "w-20 h-20 bg-white text-black rounded-3xl flex items-center justify-center shadow-2xl transition-all duration-500 relative z-10",
-          isDragging ? "scale-125 rotate-6" : "group-hover:scale-110"
+          "w-24 h-24 bg-white text-black rounded-[2.5rem] flex items-center justify-center shadow-[0_20px_50px_rgba(255,255,255,0.15)] transition-all duration-700 relative z-10",
+          isDragging ? "scale-125 rotate-12 bg-primary text-white" : "group-hover:scale-110 group-hover:-rotate-3"
         )}>
           <Upload className="w-10 h-10" />
         </div>
         
-        <div className="mt-8 space-y-2 text-center relative z-10">
-          <h3 className="text-3xl font-black tracking-tighter text-white">Drop your assets for mastery</h3>
-          <p className="text-muted-foreground font-medium uppercase text-[10px] tracking-[0.3em]">Supports batch processing up to 10GB total</p>
+        <div className="mt-10 space-y-3 text-center relative z-10 px-8">
+          <h3 className="text-4xl font-black tracking-tighter text-white uppercase leading-none">Drop assets for mastery</h3>
+          <p className="text-muted-foreground font-black uppercase text-[10px] tracking-[0.4em] opacity-60">Multi-Node Processing Hub • Max 10GB/Batch</p>
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4 relative z-10">
-          <div className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur border border-white/10 rounded-2xl text-[9px] font-black uppercase text-white/60 tracking-widest">
-            <Monitor className="w-3.5 h-3.5" /> MY DEVICE
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-4 relative z-10">
+          <div className="flex items-center gap-2.5 px-5 py-2.5 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-2xl text-[9px] font-black uppercase text-white/60 tracking-widest shadow-xl transition-all hover:border-primary/40 group/pill">
+            <Zap className="w-3.5 h-3.5 text-primary animate-pulse" /> LOCAL SESSION
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur border border-white/10 rounded-2xl text-[9px] font-black uppercase text-white/60 tracking-widest">
-            <Activity className="w-3.5 h-3.5" /> NETWORK PROTOCOL
+          <div className="flex items-center gap-2.5 px-5 py-2.5 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-2xl text-[9px] font-black uppercase text-white/60 tracking-widest shadow-xl transition-all hover:border-primary/40 group/pill">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> ENCRYPTED
           </div>
         </div>
       </div>
 
       {previews.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-in slide-in-from-bottom-4 duration-500">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-in slide-in-from-bottom-4 duration-700">
           {previews.map((file, i) => (
-            <div key={i} className="p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:border-primary/40 transition-all">
-              <div className="flex items-center gap-3 overflow-hidden">
-                <div className="p-2 bg-primary/10 rounded-lg text-primary shrink-0">
+            <div key={i} className="p-4 bg-[#0d1225]/60 backdrop-blur-3xl border border-white/10 rounded-[1.5rem] flex items-center justify-between group hover:border-primary/40 transition-all shadow-xl">
+              <div className="flex items-center gap-4 overflow-hidden">
+                <div className="p-2.5 bg-primary/10 rounded-xl text-primary shrink-0 border border-primary/10">
                   <FileIcon className="w-4 h-4" />
                 </div>
                 <div className="overflow-hidden">
-                  <p className="text-xs font-bold truncate pr-4">{file.name}</p>
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                  <p className="text-xs font-black truncate pr-4 text-white/90 uppercase tracking-tighter">{file.name}</p>
+                  <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
                 </div>
               </div>
-              <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); removeFile(i); }} className="h-8 w-8 text-muted-foreground hover:text-red-500">
-                <X className="w-4 h-4" />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={(e) => { e.stopPropagation(); removeFile(i); }} 
+                className="h-10 w-10 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+              >
+                <X className="w-4.5 h-4.5" />
               </Button>
             </div>
           ))}

@@ -21,7 +21,8 @@ import {
   ChevronRight,
   ShieldCheck,
   LogIn,
-  Activity
+  Activity,
+  Cpu
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -30,33 +31,27 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useUser, useDoc, useFirestore, useAuth, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { useUser, useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
 
 const navItems = [
-  { icon: Repeat, label: 'Convert', href: '/dashboard/convert', description: 'Universal format changer' },
+  { icon: Repeat, label: 'Converter', href: '/dashboard/convert', description: 'Universal format engine' },
 ];
 
 const toolItems = [
-  { icon: FileText, label: 'PDF Tools', href: '/dashboard/pdf-editor', description: 'Edit and manage PDFs' },
-  { icon: ImageIcon, label: 'Image Tools', href: '/dashboard/image-editor', description: 'Optimize and transform' },
-  { icon: Video, label: 'Video Tools', href: '/dashboard/tools/video', description: 'Cut and compress clips' },
-  { icon: Music, label: 'Audio Tools', href: '/dashboard/tools/audio', description: 'Track manipulation' },
-  { icon: Box, label: 'Batch Processing', href: '/dashboard/tools/batch', description: 'Multiple file operations' },
-  { icon: BrainCircuit, label: 'AI Tools', href: '/dashboard/tools/ai', description: 'Intelligent file workflows' },
+  { icon: FileText, label: 'PDF Tools', href: '/dashboard/pdf-editor', description: 'Neural PDF Studio' },
+  { icon: ImageIcon, label: 'Image Tools', href: '/dashboard/image-editor', description: 'Image Master' },
+  { icon: Video, label: 'Video Tools', href: '/dashboard/tools/video', description: 'FFmpeg transcode' },
+  { icon: Music, label: 'Audio Tools', href: '/dashboard/tools/audio', description: 'Track surgery' },
+  { icon: Box, label: 'Batch Center', href: '/dashboard/tools/batch', description: 'Multi-file tasks' },
+  { icon: BrainCircuit, label: 'AI Intel', href: '/dashboard/tools/ai', description: 'Document semantic AI' },
 ];
 
 const workspaceItems = [
-  { icon: Users, label: 'Team', href: '/dashboard/team', description: 'Collaborative workspaces' },
-  { icon: Wand2, label: 'API Panel', href: '/dashboard/api', description: 'Developer keys and logs' },
-  { icon: ShieldCheck, label: 'Admin Panel', href: '/admin', description: 'System operations', badge: 'ROOT' },
-  { icon: Settings, label: 'Settings', href: '/dashboard/settings', description: 'Account and preferences' },
-];
-
-const supportItems = [
-  { icon: HelpCircle, label: 'Help Center', href: '/dashboard/help', description: 'Guides and FAQs' },
-  { icon: Megaphone, label: "What's New", href: '/dashboard/news', description: 'Latest product updates' },
+  { icon: Users, label: 'Team', href: '/dashboard/team', description: 'Multi-node sync' },
+  { icon: Wand2, label: 'API Access', href: '/dashboard/api', description: 'Dev control' },
+  { icon: ShieldCheck, label: 'Root Panel', href: '/admin', description: 'System ops', badge: 'ROOT' },
+  { icon: Settings, label: 'Settings', href: '/dashboard/settings', description: 'Node config' },
 ];
 
 export function DashboardSidebar() {
@@ -64,15 +59,7 @@ export function DashboardSidebar() {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const { user } = useUser();
-  const firestore = useFirestore();
   const auth = useAuth();
-
-  const userProfileRef = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return doc(firestore, 'users', user.uid);
-  }, [firestore, user]);
-
-  const { data: profile } = useDoc(userProfileRef);
 
   const handleSignOut = () => {
     signOut(auth).then(() => router.push('/login'));
@@ -85,33 +72,29 @@ export function DashboardSidebar() {
           <Link
             href={item.disabled ? '#' : item.href}
             className={cn(
-              "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group relative",
+              "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group relative",
               pathname === item.href 
-                ? "bg-white/10 text-white" 
+                ? "bg-primary text-white shadow-xl shadow-primary/20" 
                 : "text-sidebar-foreground/60 hover:bg-white/5 hover:text-white",
               item.disabled && "opacity-40 cursor-not-allowed"
             )}
             onClick={item.disabled ? (e) => e.preventDefault() : undefined}
           >
-            {pathname === item.href && !collapsed && <div className="absolute left-0 top-2 bottom-2 w-1 bg-white rounded-full" />}
             <item.icon className={cn(
-              "w-5 h-5 shrink-0",
+              "w-5 h-5 shrink-0 transition-transform group-hover:scale-110",
               pathname === item.href ? "text-white" : "text-muted-foreground group-hover:text-white"
             )} />
-            {!collapsed && <span className="flex-1 text-[11px] font-bold uppercase tracking-widest">{item.label}</span>}
+            {!collapsed && <span className="flex-1 text-[11px] font-black uppercase tracking-widest">{item.label}</span>}
             {!collapsed && item.badge && (
-              <Badge className={cn(
-                "text-[9px] h-4 border-none px-1 font-black",
-                item.badge === 'ROOT' ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"
-              )}>
+              <Badge className="text-[8px] h-4 bg-white/20 text-white border-none px-1 font-black">
                 {item.badge}
               </Badge>
             )}
           </Link>
         </TooltipTrigger>
-        <TooltipContent side="right" className="bg-card/90 backdrop-blur-xl border-white/10">
-          <p className="text-xs font-bold uppercase">{item.label}</p>
-          <p className="text-[9px] opacity-70 uppercase font-black">{item.description}</p>
+        <TooltipContent side="right" className="bg-card/95 backdrop-blur-xl border-white/10 p-3 rounded-xl shadow-2xl">
+          <p className="text-xs font-black uppercase tracking-widest">{item.label}</p>
+          <p className="text-[9px] opacity-60 uppercase font-bold mt-1">{item.description}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -119,97 +102,94 @@ export function DashboardSidebar() {
 
   return (
     <aside className={cn(
-      "border-r border-white/5 bg-sidebar/40 backdrop-blur-xl text-sidebar-foreground flex flex-col h-screen fixed left-0 top-0 z-40 transition-all duration-300",
+      "border-r border-white/5 bg-[#070b18]/80 backdrop-blur-3xl text-sidebar-foreground flex flex-col h-screen fixed left-0 top-0 z-40 transition-all duration-500",
       collapsed ? "w-20" : "w-64"
     )}>
       {/* Brand Header */}
       <div className="p-6 border-b border-white/5">
-        <Link href="/" className="flex items-center gap-3 group mb-6">
-          <div className="p-2 bg-white rounded-lg shadow-2xl transition-transform group-hover:scale-110">
+        <Link href="/" className="flex items-center gap-3 group mb-8">
+          <div className="p-2.5 bg-white rounded-xl shadow-2xl transition-all group-hover:scale-110 group-hover:rotate-6">
             <Network className="w-5 h-5 text-black" />
           </div>
-          {!collapsed && <span className="font-black text-lg tracking-tighter text-white uppercase">AJN</span>}
+          {!collapsed && <span className="font-black text-xl tracking-tighter text-white uppercase">AJN</span>}
         </Link>
 
         {user ? (
-          <div className={cn("flex items-center gap-3 mb-2 transition-all", collapsed && "justify-center")}>
-            <Avatar className="h-10 w-10 border border-white/10">
-              <AvatarImage src={user?.photoURL || "https://picsum.photos/seed/alex/100/100"} />
-              <AvatarFallback>{user.displayName?.[0] || 'U'}</AvatarFallback>
+          <div className={cn("flex items-center gap-3 transition-all", collapsed && "justify-center")}>
+            <Avatar className="h-10 w-10 border-2 border-white/10 ring-4 ring-primary/5">
+              <AvatarImage src={user?.photoURL || ""} />
+              <AvatarFallback className="bg-primary/20 text-primary font-black">AD</AvatarFallback>
             </Avatar>
             {!collapsed && (
               <div className="overflow-hidden">
-                <p className="font-black text-[11px] uppercase tracking-tighter truncate">{user?.displayName || 'USER ACCOUNT'}</p>
-                <Badge variant="secondary" className="h-4 text-[8px] bg-white/10 text-white border-none px-1.5 font-black uppercase tracking-widest">{profile?.tier || 'FREE'}</Badge>
+                <p className="font-black text-[11px] uppercase tracking-tighter truncate text-white">{user?.displayName || 'OPERATOR'}</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">ACTIVE NODE</span>
+                </div>
               </div>
             )}
           </div>
         ) : (
-          <div className={cn("flex items-center gap-3 mb-2 transition-all", collapsed && "justify-center")}>
-            <div className="h-10 w-10 bg-white/5 rounded-full border border-white/10 flex items-center justify-center">
+          <div className={cn("flex items-center gap-3 transition-all", collapsed && "justify-center")}>
+            <div className="h-10 w-10 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
               <Activity className="w-5 h-5 text-muted-foreground animate-pulse" />
             </div>
             {!collapsed && (
               <div className="overflow-hidden">
                 <p className="font-black text-[11px] uppercase tracking-tighter truncate text-muted-foreground/60">GUEST SESSION</p>
-                <Badge variant="outline" className="h-4 text-[8px] border-white/10 text-white/40 border-none px-1.5 font-black uppercase tracking-widest">LIMITED</Badge>
+                <Badge variant="outline" className="h-4 text-[8px] border-white/10 text-white/40 border-none px-1.5 font-black uppercase tracking-widest mt-1">LIMITED</Badge>
               </div>
             )}
           </div>
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-8 scrollbar-hide">
+      <div className="flex-1 overflow-y-auto px-3 py-6 space-y-10 scrollbar-hide">
         <div>
-          {!collapsed && <p className="px-3 mb-3 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Tools</p>}
+          {!collapsed && <p className="px-3 mb-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Processing</p>}
           <div className="space-y-1">
             <NavLink item={{ icon: LayoutDashboard, label: 'Hub Overview', href: '/dashboard', description: 'Network Center' }} />
             {navItems.map((item) => <NavLink key={item.href} item={item} />)}
-            <div className="pt-2">
+            <div className="pt-4 mt-4 border-t border-white/5">
+              {!collapsed && <p className="px-3 mb-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Studio Tools</p>}
               {toolItems.map((item) => <NavLink key={item.href} item={item} />)}
             </div>
           </div>
         </div>
 
         <div>
-          {!collapsed && <p className="px-3 mb-3 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Workspace</p>}
+          {!collapsed && <p className="px-3 mb-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Infrastructure</p>}
           <div className="space-y-1">
             {workspaceItems.map((item) => (
-              <div key={item.href} className={!user ? "opacity-20 pointer-events-none" : ""}>
+              <div key={item.href} className={!user ? "opacity-20 pointer-events-none grayscale" : ""}>
                 <NavLink item={item} />
               </div>
             ))}
           </div>
         </div>
-
-        <div>
-          {!collapsed && <p className="px-3 mb-3 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Network Support</p>}
-          <div className="space-y-1">
-            {supportItems.map((item) => <NavLink key={item.href} item={item} />)}
-          </div>
-        </div>
       </div>
 
-      <div className="p-4 border-t border-white/5">
+      <div className="p-4 border-t border-white/5 bg-black/20">
         <button 
           onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-white transition-all mb-2"
+          className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-white hover:bg-white/5 transition-all mb-2"
         >
-          {collapsed ? <ChevronRight className="w-4 h-4" /> : <div className="flex items-center gap-3"><ChevronLeft className="w-4 h-4" /> <span>Collapse Grid</span></div>}
+          {collapsed ? <ChevronRight className="w-4 h-4" /> : <div className="flex items-center gap-3"><ChevronLeft className="w-4 h-4" /> <span>Minimize Grid</span></div>}
         </button>
         {user ? (
           <button 
             onClick={handleSignOut}
-            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-red-400 hover:bg-red-400/10 transition-all"
+            className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-red-400 hover:bg-red-500/10 transition-all"
           >
             <LogOut className="w-4 h-4 shrink-0" />
-            {!collapsed && <span>Disconnect</span>}
+            {!collapsed && <span>Disconnect Node</span>}
           </button>
         ) : (
           <Link href="/login">
-            <button className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/10 transition-all">
+            <button className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/10 transition-all">
               <LogIn className="w-4 h-4 shrink-0" />
-              {!collapsed && <span>Sign In</span>}
+              {!collapsed && <span>Node Login</span>}
             </button>
           </Link>
         )}

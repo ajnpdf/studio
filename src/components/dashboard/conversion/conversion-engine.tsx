@@ -11,7 +11,7 @@ import { engine, ConversionJob } from '@/lib/engine';
 import { HistoryDrawer } from '../history-drawer';
 import { PreviewModal } from '../preview-modal';
 import { Button } from '@/components/ui/button';
-import { History, Search, Moon, Sun, Monitor, Activity } from 'lucide-react';
+import { History, Search, Sun, Monitor, Activity, ShieldCheck, Cpu } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 
@@ -36,7 +36,7 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
   const activeJobs = jobs.filter(j => j.status === 'processing' || j.status === 'queued');
 
   return (
-    <div className="flex h-full bg-background overflow-hidden animate-in fade-in duration-700">
+    <div className="flex h-full bg-[#0a0e1f] overflow-hidden animate-in fade-in duration-700">
       {/* LEFT — CATEGORY SIDEBAR */}
       <CategorySidebar active={activeCategory} onSelect={setActiveCategory} />
 
@@ -44,9 +44,10 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
       <main className="flex-1 flex flex-col min-w-0 border-r border-white/5 relative">
         <header className="h-16 border-b border-white/5 bg-background/40 backdrop-blur-xl flex items-center justify-between px-6 shrink-0 z-20">
           <div className="flex items-center gap-4 flex-1">
-            <Badge variant="outline" className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-widest px-3 h-6">
-              v1.0 Real-Time
-            </Badge>
+            <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
+              <Cpu className="w-3.5 h-3.5 text-primary animate-pulse" />
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">v1.0 REAL-TIME</span>
+            </div>
             <div className="relative max-w-sm w-full group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
               <Input 
@@ -57,6 +58,10 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
           </div>
 
           <div className="flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-2 mr-4 px-3 py-1.5 bg-white/5 rounded-lg border border-white/5">
+              <ShieldCheck className="w-3 h-3 text-emerald-500" />
+              <span className="text-[9px] font-black text-muted-foreground uppercase">Local Node Active</span>
+            </div>
             <Button variant="ghost" size="icon" onClick={() => setHistoryOpen(true)} className="h-9 w-9 hover:bg-white/5 relative">
               <History className="w-4 h-4" />
               {completedJobs.length > 0 && (

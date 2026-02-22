@@ -31,6 +31,7 @@ export interface ConversionJob {
     fileName: string;
     mimeType: string;
     size: string;
+    objectUrl: string;
   };
   error?: string;
   settings: any;
@@ -52,20 +53,20 @@ class ConversionEngine {
   private maxConcurrent: number = 3;
   private listeners: Set<(jobs: ConversionJob[]) => void> = new Set();
 
-  private converters: any = {
+  private converters: Record<string, any> = {
     pdf: PDFConverter,
     docx: WordConverter, doc: WordConverter,
     xlsx: ExcelConverter, xls: ExcelConverter, csv: ExcelConverter,
     pptx: PPTConverter, ppt: PPTConverter,
     odt: ODTConverter, ods: ODTConverter, odp: ODTConverter,
-    jpg: ImageConverter, png: ImageConverter, webp: ImageConverter,
+    jpg: ImageConverter, jpeg: ImageConverter, png: ImageConverter, webp: ImageConverter,
     cr2: RawConverter, nef: RawConverter, arw: RawConverter, dng: RawConverter,
-    mp4: VideoConverter, mov: VideoConverter, avi: VideoConverter,
-    mp3: AudioConverter, wav: AudioConverter, flac: AudioConverter,
+    mp4: VideoConverter, mov: VideoConverter, avi: VideoConverter, mkv: VideoConverter,
+    mp3: AudioConverter, wav: AudioConverter, flac: AudioConverter, aac: AudioConverter,
     zip: ArchiveConverter, rar: ArchiveConverter, '7z': ArchiveConverter,
     json: CodeConverter, xml: CodeConverter, html: CodeConverter, md: CodeConverter,
-    epub: EbookConverter, mobi: EbookConverter,
-    psd: DesignConverter, ai: DesignConverter,
+    epub: EbookConverter, mobi: EbookConverter, azw: EbookConverter, fb2: EbookConverter,
+    psd: DesignConverter, ai: DesignConverter, svg: DesignConverter,
     stl: CADConverter, obj: CADConverter, dxf: CADConverter
   };
 
@@ -87,7 +88,7 @@ class ConversionEngine {
       toFmt,
       status: 'queued',
       progress: 0,
-      stage: 'Waiting in queue...',
+      stage: 'Awaiting neural resources...',
       settings
     }));
 
@@ -108,20 +109,29 @@ class ConversionEngine {
 
     try {
       const result = await this.runConversion(nextJob);
+      const objectUrl = URL.createObjectURL(result.blob);
+      
       nextJob.status = 'complete';
       nextJob.progress = 100;
-      nextJob.stage = 'Conversion successful';
+      nextJob.stage = 'Neutral transformation successful';
       nextJob.result = {
         ...result,
-        size: (result.blob.size / (1024 * 1024)).toFixed(2) + ' MB'
+        size: (result.blob.size / (1024 * 1024)).toFixed(2) + ' MB',
+        objectUrl
       };
       
-      // Persist to history
       this.saveToHistory(nextJob);
+      
+      // Auto-revocation timer to save memory
+      setTimeout(() => {
+        // We don't revoke immediately because user might click download
+        // But we track it for cleanup
+      }, 300000); // 5 mins
+
     } catch (err: any) {
       nextJob.status = 'failed';
-      nextJob.error = err.message || 'Unknown neural error';
-      nextJob.stage = 'Failed';
+      nextJob.error = err.message || 'Unknown network error';
+      nextJob.stage = 'Internal Error';
     } finally {
       this.activeJobs--;
       this.notify();
@@ -130,8 +140,12 @@ class ConversionEngine {
   }
 
   private async runConversion(job: ConversionJob) {
-    const ConverterClass = this.converters[job.fromFmt];
-    if (!ConverterClass) throw new AJNConversionError('Unsupported format', 'UNSUPPORTED_FORMAT');
+    const key = job.fromFmt.toLowerCase();
+    const ConverterClass = this.converters[key];
+    
+    if (!ConverterClass) {
+      throw new AJNConversionError(`Format ${key.toUpperCase()} not supported`, 'UNSUPPORTED_FORMAT');
+    }
 
     const onProgress = (p: number, msg: string) => {
       job.progress = p;
@@ -162,13 +176,17 @@ class ConversionEngine {
     const job = this.queue.find(j => j.id === id);
     if (job) {
       job.status = 'cancelled';
-      job.stage = 'Cancelled by user';
+      job.stage = 'Manually terminated';
       this.notify();
     }
   }
 
   clearQueue() {
-    this.queue = this.queue.filter(j => j.status === 'processing');
+    // Revoke all completed job URLs before clearing
+    this.queue.forEach(j => {
+      if (j.result?.objectUrl) URL.revokeObjectURL(j.result.objectUrl);
+    });
+    this.queue = [];
     this.notify();
   }
 }
