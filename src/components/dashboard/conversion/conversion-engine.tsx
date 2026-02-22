@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -34,7 +35,7 @@ const RAW_EXTS = ['CR2', 'CR3', 'NEF', 'ARW', 'DNG', 'ORF', 'RW2', 'RAF'];
 const VIDEO_EXTS = ['MP4', 'MOV', 'AVI', 'MKV', 'WEBM', 'FLV', 'WMV', '3GP', 'TS', 'M4V'];
 
 export function ConversionEngine({ initialFileId }: { initialFileId: string | null }) {
-  const [file, setFile] = useState(mockFiles.find(f => f.id === initialFileId) || mockFiles[0]);
+  const [file, setFile] = useState<any>(mockFiles.find(f => f.id === initialFileId) || null);
   const [state, setState] = useState<ConversionState>('idle');
   const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState('Initializing Engine...');
@@ -64,34 +65,34 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
   }, [file]);
 
   const handleConvert = async () => {
-    if (!settings.toFormat) return;
+    if (!settings.toFormat || !file) return;
     
     setState('processing');
     setProgress(0);
     setResult(null);
 
     try {
-      // Simulate real file fetch for demo if not already provided
-      const response = await fetch(`https://picsum.photos/seed/${file.id}/800/600`);
-      const blob = await response.blob();
-      
-      let mimeType = 'application/octet-stream';
-      const fmt = file.format.toUpperCase();
-
-      if (fmt === 'PDF') mimeType = 'application/pdf';
-      else if (fmt === 'DOCX') mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-      else if (fmt === 'XLSX') mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-      else if (fmt === 'CSV') mimeType = 'text/csv';
-      else if (fmt === 'PPTX') mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
-
-      const realFile = new File([blob], file.name, { type: mimeType });
+      // For demo files, we fetch a random image. For real uploaded files, we use the blob.
+      let realFile: File;
+      if (file.file) {
+        realFile = file.file;
+      } else {
+        const response = await fetch(`https://picsum.photos/seed/${file.id}/800/600`);
+        const blob = await response.blob();
+        let mimeType = 'application/octet-stream';
+        const fmt = file.format.toUpperCase();
+        if (fmt === 'PDF') mimeType = 'application/pdf';
+        else if (fmt === 'DOCX') mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        realFile = new File([blob], file.name, { type: mimeType });
+      }
 
       let converterResult: ConversionResult;
-
       const onProgress = (p: number, msg: string) => {
         setProgress(p);
         setStatusMessage(msg);
       };
+
+      const fmt = file.format.toUpperCase();
 
       if (fmt === 'PDF') {
         const converter = new PDFConverter(realFile, onProgress);
@@ -139,6 +140,20 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
     }
   };
 
+  const handleFileUpload = (f: File) => {
+    setFile({
+      id: Math.random().toString(36).substring(7),
+      name: f.name,
+      size: (f.size / (1024 * 1024)).toFixed(2) + ' MB',
+      format: f.name.split('.').pop()?.toUpperCase() || 'UNK',
+      type: f.type.split('/')[0],
+      date: new Date().toLocaleDateString(),
+      file: f
+    });
+    setResult(null);
+    setState('idle');
+  };
+
   const reset = () => {
     setState('idle');
     setProgress(0);
@@ -148,7 +163,11 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full min-h-0">
       {/* LEFT PANEL — Input File */}
-      <InputPanel file={file} onReplace={() => setFile(mockFiles[Math.floor(Math.random() * mockFiles.length)])} />
+      <InputPanel 
+        file={file} 
+        onReplace={() => setFile(null)} 
+        onUpload={handleFileUpload}
+      />
 
       {/* CENTER PANEL — Settings */}
       <SettingsPanel 

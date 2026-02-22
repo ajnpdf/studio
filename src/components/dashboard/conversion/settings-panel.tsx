@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Card, CardContent } from '@/components/ui/card';
@@ -62,6 +63,20 @@ const conversionTargets: Record<string, string[]> = {
 };
 
 export function SettingsPanel({ file, settings, setSettings, onConvert, isProcessing }: Props) {
+  if (!file) {
+    return (
+      <Card className="bg-card/40 backdrop-blur-xl border-white/5 flex flex-col h-full min-h-0 overflow-hidden items-center justify-center p-12 text-center opacity-40">
+        <div className="w-20 h-20 bg-white/5 rounded-[2.5rem] border border-white/10 flex items-center justify-center mb-6">
+          <Settings2 className="w-10 h-10 text-muted-foreground" />
+        </div>
+        <div className="space-y-2">
+          <h4 className="text-[11px] font-black uppercase tracking-[0.2em]">Neural Calibration</h4>
+          <p className="text-[10px] font-medium leading-relaxed">Load a source file to calibrate neural parameters and transformation paths.</p>
+        </div>
+      </Card>
+    );
+  }
+
   const targets = conversionTargets[file.format.toUpperCase()] || ['PDF', 'JPG', 'PNG'];
 
   const isImage = ['JPG', 'JPEG', 'PNG', 'WEBP', 'AVIF', 'HEIC', 'BMP', 'SVG', 'GIF'].includes(file.format.toUpperCase());
