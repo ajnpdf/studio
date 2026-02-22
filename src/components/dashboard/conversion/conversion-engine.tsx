@@ -1,11 +1,9 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
 import { InputPanel } from './input-panel';
 import { SettingsPanel } from './settings-panel';
 import { OutputPanel } from './output-panel';
-import { mockFiles } from './mock-data';
 import { PDFConverter, ConversionResult } from '@/lib/converters/pdf-converter';
 import { WordConverter } from '@/lib/converters/word-converter';
 import { ExcelConverter } from '@/lib/converters/excel-converter';
@@ -14,6 +12,8 @@ import { ODTConverter } from '@/lib/converters/odt-converter';
 import { ImageConverter } from '@/lib/converters/image-converter';
 import { RawConverter } from '@/lib/converters/raw-converter';
 import { VideoConverter } from '@/lib/converters/video-converter';
+import { AudioConverter } from '@/lib/converters/audio-converter';
+import { ArchiveConverter } from '@/lib/converters/archive-converter';
 import { useToast } from '@/hooks/use-toast';
 
 export type ConversionState = 'idle' | 'processing' | 'complete';
@@ -26,6 +26,7 @@ export interface ConversionSettings {
   ocr: boolean;
   resolution: string;
   bitrate: string;
+  sampleRate: string;
   filename: string;
   saveToWorkspace: boolean;
 }
@@ -33,9 +34,11 @@ export interface ConversionSettings {
 const IMAGE_EXTS = ['JPG', 'JPEG', 'PNG', 'WEBP', 'TIFF', 'BMP', 'GIF', 'SVG', 'AVIF', 'HEIC'];
 const RAW_EXTS = ['CR2', 'CR3', 'NEF', 'ARW', 'DNG', 'ORF', 'RW2', 'RAF'];
 const VIDEO_EXTS = ['MP4', 'MOV', 'AVI', 'MKV', 'WEBM', 'FLV', 'WMV', '3GP', 'TS', 'M4V'];
+const AUDIO_EXTS = ['MP3', 'WAV', 'AAC', 'M4A', 'FLAC', 'OGG', 'WMA', 'AIFF', 'AMR'];
+const ARCHIVE_EXTS = ['ZIP', 'RAR', '7Z', 'TAR', 'GZ', 'ISO', 'CAB'];
 
 export function ConversionEngine({ initialFileId }: { initialFileId: string | null }) {
-  const [file, setFile] = useState<any>(mockFiles.find(f => f.id === initialFileId) || null);
+  const [file, setFile] = useState<any>(null);
   const [state, setState] = useState<ConversionState>('idle');
   const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState('Initializing Engine...');
@@ -49,7 +52,8 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
     dpi: '300',
     ocr: false,
     resolution: '1080p',
-    bitrate: '320kbps',
+    bitrate: '192k',
+    sampleRate: '44100',
     filename: '',
     saveToWorkspace: true,
   });
@@ -72,21 +76,9 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
     setResult(null);
 
     try {
-      // For demo files, we fetch a random image. For real uploaded files, we use the blob.
-      let realFile: File;
-      if (file.file) {
-        realFile = file.file;
-      } else {
-        const response = await fetch(`https://picsum.photos/seed/${file.id}/800/600`);
-        const blob = await response.blob();
-        let mimeType = 'application/octet-stream';
-        const fmt = file.format.toUpperCase();
-        if (fmt === 'PDF') mimeType = 'application/pdf';
-        else if (fmt === 'DOCX') mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-        realFile = new File([blob], file.name, { type: mimeType });
-      }
-
+      let realFile: File = file.file;
       let converterResult: ConversionResult;
+      
       const onProgress = (p: number, msg: string) => {
         setProgress(p);
         setStatusMessage(msg);
@@ -117,6 +109,12 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
         converterResult = await converter.convertTo(settings.toFormat);
       } else if (VIDEO_EXTS.includes(fmt)) {
         const converter = new VideoConverter(realFile, onProgress);
+        converterResult = await converter.convertTo(settings.toFormat, settings);
+      } else if (AUDIO_EXTS.includes(fmt)) {
+        const converter = new AudioConverter(realFile, onProgress);
+        converterResult = await converter.convertTo(settings.toFormat, settings);
+      } else if (ARCHIVE_EXTS.includes(fmt)) {
+        const converter = new ArchiveConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat);
       } else {
         throw new Error(`Engine for ${file.format} is currently in calibration.`);

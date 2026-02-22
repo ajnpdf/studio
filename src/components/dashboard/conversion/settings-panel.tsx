@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,10 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowRight, Wand2, Search, Settings2, Clock, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowRight, Wand2, Settings2, Clock, Loader2 } from 'lucide-react';
 import { ConversionSettings } from './conversion-engine';
 
 interface Props {
@@ -22,44 +20,31 @@ interface Props {
 }
 
 const conversionTargets: Record<string, string[]> = {
-  'PDF': [
-    'DOCX', 'DOC', 'XLSX', 'XLS', 'PPTX', 'PPT', 
-    'TXT', 'RTF', 'HTML', 'EPUB', 'JPG', 'PNG', 
-    'TIFF', 'SVG', 'PDF/A', 'ODT', 'CSV', 'XML', 
-    'JSON', 'Markdown'
-  ],
+  // Document Targets
+  'PDF': ['DOCX', 'DOC', 'XLSX', 'XLS', 'PPTX', 'PPT', 'TXT', 'RTF', 'HTML', 'EPUB', 'JPG', 'PNG', 'TIFF', 'SVG', 'PDF/A', 'ODT', 'CSV', 'XML', 'JSON', 'Markdown'],
   'DOCX': ['PDF', 'TXT', 'HTML', 'RTF', 'EPUB', 'ODT', 'JPG', 'PNG'],
   'DOC': ['DOCX', 'PDF', 'TXT', 'HTML'],
   'XLSX': ['PDF', 'CSV', 'XLS', 'ODS', 'HTML', 'JSON', 'XML'],
-  'XLS': ['XLSX', 'CSV', 'PDF', 'HTML'],
   'CSV': ['XLSX', 'PDF', 'JSON', 'XML', 'TXT'],
+  // Image Targets
   'JPG': ['PNG', 'WebP', 'AVIF', 'BMP', 'TIFF', 'PDF', 'SVG'],
   'PNG': ['JPG', 'WebP', 'AVIF', 'SVG', 'PDF'],
   'GIF': ['MP4', 'WebP', 'PNG', 'JPG'],
   'SVG': ['PNG', 'JPG', 'PDF', 'EPS'],
-  'WEBP': ['JPG', 'PNG', 'TIFF'],
-  'HEIC': ['JPG', 'PNG', 'WEBP'],
-  'AVIF': ['JPG', 'PNG', 'WEBP'],
-  'CR2': ['JPG', 'PNG', 'TIFF', 'DNG'],
-  'NEF': ['JPG', 'PNG', 'TIFF', 'DNG'],
-  'ARW': ['JPG', 'PNG', 'TIFF', 'DNG'],
-  'DNG': ['JPG', 'PNG', 'TIFF'],
+  // Audio Targets
+  'MP3': ['WAV', 'AAC', 'OGG', 'FLAC', 'M4A'],
+  'WAV': ['MP3', 'FLAC', 'AAC'],
+  'FLAC': ['MP3', 'WAV'],
+  'AAC': ['MP3', 'WAV'],
+  // Video Targets
   'MP4': ['AVI', 'MOV', 'MKV', 'WEBM', 'GIF', 'MP3', 'WAV', 'AAC'],
   'MOV': ['MP4', 'GIF', 'AVI', 'MKV', 'WEBM'],
-  'AVI': ['MP4', 'MOV', 'MKV'],
-  'MKV': ['MP4', 'MOV', 'AVI'],
-  'WEBM': ['MP4', 'MOV', 'MKV'],
-  'FLV': ['MP4'],
-  'WMV': ['MP4'],
-  '3GP': ['MP4'],
-  'TS': ['MP4'],
-  'M4V': ['MP4'],
-  'MP3': ['WAV', 'AAC', 'OGG', 'FLAC', 'M4A'],
-  'PPTX': ['PDF', 'PPT', 'JPG', 'PNG', 'ODP'],
-  'PPT': ['PPTX', 'PDF', 'JPG', 'PNG'],
-  'ODT': ['PDF', 'DOCX', 'TXT', 'HTML'],
-  'ODS': ['XLSX', 'CSV', 'PDF', 'HTML'],
-  'ODP': ['PPTX', 'PDF', 'JPG', 'PNG'],
+  // Archive Targets
+  'ZIP': ['RAR', '7Z', 'TAR', 'ISO'],
+  'RAR': ['ZIP'],
+  '7Z': ['ZIP'],
+  'TAR': ['ZIP'],
+  'GZ': ['ZIP'],
 };
 
 export function SettingsPanel({ file, settings, setSettings, onConvert, isProcessing }: Props) {
@@ -80,8 +65,8 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
   const targets = conversionTargets[file.format.toUpperCase()] || ['PDF', 'JPG', 'PNG'];
 
   const isImage = ['JPG', 'JPEG', 'PNG', 'WEBP', 'AVIF', 'HEIC', 'BMP', 'SVG', 'GIF'].includes(file.format.toUpperCase());
-  const isRaw = ['CR2', 'NEF', 'ARW', 'DNG'].includes(file.format.toUpperCase());
   const isVideo = ['MP4', 'MOV', 'AVI', 'MKV', 'WEBM', 'FLV', 'WMV', '3GP', 'TS', 'M4V'].includes(file.format.toUpperCase());
+  const isAudio = ['MP3', 'WAV', 'AAC', 'M4A', 'FLAC', 'OGG', 'WMA', 'AIFF', 'AMR'].includes(file.format.toUpperCase());
 
   return (
     <Card className="bg-card/40 backdrop-blur-xl border-white/5 flex flex-col h-full min-h-0 overflow-hidden">
@@ -92,19 +77,12 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
         </div>
 
         <div className="p-6 flex-1 overflow-y-auto space-y-8 scrollbar-hide">
-          {/* Format Selection */}
           <div className="flex items-center justify-between gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
             <div className="space-y-1">
               <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Source</Label>
-              <div className="h-10 px-4 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center font-black text-sm uppercase">
-                {file.format}
-              </div>
+              <div className="h-10 px-4 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center font-black text-sm uppercase">{file.format}</div>
             </div>
-            
-            <div className="mt-4">
-              <ArrowRight className="w-6 h-6 text-primary animate-pulse" />
-            </div>
-
+            <div className="mt-4"><ArrowRight className="w-6 h-6 text-primary animate-pulse" /></div>
             <div className="space-y-1 flex-1">
               <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Target Format</Label>
               <Select value={settings.toFormat} onValueChange={(v) => setSettings({...settings, toFormat: v})}>
@@ -118,37 +96,19 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
             </div>
           </div>
 
-          {/* Contextual Options */}
           <div className="space-y-6">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
               <Wand2 className="w-3 h-3" /> Intelligent Parameters
             </h4>
 
-            {(isImage || isRaw) && (
+            {isImage && (
               <div className="space-y-6 animate-in slide-in-from-top-2">
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <Label className="text-[9px] font-black uppercase tracking-widest">Quality Factor</Label>
                     <span className="text-xs font-black text-primary">{settings.qualityValue}%</span>
                   </div>
-                  <Slider 
-                    value={[settings.qualityValue]} 
-                    max={100} 
-                    onValueChange={([v]) => setSettings({...settings, qualityValue: v})} 
-                  />
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-[9px] font-black uppercase tracking-widest">Target DPI</Label>
-                  <Select value={settings.dpi} onValueChange={(v) => setSettings({...settings, dpi: v})}>
-                    <SelectTrigger className="h-10 bg-white/5 border-white/10 font-black text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="72">72 DPI (Screen)</SelectItem>
-                      <SelectItem value="150">150 DPI (Print)</SelectItem>
-                      <SelectItem value="300">300 DPI (High-Res)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Slider value={[settings.qualityValue]} max={100} onValueChange={([v]) => setSettings({...settings, qualityValue: v})} />
                 </div>
               </div>
             )}
@@ -161,36 +121,22 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
                     <SelectTrigger className="h-10 bg-white/5 border-white/10 font-black text-xs">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="4k">4K (3840×2160)</SelectItem>
-                      <SelectItem value="1080p">1080p Full HD</SelectItem>
-                      <SelectItem value="720p">720p HD</SelectItem>
-                      <SelectItem value="480p">480p SD</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-[9px] font-black uppercase tracking-widest">Encoding Speed</Label>
-                  <Select defaultValue="medium">
-                    <SelectTrigger className="h-10 bg-white/5 border-white/10 font-black text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ultrafast">Ultrafast (Low Quality)</SelectItem>
-                      <SelectItem value="medium">Medium (Balanced)</SelectItem>
-                      <SelectItem value="veryslow">Very Slow (Max Quality)</SelectItem>
-                    </SelectContent>
+                    <SelectContent><SelectItem value="4k">4K (3840×2160)</SelectItem><SelectItem value="1080p">1080p Full HD</SelectItem><SelectItem value="720p">720p HD</SelectItem></SelectContent>
                   </Select>
                 </div>
               </div>
             )}
 
-            {file.format === 'PDF' && (
-              <div className="flex items-center gap-3 p-4 bg-primary/5 border border-primary/10 rounded-2xl">
-                <Checkbox id="ocr" checked={settings.ocr} onCheckedChange={(v) => setSettings({...settings, ocr: !!v})} />
-                <div className="grid gap-1">
-                  <Label htmlFor="ocr" className="text-[10px] font-black uppercase tracking-widest cursor-pointer">Enable OCR Engine</Label>
-                  <p className="text-[9px] text-muted-foreground font-medium">Reconstruct editable text layers from scans.</p>
+            {isAudio && (
+              <div className="space-y-6 animate-in slide-in-from-top-2">
+                <div className="space-y-3">
+                  <Label className="text-[9px] font-black uppercase tracking-widest">Bitrate</Label>
+                  <Select value={settings.bitrate} onValueChange={(v) => setSettings({...settings, bitrate: v})}>
+                    <SelectTrigger className="h-10 bg-white/5 border-white/10 font-black text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent><SelectItem value="128k">128 kbps (Mobile)</SelectItem><SelectItem value="192k">192 kbps (Standard)</SelectItem><SelectItem value="320k">320 kbps (Ultra)</SelectItem></SelectContent>
+                  </Select>
                 </div>
               </div>
             )}
@@ -209,7 +155,7 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
 
         <div className="p-6 bg-white/5 border-t border-white/5 space-y-4">
           <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-muted-foreground">
-            <span className="flex items-center gap-2"><Clock className="w-3 h-3" /> Est. Latency: {isRaw || isVideo ? '15-60s' : '2-5s'}</span>
+            <span className="flex items-center gap-2"><Clock className="w-3 h-3" /> Est. Latency: {isVideo ? '30-120s' : '2-5s'}</span>
             <span>Neural V2.5 Active</span>
           </div>
           <Button 
@@ -217,11 +163,7 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
             onClick={onConvert}
             disabled={isProcessing || !settings.toFormat}
           >
-            {isProcessing ? (
-              <><Loader2 className="w-5 h-5 animate-spin" /> Neural Sync...</>
-            ) : (
-              <><ArrowRight className="w-5 h-5" /> Execute Mastery</>
-            )}
+            {isProcessing ? <><Loader2 className="w-5 h-5 animate-spin" /> Neural Sync...</> : <><ArrowRight className="w-5 h-5" /> Execute Mastery</>}
           </Button>
         </div>
       </CardContent>
