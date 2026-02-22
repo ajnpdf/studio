@@ -10,7 +10,7 @@ import Link from 'next/link';
 const categories = [
   {
     id: 'Document',
-    title: 'PDF Neural Unit',
+    title: 'PDF Services Unit',
     count: '14 Units',
     desc: 'Advanced OOXML reconstruction, OCR layers, and archival processing.',
     icon: FileText,
@@ -21,7 +21,7 @@ const categories = [
     id: 'Image',
     title: 'Image Mastery',
     count: '12 Units',
-    desc: 'RAW development, neural upscaling, and vector transformations.',
+    desc: 'RAW development, smart upscaling, and vector transformations.',
     icon: ImageIcon,
     color: 'text-indigo-400',
     bg: 'bg-indigo-400/10'
@@ -51,11 +51,11 @@ export function JunctionCategories() {
     <div className="max-w-6xl mx-auto px-4 md:px-8 space-y-10 md:space-y-16 relative">
       <section className="text-center space-y-4 md:space-y-6">
         <h1 className="text-4xl md:text-7xl font-black tracking-tighter uppercase leading-[0.9] text-white">
-          Neural <br className="md:hidden" />
+          Network <br className="md:hidden" />
           <span className="text-primary/80">Junction</span>
         </h1>
         <p className="text-muted-foreground max-w-xl mx-auto font-bold text-[8px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-60 px-4">
-          Access specialized neural units for real-time infrastructure mastery.
+          Access specialized service units for real-time infrastructure mastery.
         </p>
       </section>
 

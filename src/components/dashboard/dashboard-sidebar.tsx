@@ -1,4 +1,3 @@
-
 "use client";
 
 import { 
@@ -36,6 +35,7 @@ import { useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useUser, useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
+import { LogoAnimation } from '@/components/landing/logo-animation';
 
 const navItems = [
   { icon: Repeat, label: 'Junction Core', href: '/dashboard/convert', description: 'Universal format engine' },
@@ -43,12 +43,12 @@ const navItems = [
 ];
 
 const toolItems = [
-  { icon: FileText, label: 'PDF Mastery', href: '/dashboard/pdf-editor', description: 'Neural PDF Studio' },
+  { icon: FileText, label: 'PDF Mastery', href: '/dashboard/pdf-editor', description: 'Smart PDF Studio' },
   { icon: ImageIcon, label: 'Image Mastery', href: '/dashboard/image-editor', description: 'Image Optimizer' },
   { icon: Video, label: 'Video Lab', href: '/dashboard/tools/video', description: 'FFmpeg transcode' },
   { icon: Music, label: 'Audio Studio', href: '/dashboard/tools/audio', description: 'Track surgery' },
   { icon: Box, label: 'Batch Center', href: '/dashboard/tools/batch', description: 'Multi-file tasks' },
-  { icon: BrainCircuit, label: 'AI Intelligence', href: '/dashboard/tools/ai', description: 'Semantic analysis' },
+  { icon: BrainCircuit, label: 'Smart Intelligence', href: '/dashboard/tools/ai', description: 'Semantic analysis' },
 ];
 
 const workspaceItems = [
@@ -111,11 +111,9 @@ export function DashboardSidebar() {
     )}>
       {/* Brand Header */}
       <div className="p-6 border-b border-white/5">
-        <Link href="/" className="flex items-center gap-3 group mb-8">
-          <div className="p-2.5 bg-white rounded-xl shadow-2xl transition-all group-hover:scale-110 group-hover:rotate-6">
-            <Network className="w-5 h-5 text-black" />
-          </div>
-          {!collapsed && <span className="font-black text-xl tracking-tighter text-white uppercase">AJN</span>}
+        <Link href="/" className="flex items-center gap-2 group mb-8">
+          <LogoAnimation className="w-16 h-8 md:w-20 md:h-10" showGlow={false} />
+          {!collapsed && <span className="font-black text-xl tracking-tighter text-white uppercase ml-[-8px]">AJN</span>}
         </Link>
 
         {user ? (
@@ -153,10 +151,10 @@ export function DashboardSidebar() {
         <div>
           {!collapsed && <p className="px-3 mb-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Operation Core</p>}
           <div className="space-y-1">
-            <NavLink item={{ icon: LayoutDashboard, label: 'Junction Hub', href: '/dashboard', description: 'Network Center' }} />
+            <NavLink item={{ icon: LayoutDashboard, label: 'Services Hub', href: '/dashboard', description: 'Network Center' }} />
             {navItems.map((item) => <NavLink key={item.href} item={item} />)}
             <div className="pt-4 mt-4 border-t border-white/5">
-              {!collapsed && <p className="px-3 mb-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Neural Units</p>}
+              {!collapsed && <p className="px-3 mb-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Service Units</p>}
               {toolItems.map((item) => <NavLink key={item.href} item={item} />)}
             </div>
           </div>

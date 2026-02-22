@@ -32,11 +32,11 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 const ALL_SERVICES = [
-  { id: 'pdf-docx', name: 'PDF to Word Master', desc: 'Reconstruct layouts via Neural OCR', cat: 'Document', icon: FileText, tag: 'WASM' },
-  { id: 'pdf-xlsx', name: 'PDF to Excel Grid', desc: 'Neural table detection & extraction', cat: 'Document', icon: Layers, tag: 'AI' },
+  { id: 'pdf-docx', name: 'PDF to Word Master', desc: 'Reconstruct layouts via Smart OCR', cat: 'Document', icon: FileText, tag: 'WASM' },
+  { id: 'pdf-xlsx', name: 'PDF to Excel Grid', desc: 'Smart table detection & extraction', cat: 'Document', icon: Layers, tag: 'AI' },
   { id: 'img-webp', name: 'Universal WebP Transcode', desc: 'Lossless compression for web nodes', cat: 'Image', icon: ImageIcon, tag: 'WASM' },
-  { id: 'bg-remove', name: 'Neural BG Removal', desc: 'AI-driven subject isolation', cat: 'Image', icon: Wand2, tag: 'Neural' },
-  { id: 'vid-gif', name: 'Video to Neural GIF', desc: 'Frame-accurate temporal mapping', cat: 'Video', icon: Video, tag: 'FFmpeg' },
+  { id: 'bg-remove', name: 'Smart BG Removal', desc: 'AI-driven subject isolation', cat: 'Image', icon: Wand2, tag: 'Smart' },
+  { id: 'vid-gif', name: 'Video to Smart GIF', desc: 'Frame-accurate temporal mapping', cat: 'Video', icon: Video, tag: 'FFmpeg' },
   { id: 'aud-trim', name: 'Audio Waveform Surgery', desc: 'Precise sample-level trimming', cat: 'Audio', icon: Music, tag: 'WASM' },
 ];
 
@@ -66,7 +66,7 @@ export default function AJNPage() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  const simulateNeuralProcessing = async (file: File) => {
+  const simulateProcessing = async (file: File) => {
     setFileMeta({ 
       name: file.name, 
       size: (file.size / (1024 * 1024)).toFixed(2) + ' MB' 
@@ -89,23 +89,21 @@ export default function AJNPage() {
       className="min-h-screen bg-[#020617] text-foreground selection:bg-primary/30 relative overflow-hidden font-body flex flex-col"
       onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
       onDragLeave={() => setIsDragging(false)}
-      onDrop={(e) => { e.preventDefault(); setIsDragging(false); if(e.dataTransfer.files[0]) simulateNeuralProcessing(e.dataTransfer.files[0]); }}
+      onDrop={(e) => { e.preventDefault(); setIsDragging(false); if(e.dataTransfer.files[0]) simulateProcessing(e.dataTransfer.files[0]); }}
     >
       <NightSky />
       
       {/* HUD HEADER */}
       <header className="fixed top-0 left-0 right-0 h-16 md:h-20 border-b border-white/5 bg-background/20 backdrop-blur-xl z-[60] px-4 md:px-8 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 md:gap-3 group">
-          <div className="p-1.5 md:p-2 bg-white rounded-lg shadow-2xl transition-all group-hover:scale-110">
-            <Network className="w-4 h-4 md:w-5 md:h-5 text-black" />
-          </div>
-          <span className="font-black text-lg md:text-xl tracking-tighter text-white uppercase">AJN</span>
+          <LogoAnimation className="w-16 h-8 md:w-20 md:h-10" showGlow={false} />
+          <span className="font-black text-lg md:text-xl tracking-tighter text-white uppercase ml-[-8px]">AJN</span>
         </Link>
         
         <div className="flex items-center gap-2 md:gap-6">
           <Link href="/junction">
             <Button variant="outline" className="h-8 md:h-9 border-white/10 bg-white/5 hover:bg-white hover:text-black font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-xl transition-all gap-2 px-3 md:px-4 shadow-2xl">
-              <Workflow className="w-3 md:w-3.5 h-3 md:h-3.5" /> <span className="hidden sm:inline">Junction</span> Hub
+              <Workflow className="w-3 md:w-3.5 h-3 md:h-3.5" /> <span className="hidden sm:inline">Services</span> Hub
             </Button>
           </Link>
           <div className="h-6 md:h-8 w-px bg-white/10 hidden sm:block" />
@@ -126,7 +124,7 @@ export default function AJNPage() {
                 autoFocus
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Find a neural service..." 
+                placeholder="Find a smart service..." 
                 className="h-12 md:h-14 pl-12 md:pl-14 pr-12 bg-transparent border-none text-base md:text-lg font-bold placeholder:opacity-30 focus-visible:ring-0"
               />
               <button onClick={() => setShowSearch(false)} className="absolute right-6 md:right-8 p-2 hover:bg-white/5 rounded-xl transition-colors">
@@ -159,7 +157,7 @@ export default function AJNPage() {
                 ) : (
                   <div className="py-20 text-center space-y-4 opacity-40">
                     <Search className="w-12 h-12 mx-auto text-muted-foreground" />
-                    <p className="text-[10px] font-black uppercase tracking-widest">No matching neural logic</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest">No matching service units</p>
                   </div>
                 )}
               </div>
@@ -183,7 +181,7 @@ export default function AJNPage() {
           isProcessing || showSearch ? "scale-95 opacity-40 blur-sm" : "scale-100"
         )}>
           
-          {/* LARGE GLOBAL SEARCH BOX - NOW AT THE TOP */}
+          {/* LARGE GLOBAL SEARCH BOX */}
           <div className="w-full max-w-2xl relative group animate-in fade-in slide-in-from-top-4 duration-1000 delay-200">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-[2.5rem] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
             <div className="relative flex items-center bg-[#0d1225]/80 backdrop-blur-3xl border border-white/10 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all hover:border-primary/40">
@@ -191,7 +189,7 @@ export default function AJNPage() {
               <input 
                 readOnly
                 onClick={() => setShowSearch(true)}
-                placeholder="Search 300+ Neural Units..." 
+                placeholder="Search 300+ Service Units..." 
                 className="w-full h-16 md:h-20 bg-transparent pl-16 md:pl-20 pr-24 text-base md:text-xl font-black uppercase tracking-widest text-white placeholder:text-muted-foreground/30 cursor-pointer outline-none"
               />
               <div className="absolute right-6 md:right-8 flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-xl border border-white/10">
@@ -214,7 +212,7 @@ export default function AJNPage() {
               isDragging && "border-primary bg-primary/10 scale-[0.98]"
             )}
           >
-            <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => e.target.files && simulateNeuralProcessing(e.target.files[0])} />
+            <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => e.target.files && simulateProcessing(e.target.files[0])} />
             
             <div className={cn(
               "w-16 h-16 md:w-20 md:h-20 bg-white/5 rounded-2xl md:rounded-3xl flex items-center justify-center mb-6 md:mb-8 shadow-2xl transition-all duration-500",
@@ -225,7 +223,7 @@ export default function AJNPage() {
 
             <div className="text-center space-y-2 md:space-y-3 px-6 md:px-8">
               <h2 className="text-2xl md:text-4xl font-black tracking-tight text-white uppercase leading-none">Drop to Optimize</h2>
-              <p className="text-[8px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-60">Professional Neural Transcoding System</p>
+              <p className="text-[8px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-60">Professional Smart Transcoding System</p>
             </div>
 
             <div className="mt-8 md:mt-12 flex flex-wrap justify-center gap-4 md:gap-8 text-[8px] md:text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em]">
@@ -247,7 +245,7 @@ export default function AJNPage() {
 
               <div className="space-y-4 md:space-y-6">
                 <div className="space-y-1">
-                  <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-white italic">Neural Processing</h2>
+                  <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-white italic">Processing Engine</h2>
                   <p className="text-[8px] md:text-[10px] font-black text-primary uppercase tracking-widest truncate max-w-[200px] mx-auto">{fileMeta?.name}</p>
                 </div>
                 

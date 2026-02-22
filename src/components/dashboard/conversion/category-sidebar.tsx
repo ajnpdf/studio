@@ -20,16 +20,16 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 const categories = [
-  { id: 'Document', icon: FileText, label: 'Document Studio', color: 'text-blue-400' },
-  { id: 'Image', icon: ImageIcon, label: 'Image Mastery', color: 'text-indigo-400' },
-  { id: 'Video', icon: Video, label: 'Video Transcode', color: 'text-purple-400' },
-  { id: 'Audio', icon: Music, label: 'Audio Engine', color: 'text-pink-400' },
+  { id: 'Document', icon: FileText, label: 'Document Services', color: 'text-blue-400' },
+  { id: 'Image', icon: ImageIcon, label: 'Image Services', color: 'text-indigo-400' },
+  { id: 'Video', icon: Video, label: 'Video Services', color: 'text-purple-400' },
+  { id: 'Audio', icon: Music, label: 'Audio Services', color: 'text-pink-400' },
   { id: 'Archive', icon: Archive, label: 'Archive Hub', color: 'text-amber-400' },
   { id: 'Code', icon: Code, label: 'Data & Code', color: 'text-emerald-400' },
-  { id: 'eBook', icon: BookOpen, label: 'Ebook Publish', color: 'text-cyan-400' },
+  { id: 'eBook', icon: BookOpen, label: 'Ebook Services', color: 'text-cyan-400' },
   { id: 'Design', icon: Wand2, label: 'Design Vector', color: 'text-orange-400' },
   { id: '3D/CAD', icon: Layers, label: 'Technical CAD', color: 'text-red-400' },
-  { id: 'Specialized', icon: Box, label: 'Specialized Intel', color: 'text-white' },
+  { id: 'Specialized', icon: Box, label: 'Specialized Tools', color: 'text-white' },
 ];
 
 interface Props {

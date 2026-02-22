@@ -16,14 +16,14 @@ export function ProgressSection({ jobs }: { jobs: ConversionJob[] }) {
             <Cpu className="w-4 h-4 text-primary animate-spin-slow" />
           </div>
           <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-primary">
-            Neural Task Queue ({jobs.length})
+            Smart Task Queue ({jobs.length})
           </h3>
         </div>
       </div>
 
       <div className="space-y-3">
         {jobs.map((job) => (
-          <Card key={job.id} className="bg-[#0d1225]/40 backdrop-blur-3xl border-white/5 overflow-hidden group border-2">
+          <Card key={job.id} className="bg-[#0d1225]/40 backdrop-blur-xl border-white/5 overflow-hidden group border-2">
             <CardContent className="p-5 flex items-center gap-6">
               <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center shrink-0 border border-white/5 relative overflow-hidden">
                 {job.status === 'processing' ? (
@@ -64,7 +64,7 @@ export function ProgressSection({ jobs }: { jobs: ConversionJob[] }) {
                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest animate-pulse flex items-center gap-2">
                     <span className="w-1 h-1 rounded-full bg-primary" /> {job.stage}
                   </p>
-                  <span className="text-[8px] font-bold text-muted-foreground/40 uppercase">AJN NEURAL ENGINE v1.0</span>
+                  <span className="text-[8px] font-bold text-muted-foreground/40 uppercase">AJN CORE ENGINE v1.0</span>
                 </div>
               </div>
 

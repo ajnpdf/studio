@@ -5,6 +5,7 @@ import { NightSky } from '@/components/dashboard/night-sky';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Network } from 'lucide-react';
 import Link from 'next/link';
+import { LogoAnimation } from '@/components/landing/logo-animation';
 
 export default function JunctionPage() {
   return (
@@ -14,10 +15,8 @@ export default function JunctionPage() {
       {/* HUD HEADER */}
       <header className="fixed top-0 left-0 right-0 h-16 md:h-20 border-b border-white/5 bg-background/20 backdrop-blur-xl z-50 px-4 md:px-8 flex items-center justify-between">
         <Link href="/ajn" className="flex items-center gap-2 md:gap-3 group">
-          <div className="p-1.5 md:p-2 bg-white rounded-lg shadow-2xl transition-all">
-            <Network className="w-4 h-4 md:w-5 md:h-5 text-black" />
-          </div>
-          <span className="font-black text-lg md:text-xl tracking-tighter text-white uppercase">AJN JUNCTION</span>
+          <LogoAnimation className="w-16 h-8 md:w-20 md:h-10" showGlow={false} />
+          <span className="font-black text-lg md:text-xl tracking-tighter text-white uppercase ml-[-8px]">AJN JUNCTION</span>
         </Link>
         
         <Link href="/ajn">

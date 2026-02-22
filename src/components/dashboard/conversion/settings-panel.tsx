@@ -26,7 +26,7 @@ export function SettingsPanel({ settings, setSettings }: Props) {
           <div className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
             <Settings2 className="w-4 h-4 text-muted-foreground/60" />
           </div>
-          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60">Neural Config</h3>
+          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60">Services Config</h3>
         </div>
         <Badge variant="outline" className="text-[8px] font-black border-emerald-500/20 text-emerald-500 uppercase tracking-widest">LIVE SYNC</Badge>
       </header>
@@ -57,7 +57,7 @@ export function SettingsPanel({ settings, setSettings }: Props) {
         {/* Video Settings */}
         <section className="space-y-4">
           <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 flex items-center gap-2">
-            <Cpu className="w-3.5 h-3.5" /> Neural Resolution
+            <Cpu className="w-3.5 h-3.5" /> Smart Resolution
           </Label>
           <Select value={settings.resolution} onValueChange={(v) => setSettings({...settings, resolution: v})}>
             <SelectTrigger className="h-12 bg-white/5 border-white/10 rounded-xl font-black text-xs uppercase focus:ring-primary/20 px-4">
@@ -116,7 +116,7 @@ export function SettingsPanel({ settings, setSettings }: Props) {
           </div>
           <div className="flex items-center justify-between p-5 bg-white/5 rounded-2xl border border-white/10 group transition-all hover:border-primary/20">
             <div className="space-y-1">
-              <p className="text-[10px] font-black uppercase text-white tracking-widest">Neural Cache</p>
+              <p className="text-[10px] font-black uppercase text-white tracking-widest">Smart Cache</p>
               <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest opacity-60">Optimize Repetition</p>
             </div>
             <Switch className="data-[state=checked]:bg-primary" />

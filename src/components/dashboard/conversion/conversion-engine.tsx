@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { History, Search, Sun, Monitor, Activity, ShieldCheck, Cpu } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { LogoAnimation } from '@/components/landing/logo-animation';
 
 export function ConversionEngine({ initialFileId }: { initialFileId: string | null }) {
   const [jobs, setJobs] = useState<ConversionJob[]>([]);
@@ -44,14 +45,17 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
       <main className="flex-1 flex flex-col min-w-0 border-r border-white/5 relative">
         <header className="h-16 border-b border-white/5 bg-background/40 backdrop-blur-xl flex items-center justify-between px-6 shrink-0 z-20">
           <div className="flex items-center gap-4 flex-1">
-            <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
-              <Cpu className="w-3.5 h-3.5 text-primary animate-pulse" />
-              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">v1.0 REAL-TIME</span>
+            <div className="flex items-center gap-2">
+              <LogoAnimation className="w-14 h-7" showGlow={false} />
+              <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
+                <Cpu className="w-3.5 h-3.5 text-primary animate-pulse" />
+                <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">v1.0 REAL-TIME</span>
+              </div>
             </div>
             <div className="relative max-w-sm w-full group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
               <Input 
-                placeholder="Search formats (e.g. 'HEIC', 'CAD')..." 
+                placeholder="Search services (e.g. 'HEIC', 'CAD')..." 
                 className="h-9 pl-9 bg-white/5 border-white/10 text-xs font-bold focus:ring-primary/50"
               />
             </div>

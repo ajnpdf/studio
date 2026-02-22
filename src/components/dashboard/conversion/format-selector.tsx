@@ -104,7 +104,7 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange }:
       {quickPills.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 px-4">
           <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-            <Star className="w-3 h-3 text-primary fill-current" /> TOP {category.toUpperCase()} TASKS:
+            <Star className="w-3 h-3 text-primary fill-current" /> TOP {category.toUpperCase()} SERVICES:
           </span>
           {quickPills.map(pill => (
             <button 

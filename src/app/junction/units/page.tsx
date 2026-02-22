@@ -1,4 +1,3 @@
-
 "use client";
 
 import { UnitWorkspace } from '@/components/junction/unit-workspace';
@@ -8,10 +7,11 @@ import { ArrowLeft, Network, ShieldCheck, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { LogoAnimation } from '@/components/landing/logo-animation';
 
 /**
  * AJN Units Page
- * Immersive workspace for executing neural transformations.
+ * Immersive workspace for executing smart transformations.
  */
 function UnitsContent() {
   const searchParams = useSearchParams();
@@ -24,11 +24,9 @@ function UnitsContent() {
       {/* PROFESSIONAL WORKSPACE HEADER */}
       <header className="h-16 border-b border-white/5 bg-background/40 backdrop-blur-xl flex items-center justify-between px-6 shrink-0 z-50">
         <div className="flex items-center gap-6">
-          <Link href="/junction" className="flex items-center gap-3 group">
-            <div className="p-1.5 bg-white rounded-lg shadow-2xl transition-all group-hover:rotate-6">
-              <Network className="w-4 h-4 text-black" />
-            </div>
-            <span className="font-black text-sm tracking-tighter uppercase">Neural Unit Workspace</span>
+          <Link href="/junction" className="flex items-center gap-2 group">
+            <LogoAnimation className="w-14 h-7" showGlow={false} />
+            <span className="font-black text-sm tracking-tighter uppercase ml-[-4px]">Service Unit Workspace</span>
           </Link>
           <div className="h-6 w-px bg-white/10" />
           <div className="flex items-center gap-4">
@@ -59,7 +57,7 @@ function UnitsContent() {
 
 export default function UnitsPage() {
   return (
-    <Suspense fallback={<div className="h-screen bg-background flex items-center justify-center font-black uppercase tracking-[0.5em]">Loading Neural Layer...</div>}>
+    <Suspense fallback={<div className="h-screen bg-background flex items-center justify-center font-black uppercase tracking-[0.5em]">Loading Layer...</div>}>
       <UnitsContent />
     </Suspense>
   );

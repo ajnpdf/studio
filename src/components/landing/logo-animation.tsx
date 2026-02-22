@@ -1,23 +1,26 @@
 "use client";
 
 import React from 'react';
+import { cn } from '@/lib/utils';
 
 /**
- * AJN Neural Logo Animation
+ * AJN Tools Logo Animation
  * The high-fidelity, monochromatic global brand centerpiece.
  * Features: Staggered path-draw, flowing gradients, and ambient radial glow.
  */
-export function LogoAnimation() {
+export function LogoAnimation({ className, showGlow = true }: { className?: string, showGlow?: boolean }) {
   return (
-    <div className="relative flex justify-center items-center py-20 select-none group">
-      {/* Ambient background light (Integrated from Pro snippet) */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[500px] h-[500px] bg-[radial-gradient(circle,#38bdf8_0%,transparent_70%)] opacity-[0.08] animate-bg-drift blur-3xl" />
-      </div>
+    <div className={cn("relative flex justify-center items-center select-none group", className)}>
+      {/* Ambient background light */}
+      {showGlow && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-[500px] h-[500px] bg-[radial-gradient(circle,#38bdf8_0%,transparent_70%)] opacity-[0.08] animate-bg-drift blur-3xl" />
+        </div>
+      )}
       
       <svg 
         viewBox="0 0 300 120" 
-        className="w-[320px] md:w-[480px] transition-all duration-500 cursor-pointer hover:scale-105 active:scale-95 z-10"
+        className="w-full h-full transition-all duration-500 cursor-pointer hover:scale-105 active:scale-95 z-10"
       >
         <defs>
           <linearGradient id="ajn-grad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -27,7 +30,7 @@ export function LogoAnimation() {
           </linearGradient>
         </defs>
 
-        {/* AJN Paths with Staggered Neural Animation */}
+        {/* AJN Paths with Staggered Smart Animation */}
         <g className="logo-paths">
           {/* A */}
           <path d="M20 100 L55 20 L90 100" className="logo-path" />
@@ -52,7 +55,7 @@ export function LogoAnimation() {
           stroke-dasharray: 400;
           stroke-dashoffset: 400;
           
-          /* Neural glow & animation pipeline */
+          /* Smart glow & animation pipeline */
           filter: drop-shadow(0 0 6px rgba(56,189,248,0.35));
           animation: 
             draw 1.6s ease forwards,
