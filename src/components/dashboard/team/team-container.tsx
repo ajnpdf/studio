@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -9,7 +8,7 @@ import { TeamActivityTab } from './team-activity-tab';
 import { UsageAnalyticsTab } from './usage-analytics-tab';
 import { TeamSettingsTab } from './team-settings-tab';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Users, FolderShared, History, BarChart3, Settings as SettingsIcon, ShieldCheck } from 'lucide-react';
+import { Users, FolderCode, History, BarChart3, Settings as SettingsIcon, ShieldCheck } from 'lucide-react';
 
 export function TeamContainer() {
   const [activeTab, setActiveTab] = useState('members');
@@ -40,7 +39,7 @@ export function TeamContainer() {
             <TabsList className="bg-white/5 border border-white/10 h-14 p-1 rounded-2xl w-full lg:w-auto overflow-x-auto scrollbar-hide flex justify-start lg:justify-center">
               {[
                 { id: 'members', icon: Users, label: 'MEMBERS' },
-                { id: 'files', icon: FolderShared, label: 'SHARED FILES' },
+                { id: 'files', icon: FolderCode, label: 'SHARED FILES' },
                 { id: 'activity', icon: History, label: 'ACTIVITY LOG' },
                 { id: 'analytics', icon: BarChart3, label: 'USAGE ANALYTICS' },
                 { id: 'settings', icon: SettingsIcon, label: 'TEAM SETTINGS' },

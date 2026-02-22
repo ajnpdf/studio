@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -13,7 +12,7 @@ import {
   ZoomOut, 
   Info, 
   Volume2, 
-  Mic2 
+  Mic 
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
@@ -127,7 +126,7 @@ export function WaveformPlayer({ audio }: { audio: any }) {
           </div>
         </div>
         <Button variant="outline" className="h-9 gap-2 border-white/10 bg-white/5 text-[10px] font-bold uppercase tracking-widest">
-          <Mic2 className="w-3.5 h-3.5" /> Re-Record
+          <Mic className="w-3.5 h-3.5" /> Re-Record
         </Button>
       </div>
     </section>

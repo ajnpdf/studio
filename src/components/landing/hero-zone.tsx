@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Upload, Monitor, HardDrive, Link as LinkIcon, FileText, Video, ImageIcon, Music, Database, FileCode, CheckCircle2, ArrowRight, Activity, Network } from 'lucide-react';
+import { Upload, Monitor, HardDrive, Link as LinkIcon, FileText, Video, ImageIcon, Music, Database, FileCode, CheckCircle2, ArrowRight, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { LogoAnimation } from './logo-animation';
 
 const formatPills = [
   { icon: FileText, label: 'PDF', color: 'text-white/60' },
@@ -28,13 +29,13 @@ export function HeroZone() {
 
   return (
     <section className="relative pt-40 pb-32 overflow-hidden min-h-screen flex flex-col items-center justify-center text-center bg-sufw-gradient">
-      {/* Dynamic Background Glows */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px] pointer-events-none animate-pulse-slow"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/5 rounded-full blur-[120px] pointer-events-none animate-pulse-slow delay-1000"></div>
+      {/* Ambient background light glows */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-5xl mx-auto space-y-6 mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] font-black uppercase tracking-[0.2em] mb-4">
+        <div className="max-w-5xl mx-auto space-y-2 mb-12">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] font-black uppercase tracking-[0.2em] mb-8 animate-in fade-in duration-1000">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
@@ -42,27 +43,24 @@ export function HeroZone() {
             Neural Processing Network Active
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] text-white uppercase">
-            AJN – All-in-one <br />
-            Junction Network
-          </h1>
+          <LogoAnimation />
           
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
             <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-md border border-white/5">
               <Activity className="w-3 h-3 text-white/40 animate-pulse" />
               <p className="text-[10px] font-bold text-white/60 tracking-widest uppercase">
                 Every File. One Smart Network.
               </p>
             </div>
-            <p className="text-sm text-muted-foreground max-w-xl mx-auto font-medium leading-relaxed mt-2">
+            <p className="text-sm text-muted-foreground max-w-xl mx-auto font-medium leading-relaxed mt-4">
               The professional all-in-one junction for real-time conversion, intelligence, and file mastery. 
-              Used by 2M+ experts and developers.
+              Used by 2M+ experts and developers globally.
             </p>
           </div>
         </div>
 
         {/* Upload Zone */}
-        <div className="relative max-w-3xl mx-auto">
+        <div className="relative max-w-3xl mx-auto mt-12 animate-in fade-in zoom-in-95 duration-1000 delay-700">
           {/* Animated Format Pills Orbit */}
           <div className="absolute inset-0 pointer-events-none hidden lg:block">
             {formatPills.map((pill, idx) => (
@@ -127,9 +125,9 @@ export function HeroZone() {
             <span className="w-12 h-px bg-white/10"></span>
           </p>
           
-          <Link href="/dashboard">
+          <Link href="/dashboard/convert">
             <Button size="lg" className="h-16 px-12 text-sm font-black tracking-widest bg-white text-black hover:bg-white/90 shadow-2xl shadow-white/5 rounded-2xl group uppercase">
-              Get Started for Free <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              Launch Converter Now <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
         </div>
