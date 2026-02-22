@@ -147,7 +147,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                   </div>
                 )}
 
-                {(initialUnitId === 'split-pdf' || initialUnitId === 'extract-pages') && (
+                {(initialUnitId === 'split-pdf' || initialUnitId === 'extract-pages' || initialUnitId === 'remove-pages') && (
                   <div className="space-y-3">
                     <Label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest ml-1">Page Range</Label>
                     <div className="relative">

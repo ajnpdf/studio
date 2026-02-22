@@ -78,7 +78,7 @@ export const ALL_UNITS: ServiceUnit[] = [
   { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Rotate your PDFs the way you need them. Even multiple PDFs at once.', icon: RotateCw, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
   { id: 'page-numbers', name: 'Page Numbers', desc: 'Add page numbers into PDFs with ease.', icon: Hash, tag: 'TOOL', cat: 'Document', complexity: 'SMART' },
   { id: 'watermark-pdf', name: 'Add Watermark', desc: 'Stamp an image or text over your PDF in seconds.', icon: Printer, tag: 'BRAND', cat: 'Document', complexity: 'SMART' },
-  { id: 'crop-pdf', name: 'Crop PDF', desc: 'Crop margins or select specific areas for one or all pages.', icon: Crop, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
+  { id: 'crop-pdf', name: 'Crop PDF', desc: 'Crop margins of PDF documents or select specific areas for one or all pages.', icon: Crop, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
 
   // --- SECURITY & TRUST ---
   { id: 'unlock-pdf', name: 'Unlock PDF', desc: 'Remove PDF password security and permissions freedom.', icon: Unlock, tag: 'SECURE', cat: 'Document', complexity: 'WASM' },

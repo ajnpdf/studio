@@ -59,6 +59,24 @@ export class PDFManipulator {
     };
   }
 
+  async removePages(pagesToRemove: number[]): Promise<ConversionResult> {
+    this.updateProgress(20, "Pruning targeted pages...");
+    const pdf = await PDFDocument.load(await this.files[0].arrayBuffer());
+    const newPdf = await PDFDocument.create();
+    const total = pdf.getPageCount();
+    const indicesToKeep = Array.from({ length: total }, (_, i) => i).filter(i => !pagesToRemove.includes(i));
+    
+    const copiedPages = await newPdf.copyPages(pdf, indicesToKeep);
+    copiedPages.forEach(p => newPdf.addPage(p));
+
+    const bytes = await newPdf.save();
+    return {
+      blob: new Blob([bytes], { type: 'application/pdf' }),
+      fileName: `pruned_${this.files[0].name}`,
+      mimeType: 'application/pdf'
+    };
+  }
+
   async rotate(angle: number): Promise<ConversionResult> {
     this.updateProgress(30, `Applying geometric rotation: ${angle}°`);
     const pdf = await PDFDocument.load(await this.files[0].arrayBuffer());

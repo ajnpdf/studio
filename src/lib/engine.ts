@@ -154,6 +154,8 @@ class ConversionEngine {
       case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
       case 'repair-pdf': return specialized.convertTo('REDACTED_PDF'); 
       case 'compress-pdf': return manip.rotate(0); // Dummy compress pass for proto
+      case 'remove-pages': return manip.removePages(job.settings.pages || []);
+      case 'organize-pdf': return manip.rotate(0); // Dummy organize pass
       default: return this.runConversion(job);
     }
   }
