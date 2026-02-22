@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Search, Bell, Plus, Menu, User, Settings, LogOut } from 'lucide-react';
@@ -12,6 +13,7 @@ import {
   DropdownMenuSeparator 
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Link from 'next/link';
 
 export function DashboardTopBar() {
   return (
@@ -30,10 +32,12 @@ export function DashboardTopBar() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Button className="bg-brand-gradient hover:opacity-90 shadow-lg text-white font-bold h-10 gap-2 px-4">
-          <Plus className="w-4 h-4" />
-          <span className="hidden sm:inline">New Upload</span>
-        </Button>
+        <Link href="/dashboard/upload">
+          <Button className="bg-brand-gradient hover:opacity-90 shadow-lg text-white font-bold h-10 gap-2 px-4">
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">New Upload</span>
+          </Button>
+        </Link>
 
         <div className="relative">
           <Button variant="ghost" size="icon" className="h-10 w-10 relative">
