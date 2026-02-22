@@ -20,6 +20,18 @@ export class DesignConverter {
     this.onProgress?.(percent, message);
   }
 
+  private async loadPSDLibrary() {
+    // Load from CDN to avoid CoffeeScript build issues in node_modules
+    return new Promise<any>((resolve, reject) => {
+      if ((window as any).PSD) return resolve((window as any).PSD);
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/psd.js@3.4.0/dist/psd.min.js';
+      script.onload = () => resolve((window as any).PSD);
+      script.onerror = () => reject(new Error("Failed to load PSD neural developer."));
+      document.head.appendChild(script);
+    });
+  }
+
   async convertTo(targetFormat: string): Promise<ConversionResult> {
     const target = targetFormat.toUpperCase();
     const baseName = this.file.name.split('.')[0];
@@ -51,16 +63,17 @@ export class DesignConverter {
   }
 
   private async handlePsd(baseName: string, target: string): Promise<ConversionResult> {
-    this.updateProgress(30, "Loading PSD composite buffer...");
+    this.updateProgress(20, "Loading PSD neural development module...");
+    const PSD = await this.loadPSDLibrary();
     
-    // Dynamic import for PSD.js to save initial bundle size
-    // @ts-ignore
-    const PSD = (await import('psd')).default;
+    this.updateProgress(40, "Loading composite buffer...");
     const psd = await PSD.fromArrayBuffer(await this.file.arrayBuffer());
     await psd.parse();
     
     const canvas = psd.image.toCanvas();
     const type = target === 'PNG' ? 'image/png' : 'image/jpeg';
+    
+    this.updateProgress(80, "Finalizing composite output...");
     const blob = await new Promise<Blob>((resolve) => canvas.toBlob((b: any) => resolve(b!), type, 0.92));
 
     return {
