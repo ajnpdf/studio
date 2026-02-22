@@ -1,226 +1,109 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { InputPanel } from './input-panel';
+import { CategorySidebar } from './category-sidebar';
+import { FormatSelector } from './format-selector';
+import { DropZone } from './drop-zone';
 import { SettingsPanel } from './settings-panel';
-import { OutputPanel } from './output-panel';
-import { PDFConverter, ConversionResult } from '@/lib/converters/pdf-converter';
-import { WordConverter } from '@/lib/converters/word-converter';
-import { ExcelConverter } from '@/lib/converters/excel-converter';
-import { PPTConverter } from '@/lib/converters/ppt-converter';
-import { ODTConverter } from '@/lib/converters/odt-converter';
-import { ImageConverter } from '@/lib/converters/image-converter';
-import { RawConverter } from '@/lib/converters/raw-converter';
-import { VideoConverter } from '@/lib/converters/video-converter';
-import { AudioConverter } from '@/lib/converters/audio-converter';
-import { ArchiveConverter } from '@/lib/converters/archive-converter';
-import { CodeConverter } from '@/lib/converters/code-converter';
-import { EbookConverter } from '@/lib/converters/ebook-converter';
-import { DesignConverter } from '@/lib/converters/design-converter';
-import { CADConverter } from '@/lib/converters/cad-converter';
-import { SpecializedConverter } from '@/lib/converters/specialized-converter';
-import { useToast } from '@/hooks/use-toast';
-
-export type ConversionState = 'idle' | 'processing' | 'complete';
-
-export interface ConversionSettings {
-  toFormat: string;
-  quality: 'low' | 'medium' | 'high';
-  qualityValue: number;
-  dpi: string;
-  ocr: boolean;
-  resolution: string;
-  bitrate: string;
-  sampleRate: string;
-  filename: string;
-  saveToWorkspace: boolean;
-  indent: number;
-  sqlFlavor: 'mysql' | 'postgres' | 'sqlite';
-}
-
-const IMAGE_EXTS = ['JPG', 'JPEG', 'PNG', 'WEBP', 'TIFF', 'BMP', 'GIF', 'SVG', 'AVIF', 'HEIC'];
-const RAW_EXTS = ['CR2', 'CR3', 'NEF', 'ARW', 'DNG', 'ORF', 'RW2', 'RAF'];
-const VIDEO_EXTS = ['MP4', 'MOV', 'AVI', 'MKV', 'WEBM', 'FLV', 'WMV', '3GP', 'TS', 'M4V'];
-const AUDIO_EXTS = ['MP3', 'WAV', 'AAC', 'M4A', 'FLAC', 'OGG', 'WMA', 'AIFF', 'AMR'];
-const ARCHIVE_EXTS = ['ZIP', 'RAR', '7Z', 'TAR', 'GZ', 'ISO', 'CAB'];
-const CODE_EXTS = ['JSON', 'XML', 'CSV', 'YAML', 'YML', 'HTML', 'MD', 'MARKDOWN', 'SQL'];
-const EBOOK_EXTS = ['EPUB', 'MOBI', 'AZW', 'AZW3', 'FB2'];
-const DESIGN_EXTS = ['PSD', 'AI', 'EPS', 'CDR'];
-const CAD_EXTS = ['STL', 'OBJ', 'DXF', 'FBX', 'DWG'];
-const SPECIAL_TARGETS = ['SEARCHABLE_PDF', 'REDACTED_PDF', 'FILLABLE_PDF', 'TRANSCRIPT', 'BASE64'];
+import { ProgressSection } from './progress-section';
+import { OutputSection } from './output-section';
+import { engine, ConversionJob } from '@/lib/engine';
+import { HistoryDrawer } from '../history-drawer';
+import { PreviewModal } from '../preview-modal';
+import { Button } from '@/components/ui/button';
+import { History, Search, Moon, Sun, Monitor, Activity } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 
 export function ConversionEngine({ initialFileId }: { initialFileId: string | null }) {
-  const [file, setFile] = useState<any>(null);
-  const [state, setState] = useState<ConversionState>('idle');
-  const [progress, setProgress] = useState(0);
-  const [statusMessage, setStatusMessage] = useState('Initializing Engine...');
-  const [result, setResult] = useState<ConversionResult | null>(null);
-  const { toast } = useToast();
-
-  const [settings, setSettings] = useState<ConversionSettings>({
-    toFormat: '',
-    quality: 'medium',
-    qualityValue: 80,
-    dpi: '300',
-    ocr: false,
-    resolution: '1080p',
-    bitrate: '192k',
-    sampleRate: '44100',
-    filename: '',
-    saveToWorkspace: true,
-    indent: 2,
-    sqlFlavor: 'mysql'
-  });
+  const [jobs, setJobs] = useState<ConversionJob[]>([]);
+  const [activeCategory, setActiveCategory] = useState('Document');
+  const [fromFmt, setFromFmt] = useState('');
+  const [toFmt, setToFmt] = useState('');
+  const [settings, setSettings] = useState({ quality: 85, resolution: '1080p', ocrLang: 'eng' });
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [previewJob, setPreviewJob] = useState<ConversionJob | null>(null);
 
   useEffect(() => {
-    if (file) {
-      setSettings(prev => ({
-        ...prev,
-        filename: `${file.name.split('.')[0]}_mastered`,
-        toFormat: '', 
-      }));
-    }
-  }, [file]);
+    return engine.subscribe(setJobs);
+  }, []);
 
-  const handleConvert = async () => {
-    if (!settings.toFormat || !file) return;
-    
-    setState('processing');
-    setProgress(0);
-    setResult(null);
-
-    try {
-      let realFile: File = file.file;
-      let converterResult: ConversionResult;
-      
-      const onProgress = (p: number, msg: string) => {
-        setProgress(p);
-        setStatusMessage(msg);
-      };
-
-      const fmt = file.format.toUpperCase();
-      const target = settings.toFormat.toUpperCase();
-
-      if (SPECIAL_TARGETS.includes(target)) {
-        const converter = new SpecializedConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(target, settings);
-      } else if (fmt === 'PDF') {
-        const converter = new PDFConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(settings.toFormat);
-      } else if (fmt === 'DOCX' || fmt === 'DOC') {
-        const converter = new WordConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(settings.toFormat);
-      } else if (fmt === 'XLSX' || fmt === 'XLS' || fmt === 'CSV' || fmt === 'ODS') {
-        if (CODE_EXTS.includes(fmt) && !['PDF', 'XLSX'].includes(settings.toFormat.toUpperCase())) {
-           const converter = new CodeConverter(realFile, onProgress);
-           converterResult = await converter.convertTo(settings.toFormat, settings);
-        } else {
-           const converter = new ExcelConverter(realFile, onProgress);
-           converterResult = await converter.convertTo(settings.toFormat);
-        }
-      } else if (fmt === 'PPTX' || fmt === 'PPT' || fmt === 'ODP') {
-        const converter = new PPTConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(settings.toFormat);
-      } else if (fmt === 'ODT') {
-        const converter = new ODTConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(settings.toFormat);
-      } else if (IMAGE_EXTS.includes(fmt)) {
-        const converter = new ImageConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(settings.toFormat);
-      } else if (RAW_EXTS.includes(fmt)) {
-        const converter = new RawConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(settings.toFormat);
-      } else if (VIDEO_EXTS.includes(fmt)) {
-        const converter = new VideoConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(settings.toFormat, settings);
-      } else if (AUDIO_EXTS.includes(fmt)) {
-        const converter = new AudioConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(settings.toFormat, settings);
-      } else if (ARCHIVE_EXTS.includes(fmt)) {
-        const converter = new ArchiveConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(settings.toFormat);
-      } else if (CODE_EXTS.includes(fmt)) {
-        const converter = new CodeConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(settings.toFormat, settings);
-      } else if (EBOOK_EXTS.includes(fmt)) {
-        const converter = new EbookConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(settings.toFormat);
-      } else if (DESIGN_EXTS.includes(fmt)) {
-        const converter = new DesignConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(settings.toFormat);
-      } else if (CAD_EXTS.includes(fmt)) {
-        const converter = new CADConverter(realFile, onProgress);
-        converterResult = await converter.convertTo(settings.toFormat);
-      } else {
-        throw new Error(`Engine for ${file.format} is currently in calibration.`);
-      }
-      
-      setResult(converterResult);
-      setState('complete');
-      
-      toast({
-        title: "Conversion Successful",
-        description: `Your ${settings.toFormat} file is ready for download.`,
-      });
-    } catch (err: any) {
-      console.error(err);
-      setState('idle');
-      toast({
-        variant: "destructive",
-        title: "Conversion Failed",
-        description: err.message || "An error occurred during neural processing.",
-      });
-    }
+  const handleFilesAdded = (files: File[]) => {
+    engine.addJobs(files, fromFmt, toFmt, settings);
   };
 
-  const handleFileUpload = (f: File) => {
-    setFile({
-      id: Math.random().toString(36).substring(7),
-      name: f.name,
-      size: (f.size / (1024 * 1024)).toFixed(2) + ' MB',
-      format: f.name.split('.').pop()?.toUpperCase() || 'UNK',
-      type: f.type.split('/')[0],
-      date: new Date().toLocaleDateString(),
-      file: f
-    });
-    setResult(null);
-    setState('idle');
-  };
-
-  const reset = () => {
-    setState('idle');
-    setProgress(0);
-    setResult(null);
-  };
+  const completedJobs = jobs.filter(j => j.status === 'complete');
+  const activeJobs = jobs.filter(j => j.status === 'processing' || j.status === 'queued');
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full min-h-0">
-      {/* LEFT PANEL — Input File */}
-      <InputPanel 
-        file={file} 
-        onReplace={() => setFile(null)} 
-        onUpload={handleFileUpload}
-      />
+    <div className="flex h-full bg-background overflow-hidden animate-in fade-in duration-700">
+      {/* LEFT — CATEGORY SIDEBAR */}
+      <CategorySidebar active={activeCategory} onSelect={setActiveCategory} />
 
-      {/* CENTER PANEL — Settings */}
-      <SettingsPanel 
-        file={file} 
-        settings={settings} 
-        setSettings={setSettings} 
-        onConvert={handleConvert}
-        isProcessing={state === 'processing'}
-      />
+      {/* MAIN CENTER COLUMN */}
+      <main className="flex-1 flex flex-col min-w-0 border-r border-white/5 relative">
+        <header className="h-16 border-b border-white/5 bg-background/40 backdrop-blur-xl flex items-center justify-between px-6 shrink-0 z-20">
+          <div className="flex items-center gap-4 flex-1">
+            <Badge variant="outline" className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-widest px-3 h-6">
+              v1.0 Real-Time
+            </Badge>
+            <div className="relative max-w-sm w-full group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+              <Input 
+                placeholder="Search formats (e.g. 'HEIC', 'CAD')..." 
+                className="h-9 pl-9 bg-white/5 border-white/10 text-xs font-bold focus:ring-primary/50"
+              />
+            </div>
+          </div>
 
-      {/* RIGHT PANEL — Output Preview */}
-      <OutputPanel 
-        state={state} 
-        progress={progress} 
-        statusMessage={statusMessage}
-        file={file} 
-        settings={settings}
-        result={result}
-        onReset={reset}
-      />
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => setHistoryOpen(true)} className="h-9 w-9 hover:bg-white/5 relative">
+              <History className="w-4 h-4" />
+              {completedJobs.length > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full border-2 border-background" />
+              )}
+            </Button>
+            <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-white/5">
+              <Sun className="w-4 h-4" />
+            </Button>
+          </div>
+        </header>
+
+        <div className="flex-1 overflow-y-auto scrollbar-hide">
+          <div className="p-8 space-y-10 max-w-5xl mx-auto">
+            {/* FORMAT SELECTOR HUB */}
+            <FormatSelector 
+              category={activeCategory} 
+              from={fromFmt} 
+              to={toFmt} 
+              onFromChange={setFromFmt} 
+              onToChange={setToFmt} 
+            />
+
+            {/* CENTRAL DROP ZONE */}
+            <DropZone onFiles={handleFilesAdded} />
+
+            {/* PROCESSING QUEUE */}
+            {activeJobs.length > 0 && <ProgressSection jobs={activeJobs} />}
+
+            {/* OUTPUT CARDS */}
+            {completedJobs.length > 0 && (
+              <OutputSection 
+                jobs={completedJobs} 
+                onPreview={setPreviewJob} 
+                onClear={() => engine.clearQueue()} 
+              />
+            )}
+          </div>
+        </div>
+      </main>
+
+      {/* RIGHT SETTINGS PANEL */}
+      <SettingsPanel settings={settings} setSettings={setSettings} />
+
+      {/* OVERLAYS */}
+      <HistoryDrawer open={historyOpen} onClose={() => setHistoryOpen(false)} />
+      <PreviewModal job={previewJob} onClose={() => setPreviewJob(null)} />
     </div>
   );
 }
