@@ -182,12 +182,9 @@ export default function AJNPage() {
           "w-full max-w-4xl transition-all duration-700 flex flex-col items-center gap-8 md:gap-12",
           isProcessing || showSearch ? "scale-95 opacity-40 blur-sm" : "scale-100"
         )}>
-          <div className={cn("transition-all duration-700", isDragging ? "scale-110" : "scale-100")}>
-            <LogoAnimation />
-          </div>
-
-          {/* LARGE GLOBAL SEARCH BOX */}
-          <div className="w-full max-w-2xl relative group animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200">
+          
+          {/* LARGE GLOBAL SEARCH BOX - NOW AT THE TOP */}
+          <div className="w-full max-w-2xl relative group animate-in fade-in slide-in-from-top-4 duration-1000 delay-200">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-[2.5rem] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
             <div className="relative flex items-center bg-[#0d1225]/80 backdrop-blur-3xl border border-white/10 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all hover:border-primary/40">
               <Search className="absolute left-6 md:left-8 w-6 h-6 text-primary" />
@@ -204,6 +201,12 @@ export default function AJNPage() {
             </div>
           </div>
 
+          {/* AJN ANIMATION - NOW BELOW SEARCH */}
+          <div className={cn("transition-all duration-700", isDragging ? "scale-110" : "scale-100")}>
+            <LogoAnimation />
+          </div>
+
+          {/* DROP ZONE Area */}
           <div 
             onClick={() => fileInputRef.current?.click()}
             className={cn(
