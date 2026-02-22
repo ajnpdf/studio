@@ -10,7 +10,7 @@ import { Search, Plus, LayoutGrid, List, ArrowUpDown, Loader2 } from 'lucide-rea
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { useUser, useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy } from 'firebase/firestore';
+import { collection, query, where, orderBy } from 'firebase/firestore';
 
 export interface WorkspaceFile {
   id: string;
@@ -35,24 +35,28 @@ export function FileExplorer() {
 
   const filesQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    // Query files within the user's isolated workspace
-    // Assuming workspaceId is the same as userId for personal space
+    // Query files where the user is either the owner or a team member
+    // Using ownerId check for personal files
     return query(
-      collection(firestore, 'workspaces', user.uid, 'files'),
-      orderBy('uploadDate', 'desc')
+      collection(firestore, 'files'),
+      where('ownerId', '==', user.uid),
+      where('isDeleted', '==', false),
+      orderBy('createdAt', 'desc')
     );
   }, [firestore, user]);
 
-  const { data: dbFiles, isLoading } = useCollection<WorkspaceFile>(filesQuery);
+  const { data: dbFiles, isLoading } = useCollection<any>(filesQuery);
 
-  // Map Firestore data to the component's internal interface if needed
+  // Map Firestore data to the component's internal interface
   const files: WorkspaceFile[] = (dbFiles || []).map(f => ({
-    ...f,
-    type: (f.fileType?.split('/')[0] as any) || 'doc',
-    format: f.format || f.name.split('.').pop()?.toUpperCase() || 'UNK',
-    date: f.uploadDate ? new Date(f.uploadDate).toLocaleDateString() : 'N/A',
+    id: f.fileId || f.id,
+    name: f.fileName,
+    type: (f.mimeType?.split('/')[0] as any) || 'doc',
+    format: f.format || f.fileName.split('.').pop()?.toUpperCase() || 'UNK',
+    date: f.createdAt ? new Date(f.createdAt).toLocaleDateString() : 'N/A',
+    size: (f.fileSize / (1024 * 1024)).toFixed(2) + ' MB',
     tags: f.tags || [],
-    versions: f.versions || 1,
+    versions: f.versionNumber || 1,
   }));
 
   return (

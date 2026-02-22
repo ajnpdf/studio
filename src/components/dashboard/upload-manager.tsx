@@ -46,13 +46,13 @@ export function UploadManager() {
 
   const userProfileRef = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return doc(firestore, 'userProfiles', user.uid);
+    return doc(firestore, 'users', user.uid);
   }, [firestore, user]);
 
   const { data: profile } = useDoc(userProfileRef);
 
   // Dynamic tier limits from database
-  const TIER_FILE_SIZE_LIMIT = (profile?.tier === 'BUSINESS' ? 10000 : profile?.tier === 'PRO' ? 2000 : 50) * 1024 * 1024;
+  const TIER_FILE_SIZE_LIMIT = (profile?.tier === 'business' ? 10000 : profile?.tier === 'pro' ? 2000 : 50) * 1024 * 1024;
 
   const handleFilesAdded = (newFiles: File[]) => {
     if (!user) return;
@@ -118,22 +118,23 @@ export function UploadManager() {
         else if (type.startsWith('video/')) { mockMeta.duration = '00:03:45'; mockMeta.dimensions = '1080p'; }
         else if (type === 'application/pdf') mockMeta.pages = Math.floor(Math.random() * 50) + 1;
 
-        // Persist file metadata to Firestore (Simulation of a successful cloud upload trigger)
-        const fileRef = doc(firestore, 'workspaces', user.uid, 'files', id);
+        // Persist file metadata to Firestore (Flat structure with ownership denormalization)
+        const fileRef = doc(firestore, 'files', id);
         setDocumentNonBlocking(fileRef, {
-          id,
-          name: f.file.name,
-          workspaceId: user.uid,
-          workspaceOwnerId: user.uid,
-          workspaceMemberIds: [user.uid],
-          isFolder: false,
-          fileType: type,
-          sizeBytes: f.file.size,
-          uploadDate: new Date().toISOString(),
-          modifiedDate: new Date().toISOString(),
+          fileId: id,
+          fileName: f.file.name,
+          ownerId: user.uid,
+          teamId: profile?.teamId || null,
+          teamMembers: profile?.teamId ? { [user.uid]: 'owner' } : {}, // Denormalized for security rules
+          fileSize: f.file.size,
+          mimeType: type,
           format: mockMeta.format,
+          status: 'ready',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
           tags: ['auto-tagged', type.split('/')[0]],
-          versions: 1
+          versionNumber: 1,
+          isDeleted: false
         }, { merge: true });
 
         return { ...f, state: 'ready', metadata: mockMeta };

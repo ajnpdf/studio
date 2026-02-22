@@ -1,38 +1,9 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    /**
-     * CORE PHILOSOPHY:
-     * This ruleset implements a robust dual-authorization model supporting both individual 
-     * user ownership and collaborative team workspaces. It prioritizes "Authorization 
-     * Independence" to maximize performance by denormalizing access control data (like 
-     * team membership maps) directly onto child documents, minimizing the need for 
-     * expensive cross-document lookups.
-     *
-     * DATA STRUCTURE:
-     * - /users/{userId}: Private user profiles and settings.
-     * - /users/{userId}/...: Private sub-collections for files, folders, jobs, and metadata.
-     * - /teams/{teamId}: Collaborative workspaces defined by a 'members' map.
-     * - /teams/{teamId}/...: Shared resources where access is determined by denormalized 
-     *   membership data stored within each document.
-     * - /public_file_shares/{shareToken}: A segregated collection for publicly 
-     *   accessible file metadata.
-     *
-     * KEY SECURITY DECISIONS:
-     * 1. Path-Based Security: User-specific data is nested under the user's UID, 
-     *    making ownership checks highly efficient.
-     * 2. Denormalized Roles: Team-owned documents contain a `teamMembers` map. This 
-     *    allows the rules to verify a user's role and permission without fetching the 
-     *    parent Team document.
-     * 3. Structural Segregation: Public data is moved to a top-level collection 
-     *    (`public_file_shares`) to prevent accidental exposure of private collections.
-     * 4. Relational Integrity: On creation, documents must include IDs that match their 
-     *    hierarchical path to ensure data consistency.
-     */
-
-    // --- GLOBAL HELPER FUNCTIONS ---
-
+    // --- HELPER FUNCTIONS ---
     function isSignedIn() {
       return request.auth != null;
     }
@@ -41,198 +12,59 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    // Verifies ownership and ensures the document exists for destructive operations
-    function isExistingOwner(userId) {
-      return resource != null && isOwner(userId);
+    function isDocOwner(data) {
+      return isSignedIn() && data.ownerId == request.auth.uid;
     }
 
-    // Checks if the user is a member within a denormalized teamMembers map
     function isTeamMember(data) {
       return isSignedIn() && data.teamMembers[request.auth.uid] != null;
     }
 
-    // Checks if the user is the owner of a team document directly
-    function isTeamDocumentOwner(data) {
-      return isSignedIn() && data.ownerId == request.auth.uid;
+    function isTeamAdmin(data) {
+      return isSignedIn() && (data.teamMembers[request.auth.uid] == 'admin' || data.teamMembers[request.auth.uid] == 'owner');
     }
 
     // --- COLLECTION RULES ---
 
-    /**
-     * @description Rules for the User profile. Users can only manage their own profile.
-     * @path /users/{userId}
-     * @allow (create) if auth.uid == userId
-     * @deny (get) if auth.uid != userId
-     * @principle Ownership and Self-Creation.
-     */
     match /users/{userId} {
-      allow get, list: if isOwner(userId);
+      allow read: if isOwner(userId);
       allow create: if isOwner(userId);
-      allow update, delete: if isExistingOwner(userId);
-
-      /**
-       * @description User-owned private files.
-       * @path /users/{userId}/files/{fileId}
-       */
-      match /files/{fileId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.ownerId == userId;
-        allow update: if isExistingOwner(userId) && request.resource.data.ownerId == resource.data.ownerId;
-        allow delete: if isExistingOwner(userId);
-      }
-
-      /**
-       * @description User-owned private folders.
-       * @path /users/{userId}/folders/{folderId}
-       */
-      match /folders/{folderId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.ownerId == userId;
-        allow update: if isExistingOwner(userId) && request.resource.data.ownerId == resource.data.ownerId;
-        allow delete: if isExistingOwner(userId);
-      }
-
-      /**
-       * @description Private processing jobs.
-       * @path /users/{userId}/jobs/{jobId}
-       */
-      match /jobs/{jobId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
-        allow delete: if isExistingOwner(userId);
-      }
-
-      /**
-       * @description Private batch operations.
-       * @path /users/{userId}/batches/{batchId}
-       */
-      match /batches/{batchId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
-        allow delete: if isExistingOwner(userId);
-      }
-
-      /**
-       * @description User activity logs.
-       * @path /users/{userId}/activity_logs/{logId}
-       */
-      match /activity_logs/{logId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update, delete: if isExistingOwner(userId);
-      }
-
-      /**
-       * @description Personal user notifications.
-       * @path /users/{userId}/notifications/{notificationId}
-       */
-      match /notifications/{notificationId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isSignedIn(); // System/Services may create notifications
-        allow update, delete: if isExistingOwner(userId);
-      }
+      allow update: if isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['tier']);
+      allow delete: if false; // Users cannot delete profiles directly
     }
 
-    /**
-     * @description Collaborative team documents. Access is governed by the 'members' map.
-     * @path /teams/{teamId}
-     * @allow (get) if user is in members map
-     * @principle Shared Access (Roles).
-     */
-    match /teams/{teamId} {
-      allow get: if isSignedIn() && resource.data.members[request.auth.uid] != null;
-      allow list: if isSignedIn(); // Lists should be filtered by membership in client
+    match /files/{fileId} {
+      allow read: if isDocOwner(resource.data) || isTeamMember(resource.data) || resource.data.shareToken != null;
+      allow create: if isSignedIn(); // In production, add quota checks here
+      allow update: if isDocOwner(resource.data) || isTeamAdmin(resource.data);
+      allow delete: if isDocOwner(resource.data) || isTeamAdmin(resource.data);
+    }
+
+    match /jobs/{jobId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn();
-      allow update, delete: if resource != null && isTeamDocumentOwner(resource.data);
-
-      /**
-       * @description Team-shared files using denormalized membership maps.
-       * @path /teams/{teamId}/files/{fileId}
-       */
-      match /files/{fileId} {
-        allow get: if isTeamMember(resource.data);
-        allow list: if isSignedIn() && get(/databases/$(database)/documents/teams/$(teamId)).data.members[request.auth.uid] != null;
-        allow create: if isSignedIn() && request.resource.data.teamId == teamId;
-        allow update: if isTeamMember(resource.data) && request.resource.data.teamId == resource.data.teamId;
-        allow delete: if isTeamMember(resource.data);
-      }
-
-      /**
-       * @description Team-shared folders.
-       * @path /teams/{teamId}/folders/{folderId}
-       */
-      match /folders/{folderId} {
-        allow get: if isTeamMember(resource.data);
-        allow list: if isSignedIn() && get(/databases/$(database)/documents/teams/$(teamId)).data.members[request.auth.uid] != null;
-        allow create: if isSignedIn() && request.resource.data.teamId == teamId;
-        allow update: if isTeamMember(resource.data) && request.resource.data.teamId == resource.data.teamId;
-        allow delete: if isTeamMember(resource.data);
-      }
-
-      /**
-       * @description Team context jobs.
-       * @path /teams/{teamId}/jobs/{jobId}
-       */
-      match /jobs/{jobId} {
-        allow get: if isTeamMember(resource.data);
-        allow list: if isSignedIn() && get(/databases/$(database)/documents/teams/$(teamId)).data.members[request.auth.uid] != null;
-        allow create: if isSignedIn() && request.resource.data.teamId == teamId;
-        allow update: if isTeamMember(resource.data) && request.resource.data.teamId == resource.data.teamId;
-        allow delete: if isTeamMember(resource.data);
-      }
-
-      /**
-       * @description Team context batch operations.
-       * @path /teams/{teamId}/batches/{batchId}
-       */
-      match /batches/{batchId} {
-        allow get: if isTeamMember(resource.data);
-        allow list: if isSignedIn() && get(/databases/$(database)/documents/teams/$(teamId)).data.members[request.auth.uid] != null;
-        allow create: if isSignedIn() && request.resource.data.teamId == teamId;
-        allow update: if isTeamMember(resource.data) && request.resource.data.teamId == resource.data.teamId;
-        allow delete: if isTeamMember(resource.data);
-      }
-
-      /**
-       * @description Team activity logs.
-       * @path /teams/{teamId}/activity_logs/{logId}
-       */
-      match /activity_logs/{logId} {
-        allow get: if isTeamMember(resource.data);
-        allow list: if isSignedIn() && get(/databases/$(database)/documents/teams/$(teamId)).data.members[request.auth.uid] != null;
-        allow create: if isSignedIn() && request.resource.data.teamId == teamId;
-        allow update, delete: if isTeamMember(resource.data);
-      }
+      allow update: if false; // Jobs only updated by Cloud Functions
+      allow delete: if false;
     }
 
-    /**
-     * @description Publicly shared file metadata. Accessible via token.
-     * @path /public_file_shares/{shareToken}
-     * @allow (get) if true
-     * @principle Public Read with Owner-Only Writes.
-     */
-    match /public_file_shares/{shareToken} {
-      allow get, list: if true;
-      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
-      allow update: if resource != null && resource.data.ownerId == request.auth.uid;
-      allow delete: if resource != null && resource.data.ownerId == request.auth.uid;
+    match /folders/{folderId} {
+      allow read, write: if isDocOwner(resource.data) || isTeamMember(resource.data);
     }
 
-    /**
-     * @description Team invitations. Restricted to sender and recipient email logic.
-     * @path /invitations/{inviteId}
-     * @allow (create) if user matches invitedBy
-     * @principle Ownership.
-     */
-    match /invitations/{inviteId} {
-      allow get: if isSignedIn();
-      allow list: if isSignedIn();
-      allow create: if isSignedIn() && request.resource.data.invitedBy == request.auth.uid;
-      allow update: if resource != null && resource.data.invitedBy == request.auth.uid;
-      allow delete: if resource != null && resource.data.invitedBy == request.auth.uid;
+    match /teams/{teamId} {
+      allow read: if isSignedIn() && resource.data.members[request.auth.uid] != null;
+      allow write: if isSignedIn() && resource.data.ownerId == request.auth.uid;
     }
 
+    match /activityLogs/{logId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isTeamAdmin(resource.data));
+      allow write: if false; // System only
+    }
+
+    match /notifications/{notifId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead', 'readAt']);
+      allow write: if false; // System only
+    }
   }
 }

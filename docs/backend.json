@@ -1,1173 +1,131 @@
+
 {
   "entities": {
     "User": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
+      "description": "Represents a user account, tier, and quotas.",
       "type": "object",
-      "description": "Represents a user account in the Cloud Edit Pro application, including their profile, subscription tier, resource usage, and preferences.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the User entity."
-        },
-        "email": {
-          "type": "string",
-          "description": "The user's email address.",
-          "format": "email"
-        },
-        "displayName": {
-          "type": "string",
-          "description": "The user's display name."
-        },
-        "photoURL": {
-          "type": "string",
-          "description": "URL to the user's profile picture.",
-          "format": "uri"
-        },
-        "tier": {
-          "type": "string",
-          "description": "The subscription tier of the user.",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
-        },
-        "storageUsed": {
-          "type": "number",
-          "description": "Current storage space used by the user in bytes."
-        },
-        "storageLimit": {
-          "type": "number",
-          "description": "Maximum allowed storage space for the user in bytes."
-        },
-        "dailyTasksUsed": {
-          "type": "number",
-          "description": "Number of file processing tasks used by the user today."
-        },
-        "dailyTasksLimit": {
-          "type": "number",
-          "description": "Maximum allowed daily file processing tasks for the user."
-        },
-        "dailyTasksReset": {
-          "type": "string",
-          "description": "Timestamp when daily tasks limit resets.",
-          "format": "date-time"
-        },
-        "monthlyAiCredits": {
-          "type": "number",
-          "description": "Total AI credits allocated to the user for the current month."
-        },
-        "aiCreditsUsed": {
-          "type": "number",
-          "description": "Number of AI credits used by the user in the current month."
-        },
-        "aiCreditsReset": {
-          "type": "string",
-          "description": "Timestamp when monthly AI credits reset.",
-          "format": "date-time"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the user account was created.",
-          "format": "date-time"
-        },
-        "lastActiveAt": {
-          "type": "string",
-          "description": "Timestamp of the user's last activity.",
-          "format": "date-time"
-        },
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string", "format": "uri" },
+        "tier": { "type": "string", "enum": ["free", "pro", "business"] },
+        "storageUsed": { "type": "number" },
+        "storageLimit": { "type": "number" },
+        "dailyTasksUsed": { "type": "number" },
+        "dailyTasksLimit": { "type": "number" },
+        "dailyTasksReset": { "type": "string", "format": "date-time" },
+        "monthlyAiCredits": { "type": "number" },
+        "aiCreditsUsed": { "type": "number" },
+        "aiCreditsReset": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastActiveAt": { "type": "string", "format": "date-time" },
         "settings": {
-          "type": "array",
-          "description": "User-specific settings and preferences.",
-          "items": {
-            "type": "string"
+          "type": "object",
+          "properties": {
+            "defaultSaveToWorkspace": { "type": "boolean" },
+            "emailNotifications": { "type": "boolean" },
+            "theme": { "type": "string", "enum": ["light", "dark"] }
           }
         },
-        "teamId": {
-          "type": "string",
-          "description": "Reference to the Team this user belongs to, if any. (Relationship: Team 1:N User)"
-        }
+        "teamId": { "type": "string" }
       },
-      "required": [
-        "id",
-        "email",
-        "displayName",
-        "photoURL",
-        "tier",
-        "storageUsed",
-        "storageLimit",
-        "dailyTasksUsed",
-        "dailyTasksLimit",
-        "dailyTasksReset",
-        "monthlyAiCredits",
-        "aiCreditsUsed",
-        "aiCreditsReset",
-        "createdAt",
-        "lastActiveAt",
-        "settings"
-      ]
+      "required": ["uid", "email", "tier", "storageUsed", "storageLimit", "createdAt"]
     },
     "File": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "File",
+      "description": "Metadata for a stored file.",
       "type": "object",
-      "description": "Represents a file stored and managed within the Cloud Edit Pro system, including its metadata, sharing status, and version history.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the File entity."
-        },
-        "ownerId": {
-          "type": "string",
-          "description": "Reference to the User who owns this file. (Relationship: User 1:N File)"
-        },
-        "teamId": {
-          "type": "string",
-          "description": "Reference to the Team this file belongs to, if it's a shared team file. (Relationship: Team 1:N File)"
-        },
-        "fileName": {
-          "type": "string",
-          "description": "The current name of the file."
-        },
-        "originalName": {
-          "type": "string",
-          "description": "The original name of the file when it was uploaded."
-        },
-        "fileSize": {
-          "type": "number",
-          "description": "Size of the file in bytes."
-        },
-        "mimeType": {
-          "type": "string",
-          "description": "The MIME type of the file (e.g., 'image/jpeg', 'application/pdf')."
-        },
-        "format": {
-          "type": "string",
-          "description": "The file format (e.g., 'pdf', 'jpg', 'mp4')."
-        },
-        "storagePath": {
-          "type": "string",
-          "description": "The internal storage path to the file."
-        },
-        "downloadURL": {
-          "type": "string",
-          "description": "The public URL to download the file.",
-          "format": "uri"
-        },
-        "thumbnailURL": {
-          "type": "string",
-          "description": "URL to a thumbnail image of the file, if available.",
-          "format": "uri"
-        },
-        "folderId": {
-          "type": "string",
-          "description": "Reference to the Folder this file resides in, if any. (Relationship: Folder 1:N File)"
-        },
-        "tags": {
-          "type": "array",
-          "description": "A list of tags associated with the file for organization and search.",
-          "items": {
-            "type": "string"
-          }
-        },
+        "fileId": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "teamId": { "type": "string" },
+        "fileName": { "type": "string" },
+        "originalName": { "type": "string" },
+        "fileSize": { "type": "number" },
+        "mimeType": { "type": "string" },
+        "format": { "type": "string" },
+        "storagePath": { "type": "string" },
+        "downloadURL": { "type": "string", "format": "uri" },
+        "thumbnailURL": { "type": "string", "format": "uri" },
+        "folderId": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
         "metadata": {
-          "type": "array",
-          "description": "Technical metadata specific to the file's content type.",
-          "items": {
-            "type": "string"
+          "type": "object",
+          "properties": {
+            "width": { "type": "number" },
+            "height": { "type": "number" },
+            "pages": { "type": "number" },
+            "duration": { "type": "number" },
+            "bitrate": { "type": "number" },
+            "dpi": { "type": "number" },
+            "colorMode": { "type": "string" },
+            "isPasswordProtected": { "type": "boolean" }
           }
         },
-        "status": {
-          "type": "string",
-          "description": "The current processing status of the file.",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
-        },
-        "virusScanResult": {
-          "type": "string",
-          "description": "The result of the virus scan on the file.",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
-        },
-        "isShared": {
-          "type": "boolean",
-          "description": "Indicates if the file is currently shared publicly or with specific users/teams."
-        },
-        "shareToken": {
-          "type": "string",
-          "description": "A unique token used for public or specific link sharing."
-        },
-        "shareExpiresAt": {
-          "type": "string",
-          "description": "Timestamp when the share link will expire.",
-          "format": "date-time"
-        },
-        "sharePassword": {
-          "type": "string",
-          "description": "Hashed password required to access the shared file, if applicable."
-        },
-        "shareAllowDownload": {
-          "type": "boolean",
-          "description": "Indicates if recipients of a shared link are allowed to download the file."
-        },
-        "autoDeleteAt": {
-          "type": "string",
-          "description": "Timestamp for automatic deletion, especially for free tier users.",
-          "format": "date-time"
-        },
-        "parentFileId": {
-          "type": "string",
-          "description": "Reference to the original file if this is a converted or edited version. (Relationship: File 1:N File)"
-        },
-        "versionNumber": {
-          "type": "number",
-          "description": "The current version number of the file."
-        },
-        "versions": {
-          "type": "array",
-          "description": "A list of previous versions of the file.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "downloadCount": {
-          "type": "number",
-          "description": "The number of times the file has been downloaded."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the file was first uploaded or created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the file was last updated or modified.",
-          "format": "date-time"
-        },
-        "isDeleted": {
-          "type": "boolean",
-          "description": "Flag indicating if the file is marked as deleted (soft delete)."
-        }
+        "status": { "type": "string", "enum": ["uploading", "scanning", "ready", "deleted"] },
+        "virusScanResult": { "type": "string", "enum": ["clean", "infected", "pending"] },
+        "isShared": { "type": "boolean" },
+        "shareToken": { "type": "string" },
+        "shareExpiresAt": { "type": "string", "format": "date-time" },
+        "sharePassword": { "type": "string" },
+        "shareAllowDownload": { "type": "boolean" },
+        "autoDeleteAt": { "type": "string", "format": "date-time" },
+        "parentFileId": { "type": "string" },
+        "versionNumber": { "type": "number" },
+        "versions": { "type": "array", "items": { "type": "object" } },
+        "downloadCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "isDeleted": { "type": "boolean" },
+        "teamMembers": { "type": "object", "description": "Denormalized team member map for rules." }
       },
-      "required": [
-        "id",
-        "ownerId",
-        "fileName",
-        "originalName",
-        "fileSize",
-        "mimeType",
-        "format",
-        "storagePath",
-        "downloadURL",
-        "tags",
-        "metadata",
-        "status",
-        "virusScanResult",
-        "isShared",
-        "shareAllowDownload",
-        "versionNumber",
-        "versions",
-        "downloadCount",
-        "createdAt",
-        "updatedAt",
-        "isDeleted"
-      ]
-    },
-    "Folder": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Folder",
-      "type": "object",
-      "description": "Represents a folder for organizing files within a user's or team's cloud storage.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Folder entity."
-        },
-        "ownerId": {
-          "type": "string",
-          "description": "Reference to the User who owns this folder. (Relationship: User 1:N Folder)"
-        },
-        "teamId": {
-          "type": "string",
-          "description": "Reference to the Team this folder belongs to, if it's a team folder. (Relationship: Team 1:N Folder)"
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the folder."
-        },
-        "parentFolderId": {
-          "type": "string",
-          "description": "Reference to the parent folder if this is a nested folder. (Relationship: Folder 1:N Folder)"
-        },
-        "isTeamShared": {
-          "type": "boolean",
-          "description": "Indicates if this folder is shared across an entire team."
-        },
-        "fileCount": {
-          "type": "number",
-          "description": "The total number of files directly within this folder."
-        },
-        "totalSize": {
-          "type": "number",
-          "description": "The cumulative size of all files directly within this folder in bytes."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the folder was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the folder was last updated (e.g., file added/removed, name changed).",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "ownerId",
-        "name",
-        "isTeamShared",
-        "fileCount",
-        "totalSize",
-        "createdAt",
-        "updatedAt"
-      ]
+      "required": ["fileId", "ownerId", "fileName", "fileSize", "format", "status"]
     },
     "Job": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Job",
+      "description": "Processing job metadata.",
       "type": "object",
-      "description": "Represents a single file processing task (e.g., convert, compress, resize) initiated by a user.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Job entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the User who initiated this job. (Relationship: User 1:N Job)"
-        },
-        "teamId": {
-          "type": "string",
-          "description": "Reference to the Team if this job was initiated within a team context. (Relationship: Team 1:N Job)"
-        },
-        "type": {
-          "type": "string",
-          "description": "The type of operation this job performs (e.g., 'convert', 'compress').",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
-        },
-        "status": {
-          "type": "string",
-          "description": "The current status of the job.",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
-        },
-        "priority": {
-          "type": "number",
-          "description": "The priority level of the job (1=low, 2=normal, 3=high, 4=dedicated)."
-        },
-        "inputFileId": {
-          "type": "string",
-          "description": "Reference to the input File for this job. (Relationship: File 1:N Job)"
-        },
-        "inputStoragePath": {
-          "type": "string",
-          "description": "The storage path of the input file for the job."
-        },
-        "outputFileId": {
-          "type": "string",
-          "description": "Reference to the output File generated by this job, if successful. (Relationship: File 1:N Job)"
-        },
-        "outputStoragePath": {
-          "type": "string",
-          "description": "The storage path of the output file after the job completes."
-        },
-        "outputDownloadURL": {
-          "type": "string",
-          "description": "The public URL to download the output file.",
-          "format": "uri"
-        },
-        "settings": {
-          "type": "array",
-          "description": "Format-specific settings and parameters for the job.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "progress": {
-          "type": "number",
-          "description": "The current progress of the job in percentage (0-100)."
-        },
-        "errorCode": {
-          "type": "string",
-          "description": "An error code if the job failed."
-        },
-        "errorMessage": {
-          "type": "string",
-          "description": "A descriptive error message if the job failed."
-        },
-        "retryCount": {
-          "type": "number",
-          "description": "The number of times the job has been retried."
-        },
-        "queuedAt": {
-          "type": "string",
-          "description": "Timestamp when the job was added to the queue.",
-          "format": "date-time"
-        },
-        "startedAt": {
-          "type": "string",
-          "description": "Timestamp when the job began processing.",
-          "format": "date-time"
-        },
-        "completedAt": {
-          "type": "string",
-          "description": "Timestamp when the job finished processing (either complete or failed).",
-          "format": "date-time"
-        },
-        "processingTimeMs": {
-          "type": "number",
-          "description": "The total time in milliseconds taken to process the job."
-        },
-        "batchId": {
-          "type": "string",
-          "description": "Reference to the Batch if this job is part of a larger batch operation. (Relationship: Batch 1:N Job)"
-        },
-        "notifyEmail": {
-          "type": "string",
-          "description": "Email address to notify upon job completion, if different from user's primary email.",
-          "format": "email"
-        }
+        "jobId": { "type": "string" },
+        "userId": { "type": "string" },
+        "teamId": { "type": "string" },
+        "type": { "type": "string" },
+        "status": { "type": "string" },
+        "progress": { "type": "number" },
+        "queuedAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "userId",
-        "type",
-        "status",
-        "priority",
-        "inputFileId",
-        "inputStoragePath",
-        "settings",
-        "progress",
-        "retryCount",
-        "queuedAt"
-      ]
-    },
-    "Batch": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Batch",
-      "type": "object",
-      "description": "Represents a collection of file processing jobs executed together as a single batch operation.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Batch entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the User who initiated this batch. (Relationship: User 1:N Batch)"
-        },
-        "teamId": {
-          "type": "string",
-          "description": "Reference to the Team if this batch was initiated within a team context. (Relationship: Team 1:N Batch)"
-        },
-        "operation": {
-          "type": "string",
-          "description": "The type of operation performed by the batch (e.g., 'batch_convert', 'batch_compress')."
-        },
-        "settings": {
-          "type": "array",
-          "description": "General settings and parameters applied to all jobs within the batch.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "totalFiles": {
-          "type": "number",
-          "description": "The total number of files/jobs included in the batch."
-        },
-        "completedFiles": {
-          "type": "number",
-          "description": "The number of files/jobs in the batch that have successfully completed."
-        },
-        "failedFiles": {
-          "type": "number",
-          "description": "The number of files/jobs in the batch that have failed."
-        },
-        "status": {
-          "type": "string",
-          "description": "The overall status of the batch operation.",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
-        },
-        "jobIds": {
-          "type": "array",
-          "description": "References to individual Job entities that constitute this batch. (Relationship: Batch N:N Job)",
-          "items": {
-            "type": "string"
-          }
-        },
-        "outputZipURL": {
-          "type": "string",
-          "description": "URL to a ZIP archive containing all output files from the batch, if applicable.",
-          "format": "uri"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the batch was created.",
-          "format": "date-time"
-        },
-        "completedAt": {
-          "type": "string",
-          "description": "Timestamp when the batch operation was completed (all jobs processed).",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "userId",
-        "operation",
-        "settings",
-        "totalFiles",
-        "completedFiles",
-        "failedFiles",
-        "status",
-        "jobIds",
-        "createdAt"
-      ]
-    },
-    "Team": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Team",
-      "type": "object",
-      "description": "Represents a collaborative team or workspace within Cloud Edit Pro, allowing multiple users to share resources and files.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Team entity."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the team."
-        },
-        "ownerId": {
-          "type": "string",
-          "description": "Reference to the User who created and owns this team. (Relationship: User 1:N Team)"
-        },
-        "logoURL": {
-          "type": "string",
-          "description": "URL to the team's logo.",
-          "format": "uri"
-        },
-        "members": {
-          "type": "array",
-          "description": "A list of members belonging to this team, with their roles and join dates. (Relationship: Team N:N User)",
-          "items": {
-            "type": "string"
-          }
-        },
-        "storageUsed": {
-          "type": "number",
-          "description": "Current storage space used by the team in bytes."
-        },
-        "storageLimit": {
-          "type": "number",
-          "description": "Maximum allowed storage space for the team in bytes."
-        },
-        "creditsUsed": {
-          "type": "number",
-          "description": "Number of AI/task credits used by the team in the current billing period."
-        },
-        "creditsLimit": {
-          "type": "number",
-          "description": "Maximum allowed AI/task credits for the team in the current billing period."
-        },
-        "creditsReset": {
-          "type": "string",
-          "description": "Timestamp when monthly credits for the team reset.",
-          "format": "date-time"
-        },
-        "plan": {
-          "type": "string",
-          "description": "The subscription plan for the team.",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
-        },
-        "seats": {
-          "type": "number",
-          "description": "The number of active user seats available in the team."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the team was created.",
-          "format": "date-time"
-        },
-        "settings": {
-          "type": "array",
-          "description": "Team-specific settings and preferences.",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "ownerId",
-        "members",
-        "storageUsed",
-        "storageLimit",
-        "creditsUsed",
-        "creditsLimit",
-        "creditsReset",
-        "plan",
-        "seats",
-        "createdAt",
-        "settings"
-      ]
-    },
-    "Invitation": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Invitation",
-      "type": "object",
-      "description": "Represents an invitation sent to a user to join a specific team.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Invitation entity."
-        },
-        "teamId": {
-          "type": "string",
-          "description": "Reference to the Team the user is invited to. (Relationship: Team 1:N Invitation)"
-        },
-        "invitedEmail": {
-          "type": "string",
-          "description": "The email address of the person invited.",
-          "format": "email"
-        },
-        "role": {
-          "type": "string",
-          "description": "The role the invited user will have in the team upon joining.",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
-        },
-        "invitedBy": {
-          "type": "string",
-          "description": "Reference to the User who sent the invitation. (Relationship: User 1:N Invitation)"
-        },
-        "status": {
-          "type": "string",
-          "description": "The current status of the invitation.",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
-        },
-        "token": {
-          "type": "string",
-          "description": "A unique, signed token for the invitation link."
-        },
-        "expiresAt": {
-          "type": "string",
-          "description": "Timestamp when the invitation link expires.",
-          "format": "date-time"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the invitation was created.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "teamId",
-        "invitedEmail",
-        "role",
-        "invitedBy",
-        "status",
-        "token",
-        "expiresAt",
-        "createdAt"
-      ]
-    },
-    "ActivityLog": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "ActivityLog",
-      "type": "object",
-      "description": "Records user and system activities within the application for auditing and user dashboard display.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the ActivityLog entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the User who performed the action. (Relationship: User 1:N ActivityLog)"
-        },
-        "teamId": {
-          "type": "string",
-          "description": "Reference to the Team if the activity occurred within a team context. (Relationship: Team 1:N ActivityLog)"
-        },
-        "action": {
-          "type": "string",
-          "description": "A description of the action performed (e.g., 'upload', 'convert', 'delete')."
-        },
-        "fileId": {
-          "type": "string",
-          "description": "Reference to the File related to this activity, if applicable. (Relationship: File 1:N ActivityLog)"
-        },
-        "fileName": {
-          "type": "string",
-          "description": "The name of the file related to the activity, for easier logging and display."
-        },
-        "jobId": {
-          "type": "string",
-          "description": "Reference to the Job related to this activity, if applicable. (Relationship: Job 1:N ActivityLog)"
-        },
-        "details": {
-          "type": "array",
-          "description": "Action-specific metadata providing additional context for the activity.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "ipAddress": {
-          "type": "string",
-          "description": "The IP address from which the action was performed."
-        },
-        "userAgent": {
-          "type": "string",
-          "description": "The user agent string of the client that performed the action."
-        },
-        "timestamp": {
-          "type": "string",
-          "description": "Timestamp when the activity occurred.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "userId",
-        "action",
-        "details",
-        "ipAddress",
-        "userAgent",
-        "timestamp"
-      ]
-    },
-    "Notification": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Notification",
-      "type": "object",
-      "description": "Manages user notifications, such as job completion, errors, or invitations.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Notification entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the User who should receive this notification. (Relationship: User 1:N Notification)"
-        },
-        "type": {
-          "type": "string",
-          "description": "The type of notification (e.g., 'job_complete', 'invite').",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
-        },
-        "title": {
-          "type": "string",
-          "description": "The title of the notification."
-        },
-        "message": {
-          "type": "string",
-          "description": "The detailed message content of the notification."
-        },
-        "isRead": {
-          "type": "boolean",
-          "description": "Indicates if the user has read the notification."
-        },
-        "actionURL": {
-          "type": "string",
-          "description": "An optional URL to direct the user to upon clicking the notification.",
-          "format": "uri"
-        },
-        "jobId": {
-          "type": "string",
-          "description": "Reference to the Job related to this notification, if applicable. (Relationship: Job 1:N Notification)"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the notification was created.",
-          "format": "date-time"
-        },
-        "readAt": {
-          "type": "string",
-          "description": "Timestamp when the notification was marked as read.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "userId",
-        "type",
-        "title",
-        "message",
-        "isRead",
-        "createdAt"
-      ]
-    },
-    "JobProgress": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "JobProgress",
-      "type": "object",
-      "description": "Provides real-time updates for the progress of an ongoing job, optimized for high-frequency writes.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the JobProgress entity, referencing a Job. (Relationship: Job 1:1 JobProgress)"
-        },
-        "progress": {
-          "type": "number",
-          "description": "The current progress of the job in percentage (0-100)."
-        },
-        "status": {
-          "type": "string",
-          "description": "The current operational status of the job (e.g., 'Extracting text...', 'Compressing frames...')."
-        },
-        "message": {
-          "type": "string",
-          "description": "A descriptive message indicating the current sub-task or state of the job."
-        },
-        "startedAt": {
-          "type": "number",
-          "description": "Unix timestamp (milliseconds) when the job progress tracking started."
-        },
-        "updatedAt": {
-          "type": "number",
-          "description": "Unix timestamp (milliseconds) when this progress record was last updated."
-        }
-      },
-      "required": [
-        "id",
-        "progress",
-        "status",
-        "message",
-        "startedAt",
-        "updatedAt"
-      ]
+      "required": ["jobId", "userId", "type", "status", "queuedAt"]
     }
   },
   "auth": {
-    "providers": [
-      "password",
-      "anonymous"
-    ]
+    "providers": ["password", "google.com"]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/users/{userId}",
-        "definition": {
-          "entityName": "User",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "User profiles, including subscription tiers, resource usage, and personal settings. `userId` in the path must match `request.auth.uid` for access.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user, matching Firebase Authentication UID."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/teams/{teamId}",
-        "definition": {
-          "entityName": "Team",
-          "schema": {
-            "$ref": "#/backend/entities/Team"
-          },
-          "description": "Team metadata, including the owner and the `members` map for collaborative authorization. Access is restricted to `ownerId` or `members` listed within the document.",
-          "params": [
-            {
-              "name": "teamId",
-              "description": "The unique identifier of the team."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/files/{fileId}",
-        "definition": {
-          "entityName": "File",
-          "schema": {
-            "$ref": "#/backend/entities/File"
-          },
-          "description": "Private files owned by a specific user. The `ownerId` field within the document must match the `{userId}` in the path for authorization. Sharing-related fields (`isShared`, `shareToken`, `sharePassword`, `shareAllowDownload`) on these documents are primarily for internal app logic, not direct Firestore rule-based public access.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user owner."
-            },
-            {
-              "name": "fileId",
-              "description": "The unique identifier of the file."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/teams/{teamId}/files/{fileId}",
-        "definition": {
-          "entityName": "File",
-          "schema": {
-            "$ref": "#/backend/entities/File"
-          },
-          "description": "Files shared and managed within a team. Documents include a denormalized `teamMembers` map (e.g., `{uid1: 'role', uid2: 'role'}`) for authorization independence, allowing rules to check team membership without a `get()` call. The `ownerId` indicates the user who initially uploaded/created the file. Sharing-related fields on these documents are primarily for internal app logic, not direct Firestore rule-based public access.",
-          "params": [
-            {
-              "name": "teamId",
-              "description": "The unique identifier of the team owner."
-            },
-            {
-              "name": "fileId",
-              "description": "The unique identifier of the file."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/public_file_shares/{shareToken}",
-        "definition": {
-          "entityName": "File",
-          "schema": {
-            "$ref": "#/backend/entities/File"
-          },
-          "description": "A separate, denormalized collection for publicly shared files, where the document ID is the `shareToken`. This collection contains a *subset* of the `File` entity data, specifically those fields relevant for public access (e.g., `fileName`, `downloadURL`, `thumbnailURL`), along with sharing-specific fields (`shareExpiresAt`, `sharePassword`, `shareAllowDownload`, and `fileId` to reference the original). This design maintains structural segregation for different security postures, allowing simple, direct public access rules based on the `shareToken` as the document identifier. The `isShared` field on the original `File` entity would indicate that a corresponding document exists here.",
-          "params": [
-            {
-              "name": "shareToken",
-              "description": "A unique token used as the document ID for publicly accessible file metadata."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/folders/{folderId}",
-        "definition": {
-          "entityName": "Folder",
-          "schema": {
-            "$ref": "#/backend/entities/Folder"
-          },
-          "description": "Private folders for a user's file organization. The `ownerId` field within the document must match the `{userId}` in the path for authorization.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user owner."
-            },
-            {
-              "name": "folderId",
-              "description": "The unique identifier of the folder."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/teams/{teamId}/folders/{folderId}",
-        "definition": {
-          "entityName": "Folder",
-          "schema": {
-            "$ref": "#/backend/entities/Folder"
-          },
-          "description": "Folders shared and managed within a team. Documents include a denormalized `teamMembers` map for authorization independence, allowing rules to check team membership without a `get()` call. The `ownerId` indicates the user who initially created the folder.",
-          "params": [
-            {
-              "name": "teamId",
-              "description": "The unique identifier of the team owner."
-            },
-            {
-              "name": "folderId",
-              "description": "The unique identifier of the folder."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/jobs/{jobId}",
-        "definition": {
-          "entityName": "Job",
-          "schema": {
-            "$ref": "#/backend/entities/Job"
-          },
-          "description": "File processing jobs initiated by a specific user. The `userId` field within the document must match the `{userId}` in the path for authorization.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who initiated the job."
-            },
-            {
-              "name": "jobId",
-              "description": "The unique identifier of the job."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/teams/{teamId}/jobs/{jobId}",
-        "definition": {
-          "entityName": "Job",
-          "schema": {
-            "$ref": "#/backend/entities/Job"
-          },
-          "description": "File processing jobs initiated within a team context. Documents include a denormalized `teamMembers` map for authorization independence, allowing rules to check team membership without a `get()` call. The `userId` indicates the user who initiated the job within the team.",
-          "params": [
-            {
-              "name": "teamId",
-              "description": "The unique identifier of the team where the job was initiated."
-            },
-            {
-              "name": "jobId",
-              "description": "The unique identifier of the job."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/batches/{batchId}",
-        "definition": {
-          "entityName": "Batch",
-          "schema": {
-            "$ref": "#/backend/entities/Batch"
-          },
-          "description": "Batch processing operations initiated by a specific user. The `userId` field within the document must match the `{userId}` in the path for authorization.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who initiated the batch."
-            },
-            {
-              "name": "batchId",
-              "description": "The unique identifier of the batch operation."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/teams/{teamId}/batches/{batchId}",
-        "definition": {
-          "entityName": "Batch",
-          "schema": {
-            "$ref": "#/backend/entities/Batch"
-          },
-          "description": "Batch processing operations initiated within a team context. Documents include a denormalized `teamMembers` map for authorization independence, allowing rules to check team membership without a `get()` call. The `userId` indicates the user who initiated the batch within the team.",
-          "params": [
-            {
-              "name": "teamId",
-              "description": "The unique identifier of the team where the batch was initiated."
-            },
-            {
-              "name": "batchId",
-              "description": "The unique identifier of the batch operation."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/invitations/{inviteId}",
-        "definition": {
-          "entityName": "Invitation",
-          "schema": {
-            "$ref": "#/backend/entities/Invitation"
-          },
-          "description": "Invitations sent to users to join a team. Accessible by the `invitedBy` user (sender) for management, and potentially readable by the `invitedEmail` recipient (for acceptance) via a secure lookup mechanism.",
-          "params": [
-            {
-              "name": "inviteId",
-              "description": "The unique identifier of the invitation."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/activity_logs/{logId}",
-        "definition": {
-          "entityName": "ActivityLog",
-          "schema": {
-            "$ref": "#/backend/entities/ActivityLog"
-          },
-          "description": "Activity logs specific to a user's actions. The `userId` field within the document must match the `{userId}` in the path for authorization.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user whose activity is logged."
-            },
-            {
-              "name": "logId",
-              "description": "The unique identifier of the activity log entry."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/teams/{teamId}/activity_logs/{logId}",
-        "definition": {
-          "entityName": "ActivityLog",
-          "schema": {
-            "$ref": "#/backend/entities/ActivityLog"
-          },
-          "description": "Activity logs for actions performed within a team context. Documents include a denormalized `teamMembers` map for authorization independence, allowing rules to check team membership without a `get()` call. The `userId` indicates the user who performed the action within the team.",
-          "params": [
-            {
-              "name": "teamId",
-              "description": "The unique identifier of the team where the activity occurred."
-            },
-            {
-              "name": "logId",
-              "description": "The unique identifier of the activity log entry."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/notifications/{notificationId}",
-        "definition": {
-          "entityName": "Notification",
-          "schema": {
-            "$ref": "#/backend/entities/Notification"
-          },
-          "description": "Personal notifications for a user. The `userId` field within the document must match the `{userId}` in the path for authorization.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who receives the notification."
-            },
-            {
-              "name": "notificationId",
-              "description": "The unique identifier of the notification."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "The proposed Firestore structure adheres to the core design principles by emphasizing Authorization Independence and Structural Segregation. \n\n**Authorization Independence:** To eliminate `get()` calls in Firestore security rules (a critical mandate), authorization context for collaborative data is denormalized directly into the relevant documents. For entities like Files, Folders, Jobs, Batches, and Activity Logs that can belong to a team, the `members` map (containing `userId: role` pairs) from the parent `/teams/{teamId}` document is copied into each individual document (e.g., `resource.data.teamMembers`). This allows security rules to check `request.auth.uid in resource.data.teamMembers` directly on the document being accessed, ensuring atomic operations and simplifying rule logic. User-owned data inherently achieves authorization independence as the path (`/users/{userId}/...`) matches the authenticated user's ID (`request.auth.uid`).\n\n**Structural Segregation & QAPs (Query-Accessible Permissions):** The primary strategy for ensuring secure `list` operations and clear authorization intent is structural segregation. Instead of a single top-level collection (e.g., `/files` mixing public, private, and team files), data is split into distinct collections based on its security posture:\n\n1.  **Private User Data:** `/users/{userId}/<collection_name>/{documentId}`: Collections like `files`, `folders`, `jobs`, `batches`, `activity_logs`, and `notifications` are nested under `/users/{userId}`. This structure inherently secures documents, as the `{userId}` in the path must match `request.auth.uid`. Listing operations on these collections (e.g., `/users/{request.auth.uid}/files`) are naturally secure, as rules can simply check `allow list: if request.auth.uid == userId`.\n\n2.  **Collaborative Team Data:** `/teams/{teamId}/<collection_name>/{documentId}`: Similar collections for `files`, `folders`, `jobs`, `batches`, and `activity_logs` are nested under `/teams/{teamId}`. Documents in these collections include the denormalized `teamMembers` map. This enables secure listing and access, as rules can check `allow list: if resource.data.teamMembers[request.auth.uid] != null`.\n\n3.  **Publicly Shared Data:** A dedicated top-level collection `/public_file_shares/{shareToken}` is introduced for file metadata explicitly intended for public, unauthenticated access. This adheres to structural segregation by separating public data from private data. Documents here use the `File` entity schema for reference, but contain only the necessary information for public view and download, with simple rules based on `shareExpiresAt` and `sharePassword` checks. This approach ensures private file collections remain purely private, avoiding complex, multi-condition rules on core data and enhancing security.\n\n**DBAC (Database-Backed Access Control):** Roles are managed via the `members` map within `Team` documents and denormalized into related team documents. Authorization relies solely on `request.auth.uid` and the `role` defined in these maps, completely avoiding custom claims and simplifying rule maintenance.\n\n**Invariants:** Ownership is explicit via `ownerId` and path-based `userId`/`teamId`. Timestamps (`createdAt`, `updatedAt`) are standard. Denormalized `teamMembers` ensures that the authorization context is consistent and robust for integrity."
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles and quotas."
+    },
+    "/files/{fileId}": {
+      "schema": { "$ref": "#/entities/File" },
+      "description": "Flat file collection with denormalized access."
+    },
+    "/jobs/{jobId}": {
+      "schema": { "$ref": "#/entities/Job" },
+      "description": "Processing jobs."
+    },
+    "/teams/{teamId}": {
+      "schema": { "type": "object" },
+      "description": "Team workspace metadata."
+    },
+    "/activityLogs/{logId}": {
+      "schema": { "type": "object" },
+      "description": "Audit trails."
+    },
+    "/notifications/{notifId}": {
+      "schema": { "type": "object" },
+      "description": "User notifications."
+    }
   }
 }
