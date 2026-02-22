@@ -4,7 +4,7 @@
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
 import { DashboardTopBar } from '@/components/dashboard/dashboard-top-bar';
 import { NightSky } from '@/components/dashboard/night-sky';
-import { useUser, FirebaseClientProvider } from '@/firebase';
+import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
@@ -50,8 +50,6 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <FirebaseClientProvider>
-      <DashboardGuard>{children}</DashboardGuard>
-    </FirebaseClientProvider>
+    <DashboardGuard>{children}</DashboardGuard>
   );
 }
