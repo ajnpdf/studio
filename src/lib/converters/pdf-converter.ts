@@ -80,32 +80,36 @@ export class PDFConverter {
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
-      this.updateProgress(Math.round((i / pdf.numPages) * 100), `Reconstructing paragraph layers - Page ${i}...`);
+      this.updateProgress(Math.round((i / pdf.numPages) * 100), `Reconstructing paragraphs - Page ${i}...`);
 
-      const lines: any[] = [];
+      const items: any[] = content.items;
+      const lines: Map<number, any[]> = new Map();
       const fontSizes: number[] = [];
-      
-      content.items.forEach((item: any) => {
+
+      items.forEach(item => {
         const y = Math.round(item.transform[5]);
         fontSizes.push(item.height);
-        let line = lines.find(l => Math.abs(l.y - y) <= 3);
-        if (!line) {
-          line = { y, items: [] };
-          lines.push(line);
+        
+        let found = false;
+        for (const [key, val] of lines.entries()) {
+          if (Math.abs(key - y) <= 3) {
+            val.push(item);
+            found = true;
+            break;
+          }
         }
-        line.items.push(item);
+        if (!found) lines.set(y, [item]);
       });
 
-      const avgFontSize = fontSizes.length > 0 ? fontSizes.reduce((a, b) => a + b, 0) / fontSizes.length : 12;
+      const avgSize = fontSizes.reduce((a, b) => a + b, 0) / fontSizes.length;
+      const sortedY = Array.from(lines.keys()).sort((a, b) => b - a);
 
-      lines.sort((a, b) => b.y - a.y).forEach(line => {
-        line.items.sort((a: any, b: any) => a.transform[4] - b.transform[4]);
-        const text = line.items.map((it: any) => it.str).join(' ');
+      sortedY.forEach(y => {
+        const lineItems = lines.get(y)!.sort((a, b) => a.transform[4] - b.transform[4]);
+        const text = lineItems.map(it => it.str).join(' ');
+        const isHeading = lineItems.some(it => it.height > avgSize * 1.3);
         
-        const isHeading = line.items.some((it: any) => it.height > avgFontSize * 1.3);
-        const style = isHeading ? 'Heading1' : 'Normal';
-        
-        documentXml += `<w:p><w:pPr><w:pStyle w:val="${style}"/></w:pPr><w:r><w:t>${this.xmlEscape(text)}</w:t></w:r></w:p>`;
+        documentXml += `<w:p><w:pPr>${isHeading ? '<w:pStyle w:val="Heading1"/>' : ''}</w:pPr><w:r><w:t>${this.xmlEscape(text)}</w:t></w:r></w:p>`;
       });
     }
 
@@ -132,23 +136,26 @@ export class PDFConverter {
       const content = await page.getTextContent();
       this.updateProgress(Math.round((i / pdf.numPages) * 100), `Detecting grids - Page ${i}...`);
 
-      const rows: string[][] = [];
-      const lines: any[] = [];
+      const lines: Map<number, any[]> = new Map();
       content.items.forEach((item: any) => {
         const y = Math.round(item.transform[5]);
-        let line = lines.find(l => Math.abs(l.y - y) <= 5);
-        if (!line) {
-          line = { y, items: [] };
-          lines.push(line);
+        let found = false;
+        for (const key of lines.keys()) {
+          if (Math.abs(key - y) <= 5) {
+            lines.get(key)!.push(item);
+            found = true;
+            break;
+          }
         }
-        line.items.push(item);
+        if (!found) lines.set(y, [item]);
       });
 
-      lines.sort((a, b) => b.y - a.y).forEach(line => {
-        line.items.sort((a: any, b: any) => a.transform[4] - b.transform[4]);
+      const rows: string[][] = [];
+      Array.from(lines.keys()).sort((a, b) => b - a).forEach(y => {
+        const lineItems = lines.get(y)!.sort((a, b) => a.transform[4] - b.transform[4]);
         const row: string[] = [];
         let lastX = -1;
-        line.items.forEach((it: any) => {
+        lineItems.forEach(it => {
           if (lastX !== -1 && it.transform[4] - lastX > 20) row.push(it.str);
           else if (row.length === 0) row.push(it.str);
           else row[row.length - 1] += ' ' + it.str;
@@ -174,8 +181,7 @@ export class PDFConverter {
       const page = await pdf.getPage(i);
       const viewport = page.getViewport({ scale: 2.0 });
       const canvas = document.createElement('canvas');
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
+      canvas.width = viewport.width; canvas.height = viewport.height;
       await page.render({ canvasContext: canvas.getContext('2d')!, viewport }).promise;
       pres.addSlide().addImage({ data: canvas.toDataURL('image/png'), x: 0, y: 0, w: '100%', h: '100%' });
       this.updateProgress(Math.round((i/pdf.numPages)*100), `Rendering slide ${i}...`);
@@ -242,8 +248,21 @@ export class PDFConverter {
   }
 
   private async toImages(pdf: any, baseName: string, type: string): Promise<ConversionResult> {
-    const zip = new JSZip();
     const ext = type === 'image/jpeg' ? 'jpg' : 'png';
+    
+    // FAST PATH: Single page directly to blob
+    if (pdf.numPages === 1) {
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 2.0 });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width; canvas.height = viewport.height;
+      await page.render({ canvasContext: canvas.getContext('2d')!, viewport }).promise;
+      const blob = await new Promise<Blob>((resolve) => canvas.toBlob((b) => resolve(b!), type, 0.92));
+      return { blob, fileName: `${baseName}.${ext}`, mimeType: type };
+    }
+
+    // BATCH PATH: Multi-page to ZIP
+    const zip = new JSZip();
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const viewport = page.getViewport({ scale: 2.0 });
@@ -252,6 +271,7 @@ export class PDFConverter {
       await page.render({ canvasContext: canvas.getContext('2d')!, viewport }).promise;
       const b64 = canvas.toDataURL(type).split(',')[1];
       zip.file(`page_${String(i).padStart(3, '0')}.${ext}`, b64, { base64: true });
+      this.updateProgress(Math.round((i / pdf.numPages) * 100), `Capturing neural frame ${i} of ${pdf.numPages}...`);
     }
     const blob = await zip.generateAsync({ type: 'blob' });
     return { blob, fileName: `${baseName}_images.zip`, mimeType: 'application/zip' };
@@ -276,19 +296,14 @@ export class PDFConverter {
 
   private async toSVG(pdf: any, baseName: string): Promise<ConversionResult> {
     const zip = new JSZip();
-    this.updateProgress(50, "Rendering vector raster proxies for SVG container...");
-    
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const viewport = page.getViewport({ scale: 1.5 });
       const canvas = document.createElement('canvas');
       canvas.width = viewport.width; canvas.height = viewport.height;
       await page.render({ canvasContext: canvas.getContext('2d')!, viewport }).promise;
-      
       const b64 = canvas.toDataURL('image/png');
-      const svg = `<svg width="${viewport.width}" height="${viewport.height}" xmlns="http://www.w3.org/2000/svg">
-        <image href="${b64}" width="100%" height="100%" />
-      </svg>`;
+      const svg = `<svg width="${viewport.width}" height="${viewport.height}" xmlns="http://www.w3.org/2000/svg"><image href="${b64}" width="100%" height="100%" /></svg>`;
       zip.file(`page_${String(i).padStart(3, '0')}.svg`, svg);
     }
     const blob = await zip.generateAsync({ type: 'blob' });
