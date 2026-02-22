@@ -1,23 +1,33 @@
-
 "use client";
 
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
 import { DashboardTopBar } from '@/components/dashboard/dashboard-top-bar';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { useUser } from '@/firebase';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
+
+const PUBLIC_DASHBOARD_ROUTES = [
+  '/dashboard/convert',
+  '/dashboard/pdf-editor',
+  '/dashboard/image-editor',
+  '/dashboard/tools/video',
+  '/dashboard/tools/audio',
+  '/dashboard/upload'
+];
 
 function DashboardGuard({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (!isUserLoading && !user) {
+    const isPublicRoute = PUBLIC_DASHBOARD_ROUTES.includes(pathname);
+    if (!isUserLoading && !user && !isPublicRoute && pathname !== '/dashboard') {
       router.push('/login');
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, router, pathname]);
 
   if (isUserLoading) {
     return (
@@ -27,8 +37,6 @@ function DashboardGuard({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-
-  if (!user) return null;
 
   return (
     <div className="min-h-screen flex text-foreground relative bg-[#0a0e1f]">

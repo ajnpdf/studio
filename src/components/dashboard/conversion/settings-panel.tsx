@@ -43,7 +43,16 @@ const conversionTargets: Record<string, string[]> = {
   'NEF': ['JPG', 'PNG', 'TIFF', 'DNG'],
   'ARW': ['JPG', 'PNG', 'TIFF', 'DNG'],
   'DNG': ['JPG', 'PNG', 'TIFF'],
-  'MP4': ['MOV', 'AVI', 'MKV', 'WebM', 'MP3', 'WAV'],
+  'MP4': ['AVI', 'MOV', 'MKV', 'WEBM', 'GIF', 'MP3', 'WAV', 'AAC'],
+  'MOV': ['MP4', 'GIF', 'AVI', 'MKV', 'WEBM'],
+  'AVI': ['MP4', 'MOV', 'MKV'],
+  'MKV': ['MP4', 'MOV', 'AVI'],
+  'WEBM': ['MP4', 'MOV', 'MKV'],
+  'FLV': ['MP4'],
+  'WMV': ['MP4'],
+  '3GP': ['MP4'],
+  'TS': ['MP4'],
+  'M4V': ['MP4'],
   'MP3': ['WAV', 'AAC', 'OGG', 'FLAC', 'M4A'],
   'PPTX': ['PDF', 'PPT', 'JPG', 'PNG', 'ODP'],
   'PPT': ['PPTX', 'PDF', 'JPG', 'PNG'],
@@ -57,6 +66,7 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
 
   const isImage = ['JPG', 'JPEG', 'PNG', 'WEBP', 'AVIF', 'HEIC', 'BMP', 'SVG', 'GIF'].includes(file.format.toUpperCase());
   const isRaw = ['CR2', 'NEF', 'ARW', 'DNG'].includes(file.format.toUpperCase());
+  const isVideo = ['MP4', 'MOV', 'AVI', 'MKV', 'WEBM', 'FLV', 'WMV', '3GP', 'TS', 'M4V'].includes(file.format.toUpperCase());
 
   return (
     <Card className="bg-card/40 backdrop-blur-xl border-white/5 flex flex-col h-full min-h-0 overflow-hidden">
@@ -128,6 +138,38 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
               </div>
             )}
 
+            {isVideo && (
+              <div className="space-y-6 animate-in slide-in-from-top-2">
+                <div className="space-y-3">
+                  <Label className="text-[9px] font-black uppercase tracking-widest">Target Resolution</Label>
+                  <Select value={settings.resolution} onValueChange={(v) => setSettings({...settings, resolution: v})}>
+                    <SelectTrigger className="h-10 bg-white/5 border-white/10 font-black text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="4k">4K (3840×2160)</SelectItem>
+                      <SelectItem value="1080p">1080p Full HD</SelectItem>
+                      <SelectItem value="720p">720p HD</SelectItem>
+                      <SelectItem value="480p">480p SD</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-3">
+                  <Label className="text-[9px] font-black uppercase tracking-widest">Encoding Speed</Label>
+                  <Select defaultValue="medium">
+                    <SelectTrigger className="h-10 bg-white/5 border-white/10 font-black text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ultrafast">Ultrafast (Low Quality)</SelectItem>
+                      <SelectItem value="medium">Medium (Balanced)</SelectItem>
+                      <SelectItem value="veryslow">Very Slow (Max Quality)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+
             {file.format === 'PDF' && (
               <div className="flex items-center gap-3 p-4 bg-primary/5 border border-primary/10 rounded-2xl">
                 <Checkbox id="ocr" checked={settings.ocr} onCheckedChange={(v) => setSettings({...settings, ocr: !!v})} />
@@ -152,7 +194,7 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
 
         <div className="p-6 bg-white/5 border-t border-white/5 space-y-4">
           <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-muted-foreground">
-            <span className="flex items-center gap-2"><Clock className="w-3 h-3" /> Est. Latency: {isRaw ? '15-30s' : '2-5s'}</span>
+            <span className="flex items-center gap-2"><Clock className="w-3 h-3" /> Est. Latency: {isRaw || isVideo ? '15-60s' : '2-5s'}</span>
             <span>Neural V2.5 Active</span>
           </div>
           <Button 

@@ -1,7 +1,6 @@
-
 "use client";
 
-import { Search, Bell, Plus, Menu, User, Settings, LogOut } from 'lucide-react';
+import { Search, Bell, Plus, Menu, User, Settings, LogOut, LogIn } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,12 +16,13 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { BillingModal } from './billing-modal';
 import { LanguageSelector } from './language-selector';
-import { useAuth } from '@/firebase';
+import { useAuth, useUser } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
 export function DashboardTopBar() {
   const [showBilling, setShowBilling] = useState(false);
+  const { user } = useUser();
   const auth = useAuth();
   const router = useRouter();
 
@@ -32,7 +32,7 @@ export function DashboardTopBar() {
 
   return (
     <div className="flex flex-col sticky top-0 z-30">
-      <header className="h-16 border-b border-white/5 bg-background/20 backdrop-blur-xl flex items-center justify-between px-6">
+      <header className="h-16 border-b border-white/5 bg-background/40 backdrop-blur-xl flex items-center justify-between px-6">
         <div className="flex items-center gap-4 flex-1">
           <Button variant="ghost" size="icon" className="lg:hidden">
             <Menu className="w-5 h-5" />
@@ -56,52 +56,62 @@ export function DashboardTopBar() {
             </Button>
           </Link>
 
-          <div className="relative">
-            <Button variant="ghost" size="icon" className="h-10 w-10 relative hover:bg-white/5">
-              <Bell className="w-5 h-5" />
-            </Button>
-          </div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-10 w-10 p-0 rounded-full border border-white/10">
-                <Avatar className="h-full w-full">
-                  <AvatarImage src="https://picsum.photos/seed/alex/100/100" />
-                  <AvatarFallback>AD</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 mt-2 bg-card/80 backdrop-blur-xl border-white/10">
-              <div className="flex items-center gap-3 p-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://picsum.photos/seed/alex/100/100" />
-                  <AvatarFallback>AD</AvatarFallback>
-                </Avatar>
-                <div className="overflow-hidden">
-                  <p className="text-sm font-black truncate uppercase tracking-tighter">Alex Doe</p>
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Workspace Member</p>
-                </div>
+          {user ? (
+            <>
+              <div className="relative">
+                <Button variant="ghost" size="icon" className="h-10 w-10 relative hover:bg-white/5">
+                  <Bell className="w-5 h-5" />
+                </Button>
               </div>
-              <DropdownMenuSeparator className="bg-white/5" />
-              <DropdownMenuItem asChild>
-                <Link href="/dashboard/settings" className="flex items-center gap-3 py-2.5 cursor-pointer">
-                  <User className="w-4 h-4" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest">Profile & Account</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/dashboard/settings?tab=billing" className="flex items-center gap-3 py-2.5 cursor-pointer">
-                  <Badge variant="outline" className="h-4 border-white/20 text-[8px] px-1 font-black">UPGRADE</Badge>
-                  <span className="text-[10px] font-bold uppercase tracking-widest">Billing & Tier</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-white/5" />
-              <DropdownMenuItem onClick={handleSignOut} className="flex items-center gap-3 py-2.5 cursor-pointer text-red-400 focus:text-red-400">
-                <LogOut className="w-4 h-4" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Sign Out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-10 w-10 p-0 rounded-full border border-white/10">
+                    <Avatar className="h-full w-full">
+                      <AvatarImage src={user.photoURL || "https://picsum.photos/seed/alex/100/100"} />
+                      <AvatarFallback>{user.displayName?.[0] || 'U'}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 mt-2 bg-card/80 backdrop-blur-xl border-white/10">
+                  <div className="flex items-center gap-3 p-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.photoURL || "https://picsum.photos/seed/alex/100/100"} />
+                      <AvatarFallback>{user.displayName?.[0] || 'U'}</AvatarFallback>
+                    </Avatar>
+                    <div className="overflow-hidden">
+                      <p className="text-sm font-black truncate uppercase tracking-tighter">{user.displayName || 'User Account'}</p>
+                      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Active Member</p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator className="bg-white/5" />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/settings" className="flex items-center gap-3 py-2.5 cursor-pointer">
+                      <User className="w-4 h-4" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Profile & Account</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/settings?tab=billing" className="flex items-center gap-3 py-2.5 cursor-pointer">
+                      <Badge variant="outline" className="h-4 border-white/20 text-[8px] px-1 font-black">UPGRADE</Badge>
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Billing & Tier</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-white/5" />
+                  <DropdownMenuItem onClick={handleSignOut} className="flex items-center gap-3 py-2.5 cursor-pointer text-red-400 focus:text-red-400">
+                    <LogOut className="w-4 h-4" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Sign Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <Link href="/login">
+              <Button variant="ghost" className="h-10 gap-2 text-[10px] font-black uppercase tracking-widest hover:bg-white/5">
+                <LogIn className="w-4 h-4" /> SIGN IN
+              </Button>
+            </Link>
+          )}
         </div>
       </header>
 

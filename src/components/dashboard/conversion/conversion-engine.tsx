@@ -12,6 +12,7 @@ import { PPTConverter } from '@/lib/converters/ppt-converter';
 import { ODTConverter } from '@/lib/converters/odt-converter';
 import { ImageConverter } from '@/lib/converters/image-converter';
 import { RawConverter } from '@/lib/converters/raw-converter';
+import { VideoConverter } from '@/lib/converters/video-converter';
 import { useToast } from '@/hooks/use-toast';
 
 export type ConversionState = 'idle' | 'processing' | 'complete';
@@ -30,6 +31,7 @@ export interface ConversionSettings {
 
 const IMAGE_EXTS = ['JPG', 'JPEG', 'PNG', 'WEBP', 'TIFF', 'BMP', 'GIF', 'SVG', 'AVIF', 'HEIC'];
 const RAW_EXTS = ['CR2', 'CR3', 'NEF', 'ARW', 'DNG', 'ORF', 'RW2', 'RAF'];
+const VIDEO_EXTS = ['MP4', 'MOV', 'AVI', 'MKV', 'WEBM', 'FLV', 'WMV', '3GP', 'TS', 'M4V'];
 
 export function ConversionEngine({ initialFileId }: { initialFileId: string | null }) {
   const [file, setFile] = useState(mockFiles.find(f => f.id === initialFileId) || mockFiles[0]);
@@ -111,6 +113,9 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
         converterResult = await converter.convertTo(settings.toFormat);
       } else if (RAW_EXTS.includes(fmt)) {
         const converter = new RawConverter(realFile, onProgress);
+        converterResult = await converter.convertTo(settings.toFormat);
+      } else if (VIDEO_EXTS.includes(fmt)) {
+        const converter = new VideoConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat);
       } else {
         throw new Error(`Engine for ${file.format} is currently in calibration.`);

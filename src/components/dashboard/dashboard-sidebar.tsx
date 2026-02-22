@@ -1,4 +1,3 @@
-
 "use client";
 
 import { 
@@ -20,7 +19,9 @@ import {
   Megaphone,
   ChevronLeft,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  LogIn,
+  Activity
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -34,7 +35,6 @@ import { doc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 
 const navItems = [
-  { icon: Files, label: 'My Session', href: '/dashboard/files', description: 'Active workspace files' },
   { icon: Repeat, label: 'Convert', href: '/dashboard/convert', description: 'Universal format changer' },
 ];
 
@@ -131,18 +131,32 @@ export function DashboardSidebar() {
           {!collapsed && <span className="font-black text-lg tracking-tighter text-white uppercase">AJN</span>}
         </Link>
 
-        <div className={cn("flex items-center gap-3 mb-2 transition-all", collapsed && "justify-center")}>
-          <Avatar className="h-10 w-10 border border-white/10">
-            <AvatarImage src={user?.photoURL || "https://picsum.photos/seed/alex/100/100"} />
-            <AvatarFallback>U</AvatarFallback>
-          </Avatar>
-          {!collapsed && (
-            <div className="overflow-hidden">
-              <p className="font-black text-[11px] uppercase tracking-tighter truncate">{user?.displayName || 'USER ACCOUNT'}</p>
-              <Badge variant="secondary" className="h-4 text-[8px] bg-white/10 text-white border-none px-1.5 font-black uppercase tracking-widest">{profile?.tier || 'FREE'}</Badge>
+        {user ? (
+          <div className={cn("flex items-center gap-3 mb-2 transition-all", collapsed && "justify-center")}>
+            <Avatar className="h-10 w-10 border border-white/10">
+              <AvatarImage src={user?.photoURL || "https://picsum.photos/seed/alex/100/100"} />
+              <AvatarFallback>{user.displayName?.[0] || 'U'}</AvatarFallback>
+            </Avatar>
+            {!collapsed && (
+              <div className="overflow-hidden">
+                <p className="font-black text-[11px] uppercase tracking-tighter truncate">{user?.displayName || 'USER ACCOUNT'}</p>
+                <Badge variant="secondary" className="h-4 text-[8px] bg-white/10 text-white border-none px-1.5 font-black uppercase tracking-widest">{profile?.tier || 'FREE'}</Badge>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className={cn("flex items-center gap-3 mb-2 transition-all", collapsed && "justify-center")}>
+            <div className="h-10 w-10 bg-white/5 rounded-full border border-white/10 flex items-center justify-center">
+              <Activity className="w-5 h-5 text-muted-foreground animate-pulse" />
             </div>
-          )}
-        </div>
+            {!collapsed && (
+              <div className="overflow-hidden">
+                <p className="font-black text-[11px] uppercase tracking-tighter truncate text-muted-foreground/60">GUEST SESSION</p>
+                <Badge variant="outline" className="h-4 text-[8px] border-white/10 text-white/40 border-none px-1.5 font-black uppercase tracking-widest">LIMITED</Badge>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-8 scrollbar-hide">
@@ -160,7 +174,11 @@ export function DashboardSidebar() {
         <div>
           {!collapsed && <p className="px-3 mb-3 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Workspace</p>}
           <div className="space-y-1">
-            {workspaceItems.map((item) => <NavLink key={item.href} item={item} />)}
+            {workspaceItems.map((item) => (
+              <div key={item.href} className={!user ? "opacity-20 pointer-events-none" : ""}>
+                <NavLink item={item} />
+              </div>
+            ))}
           </div>
         </div>
 
@@ -175,17 +193,26 @@ export function DashboardSidebar() {
       <div className="p-4 border-t border-white/5">
         <button 
           onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-white/5 hover:text-white transition-all mb-2"
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-white transition-all mb-2"
         >
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <div className="flex items-center gap-3"><ChevronLeft className="w-4 h-4" /> <span>Collapse Grid</span></div>}
         </button>
-        <button 
-          onClick={handleSignOut}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-red-400 hover:bg-red-400/10 transition-all"
-        >
-          <LogOut className="w-4 h-4 shrink-0" />
-          {!collapsed && <span>Disconnect</span>}
-        </button>
+        {user ? (
+          <button 
+            onClick={handleSignOut}
+            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-red-400 hover:bg-red-400/10 transition-all"
+          >
+            <LogOut className="w-4 h-4 shrink-0" />
+            {!collapsed && <span>Disconnect</span>}
+          </button>
+        ) : (
+          <Link href="/login">
+            <button className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/10 transition-all">
+              <LogIn className="w-4 h-4 shrink-0" />
+              {!collapsed && <span>Sign In</span>}
+            </button>
+          </Link>
+        )}
       </div>
     </aside>
   );
