@@ -4,56 +4,34 @@
 
 @layer base {
   :root {
-    --background: 210 20% 96%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 231 48% 48%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 262 47% 55%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 210 40% 92%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 262 47% 95%;
-    --accent-foreground: 262 47% 40%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 231 48% 48%;
-    --radius: 0.75rem;
-    --sidebar-background: 231 48% 15%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 231 48% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 231 48% 25%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 231 48% 20%;
-    --sidebar-ring: 231 48% 48%;
-  }
-
-  .dark {
     --background: 222 47% 11%;
     --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
+    --card: 222 47% 12%;
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 262 47% 55%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 262 80% 60%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217 32% 17%;
     --muted-foreground: 215 20% 65%;
-    --accent: 262 47% 20%;
+    --accent: 217 91% 60%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217 32% 17%;
     --input: 217 32% 17%;
     --ring: 224 76% 48%;
+    --radius: 1rem;
+    --sidebar-background: 222 47% 8%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217 91% 20%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 32% 15%;
+    --sidebar-ring: 224 76% 48%;
   }
 }
 
@@ -67,25 +45,34 @@
 }
 
 @layer utilities {
-  .bg-brand-gradient {
-    background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
+  .bg-sufw-gradient {
+    background: linear-gradient(180deg, hsl(222, 47%, 11%) 0%, hsl(222, 47%, 5%) 100%);
   }
-  .bg-accent-gradient {
-    background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+  .bg-brand-gradient {
+    background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
   }
   .text-gradient {
     @apply bg-clip-text text-transparent bg-brand-gradient;
   }
-  .animate-gradient-shift {
-    background-size: 200% 200%;
-    animation: gradientShift 12s ease infinite;
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+  .animate-orbit {
+    animation: orbit 20s linear infinite;
+  }
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 }
 
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(150px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
 }
 
 @keyframes float {
@@ -96,9 +83,4 @@
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
-}
-
-.animate-float-delayed {
-  animation: float 6s ease-in-out infinite;
-  animation-delay: 2s;
 }
