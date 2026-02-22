@@ -140,7 +140,9 @@ class ConversionEngine {
 
     switch (job.operationId) {
       case 'merge-pdf': return manip.merge();
-      case 'split-pdf': return manip.split(job.settings.pages || [0]);
+      case 'split-pdf': 
+      case 'extract-pages':
+        return manip.split(job.settings.pages || [0]);
       case 'rotate-pdf': return manip.rotate(job.settings.angle || 90);
       case 'protect-pdf': return manip.protect(job.settings.password || '1234');
       case 'unlock-pdf': return manip.rotate(0); // Dummy unlock pass
@@ -151,6 +153,7 @@ class ConversionEngine {
       case 'redact-pdf': return specialized.convertTo('REDACTED_PDF', job.settings);
       case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
       case 'repair-pdf': return specialized.convertTo('REDACTED_PDF'); 
+      case 'compress-pdf': return manip.rotate(0); // Dummy compress pass for proto
       default: return this.runConversion(job);
     }
   }
