@@ -15,6 +15,8 @@ import { VideoConverter } from '@/lib/converters/video-converter';
 import { AudioConverter } from '@/lib/converters/audio-converter';
 import { ArchiveConverter } from '@/lib/converters/archive-converter';
 import { CodeConverter } from '@/lib/converters/code-converter';
+import { EbookConverter } from '@/lib/converters/ebook-converter';
+import { DesignConverter } from '@/lib/converters/design-converter';
 import { useToast } from '@/hooks/use-toast';
 
 export type ConversionState = 'idle' | 'processing' | 'complete';
@@ -40,6 +42,8 @@ const VIDEO_EXTS = ['MP4', 'MOV', 'AVI', 'MKV', 'WEBM', 'FLV', 'WMV', '3GP', 'TS
 const AUDIO_EXTS = ['MP3', 'WAV', 'AAC', 'M4A', 'FLAC', 'OGG', 'WMA', 'AIFF', 'AMR'];
 const ARCHIVE_EXTS = ['ZIP', 'RAR', '7Z', 'TAR', 'GZ', 'ISO', 'CAB'];
 const CODE_EXTS = ['JSON', 'XML', 'CSV', 'YAML', 'YML', 'HTML', 'MD', 'MARKDOWN', 'SQL'];
+const EBOOK_EXTS = ['EPUB', 'MOBI', 'AZW', 'AZW3', 'FB2'];
+const DESIGN_EXTS = ['PSD', 'AI', 'EPS', 'CDR'];
 
 export function ConversionEngine({ initialFileId }: { initialFileId: string | null }) {
   const [file, setFile] = useState<any>(null);
@@ -99,7 +103,6 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
         const converter = new WordConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat);
       } else if (fmt === 'XLSX' || fmt === 'XLS' || fmt === 'CSV' || fmt === 'ODS') {
-        // Special case: CSV can go to code or excel. Routing logic handles both.
         if (CODE_EXTS.includes(fmt) && !['PDF', 'XLSX'].includes(settings.toFormat.toUpperCase())) {
            const converter = new CodeConverter(realFile, onProgress);
            converterResult = await converter.convertTo(settings.toFormat, settings);
@@ -131,6 +134,12 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
       } else if (CODE_EXTS.includes(fmt)) {
         const converter = new CodeConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat, settings);
+      } else if (EBOOK_EXTS.includes(fmt)) {
+        const converter = new EbookConverter(realFile, onProgress);
+        converterResult = await converter.convertTo(settings.toFormat);
+      } else if (DESIGN_EXTS.includes(fmt)) {
+        const converter = new DesignConverter(realFile, onProgress);
+        converterResult = await converter.convertTo(settings.toFormat);
       } else {
         throw new Error(`Engine for ${file.format} is currently in calibration.`);
       }

@@ -6,9 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowRight, Wand2, Settings2, Clock, Loader2, Code2 } from 'lucide-react';
+import { ArrowRight, Wand2, Settings2, Clock, Loader2 } from 'lucide-react';
 import { ConversionSettings } from './conversion-engine';
 
 interface Props {
@@ -53,6 +52,16 @@ const conversionTargets: Record<string, string[]> = {
   '7Z': ['ZIP'],
   'TAR': ['ZIP'],
   'GZ': ['ZIP'],
+  // Ebook Targets
+  'EPUB': ['PDF', 'MOBI', 'DOCX', 'TXT'],
+  'MOBI': ['EPUB'],
+  'AZW': ['EPUB'],
+  'AZW3': ['EPUB'],
+  'FB2': ['EPUB'],
+  // Design Targets
+  'PSD': ['JPG', 'PNG', 'PDF'],
+  'AI': ['PDF', 'SVG', 'PNG'],
+  'EPS': ['SVG', 'PNG', 'JPG'],
 };
 
 export function SettingsPanel({ file, settings, setSettings, onConvert, isProcessing }: Props) {
@@ -72,7 +81,7 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
 
   const targets = conversionTargets[file.format.toUpperCase()] || ['PDF', 'JPG', 'PNG'];
 
-  const isImage = ['JPG', 'JPEG', 'PNG', 'WEBP', 'AVIF', 'HEIC', 'BMP', 'SVG', 'GIF'].includes(file.format.toUpperCase());
+  const isImage = ['JPG', 'JPEG', 'PNG', 'WEBP', 'AVIF', 'HEIC', 'BMP', 'SVG', 'GIF', 'PSD', 'AI', 'EPS'].includes(file.format.toUpperCase());
   const isVideo = ['MP4', 'MOV', 'AVI', 'MKV', 'WEBM', 'FLV', 'WMV', '3GP', 'TS', 'M4V'].includes(file.format.toUpperCase());
   const isAudio = ['MP3', 'WAV', 'AAC', 'M4A', 'FLAC', 'OGG', 'WMA', 'AIFF', 'AMR'].includes(file.format.toUpperCase());
   const isCode = ['JSON', 'XML', 'CSV', 'YAML', 'YML', 'HTML', 'MD', 'MARKDOWN', 'SQL'].includes(file.format.toUpperCase());
