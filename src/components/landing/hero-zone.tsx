@@ -1,11 +1,10 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Upload, Monitor, HardDrive, Link as LinkIcon, FileText, Video, ImageIcon, Music, Database, FileCode, CheckCircle2, ArrowRight, Activity } from 'lucide-react';
+import { Upload, FileText, Video, ImageIcon, Music, Database, FileCode, CheckCircle2, ArrowRight, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
 import { LogoAnimation } from './logo-animation';
 
 const formatPills = [
@@ -59,24 +58,8 @@ export function HeroZone() {
           </div>
         </div>
 
-        {/* Upload Zone */}
+        {/* Drop Zone Placeholder */}
         <div className="relative max-w-3xl mx-auto mt-12 animate-in fade-in zoom-in-95 duration-1000 delay-700">
-          {/* Animated Format Pills Orbit */}
-          <div className="absolute inset-0 pointer-events-none hidden lg:block">
-            {formatPills.map((pill, idx) => (
-              <div 
-                key={idx}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-orbit"
-                style={{ animationDelay: `${idx * -5}s`, animationDuration: '30s' }}
-              >
-                <div className="bg-card/80 border border-white/10 rounded-2xl px-5 py-3 flex items-center gap-3 shadow-2xl backdrop-blur-xl transition-transform hover:scale-110 cursor-default">
-                  <pill.icon className={cn("w-5 h-5", pill.color)} />
-                  <span className="text-[10px] font-black tracking-widest text-white/80">{pill.label}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
           <div className="glass-card rounded-[3rem] p-1.5 shadow-[0_0_50px_rgba(255,255,255,0.05)] relative group">
             <div className="bg-background/40 rounded-[2.8rem] p-12 border-2 border-dashed border-white/10 hover:border-white/30 transition-all duration-500 cursor-pointer flex flex-col items-center gap-6 relative overflow-hidden">
               <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity animate-shimmer"></div>
@@ -86,7 +69,7 @@ export function HeroZone() {
               </div>
               
               <div className="space-y-2">
-                <h3 className="text-3xl font-black tracking-tight text-white">Drop files to optimize</h3>
+                <h3 className="text-3xl font-black tracking-tight text-white uppercase">Drop files to optimize</h3>
                 <p className="text-muted-foreground font-medium uppercase text-[10px] tracking-widest">Supports 300+ Formats up to 10GB</p>
               </div>
 
@@ -100,22 +83,6 @@ export function HeroZone() {
               </div>
             </div>
           </div>
-
-          <div className="mt-8">
-            <Tabs defaultValue="device" className="w-full">
-              <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-14 w-full sm:w-auto">
-                <TabsTrigger value="device" className="gap-2 px-8 rounded-xl data-[state=active]:bg-white data-[state=active]:text-black font-black text-[10px] tracking-widest">
-                  <Monitor className="w-4 h-4" /> MY DEVICE
-                </TabsTrigger>
-                <TabsTrigger value="vault" className="gap-2 px-8 rounded-xl font-black text-[10px] tracking-widest">
-                  <HardDrive className="w-4 h-4" /> NETWORK VAULT
-                </TabsTrigger>
-                <TabsTrigger value="url" className="gap-2 px-8 rounded-xl font-black text-[10px] tracking-widest">
-                  <LinkIcon className="w-4 h-4" /> PASTE URL
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
         </div>
 
         <div className="mt-16 space-y-8 flex flex-col items-center">
@@ -125,11 +92,9 @@ export function HeroZone() {
             <span className="w-12 h-px bg-white/10"></span>
           </p>
           
-          <Link href="/dashboard/convert">
-            <Button size="lg" className="h-16 px-12 text-sm font-black tracking-widest bg-white text-black hover:bg-white/90 shadow-2xl shadow-white/5 rounded-2xl group uppercase">
-              Launch Converter Now <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </Link>
+          <Button size="lg" className="h-16 px-12 text-sm font-black tracking-widest bg-white text-black hover:bg-white/90 shadow-2xl shadow-white/5 rounded-2xl group uppercase">
+            Start Processing <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </Button>
         </div>
       </div>
     </section>

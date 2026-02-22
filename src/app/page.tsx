@@ -12,14 +12,14 @@ import { Footer } from '@/components/landing/footer';
 
 /**
  * AJN Production Landing Page
- * Clean, high-fidelity entry point using superseded component structure.
+ * Now the primary and exclusive entry point for the platform.
  */
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-sufw-gradient overflow-x-hidden">
       <Navbar />
       <main>
-        {/* SECTION A - Hero Zone (includes LogoAnimation) */}
+        {/* SECTION A - Hero Zone (includes Neural Logo Animation) */}
         <HeroZone />
 
         {/* SECTION B - Format Support Strip */}
