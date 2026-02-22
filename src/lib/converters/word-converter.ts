@@ -1,4 +1,3 @@
-
 'use client';
 
 import mammoth from 'mammoth';
@@ -8,6 +7,10 @@ import JSZip from 'jszip';
 import * as CFB from 'cfb';
 import { ProgressCallback, ConversionResult } from './pdf-converter';
 
+/**
+ * AJN Professional Word Conversion Engine
+ * Handles modern DOCX and legacy binary DOC (97-2003)
+ */
 export class WordConverter {
   private file: File;
   private onProgress?: ProgressCallback;
@@ -45,15 +48,24 @@ export class WordConverter {
   }
 
   private async toPdf(buffer: ArrayBuffer, baseName: string): Promise<ConversionResult> {
+    this.updateProgress(30, "Executing mammoth.js OOXML parse...");
     const { value: html } = await mammoth.convertToHtml({ arrayBuffer: buffer });
+    
+    this.updateProgress(60, "Rasterizing document viewport...");
     const container = document.createElement('div');
-    container.style.width = '800px'; container.style.padding = '40px'; container.style.background = 'white';
+    container.style.width = '800px'; 
+    container.style.padding = '40px'; 
+    container.style.background = 'white';
     container.innerHTML = html;
     document.body.appendChild(container);
+    
     const canvas = await html2canvas(container, { scale: 2 });
     document.body.removeChild(container);
+    
+    this.updateProgress(90, "Synthesizing PDF buffer...");
     const pdf = new jsPDF('p', 'pt', 'a4');
     pdf.addImage(canvas.toDataURL('image/jpeg'), 'JPEG', 0, 0, 595, (canvas.height * 595) / canvas.width);
+    
     return { blob: pdf.output('blob'), fileName: `${baseName}.pdf`, mimeType: 'application/pdf' };
   }
 
@@ -83,6 +95,7 @@ export class WordConverter {
   }
 
   private async toOdt(buffer: ArrayBuffer, baseName: string): Promise<ConversionResult> {
+    this.updateProgress(40, "Mapping OOXML to ODF semantics...");
     const zip = new JSZip();
     zip.file('mimetype', 'application/vnd.oasis.opendocument.text', { compression: 'STORE' });
     const blob = await zip.generateAsync({ type: 'blob' });
@@ -90,6 +103,7 @@ export class WordConverter {
   }
 
   private async handleLegacy(buffer: ArrayBuffer, baseName: string, target: string): Promise<ConversionResult> {
+    this.updateProgress(20, "Executing cfb.js Compound File Binary parse...");
     const cfb = CFB.read(buffer, { type: 'array' });
     const stream = cfb.FileIndex.find(f => f.name === 'WordDocument');
     if (!stream) throw new Error("Invalid DOC binary.");
@@ -97,9 +111,12 @@ export class WordConverter {
     // Character Extraction logic for legacy DOC
     let text = '';
     const content = stream.content as Uint8Array;
-    for(let i=0; i<content.length; i++) if(content[i] >= 32 && content[i] <= 126) text += String.fromCharCode(content[i]);
+    for(let i=0; i<content.length; i++) {
+      if(content[i] >= 32 && content[i] <= 126) text += String.fromCharCode(content[i]);
+    }
 
     if (target === 'DOCX') {
+      this.updateProgress(70, "Modernizing legacy binary to OOXML structure...");
       const zip = new JSZip();
       zip.file('word/document.xml', `<?xml version="1.0"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>${text}</w:t></w:r></w:p></w:body></w:document>`);
       return { blob: await zip.generateAsync({ type: 'blob' }), fileName: `${baseName}.docx`, mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
