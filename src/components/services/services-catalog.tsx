@@ -15,7 +15,8 @@ import {
   Zap,
   BrainCircuit,
   Workflow,
-  X
+  X,
+  Cpu
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -352,7 +353,7 @@ export function ServicesCatalog() {
 
               <div className="flex gap-4 pt-4">
                 <Button 
-                  onClick={() => window.location.href = '/dashboard/convert'}
+                  onClick={() => window.location.href = '/ajn'}
                   className="flex-1 h-16 bg-brand-gradient hover:opacity-90 font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-primary/20 rounded-2xl"
                 >
                   Launch Service Now <ArrowRight className="ml-3 w-5 h-5" />

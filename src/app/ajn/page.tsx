@@ -14,7 +14,8 @@ import {
   Activity, 
   FileCode, 
   Loader2,
-  Lock
+  Lock,
+  Grid2X2
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -87,6 +88,12 @@ export default function AJNPage() {
         </Link>
         
         <div className="flex items-center gap-6">
+          <Link href="/services">
+            <Button variant="outline" className="h-9 border-white/10 bg-white/5 hover:bg-white hover:text-black font-black text-[10px] uppercase tracking-widest rounded-xl transition-all gap-2 px-4 shadow-2xl">
+              <Grid2X2 className="w-3.5 h-3.5" /> Services Directory
+            </Button>
+          </Link>
+          <div className="h-8 w-px bg-white/10 hidden md:block" />
           <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-xl border border-white/10">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
             <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">WASM Layer Active</span>

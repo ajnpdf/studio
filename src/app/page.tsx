@@ -1,7 +1,8 @@
+
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Grid2X2 } from 'lucide-react';
 
 /**
  * AJN Minimal Standalone Landing
@@ -25,10 +26,15 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="pt-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link href="/ajn">
-              <Button variant="outline" className="h-12 px-8 border-white/10 bg-white/5 hover:bg-white hover:text-black font-black text-[10px] uppercase tracking-[0.3em] rounded-xl transition-all gap-3 shadow-2xl">
+              <Button className="h-12 px-8 bg-white text-black hover:bg-white/90 font-black text-[10px] uppercase tracking-[0.3em] rounded-xl transition-all gap-3 shadow-2xl">
                 Discover the Core <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+            <Link href="/services">
+              <Button variant="outline" className="h-12 px-8 border-white/10 bg-white/5 hover:bg-white/10 text-white font-black text-[10px] uppercase tracking-[0.3em] rounded-xl transition-all gap-3 shadow-2xl">
+                <Grid2X2 className="w-4 h-4" /> Explore Services
               </Button>
             </Link>
           </div>
