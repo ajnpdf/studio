@@ -20,14 +20,12 @@ import {
   Megaphone,
   ChevronLeft,
   ChevronRight,
-  ShieldCheck,
-  ShieldAlert
+  ShieldCheck
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -36,7 +34,7 @@ import { doc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 
 const navItems = [
-  { icon: Files, label: 'My Files', href: '/dashboard/files', description: 'Manage your assets' },
+  { icon: Files, label: 'My Session', href: '/dashboard/files', description: 'Active workspace files' },
   { icon: Repeat, label: 'Convert', href: '/dashboard/convert', description: 'Universal format changer' },
 ];
 
@@ -50,7 +48,7 @@ const toolItems = [
 ];
 
 const workspaceItems = [
-  { icon: Users, label: 'Team', href: '/dashboard/team', disabled: false, badge: 'Business', description: 'Collaborative workspaces' },
+  { icon: Users, label: 'Team', href: '/dashboard/team', description: 'Collaborative workspaces' },
   { icon: Wand2, label: 'API Panel', href: '/dashboard/api', description: 'Developer keys and logs' },
   { icon: ShieldCheck, label: 'Admin Panel', href: '/admin', description: 'System operations', badge: 'ROOT' },
   { icon: Settings, label: 'Settings', href: '/dashboard/settings', description: 'Account and preferences' },
@@ -71,7 +69,6 @@ export function DashboardSidebar() {
 
   const userProfileRef = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    // FIX: Collection name should be 'users' to match rules and backend.json
     return doc(firestore, 'users', user.uid);
   }, [firestore, user]);
 
@@ -120,11 +117,6 @@ export function DashboardSidebar() {
     </TooltipProvider>
   );
 
-  // FIX: Field names aligned with backend.json (storageUsed, storageLimit)
-  const storageUsed = profile?.storageUsed || 0;
-  const storageLimit = profile?.storageLimit || (50 * 1024 * 1024); // Default 50MB
-  const storagePercent = Math.min(100, Math.round((storageUsed / storageLimit) * 100)) || 0;
-
   return (
     <aside className={cn(
       "border-r border-white/5 bg-sidebar/40 backdrop-blur-xl text-sidebar-foreground flex flex-col h-screen fixed left-0 top-0 z-40 transition-all duration-300",
@@ -139,7 +131,7 @@ export function DashboardSidebar() {
           {!collapsed && <span className="font-black text-lg tracking-tighter text-white uppercase">AJN</span>}
         </Link>
 
-        <div className={cn("flex items-center gap-3 mb-6 transition-all", collapsed && "justify-center")}>
+        <div className={cn("flex items-center gap-3 mb-2 transition-all", collapsed && "justify-center")}>
           <Avatar className="h-10 w-10 border border-white/10">
             <AvatarImage src={user?.photoURL || "https://picsum.photos/seed/alex/100/100"} />
             <AvatarFallback>U</AvatarFallback>
@@ -151,16 +143,6 @@ export function DashboardSidebar() {
             </div>
           )}
         </div>
-
-        {!collapsed && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
-              <span>Vault Capacity</span>
-              <span>{storagePercent}%</span>
-            </div>
-            <Progress value={storagePercent} className="h-1 bg-white/5 [&>div]:bg-white" />
-          </div>
-        )}
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-8 scrollbar-hide">
