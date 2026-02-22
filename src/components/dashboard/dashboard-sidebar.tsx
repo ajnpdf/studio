@@ -19,7 +19,8 @@ import {
   HelpCircle,
   Megaphone,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ShieldCheck
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -47,6 +48,7 @@ const toolItems = [
 const workspaceItems = [
   { icon: Users, label: 'Team', href: '/dashboard/team', disabled: false, badge: 'Business', description: 'Collaborative workspaces' },
   { icon: Wand2, label: 'API Panel', href: '/dashboard/api', description: 'Developer keys and logs' },
+  { icon: ShieldCheck, label: 'Admin Panel', href: '/admin', description: 'System operations', badge: 'ROOT' },
   { icon: Settings, label: 'Settings', href: '/dashboard/settings', description: 'Account and preferences' },
 ];
 
@@ -80,7 +82,14 @@ export function DashboardSidebar() {
               pathname === item.href ? "text-primary" : "text-muted-foreground group-hover:text-white"
             )} />
             {!collapsed && <span className="flex-1">{item.label}</span>}
-            {!collapsed && item.badge && <Badge className="text-[9px] h-4 bg-muted text-muted-foreground border-none px-1">{item.badge}</Badge>}
+            {!collapsed && item.badge && (
+              <Badge className={cn(
+                "text-[9px] h-4 border-none px-1 font-black",
+                item.badge === 'ROOT' ? "bg-red-500/20 text-red-500" : "bg-muted text-muted-foreground"
+              )}>
+                {item.badge}
+              </Badge>
+            )}
           </Link>
         </TooltipTrigger>
         <TooltipContent side="right" className="bg-card/90 backdrop-blur-xl border-white/10">
