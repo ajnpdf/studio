@@ -9,11 +9,11 @@ import {
   Network, 
   Cpu, 
   ShieldCheck, 
-  Zap, 
   Grid2X2,
   Lock,
   Upload,
-  CheckCircle2
+  CheckCircle2,
+  Workflow
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -85,9 +85,9 @@ export default function AJNPage() {
         </Link>
         
         <div className="flex items-center gap-6">
-          <Link href="/services">
+          <Link href="/junction">
             <Button variant="outline" className="h-9 border-white/10 bg-white/5 hover:bg-white hover:text-black font-black text-[10px] uppercase tracking-widest rounded-xl transition-all gap-2 px-4 shadow-2xl">
-              <Grid2X2 className="w-3.5 h-3.5" /> Services Directory
+              <Workflow className="w-3.5 h-3.5" /> Junction Network
             </Button>
           </Link>
           <div className="h-8 w-px bg-white/10 hidden md:block" />
