@@ -8,6 +8,8 @@ import { mockFiles } from './mock-data';
 import { PDFConverter, ConversionResult } from '@/lib/converters/pdf-converter';
 import { WordConverter } from '@/lib/converters/word-converter';
 import { ExcelConverter } from '@/lib/converters/excel-converter';
+import { PPTConverter } from '@/lib/converters/ppt-converter';
+import { ODTConverter } from '@/lib/converters/odt-converter';
 import { useToast } from '@/hooks/use-toast';
 
 export type ConversionState = 'idle' | 'processing' | 'complete';
@@ -49,7 +51,7 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
       setSettings(prev => ({
         ...prev,
         filename: `${file.name.split('.')[0]}_mastered`,
-        toFormat: '', // Reset on file change
+        toFormat: '', 
       }));
     }
   }, [file]);
@@ -67,10 +69,13 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
       const blob = await response.blob();
       
       let mimeType = 'application/octet-stream';
-      if (file.format === 'PDF') mimeType = 'application/pdf';
-      else if (file.format === 'DOCX') mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-      else if (file.format === 'XLSX') mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-      else if (file.format === 'CSV') mimeType = 'text/csv';
+      const fmt = file.format.toUpperCase();
+
+      if (fmt === 'PDF') mimeType = 'application/pdf';
+      else if (fmt === 'DOCX') mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      else if (fmt === 'XLSX') mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      else if (fmt === 'CSV') mimeType = 'text/csv';
+      else if (fmt === 'PPTX') mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
 
       const realFile = new File([blob], file.name, { type: mimeType });
 
@@ -81,16 +86,20 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
         setStatusMessage(msg);
       };
 
-      const fmt = file.format.toUpperCase();
-
       if (fmt === 'PDF') {
         const converter = new PDFConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat);
       } else if (fmt === 'DOCX' || fmt === 'DOC') {
         const converter = new WordConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat);
-      } else if (fmt === 'XLSX' || fmt === 'XLS' || fmt === 'CSV') {
+      } else if (fmt === 'XLSX' || fmt === 'XLS' || fmt === 'CSV' || fmt === 'ODS') {
         const converter = new ExcelConverter(realFile, onProgress);
+        converterResult = await converter.convertTo(settings.toFormat);
+      } else if (fmt === 'PPTX' || fmt === 'PPT' || fmt === 'ODP') {
+        const converter = new PPTConverter(realFile, onProgress);
+        converterResult = await converter.convertTo(settings.toFormat);
+      } else if (fmt === 'ODT') {
+        const converter = new ODTConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat);
       } else {
         throw new Error(`Engine for ${file.format} is currently in calibration.`);

@@ -36,6 +36,11 @@ const conversionTargets: Record<string, string[]> = {
   'PNG': ['JPG', 'WebP', 'AVIF', 'SVG', 'PDF'],
   'MP4': ['MOV', 'AVI', 'MKV', 'WebM', 'MP3', 'WAV'],
   'MP3': ['WAV', 'AAC', 'OGG', 'FLAC', 'M4A'],
+  'PPTX': ['PDF', 'PPT', 'JPG', 'PNG', 'ODP'],
+  'PPT': ['PPTX', 'PDF', 'JPG', 'PNG'],
+  'ODT': ['PDF', 'DOCX', 'TXT', 'HTML'],
+  'ODS': ['XLSX', 'CSV', 'PDF', 'HTML'],
+  'ODP': ['PPTX', 'PDF', 'JPG', 'PNG'],
 };
 
 export function SettingsPanel({ file, settings, setSettings, onConvert, isProcessing }: Props) {
@@ -91,7 +96,7 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
               </div>
             )}
 
-            {(file.format === 'PDF' || file.format === 'DOCX' || file.format === 'XLSX') && (
+            {(file.format === 'PDF' || file.format === 'DOCX' || file.format === 'XLSX' || file.format === 'PPTX') && (
               <div className="space-y-6 animate-in slide-in-from-top-2">
                 <div className="space-y-3">
                   <Label className="text-[9px] font-black uppercase tracking-widest">Processing Tier</Label>
