@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -7,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, Wand2, Copy, Download, Save, RefreshCw, FileCode, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Upload, Wand2, Copy, Download, Save, RefreshCw, FileCode, CheckCircle2, AlertCircle, BrainCircuit } from 'lucide-react';
 import { AIThinking } from './ai-thinking';
 import { runFileIntelligence } from '@/ai/flows/file-intelligence';
 import { Badge } from '@/components/ui/badge';

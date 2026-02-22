@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState } from 'react';
 import { DashboardStatsGrid } from '@/components/dashboard/dashboard-stats-grid';
 import { FileGrid } from '@/components/dashboard/file-grid';
 import { DashboardRightPanel } from '@/components/dashboard/dashboard-right-panel';
@@ -13,7 +14,7 @@ import {
   DropdownMenuContent, 
   DropdownMenuItem, 
 } from '@/components/ui/dropdown-menu';
-import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 export default function DashboardPage() {
   const [view, setView] = useState<'grid' | 'list'>('grid');
@@ -95,5 +96,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-import { cn } from '@/lib/utils';

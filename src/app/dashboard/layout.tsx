@@ -1,3 +1,4 @@
+
 "use client";
 
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
@@ -14,6 +15,9 @@ const PUBLIC_DASHBOARD_ROUTES = [
   '/dashboard/image-editor',
   '/dashboard/tools/video',
   '/dashboard/tools/audio',
+  '/dashboard/tools/ai',
+  '/dashboard/tools/batch',
+  '/dashboard/tools',
   '/dashboard/upload'
 ];
 
@@ -23,7 +27,7 @@ function DashboardGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    const isPublicRoute = PUBLIC_DASHBOARD_ROUTES.includes(pathname);
+    const isPublicRoute = PUBLIC_DASHBOARD_ROUTES.some(route => pathname.startsWith(route));
     if (!isUserLoading && !user && !isPublicRoute && pathname !== '/dashboard') {
       router.push('/login');
     }
