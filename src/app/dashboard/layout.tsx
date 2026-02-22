@@ -1,6 +1,6 @@
+
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
 import { DashboardTopBar } from '@/components/dashboard/dashboard-top-bar';
-import { DashboardRightPanel } from '@/components/dashboard/dashboard-right-panel';
 import { NightSky } from '@/components/dashboard/night-sky';
 
 export default function DashboardLayout({
@@ -9,19 +9,14 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex text-foreground relative">
+    <div className="min-h-screen flex text-foreground relative bg-[#0a0e1f]">
       <NightSky />
       <DashboardSidebar />
-      <div className="flex-1 flex flex-col ml-64 transition-all duration-300">
+      <div className="flex-1 flex flex-col ml-64 transition-all duration-300 min-h-screen">
         <DashboardTopBar />
-        <div className="flex-1 flex overflow-hidden">
-          <main className="flex-1 p-8 overflow-y-auto">
-            <div className="max-w-7xl mx-auto">
-              {children}
-            </div>
-          </main>
-          <DashboardRightPanel />
-        </div>
+        <main className="flex-1 overflow-y-auto">
+          {children}
+        </main>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -10,15 +11,16 @@ export function NightSky() {
       
       {/* Twinkling stars */}
       <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(25)].map((_, i) => (
           <div
             key={i}
-            className="absolute bg-white rounded-full opacity-30 animate-[twinkle_linear_infinite]"
+            className="absolute bg-[#f0f9ff] rounded-full opacity-30 animate-[twinkle_linear_infinite]"
             style={{
-              width: `${Math.random() * 2 + 1}px`,
-              height: `${Math.random() * 2 + 1}px`,
+              width: `${Math.random() * 1.5 + 0.8}px`,
+              height: `${Math.random() * 1.5 + 0.8}px`,
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
+              boxShadow: '0 0 4px #e0f2fe, 0 0 10px #93c5fd, 0 0 18px rgba(147, 197, 253, 0.5)',
               animationDuration: `${Math.random() * 3 + 3}s`,
               animationDelay: `${Math.random() * 5}s`,
             }}
