@@ -29,6 +29,9 @@ const conversionTargets: Record<string, string[]> = {
   ],
   'DOCX': ['PDF', 'TXT', 'HTML', 'RTF', 'EPUB', 'ODT', 'JPG', 'PNG'],
   'DOC': ['DOCX', 'PDF', 'TXT', 'HTML'],
+  'XLSX': ['PDF', 'CSV', 'XLS', 'ODS', 'HTML', 'JSON', 'XML'],
+  'XLS': ['XLSX', 'CSV', 'PDF', 'HTML'],
+  'CSV': ['XLSX', 'PDF', 'JSON', 'XML', 'TXT'],
   'JPG': ['PNG', 'WebP', 'AVIF', 'BMP', 'TIFF', 'PDF', 'SVG'],
   'PNG': ['JPG', 'WebP', 'AVIF', 'SVG', 'PDF'],
   'MP4': ['MOV', 'AVI', 'MKV', 'WebM', 'MP3', 'WAV'],
@@ -88,11 +91,11 @@ export function SettingsPanel({ file, settings, setSettings, onConvert, isProces
               </div>
             )}
 
-            {(file.format === 'PDF' || file.format === 'DOCX') && (
+            {(file.format === 'PDF' || file.format === 'DOCX' || file.format === 'XLSX') && (
               <div className="space-y-6 animate-in slide-in-from-top-2">
                 <div className="space-y-3">
                   <Label className="text-[9px] font-black uppercase tracking-widest">Processing Tier</Label>
-                  <RadioGroup defaultValue="medium" className="grid grid-cols-3 gap-3">
+                  <RadioGroup value={settings.quality} onValueChange={(v) => setSettings({...settings, quality: v})} className="grid grid-cols-3 gap-3">
                     {['low', 'medium', 'high'].map(q => (
                       <Label key={q} className="flex flex-col items-center justify-between gap-2 p-3 border border-white/10 rounded-xl cursor-pointer hover:bg-white/5 transition-colors [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/10">
                         <RadioGroupItem value={q} className="sr-only" />

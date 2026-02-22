@@ -7,6 +7,7 @@ import { OutputPanel } from './output-panel';
 import { mockFiles } from './mock-data';
 import { PDFConverter, ConversionResult } from '@/lib/converters/pdf-converter';
 import { WordConverter } from '@/lib/converters/word-converter';
+import { ExcelConverter } from '@/lib/converters/excel-converter';
 import { useToast } from '@/hooks/use-toast';
 
 export type ConversionState = 'idle' | 'processing' | 'complete';
@@ -48,6 +49,7 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
       setSettings(prev => ({
         ...prev,
         filename: `${file.name.split('.')[0]}_mastered`,
+        toFormat: '', // Reset on file change
       }));
     }
   }, [file]);
@@ -60,12 +62,17 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
     setResult(null);
 
     try {
-      // For demonstration, we fetch a mock blob based on file type
+      // Simulate real file fetch for demo
       const response = await fetch(`https://picsum.photos/seed/${file.id}/800/600`);
       const blob = await response.blob();
-      const realFile = new File([blob], file.name, { 
-        type: file.format === 'PDF' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
-      });
+      
+      let mimeType = 'application/octet-stream';
+      if (file.format === 'PDF') mimeType = 'application/pdf';
+      else if (file.format === 'DOCX') mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      else if (file.format === 'XLSX') mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      else if (file.format === 'CSV') mimeType = 'text/csv';
+
+      const realFile = new File([blob], file.name, { type: mimeType });
 
       let converterResult: ConversionResult;
 
@@ -74,11 +81,16 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
         setStatusMessage(msg);
       };
 
-      if (file.format === 'PDF') {
+      const fmt = file.format.toUpperCase();
+
+      if (fmt === 'PDF') {
         const converter = new PDFConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat);
-      } else if (file.format === 'DOCX' || file.format === 'DOC') {
+      } else if (fmt === 'DOCX' || fmt === 'DOC') {
         const converter = new WordConverter(realFile, onProgress);
+        converterResult = await converter.convertTo(settings.toFormat);
+      } else if (fmt === 'XLSX' || fmt === 'XLS' || fmt === 'CSV') {
+        const converter = new ExcelConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat);
       } else {
         throw new Error(`Engine for ${file.format} is currently in calibration.`);
