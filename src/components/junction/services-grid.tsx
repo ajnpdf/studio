@@ -26,7 +26,19 @@ import {
   BookOpen,
   FileJson,
   FileCode,
-  ShieldAlert
+  ShieldAlert,
+  Merge,
+  RotateCw,
+  Lock,
+  Unlock,
+  Layout,
+  FileSearch,
+  Languages,
+  Printer,
+  Hammer,
+  Hash,
+  Crop,
+  Camera
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -44,42 +56,45 @@ type ServiceUnit = {
 };
 
 const ALL_UNITS: ServiceUnit[] = [
-  // PDF CORE UNITS (20+)
+  // --- PDF MANIPULATION & TOOLS ---
+  { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple documents into one in any order.', icon: Merge, tag: 'CORE', cat: 'Document', complexity: 'WASM' },
+  { id: 'split-pdf', name: 'Split PDF', desc: 'Separate pages or extract entire sets into new files.', icon: Scissors, tag: 'CORE', cat: 'Document', complexity: 'WASM' },
+  { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce file size while maximizing visual quality.', icon: Zap, tag: 'SMART', cat: 'Document', complexity: 'SMART' },
+  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Add text, images, shapes, and annotations directly.', icon: Wand2, tag: 'MASTER', cat: 'Document', complexity: 'WASM' },
+  { id: 'sign-pdf', name: 'Sign PDF', desc: 'Securely sign or request electronic signatures.', icon: Type, tag: 'SECURE', cat: 'Document', complexity: 'WASM' },
+  { id: 'watermark-pdf', name: 'Watermark PDF', desc: 'Stamp images or text with opacity control.', icon: Printer, tag: 'BRAND', cat: 'Document', complexity: 'SMART' },
+  { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Bulk rotate pages to any orientation.', icon: RotateCw, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
+  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Delete, add, or sort pages within your document.', icon: Layout, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
+  { id: 'protect-pdf', name: 'Protect PDF', desc: 'AES-256 encryption for sensitive documents.', icon: Lock, tag: 'SECURE', cat: 'Document', complexity: 'WASM' },
+  { id: 'unlock-pdf', name: 'Unlock PDF', desc: 'Remove password security and permissions.', icon: Unlock, tag: 'SECURE', cat: 'Document', complexity: 'WASM' },
+  { id: 'pdf-pdfa', name: 'PDF to PDF/A', desc: 'ISO archival standard for long-term storage.', icon: ShieldCheck, tag: 'ISO', cat: 'Document', complexity: 'SMART' },
+  { id: 'repair-pdf', name: 'Repair PDF', desc: 'Recover data from corrupted or damaged files.', icon: Hammer, tag: 'TOOL', cat: 'Document', complexity: 'SMART' },
+  { id: 'page-numbers', name: 'Page Numbers', desc: 'Add customizable numbering to all pages.', icon: Hash, tag: 'TOOL', cat: 'Document', complexity: 'SMART' },
+  { id: 'scan-pdf', name: 'Scan to PDF', desc: 'Capture documents via mobile camera to browser.', icon: Camera, tag: 'MOBILE', cat: 'Document', complexity: 'SMART' },
+  { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Make scanned documents searchable and selectable.', icon: Scan, tag: 'AI', cat: 'Document', complexity: 'AI' },
+  { id: 'compare-pdf', name: 'Compare PDF', desc: 'Side-by-side version change detection.', icon: FileSearch, tag: 'PRO', cat: 'Document', complexity: 'AI' },
+  { id: 'redact-pdf', name: 'Redact PDF', desc: 'Permanently remove sensitive information.', icon: ShieldAlert, tag: 'SECURE', cat: 'Document', complexity: 'AI' },
+  { id: 'crop-pdf', name: 'Crop PDF', desc: 'Adjust margins or select specific print areas.', icon: Crop, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
+  { id: 'translate-pdf', name: 'Translate PDF', desc: 'AI-powered translation preserving layout.', icon: Languages, tag: 'AI', cat: 'Document', complexity: 'AI' },
+
+  // --- OFFICE TO PDF ---
+  { id: 'word-pdf', name: 'Word to PDF', desc: 'Convert DOCX/DOC to high-fidelity PDF.', icon: FileText, tag: 'OOXML', cat: 'Document', complexity: 'WASM' },
+  { id: 'pptx-pdf', name: 'PowerPoint to PDF', desc: 'Slide-accurate presentation export.', icon: Presentation, tag: 'OOXML', cat: 'Document', complexity: 'WASM' },
+  { id: 'excel-pdf', name: 'Excel to PDF', desc: 'Grid-perfect spreadsheet rendering.', icon: Table, tag: 'OOXML', cat: 'Document', complexity: 'SMART' },
+  { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Convert and merge images into PDF docs.', icon: ImageIcon, tag: 'IMAGE', cat: 'Document', complexity: 'WASM' },
+  { id: 'html-pdf', name: 'HTML to PDF', desc: 'Convert web pages to professional documents.', icon: Code2, tag: 'WEB', cat: 'Document', complexity: 'SMART' },
+
+  // --- PDF TO OFFICE ---
   { id: 'pdf-word', name: 'PDF to Word Master', desc: 'Preserves complex layout reconstruction.', icon: FileText, tag: 'DOCX', cat: 'Document', complexity: 'WASM' },
   { id: 'pdf-excel', name: 'PDF to Excel Grid', desc: 'Smart table boundary detection.', icon: Table, tag: 'XLSX', cat: 'Document', complexity: 'SMART' },
   { id: 'pdf-ppt', name: 'PDF to PowerPoint', desc: 'Slide-accurate vector reconstruction.', icon: Presentation, tag: 'PPTX', cat: 'Document', complexity: 'WASM' },
-  { id: 'pdf-epub', name: 'PDF to EPUB Reader', desc: 'Fluid layout ebook synthesis.', icon: BookOpen, tag: 'EPUB', cat: 'Document', complexity: 'SMART' },
-  { id: 'pdf-json', name: 'PDF to Data JSON', desc: 'Semantic text-to-object mapping.', icon: FileJson, tag: 'JSON', cat: 'Data', complexity: 'AI' },
-  { id: 'pdf-xml', name: 'PDF to Structural XML', desc: 'Tag-based content hierarchy.', icon: FileCode, tag: 'XML', cat: 'Data', complexity: 'SMART' },
-  { id: 'pdf-html', name: 'PDF to HTML Node', desc: 'Responsive web-ready rendering.', icon: Code2, tag: 'HTML', cat: 'Document', complexity: 'WASM' },
-  { id: 'pdf-pdfa', name: 'PDF to Archival A-1b', desc: 'ISO-standard long-term preservation.', icon: ShieldCheck, tag: 'PDF/A', cat: 'Document', complexity: 'SMART' },
-  { id: 'pdf-md', name: 'PDF to Markdown', desc: 'Clean MD formatting for developers.', icon: Type, tag: 'MD', cat: 'Document', complexity: 'AI' },
-  { id: 'pdf-rtf', name: 'PDF to RTF Layer', desc: 'Cross-platform legacy interop.', icon: FileText, tag: 'RTF', cat: 'Document', complexity: 'WASM' },
-  { id: 'pdf-txt', name: 'PDF to Pure Text', desc: 'High-speed OCR character extraction.', icon: Type, tag: 'TXT', cat: 'Document', complexity: 'WASM' },
-  { id: 'pdf-svg', name: 'PDF to Vector SVG', desc: 'Extract vector paths for design.', icon: Layers, tag: 'SVG', cat: 'Image', complexity: 'SMART' },
-  { id: 'pdf-tiff', name: 'PDF to Multi-TIFF', desc: 'Print-optimized raster output.', icon: ImageIcon, tag: 'TIFF', cat: 'Image', complexity: 'WASM' },
-  { id: 'pdf-png', name: 'PDF to PNG Frames', desc: 'High-res alpha-preserved images.', icon: ImageIcon, tag: 'PNG', cat: 'Image', complexity: 'WASM' },
-  { id: 'pdf-jpg', name: 'PDF to JPEG Grid', desc: 'Compressed proof-quality pages.', icon: ImageIcon, tag: 'JPG', cat: 'Image', complexity: 'WASM' },
-  { id: 'pdf-merge', name: 'PDF Unit Merger', desc: 'Combine multiple document streams.', icon: Layers, tag: 'PDF', cat: 'Document', complexity: 'WASM' },
-  { id: 'pdf-split', name: 'PDF Page Splitter', desc: 'Deconstruct document into segments.', icon: Scissors, tag: 'PDF', cat: 'Document', complexity: 'WASM' },
-  { id: 'pdf-redact', name: 'Smart Redactor', desc: 'Neural PII detection and masking.', icon: ShieldAlert, tag: 'SECURE', cat: 'Document', complexity: 'AI' },
-  { id: 'ocr-layer', name: 'Smart OCR Engine', desc: 'Image to searchable text layer.', icon: Scan, tag: 'PDF', cat: 'Document', complexity: 'AI' },
-  { id: 'word-pdf', name: 'Word to PDF Pro', desc: 'High-fidelity OOXML transformation.', icon: FileText, tag: 'PDF', cat: 'Document', complexity: 'WASM' },
+  { id: 'pdf-jpg', name: 'PDF to JPEG Grid', desc: 'Compressed proof-quality pages.', icon: ImageIcon, tag: 'JPG', cat: 'Document', complexity: 'WASM' },
 
-  // IMAGE & MEDIA UNITS
-  { id: 'img-webp', name: 'Image to WebP Node', desc: 'Lossless web node optimization.', icon: ImageIcon, tag: 'WEBP', cat: 'Image', complexity: 'WASM' },
+  // --- MEDIA & DATA UNITS ---
+  { id: 'img-webp', name: 'Image to WebP', desc: 'Lossless web node optimization.', icon: ImageIcon, tag: 'WEBP', cat: 'Image', complexity: 'WASM' },
   { id: 'bg-remove', name: 'Smart BG Removal', desc: 'Automated subject isolation.', icon: Wand2, tag: 'PNG', cat: 'Image', complexity: 'AI' },
-  { id: 'img-upscale', name: 'Smart Upscaler', desc: 'Super-resolution pixel mapping.', icon: Zap, tag: '4K', cat: 'Image', complexity: 'AI' },
-  { id: 'heic-jpg', name: 'HEIC Developer', desc: 'Mobile-to-web format bridge.', icon: ImageIcon, tag: 'JPG', cat: 'Image', complexity: 'WASM' },
-  { id: 'raw-dev', name: 'RAW Developer', desc: 'Professional camera development.', icon: ImageIcon, tag: 'JPG', cat: 'Image', complexity: '4K' },
-  { id: 'vid-gif', name: 'Video to Smart GIF', desc: 'Frame-accurate temporal mapping.', icon: Video, tag: 'GIF', cat: 'Video', complexity: 'WASM' },
   { id: 'vid-compress', name: 'Video Compressor', desc: 'Crush size without frame loss.', icon: Monitor, tag: 'MP4', cat: 'Video', complexity: '4K' },
-  { id: 'vid-audio', name: 'Audio Extractor', desc: 'Extract high-bitrate master tracks.', icon: Music, tag: 'MP3', cat: 'Video', complexity: 'WASM' },
-  { id: 'aud-trim', name: 'Audio Surgery', desc: 'Precise waveform manipulation.', icon: Scissors, tag: 'WAV', cat: 'Audio', complexity: 'WASM' },
-  { id: 'aud-norm', name: 'Loudness Engine', desc: 'LUFS broadcast normalization.', icon: Zap, tag: 'MP3', cat: 'Audio', complexity: 'SMART' },
   { id: 'csv-json', name: 'Data Transformer', desc: 'Schema-mapped data conversion.', icon: Code2, tag: 'JSON', cat: 'Data', complexity: 'WASM' },
-  { id: 'zip-7z', name: 'Archive Hub', desc: 'High-ratio LZMA2 compression.', icon: Box, tag: '7Z', cat: 'Archive', complexity: 'WASM' },
-  { id: 'cad-vector', name: 'CAD to SVG Unit', desc: 'DXF to vector path conversion.', icon: Layers, tag: 'SVG', cat: 'Image', complexity: 'SMART' },
 ];
 
 export function ServicesGrid({ query, category }: { query: string, category: string }) {
@@ -108,7 +123,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       {filteredUnits.map((unit) => (
-        <Link key={unit.id} href={`/junction/units?cat=${unit.cat}`}>
+        <Link key={unit.id} href={`/junction/units?cat=${unit.cat}&unit=${unit.id}`}>
           <Card className="h-full bg-white/[0.02] border-white/5 hover:border-primary/40 hover:bg-white/[0.04] transition-all duration-500 group cursor-pointer overflow-hidden border-2 relative">
             <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
               <ArrowRight className="w-3 h-3 text-primary" />

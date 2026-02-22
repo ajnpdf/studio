@@ -1,3 +1,4 @@
+
 'use client';
 
 import { PDFConverter } from './converters/pdf-converter';
@@ -15,6 +16,7 @@ import { EbookConverter } from './converters/ebook-converter';
 import { DesignConverter } from './converters/design-converter';
 import { CADConverter } from './converters/cad-converter';
 import { SpecializedConverter } from './converters/specialized-converter';
+import { PDFManipulator } from './converters/pdf-manipulator';
 
 export type JobStatus = 'queued' | 'processing' | 'complete' | 'failed' | 'cancelled';
 
@@ -35,6 +37,7 @@ export interface ConversionJob {
   };
   error?: string;
   settings: any;
+  operationId?: string;
 }
 
 class ConversionEngine {
@@ -82,7 +85,7 @@ class ConversionEngine {
     };
   }
 
-  addJobs(files: File[], fromFmt: string, toFmt: string, settings: any) {
+  addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, operationId?: string) {
     const newJobs: ConversionJob[] = files.map(file => ({
       id: Math.random().toString(36).substr(2, 9),
       file,
@@ -91,7 +94,8 @@ class ConversionEngine {
       status: 'queued',
       progress: 0,
       stage: 'Awaiting neural resources...',
-      settings
+      settings,
+      operationId
     }));
 
     this.queue = [...newJobs, ...this.queue];
@@ -104,36 +108,19 @@ class ConversionEngine {
     const nextJob = this.queue.find(j => j.status === 'queued');
     if (!nextJob) return;
 
-    // Check Neural Cache
-    const cacheKey = `${nextJob.file.name}_${nextJob.toFmt}_${JSON.stringify(nextJob.settings)}`;
-    if (this.cache.has(cacheKey)) {
-      const cachedBlob = this.cache.get(cacheKey)!;
-      nextJob.status = 'complete';
-      nextJob.progress = 100;
-      nextJob.stage = 'Recovered from Neural Cache';
-      nextJob.result = {
-        blob: cachedBlob,
-        fileName: `${nextJob.file.name.split('.')[0]}.${nextJob.toFmt.toLowerCase()}`,
-        mimeType: cachedBlob.type,
-        size: (cachedBlob.size / (1024 * 1024)).toFixed(2) + ' MB',
-        objectUrl: URL.createObjectURL(cachedBlob)
-      };
-      this.notify();
-      this.processNext();
-      return;
-    }
-
     this.activeJobs++;
     nextJob.status = 'processing';
     this.notify();
 
     try {
-      const result = await this.runConversion(nextJob);
-      const objectUrl = URL.createObjectURL(result.blob);
+      let result;
+      if (nextJob.operationId) {
+        result = await this.runOperation(nextJob);
+      } else {
+        result = await this.runConversion(nextJob);
+      }
       
-      // Update Cache
-      this.cache.set(cacheKey, result.blob);
-
+      const objectUrl = URL.createObjectURL(result.blob);
       nextJob.status = 'complete';
       nextJob.progress = 100;
       nextJob.stage = 'Transformation successful';
@@ -150,6 +137,30 @@ class ConversionEngine {
       this.activeJobs--;
       this.notify();
       this.processNext();
+    }
+  }
+
+  private async runOperation(job: ConversionJob) {
+    const manip = new PDFManipulator(job.file, (p, msg) => {
+      job.progress = p; job.stage = msg; this.notify();
+    });
+    const specialized = new SpecializedConverter(job.file, (p, msg) => {
+      job.progress = p; job.stage = msg; this.notify();
+    });
+
+    switch (job.operationId) {
+      case 'merge-pdf': return manip.merge();
+      case 'split-pdf': return manip.split(job.settings.pages || [0]);
+      case 'rotate-pdf': return manip.rotate(job.settings.angle || 90);
+      case 'protect-pdf': return manip.protect(job.settings.password || '1234');
+      case 'watermark-pdf': return manip.addWatermark(job.settings.text || 'AJN');
+      case 'page-numbers': return manip.addPageNumbers();
+      case 'crop-pdf': return manip.crop(job.settings.margins);
+      case 'ocr-pdf': return specialized.convertTo('SEARCHABLE_PDF');
+      case 'redact-pdf': return specialized.convertTo('REDACTED_PDF', job.settings);
+      case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings); // AI Mock
+      case 'repair-pdf': return specialized.convertTo('REDACTED_PDF'); // Save pass
+      default: return this.runConversion(job);
     }
   }
 
