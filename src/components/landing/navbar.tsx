@@ -1,8 +1,9 @@
+
 "use client";
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Cloud, Menu, X, ArrowRight } from 'lucide-react';
+import { Cloud, Menu, X, ArrowRight, Network } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -24,25 +25,25 @@ export function Navbar() {
       <div className="container mx-auto px-6 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="p-2.5 bg-white rounded-xl shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-            <Cloud className="w-7 h-7 text-black" />
+            <Network className="w-7 h-7 text-black" />
           </div>
           <span className="font-black text-2xl tracking-tighter text-white">AJN</span>
         </Link>
         
         <div className="hidden lg:flex items-center gap-10 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/80">
-          <Link href="#features" className="hover:text-white transition-colors">Tools</Link>
-          <Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link>
-          <Link href="#faq" className="hover:text-white transition-colors">FAQ</Link>
+          <Link href="/services" className="hover:text-white transition-colors">Directory</Link>
+          <Link href="/#features" className="hover:text-white transition-colors">Unit Core</Link>
+          <Link href="/#pricing" className="hover:text-white transition-colors">Economy</Link>
           <Link href="/dashboard/api" className="hover:text-white transition-colors">Developer API</Link>
         </div>
 
         <div className="flex items-center gap-4">
           <Link href="/login" className="hidden sm:inline-flex">
-            <Button variant="ghost" className="text-[10px] font-black uppercase tracking-widest px-6 hover:bg-white/5 text-white/80">Sign In</Button>
+            <Button variant="ghost" className="text-[10px] font-black uppercase tracking-widest px-6 hover:bg-white/5 text-white/80">Access</Button>
           </Link>
           <Link href="/dashboard">
             <Button className="bg-white text-black hover:bg-white/90 transition-all font-black text-[10px] uppercase tracking-widest px-8 rounded-xl h-11 shadow-xl">
-              Open Workspace
+              Open Junction
             </Button>
           </Link>
           <Button 
@@ -60,9 +61,9 @@ export function Navbar() {
       {mobileMenuOpen && (
         <div className="lg:hidden absolute top-full left-0 w-full bg-card/95 backdrop-blur-3xl border-b border-white/5 p-8 animate-in fade-in slide-in-from-top-4 duration-500">
           <div className="flex flex-col gap-8 text-center font-black text-[10px] uppercase tracking-[0.3em] text-white/80">
-            <Link href="#features" onClick={() => setMobileMenuOpen(false)}>Tools</Link>
-            <Link href="#pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</Link>
-            <Link href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</Link>
+            <Link href="/services" onClick={() => setMobileMenuOpen(false)}>Directory</Link>
+            <Link href="/#features" onClick={() => setMobileMenuOpen(false)}>Unit Core</Link>
+            <Link href="/#pricing" onClick={() => setMobileMenuOpen(false)}>Economy</Link>
             <Link href="/dashboard/api" onClick={() => setMobileMenuOpen(false)}>Developer API</Link>
             <hr className="border-white/10" />
             <Link href="/login" className="text-white">Sign In to Account</Link>
