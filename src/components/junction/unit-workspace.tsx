@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -35,10 +34,12 @@ export function UnitWorkspace({ defaultCategory }: Props) {
   const [toFmt, setToFmt] = useState('');
   const [showDebugger, setShowDebugger] = useState(true);
   const [activeJobForDebug, setActiveJobForDebug] = useState<ConversionJob | null>(null);
+  const [stats, setStats] = useState(engine.getStats());
 
   useEffect(() => {
     return engine.subscribe((newJobs) => {
       setJobs(newJobs);
+      setStats(engine.getStats());
       const processing = newJobs.find(j => j.status === 'processing');
       if (processing) setActiveJobForDebug(processing);
     });
@@ -87,11 +88,11 @@ export function UnitWorkspace({ defaultCategory }: Props) {
           <div className="flex items-center gap-3 p-3 bg-black/60 backdrop-blur-3xl border border-white/10 rounded-2xl pointer-events-auto">
             <div className="flex items-center gap-2 px-3 border-r border-white/10">
               <Cpu className="w-3.5 h-3.5 text-primary" />
-              <span className="text-[9px] font-black uppercase text-white/60">Thread Isolation: 3</span>
+              <span className="text-[9px] font-black uppercase text-white/60">Parallel Slots: {stats.activeThreads}/{3}</span>
             </div>
             <div className="flex items-center gap-2 px-3">
               <Database className="w-3.5 h-3.5 text-primary" />
-              <span className="text-[9px] font-black uppercase text-white/60">Vault Buffer: Clean</span>
+              <span className="text-[9px] font-black uppercase text-white/60">Vault Buffer: {stats.vaultStatus}</span>
             </div>
           </div>
 
@@ -112,7 +113,7 @@ export function UnitWorkspace({ defaultCategory }: Props) {
               <Workflow className="w-4 h-4 text-primary" />
               <h3 className="text-[10px] font-black uppercase tracking-widest">Logic Stream Debugger</h3>
             </div>
-            <Badge variant="outline" className="text-[8px] font-black border-primary/20 text-primary uppercase">Alpha 1.0</Badge>
+            <Badge variant="outline" className="text-[8px] font-black border-primary/20 text-primary uppercase">v1.0 ACTIVE</Badge>
           </header>
 
           <ScrollArea className="flex-1">
@@ -165,7 +166,7 @@ export function UnitWorkspace({ defaultCategory }: Props) {
                       <Monitor className="w-3 h-3" /> Live Telemetry
                     </p>
                     <div className="font-mono text-[9px] text-white/40 leading-relaxed">
-                      [INFO] Allocated 12.4MB buffer<br />
+                      [INFO] Allocated {activeJobForDebug.file.size / 1024 / 1024 > 1 ? (activeJobForDebug.file.size / 1024 / 1024).toFixed(1) + 'MB' : '8.4KB'} buffer<br />
                       [DBUG] Thread pool synchronized<br />
                       [INFO] Running {activeJobForDebug.toFmt} neural pass...
                     </div>
@@ -178,10 +179,12 @@ export function UnitWorkspace({ defaultCategory }: Props) {
           <footer className="p-6 border-t border-white/5 bg-black/20">
             <div className="flex items-center justify-between mb-4">
               <span className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">Neural Cache</span>
-              <Badge className="bg-emerald-500/20 text-emerald-500 border-none h-4 text-[8px] font-black">ACTIVE</Badge>
+              <Badge className={cn("border-none h-4 text-[8px] font-black", stats.cacheSize > 0 ? "bg-emerald-500/20 text-emerald-500" : "bg-white/5 text-muted-foreground")}>
+                {stats.cacheSize > 0 ? 'LOADED' : 'READY'}
+              </Badge>
             </div>
-            <Button variant="outline" className="w-full h-10 border-white/10 bg-white/5 text-[9px] font-black uppercase tracking-widest gap-2">
-              DUMP SYSTEM LOG
+            <Button variant="outline" onClick={() => engine.clearQueue()} className="w-full h-10 border-white/10 bg-white/5 text-[9px] font-black uppercase tracking-widest gap-2">
+              PURGE SESSION VAULT
             </Button>
           </footer>
         </aside>

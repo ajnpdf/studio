@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
@@ -23,28 +22,44 @@ import {
   Video,
   Music,
   X,
-  Layers
+  Layers,
+  FileCode,
+  Archive,
+  Wand2
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const ALL_SERVICES = [
-  { id: 'pdf-docx', name: 'PDF to Word Mastery', desc: 'Reconstruct layouts via Neural OCR', cat: 'Document', icon: FileText, tag: 'WASM' },
+  // Document Sector
+  { id: 'pdf-docx', name: 'PDF to Word Master', desc: 'Reconstruct layouts via Neural OCR', cat: 'Document', icon: FileText, tag: 'WASM' },
   { id: 'pdf-xlsx', name: 'PDF to Excel Grid', desc: 'Neural table detection & extraction', cat: 'Document', icon: Layers, tag: 'AI' },
+  { id: 'doc-docx', name: 'Legacy Word Update', desc: 'Convert binary DOC to modern OOXML', cat: 'Document', icon: FileText, tag: 'CFB' },
+  { id: 'pdf-pdfa', name: 'PDF/A Archival', desc: 'Compliance & long-term preservation', cat: 'Document', icon: ShieldCheck, tag: 'Metadata' },
+  { id: 'pdf-epub', name: 'PDF to EPUB 3', desc: 'Reflowable ebook serialization', cat: 'Document', icon: FileText, tag: 'ZIP' },
+  // Image Sector
   { id: 'img-webp', name: 'Universal WebP Transcode', desc: 'Lossless compression for web nodes', cat: 'Image', icon: ImageIcon, tag: 'WASM' },
+  { id: 'bg-remove', name: 'Neural BG Removal', desc: 'AI-driven subject isolation', cat: 'Image', icon: Wand2, tag: 'Neural' },
+  { id: 'heic-jpg', name: 'HEIC Developer', desc: 'Transform iPhone photos for web', cat: 'Image', icon: ImageIcon, tag: 'libheif' },
+  { id: 'svg-png', name: 'Vector Rasterization', desc: 'High-res exports from SVG paths', cat: 'Image', icon: Layers, tag: 'Vector' },
+  { id: 'img-tiff', name: 'Print-Ready TIFF', desc: 'Multi-page lossless encoding', cat: 'Image', icon: FileCode, tag: 'UTIF' },
+  // Video Sector
   { id: 'vid-gif', name: 'Video to Neural GIF', desc: 'Frame-accurate temporal mapping', cat: 'Video', icon: Video, tag: 'FFmpeg' },
-  { id: 'aud-trim', name: 'Audio Waveform Surgery', desc: 'Precise sample-level trimming', cat: 'Audio', icon: Music, tag: 'WASM' },
-  { id: 'ocr-search', name: 'Searchable PDF Layer', desc: 'Inject invisible semantic text', cat: 'Specialized', icon: BrainCircuit, tag: 'Neural' },
-  { id: 'bg-remove', name: 'Neural BG Removal', desc: 'AI-driven subject isolation', cat: 'Image', icon: ImageIcon, tag: 'AI' },
   { id: 'vid-4k', name: '4K Lab Transcode', desc: 'Hardware accelerated rendering', cat: 'Video', icon: Video, tag: 'FFmpeg' },
+  { id: 'vid-trim', name: 'Video Frame Surgery', desc: 'Precise sample-level trimming', cat: 'Video', icon: Video, tag: 'WASM' },
+  // Audio Sector
+  { id: 'aud-trim', name: 'Audio Waveform Surgery', desc: 'Precise sample-level trimming', cat: 'Audio', icon: Music, tag: 'WASM' },
+  { id: 'aud-norm', name: 'Dynamic Normalization', desc: 'LUFS-based loudness calibration', cat: 'Audio', icon: Music, tag: 'Neural' },
+  // Specialized Sector
+  { id: 'ocr-search', name: 'Searchable PDF Layer', desc: 'Inject invisible semantic text', cat: 'Specialized', icon: BrainCircuit, tag: 'Neural' },
+  { id: 'raw-dev', name: 'RAW Neural Developer', desc: 'Canon/Nikon/Sony camera processing', cat: 'Specialized', icon: ImageIcon, tag: 'dcraw' },
+  { id: 'code-json', name: 'Code Interop Hub', desc: 'XML/YAML/JSON schema mapping', cat: 'Code', icon: FileCode, tag: 'Data' },
+  { id: 'cad-pdf', name: 'Technical CAD View', desc: 'DXF blueprints to vector PDF', cat: '3D/CAD', icon: Layers, tag: 'Three.js' },
 ];
 
-/**
- * AJN Core - Neural Gateway
- * Enhanced with Global Service Search and Immersive Processing.
- */
 export default function AJNPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -131,7 +146,7 @@ export default function AJNPage() {
             <input 
               readOnly
               onClick={() => setShowSearch(true)}
-              placeholder="Search services..." 
+              placeholder="Search 300+ neural units..." 
               className="h-9 w-64 bg-white/5 border border-white/10 rounded-xl pl-10 pr-12 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/10 transition-all outline-none"
             />
             <div className="absolute right-3 flex items-center gap-1 opacity-40">
@@ -163,7 +178,7 @@ export default function AJNPage() {
                 autoFocus
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Find a neural service (e.g. 'PDF to DOCX', 'Upscale')..." 
+                placeholder="Find a neural service (e.g. 'PDF to DOCX', 'RAW', 'Transcode')..." 
                 className="h-14 pl-14 pr-12 bg-transparent border-none text-lg font-bold placeholder:opacity-30 focus-visible:ring-0"
               />
               <button onClick={() => setShowSearch(false)} className="absolute right-8 p-2 hover:bg-white/5 rounded-xl transition-colors">
@@ -318,5 +333,3 @@ export default function AJNPage() {
     </div>
   );
 }
-
-import { ScrollArea } from '@/components/ui/scroll-area';

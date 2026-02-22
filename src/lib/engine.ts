@@ -39,6 +39,7 @@ export interface ConversionJob {
 
 class ConversionEngine {
   private queue: ConversionJob[] = [];
+  private cache: Map<string, Blob> = new Map();
   private activeJobs: number = 0;
   private maxConcurrent: number = 3;
   private listeners: Set<(jobs: ConversionJob[]) => void> = new Set();
@@ -72,6 +73,15 @@ class ConversionEngine {
     this.listeners.forEach(l => l([...this.queue]));
   }
 
+  getStats() {
+    return {
+      activeThreads: this.activeJobs,
+      totalQueued: this.queue.filter(j => j.status === 'queued').length,
+      cacheSize: this.cache.size,
+      vaultStatus: this.cache.size > 0 ? 'ACTIVE' : 'CLEAN'
+    };
+  }
+
   addJobs(files: File[], fromFmt: string, toFmt: string, settings: any) {
     const newJobs: ConversionJob[] = files.map(file => ({
       id: Math.random().toString(36).substr(2, 9),
@@ -94,6 +104,25 @@ class ConversionEngine {
     const nextJob = this.queue.find(j => j.status === 'queued');
     if (!nextJob) return;
 
+    // Check Neural Cache
+    const cacheKey = `${nextJob.file.name}_${nextJob.toFmt}_${JSON.stringify(nextJob.settings)}`;
+    if (this.cache.has(cacheKey)) {
+      const cachedBlob = this.cache.get(cacheKey)!;
+      nextJob.status = 'complete';
+      nextJob.progress = 100;
+      nextJob.stage = 'Recovered from Neural Cache';
+      nextJob.result = {
+        blob: cachedBlob,
+        fileName: `${nextJob.file.name.split('.')[0]}.${nextJob.toFmt.toLowerCase()}`,
+        mimeType: cachedBlob.type,
+        size: (cachedBlob.size / (1024 * 1024)).toFixed(2) + ' MB',
+        objectUrl: URL.createObjectURL(cachedBlob)
+      };
+      this.notify();
+      this.processNext();
+      return;
+    }
+
     this.activeJobs++;
     nextJob.status = 'processing';
     this.notify();
@@ -101,6 +130,10 @@ class ConversionEngine {
     try {
       const result = await this.runConversion(nextJob);
       const objectUrl = URL.createObjectURL(result.blob);
+      
+      // Update Cache
+      this.cache.set(cacheKey, result.blob);
+
       nextJob.status = 'complete';
       nextJob.progress = 100;
       nextJob.stage = 'Transformation successful';
@@ -137,7 +170,9 @@ class ConversionEngine {
 
   clearQueue() {
     this.queue.forEach(j => { if (j.result?.objectUrl) URL.revokeObjectURL(j.result.objectUrl); });
-    this.queue = []; this.notify();
+    this.queue = []; 
+    this.cache.clear();
+    this.notify();
   }
 }
 
