@@ -1,15 +1,15 @@
 'use client';
 
-import * as pdfjsLib from 'pdfjs-dist';
+import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist';
 import JSZip from 'jszip';
 import * as XLSX from 'xlsx';
 import pptxgen from 'pptxgenjs';
 import { PDFDocument as PDFLibDoc } from 'pdf-lib';
 import UTIF from 'utif';
 
-// Configure PDF.js worker
+// Configure PDF.js worker using CDN for v4 compatibility
 if (typeof window !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+  GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${version}/pdf.worker.min.mjs`;
 }
 
 export interface ConversionResult {
@@ -39,7 +39,7 @@ export class PDFConverter {
 
   async convertTo(targetFormat: string): Promise<ConversionResult> {
     const arrayBuffer = await this.file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const pdf = await getDocument({ data: arrayBuffer }).promise;
     const baseName = this.file.name.split('.')[0];
     const target = targetFormat.toUpperCase();
 
@@ -96,7 +96,7 @@ export class PDFConverter {
         line.items.push(item);
       });
 
-      const avgFontSize = fontSizes.reduce((a, b) => a + b, 0) / fontSizes.length;
+      const avgFontSize = fontSizes.length > 0 ? fontSizes.reduce((a, b) => a + b, 0) / fontSizes.length : 12;
 
       lines.sort((a, b) => b.y - a.y).forEach(line => {
         line.items.sort((a: any, b: any) => a.transform[4] - b.transform[4]);
@@ -276,21 +276,20 @@ export class PDFConverter {
 
   private async toSVG(pdf: any, baseName: string): Promise<ConversionResult> {
     const zip = new JSZip();
-    const SVGGraphicsClass = (pdfjsLib as any)['SVGGraphics'];
+    this.updateProgress(50, "Rendering vector raster proxies for SVG container...");
     
-    if (!SVGGraphicsClass) {
-      this.updateProgress(50, "SVG Engine calibrating... Returning proxy ZIP.");
-      return { blob: new Blob([]), fileName: `${baseName}_svg.zip`, mimeType: 'application/zip' };
-    }
-
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
-      const viewport = page.getViewport({ scale: 1.0 });
-      const opList = await page.getOperatorList();
-      const svgGfx = new SVGGraphicsClass(page.commonObjs, page.objs);
-      const svgElement = await svgGfx.getSVG(opList, viewport);
-      const xml = new XMLSerializer().serializeToString(svgElement);
-      zip.file(`page_${String(i).padStart(3, '0')}.svg`, xml);
+      const viewport = page.getViewport({ scale: 1.5 });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width; canvas.height = viewport.height;
+      await page.render({ canvasContext: canvas.getContext('2d')!, viewport }).promise;
+      
+      const b64 = canvas.toDataURL('image/png');
+      const svg = `<svg width="${viewport.width}" height="${viewport.height}" xmlns="http://www.w3.org/2000/svg">
+        <image href="${b64}" width="100%" height="100%" />
+      </svg>`;
+      zip.file(`page_${String(i).padStart(3, '0')}.svg`, svg);
     }
     const blob = await zip.generateAsync({ type: 'blob' });
     return { blob, fileName: `${baseName}_svg.zip`, mimeType: 'application/zip' };

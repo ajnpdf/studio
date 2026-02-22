@@ -81,15 +81,16 @@ export class WordConverter {
   }
 
   private async toHtml(buffer: ArrayBuffer, baseName: string): Promise<ConversionResult> {
-    const { value } = await mammoth.convertToHtml({ arrayBuffer: buffer });
-    return { blob: new Blob([`<html><body>${value}</body></html>`]), fileName: `${baseName}.html`, mimeType: 'text/html' };
+    const { value: htmlBody } = await mammoth.convertToHtml({ arrayBuffer: buffer });
+    const html = `<html><head><meta charset="UTF-8"><style>body{font-family:sans-serif;padding:40px;line-height:1.6;}</style></head><body>${htmlBody}</body></html>`;
+    return { blob: new Blob([html], { type: 'text/html' }), fileName: `${baseName}.html`, mimeType: 'text/html' };
   }
 
   private async toEpub(buffer: ArrayBuffer, baseName: string): Promise<ConversionResult> {
-    const { value } = await mammoth.convertToHtml({ arrayBuffer: buffer });
+    const { value: html } = await mammoth.convertToHtml({ arrayBuffer: buffer });
     const zip = new JSZip();
     zip.file('mimetype', 'application/epub+zip', { compression: 'STORE' });
-    zip.file('OEBPS/chapter.xhtml', `<html><body>${value}</body></html>`);
+    zip.file('OEBPS/chapter.xhtml', `<?xml version="1.0" encoding="utf-8"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><body>${html}</body></html>`);
     const blob = await zip.generateAsync({ type: 'blob' });
     return { blob, fileName: `${baseName}.epub`, mimeType: 'application/epub+zip' };
   }
