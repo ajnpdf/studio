@@ -38,7 +38,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-4">
           <Button className="bg-white text-black hover:bg-white/90 transition-all font-black text-[10px] uppercase tracking-widest px-8 rounded-xl h-11 shadow-xl">
-            Get Access
+            Coming Soon
           </Button>
           <Button 
             variant="ghost" 

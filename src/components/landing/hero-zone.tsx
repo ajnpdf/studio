@@ -2,19 +2,9 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Upload, FileText, Video, ImageIcon, Music, Database, FileCode, CheckCircle2, ArrowRight, Activity } from 'lucide-react';
+import { Upload, CheckCircle2, ArrowRight, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import { LogoAnimation } from './logo-animation';
-
-const formatPills = [
-  { icon: FileText, label: 'PDF', color: 'text-white/60' },
-  { icon: Video, label: 'MP4', color: 'text-white/60' },
-  { icon: ImageIcon, label: 'PNG', color: 'text-white/60' },
-  { icon: FileCode, label: 'DOCX', color: 'text-white/60' },
-  { icon: Music, label: 'MP3', color: 'text-white/60' },
-  { icon: Database, label: 'XLSX', color: 'text-white/60' },
-];
 
 export function HeroZone() {
   const [fileCount, setFileCount] = useState(4827341);
@@ -53,15 +43,15 @@ export function HeroZone() {
             </div>
             <p className="text-sm text-muted-foreground max-w-xl mx-auto font-medium leading-relaxed mt-4">
               The professional all-in-one junction for real-time conversion, intelligence, and file mastery. 
-              Used by 2M+ experts and developers globally.
+              Coming soon to browsers worldwide.
             </p>
           </div>
         </div>
 
-        {/* Drop Zone Placeholder */}
+        {/* Drop Zone Showcase */}
         <div className="relative max-w-3xl mx-auto mt-12 animate-in fade-in zoom-in-95 duration-1000 delay-700">
           <div className="glass-card rounded-[3rem] p-1.5 shadow-[0_0_50px_rgba(255,255,255,0.05)] relative group">
-            <div className="bg-background/40 rounded-[2.8rem] p-12 border-2 border-dashed border-white/10 hover:border-white/30 transition-all duration-500 cursor-pointer flex flex-col items-center gap-6 relative overflow-hidden">
+            <div className="bg-background/40 rounded-[2.8rem] p-12 border-2 border-dashed border-white/10 hover:border-white/30 transition-all duration-500 flex flex-col items-center gap-6 relative overflow-hidden">
               <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity animate-shimmer"></div>
               
               <div className="w-20 h-20 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center shadow-2xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
@@ -69,7 +59,7 @@ export function HeroZone() {
               </div>
               
               <div className="space-y-2">
-                <h3 className="text-3xl font-black tracking-tight text-white uppercase">Drop files to optimize</h3>
+                <h3 className="text-3xl font-black tracking-tight text-white uppercase">Drop files to preview</h3>
                 <p className="text-muted-foreground font-medium uppercase text-[10px] tracking-widest">Supports 300+ Formats up to 10GB</p>
               </div>
 
@@ -93,7 +83,7 @@ export function HeroZone() {
           </p>
           
           <Button size="lg" className="h-16 px-12 text-sm font-black tracking-widest bg-white text-black hover:bg-white/90 shadow-2xl shadow-white/5 rounded-2xl group uppercase">
-            Start Processing <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            Join Waitlist <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
       </div>

@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { Network, Github, Twitter, Linkedin, Facebook, Globe, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ export function Footer() {
           <div className="space-y-6">
             <div className="space-y-4">
               <Link href="/" className="flex items-center gap-2 group">
-                <div className="p-2 bg-white rounded-xl shadow-lg">
+                <div className="p-2.5 bg-white rounded-xl shadow-lg">
                   <Network className="w-6 h-6 text-black" />
                 </div>
                 <span className="font-bold text-2xl tracking-tight text-white">AJN</span>
@@ -31,17 +32,6 @@ export function Footer() {
               <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10 text-white/60 hover:text-white"><Linkedin className="w-4 h-4"/></Button>
               <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10 text-white/60 hover:text-white"><Facebook className="w-4 h-4"/></Button>
             </div>
-          </div>
-
-          <div>
-            <h4 className="font-bold mb-6 text-white/90">Product</h4>
-            <ul className="space-y-4 text-sm text-muted-foreground">
-              <li><Link href="/dashboard/convert" className="hover:text-white transition-colors">Converter</Link></li>
-              <li><Link href="/dashboard/pdf-editor" className="hover:text-white transition-colors">PDF Editor</Link></li>
-              <li><Link href="/dashboard/image-editor" className="hover:text-white transition-colors">Image Optimizer</Link></li>
-              <li><Link href="/dashboard/tools/video" className="hover:text-white transition-colors">Video Tools</Link></li>
-              <li><Link href="/dashboard/api" className="hover:text-white transition-colors">Developer API</Link></li>
-            </ul>
           </div>
 
           <div>
