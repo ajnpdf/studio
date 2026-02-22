@@ -24,7 +24,8 @@ import {
   LogIn,
   Activity,
   Cpu,
-  Grid2X2
+  Grid2X2,
+  Workflow
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -37,24 +38,24 @@ import { useUser, useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
 
 const navItems = [
-  { icon: Repeat, label: 'Converter', href: '/dashboard/convert', description: 'Universal format engine' },
-  { icon: Grid2X2, label: 'All Tools', href: '/dashboard/tools', description: 'Service directory hub' },
+  { icon: Repeat, label: 'Junction Core', href: '/dashboard/convert', description: 'Universal format engine' },
+  { icon: Grid2X2, label: 'All Units', href: '/dashboard/tools', description: 'Network directory hub' },
 ];
 
 const toolItems = [
-  { icon: FileText, label: 'PDF Tools', href: '/dashboard/pdf-editor', description: 'Neural PDF Studio' },
-  { icon: ImageIcon, label: 'Image Tools', href: '/dashboard/image-editor', description: 'Image Master' },
-  { icon: Video, label: 'Video Tools', href: '/dashboard/tools/video', description: 'FFmpeg transcode' },
-  { icon: Music, label: 'Audio Tools', href: '/dashboard/tools/audio', description: 'Track surgery' },
+  { icon: FileText, label: 'PDF Mastery', href: '/dashboard/pdf-editor', description: 'Neural PDF Studio' },
+  { icon: ImageIcon, label: 'Image Mastery', href: '/dashboard/image-editor', description: 'Image Optimizer' },
+  { icon: Video, label: 'Video Lab', href: '/dashboard/tools/video', description: 'FFmpeg transcode' },
+  { icon: Music, label: 'Audio Studio', href: '/dashboard/tools/audio', description: 'Track surgery' },
   { icon: Box, label: 'Batch Center', href: '/dashboard/tools/batch', description: 'Multi-file tasks' },
-  { icon: BrainCircuit, label: 'AI Intel', href: '/dashboard/tools/ai', description: 'Document semantic AI' },
+  { icon: BrainCircuit, label: 'AI Intelligence', href: '/dashboard/tools/ai', description: 'Semantic analysis' },
 ];
 
 const workspaceItems = [
-  { icon: Users, label: 'Team', href: '/dashboard/team', description: 'Multi-node sync' },
-  { icon: Wand2, label: 'API Access', href: '/dashboard/api', description: 'Dev control' },
-  { icon: ShieldCheck, label: 'Root Panel', href: '/admin', description: 'System ops', badge: 'ROOT' },
-  { icon: Settings, label: 'Settings', href: '/dashboard/settings', description: 'Node config' },
+  { icon: Users, label: 'Node Team', href: '/dashboard/team', description: 'Multi-user sync' },
+  { icon: Wand2, label: 'API Gateway', href: '/dashboard/api', description: 'Developer control' },
+  { icon: ShieldCheck, label: 'Root Ops', href: '/admin', description: 'System core', badge: 'ROOT' },
+  { icon: Settings, label: 'Node Config', href: '/dashboard/settings', description: 'Session prefs' },
 ];
 
 export function DashboardSidebar() {
@@ -121,7 +122,7 @@ export function DashboardSidebar() {
           <div className={cn("flex items-center gap-3 transition-all", collapsed && "justify-center")}>
             <Avatar className="h-10 w-10 border-2 border-white/10 ring-4 ring-primary/5">
               <AvatarImage src={user?.photoURL || ""} />
-              <AvatarFallback className="bg-primary/20 text-primary font-black">AD</AvatarFallback>
+              <AvatarFallback className="bg-primary/20 text-primary font-black">OP</AvatarFallback>
             </Avatar>
             {!collapsed && (
               <div className="overflow-hidden">
@@ -150,12 +151,12 @@ export function DashboardSidebar() {
 
       <div className="flex-1 overflow-y-auto px-3 py-6 space-y-10 scrollbar-hide">
         <div>
-          {!collapsed && <p className="px-3 mb-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Processing</p>}
+          {!collapsed && <p className="px-3 mb-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Operation Core</p>}
           <div className="space-y-1">
-            <NavLink item={{ icon: LayoutDashboard, label: 'Hub Overview', href: '/dashboard', description: 'Network Center' }} />
+            <NavLink item={{ icon: LayoutDashboard, label: 'Junction Hub', href: '/dashboard', description: 'Network Center' }} />
             {navItems.map((item) => <NavLink key={item.href} item={item} />)}
             <div className="pt-4 mt-4 border-t border-white/5">
-              {!collapsed && <p className="px-3 mb-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Studio Tools</p>}
+              {!collapsed && <p className="px-3 mb-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Neural Units</p>}
               {toolItems.map((item) => <NavLink key={item.href} item={item} />)}
             </div>
           </div>
@@ -192,7 +193,7 @@ export function DashboardSidebar() {
           <Link href="/login">
             <button className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/10 transition-all">
               <LogIn className="w-4 h-4 shrink-0" />
-              {!collapsed && <span>Node Login</span>}
+              {!collapsed && <span>Auth Access</span>}
             </button>
           </Link>
         )}
