@@ -10,6 +10,8 @@ import { WordConverter } from '@/lib/converters/word-converter';
 import { ExcelConverter } from '@/lib/converters/excel-converter';
 import { PPTConverter } from '@/lib/converters/ppt-converter';
 import { ODTConverter } from '@/lib/converters/odt-converter';
+import { ImageConverter } from '@/lib/converters/image-converter';
+import { RawConverter } from '@/lib/converters/raw-converter';
 import { useToast } from '@/hooks/use-toast';
 
 export type ConversionState = 'idle' | 'processing' | 'complete';
@@ -25,6 +27,9 @@ export interface ConversionSettings {
   filename: string;
   saveToWorkspace: boolean;
 }
+
+const IMAGE_EXTS = ['JPG', 'JPEG', 'PNG', 'WEBP', 'TIFF', 'BMP', 'GIF', 'SVG', 'AVIF', 'HEIC'];
+const RAW_EXTS = ['CR2', 'CR3', 'NEF', 'ARW', 'DNG', 'ORF', 'RW2', 'RAF'];
 
 export function ConversionEngine({ initialFileId }: { initialFileId: string | null }) {
   const [file, setFile] = useState(mockFiles.find(f => f.id === initialFileId) || mockFiles[0]);
@@ -64,7 +69,7 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
     setResult(null);
 
     try {
-      // Simulate real file fetch for demo
+      // Simulate real file fetch for demo if not already provided
       const response = await fetch(`https://picsum.photos/seed/${file.id}/800/600`);
       const blob = await response.blob();
       
@@ -100,6 +105,12 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
         converterResult = await converter.convertTo(settings.toFormat);
       } else if (fmt === 'ODT') {
         const converter = new ODTConverter(realFile, onProgress);
+        converterResult = await converter.convertTo(settings.toFormat);
+      } else if (IMAGE_EXTS.includes(fmt)) {
+        const converter = new ImageConverter(realFile, onProgress);
+        converterResult = await converter.convertTo(settings.toFormat);
+      } else if (RAW_EXTS.includes(fmt)) {
+        const converter = new RawConverter(realFile, onProgress);
         converterResult = await converter.convertTo(settings.toFormat);
       } else {
         throw new Error(`Engine for ${file.format} is currently in calibration.`);
