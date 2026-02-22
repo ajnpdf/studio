@@ -27,8 +27,11 @@ function DashboardGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    const isPublicRoute = PUBLIC_DASHBOARD_ROUTES.some(route => pathname.startsWith(route));
-    if (!isUserLoading && !user && !isPublicRoute && pathname !== '/dashboard') {
+    // Explicitly allow core dashboard routes for guests to enable "Real-Time Mastery" without account
+    const isPublicRoute = PUBLIC_DASHBOARD_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'));
+    const isRootDashboard = pathname === '/dashboard';
+    
+    if (!isUserLoading && !user && !isPublicRoute && !isRootDashboard) {
       router.push('/login');
     }
   }, [user, isUserLoading, router, pathname]);

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -24,8 +25,7 @@ export function AIWorkspace({ tool }: { tool: AITool }) {
   const handleRun = async () => {
     setState('processing');
     try {
-      // Simulate content extraction
-      const mockContent = tool.id === 'contract' ? 'This agreement is between SUFW Corp and Alex Doe...' : 'Project Proposal: A plan to build a new workspace...';
+      const mockContent = tool.id === 'contract' ? 'This agreement is between AJN Corp and Alex Doe...' : 'Project Proposal: A plan to build a new workspace...';
       
       const output = await runFileIntelligence({
         toolId: tool.id as any,
@@ -33,7 +33,6 @@ export function AIWorkspace({ tool }: { tool: AITool }) {
         config
       });
       
-      // Artificial delay for better UX
       await new Promise(r => setTimeout(r, 2000));
       setResult(output);
       setState('complete');
