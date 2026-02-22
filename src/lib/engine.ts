@@ -1,3 +1,4 @@
+
 'use client';
 
 import { PDFConverter } from './converters/pdf-converter';
@@ -35,16 +36,6 @@ export interface ConversionJob {
   };
   error?: string;
   settings: any;
-}
-
-export class AJNConversionError extends Error {
-  code: string;
-  recoverable: boolean;
-  constructor(message: string, code: string, recoverable: boolean = false) {
-    super(message);
-    this.code = code;
-    this.recoverable = recoverable;
-  }
 }
 
 class ConversionEngine {
@@ -99,7 +90,6 @@ class ConversionEngine {
 
   private async processNext() {
     if (this.activeJobs >= this.maxConcurrent) return;
-
     const nextJob = this.queue.find(j => j.status === 'queued');
     if (!nextJob) return;
 
@@ -110,27 +100,17 @@ class ConversionEngine {
     try {
       const result = await this.runConversion(nextJob);
       const objectUrl = URL.createObjectURL(result.blob);
-      
       nextJob.status = 'complete';
       nextJob.progress = 100;
-      nextJob.stage = 'Neutral transformation successful';
+      nextJob.stage = 'Transformation successful';
       nextJob.result = {
         ...result,
         size: (result.blob.size / (1024 * 1024)).toFixed(2) + ' MB',
         objectUrl
       };
-      
-      this.saveToHistory(nextJob);
-      
-      // Auto-revocation timer to save memory
-      setTimeout(() => {
-        // We don't revoke immediately because user might click download
-        // But we track it for cleanup
-      }, 300000); // 5 mins
-
     } catch (err: any) {
       nextJob.status = 'failed';
-      nextJob.error = err.message || 'Unknown network error';
+      nextJob.error = err.message || 'Error';
       nextJob.stage = 'Internal Error';
     } finally {
       this.activeJobs--;
@@ -142,52 +122,21 @@ class ConversionEngine {
   private async runConversion(job: ConversionJob) {
     const key = job.fromFmt.toLowerCase();
     const ConverterClass = this.converters[key];
-    
-    if (!ConverterClass) {
-      throw new AJNConversionError(`Format ${key.toUpperCase()} not supported`, 'UNSUPPORTED_FORMAT');
-    }
-
-    const onProgress = (p: number, msg: string) => {
-      job.progress = p;
-      job.stage = msg;
-      this.notify();
-    };
-
-    const converter = new ConverterClass(job.file, onProgress);
+    if (!ConverterClass) throw new Error(`Format ${key.toUpperCase()} not supported`);
+    const converter = new ConverterClass(job.file, (p: number, msg: string) => {
+      job.progress = p; job.stage = msg; this.notify();
+    });
     return await converter.convertTo(job.toFmt, job.settings);
-  }
-
-  private saveToHistory(job: ConversionJob) {
-    if (typeof window === 'undefined') return;
-    const history = JSON.parse(localStorage.getItem('ajn_history') || '[]');
-    const entry = {
-      id: job.id,
-      fileName: job.file.name,
-      fromFmt: job.fromFmt,
-      toFmt: job.toFmt,
-      date: new Date().toISOString(),
-      size: job.result?.size,
-      status: 'complete'
-    };
-    localStorage.setItem('ajn_history', JSON.stringify([entry, ...history].slice(0, 50)));
   }
 
   cancelJob(id: string) {
     const job = this.queue.find(j => j.id === id);
-    if (job) {
-      job.status = 'cancelled';
-      job.stage = 'Manually terminated';
-      this.notify();
-    }
+    if (job) { job.status = 'cancelled'; this.notify(); }
   }
 
   clearQueue() {
-    // Revoke all completed job URLs before clearing
-    this.queue.forEach(j => {
-      if (j.result?.objectUrl) URL.revokeObjectURL(j.result.objectUrl);
-    });
-    this.queue = [];
-    this.notify();
+    this.queue.forEach(j => { if (j.result?.objectUrl) URL.revokeObjectURL(j.result.objectUrl); });
+    this.queue = []; this.notify();
   }
 }
 
