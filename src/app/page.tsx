@@ -1,5 +1,8 @@
 
 import { LogoAnimation } from '@/components/landing/logo-animation';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 
 /**
  * AJN Minimal Standalone Landing
@@ -13,12 +16,22 @@ export default function LandingPage() {
         <LogoAnimation />
         
         {/* MINIMAL BRAND IDENTIFIER */}
-        <div className="text-center space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
-          <h1 className="text-3xl font-black tracking-tighter text-white uppercase">AJN – All-in-one Junction Network</h1>
-          <div className="flex items-center justify-center gap-3">
-            <span className="w-8 h-px bg-white/10"></span>
-            <p className="text-white/40 text-[10px] font-bold tracking-[0.5em] uppercase">Every File. One Smart Network.</p>
-            <span className="w-8 h-px bg-white/10"></span>
+        <div className="text-center space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
+          <div className="space-y-4">
+            <h1 className="text-3xl font-black tracking-tighter text-white uppercase">AJN – All-in-one Junction Network</h1>
+            <div className="flex items-center justify-center gap-3">
+              <span className="w-8 h-px bg-white/10"></span>
+              <p className="text-white/40 text-[10px] font-bold tracking-[0.5em] uppercase">Every File. One Smart Network.</p>
+              <span className="w-8 h-px bg-white/10"></span>
+            </div>
+          </div>
+
+          <div className="pt-4">
+            <Link href="/ajn">
+              <Button variant="outline" className="h-12 px-8 border-white/10 bg-white/5 hover:bg-white hover:text-black font-black text-[10px] uppercase tracking-[0.3em] rounded-xl transition-all gap-3 shadow-2xl">
+                Discover the Core <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
           </div>
         </div>
       </main>
