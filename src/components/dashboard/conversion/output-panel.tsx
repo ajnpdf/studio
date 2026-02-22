@@ -6,17 +6,32 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { FileIcon, Download, Save, RefreshCw, Share2, CheckCircle2, Wand2, ArrowRight } from 'lucide-react';
 import { ConversionState, ConversionSettings } from './conversion-engine';
+import { ConversionResult } from '@/lib/converters/pdf-converter';
 import { cn } from '@/lib/utils';
 
 interface Props {
   state: ConversionState;
   progress: number;
+  statusMessage?: string;
   file: any;
   settings: ConversionSettings;
+  result: ConversionResult | null;
   onReset: () => void;
 }
 
-export function OutputPanel({ state, progress, file, settings, onReset }: Props) {
+export function OutputPanel({ state, progress, statusMessage, file, settings, result, onReset }: Props) {
+  const handleDownload = () => {
+    if (!result) return;
+    const url = URL.createObjectURL(result.blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = result.fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <Card className="bg-card/40 backdrop-blur-xl border-white/5 flex flex-col h-full min-h-0 overflow-hidden">
       <CardContent className="p-0 flex flex-col h-full">
@@ -33,7 +48,7 @@ export function OutputPanel({ state, progress, file, settings, onReset }: Props)
               </div>
               <div className="space-y-2">
                 <h4 className="font-bold text-lg">Waiting for input</h4>
-                <p className="text-xs text-muted-foreground max-w-[200px] mx-auto">Configure your settings and click convert to see the magic.</p>
+                <p className="text-xs text-muted-foreground max-w-[200px] mx-auto uppercase tracking-widest font-black">Configure parameters & trigger</p>
               </div>
             </div>
           )}
@@ -50,16 +65,16 @@ export function OutputPanel({ state, progress, file, settings, onReset }: Props)
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
                   <div className="text-left space-y-1">
-                    <p className="text-[10px] font-black text-primary uppercase tracking-widest">Converting...</p>
+                    <p className="text-[10px] font-black text-primary uppercase tracking-widest">Neural Processing</p>
                     <p className="text-sm font-bold">{progress}% Complete</p>
                   </div>
-                  <p className="text-[10px] text-muted-foreground font-bold">~{Math.ceil((100 - progress) / 12)}s left</p>
+                  <p className="text-[10px] text-muted-foreground font-bold">AJN ENGINE</p>
                 </div>
                 <Progress value={progress} className="h-2 bg-white/5" />
               </div>
 
-              <p className="text-xs text-muted-foreground leading-relaxed animate-pulse">
-                Applying advanced {settings.toFormat} optimization and re-encoding vectors...
+              <p className="text-[10px] text-muted-foreground leading-relaxed animate-pulse font-black uppercase tracking-widest">
+                {statusMessage || 'Analyzing document vectors...'}
               </p>
             </div>
           )}
@@ -71,40 +86,43 @@ export function OutputPanel({ state, progress, file, settings, onReset }: Props)
                   <CheckCircle2 className="w-16 h-16 text-emerald-500" />
                 </div>
                 <div className="absolute -bottom-4 left-1/2 -translate-x-1/2">
-                   <Badge className="bg-emerald-500 text-white border-none font-bold text-[10px] px-3 h-6 shadow-xl">SUCCESS</Badge>
+                   <Badge className="bg-emerald-500 text-white border-none font-bold text-[10px] px-3 h-6 shadow-xl uppercase tracking-widest">SUCCESS</Badge>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <h4 className="font-black text-xl tracking-tighter truncate px-4">{settings.filename}.{settings.toFormat.toLowerCase()}</h4>
+                <h4 className="font-black text-xl tracking-tighter truncate px-4 uppercase">{result?.fileName || 'output_file'}</h4>
                 <div className="flex items-center justify-center gap-2">
-                   <span className="text-xs font-bold text-muted-foreground">Output: 1.1 MB</span>
-                   <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-500 text-[10px] font-bold">73% SMALLER</Badge>
+                   <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Verified Secure Output</span>
+                   <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-500 text-[8px] font-black uppercase">Optimized</Badge>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-3 px-4">
-                <Button className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 font-black gap-2 shadow-xl shadow-emerald-500/20">
+                <Button 
+                  onClick={handleDownload}
+                  className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 font-black gap-2 shadow-xl shadow-emerald-500/20 text-xs uppercase tracking-widest"
+                >
                   <Download className="w-4 h-4" /> Download Result
                 </Button>
                 <div className="grid grid-cols-2 gap-3">
-                  <Button variant="outline" className="h-11 border-white/10 bg-white/5 font-bold gap-2">
+                  <Button variant="outline" className="h-11 border-white/10 bg-white/5 font-black text-[10px] uppercase tracking-widest gap-2">
                     <Save className="w-4 h-4" /> Save to Vault
                   </Button>
-                  <Button variant="outline" className="h-11 border-white/10 bg-white/5 font-bold gap-2" onClick={onReset}>
-                    <RefreshCw className="w-4 h-4" /> Try Another
+                  <Button variant="outline" className="h-11 border-white/10 bg-white/5 font-black text-[10px] uppercase tracking-widest gap-2" onClick={onReset}>
+                    <RefreshCw className="w-4 h-4" /> New Task
                   </Button>
                 </div>
               </div>
 
               <div className="pt-8 border-t border-white/5 px-4">
                 <div className="flex items-center justify-between mb-4">
-                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Share this conversion</p>
+                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">Secure Node Share</p>
                    <Share2 className="w-3.5 h-3.5 text-muted-foreground/40" />
                 </div>
                 <div className="flex gap-2">
-                   <div className="flex-1 bg-white/5 border border-white/10 rounded-lg h-10 flex items-center px-4 text-[10px] font-mono text-muted-foreground truncate">
-                      https://ajn.io/share/7a82b9c1
+                   <div className="flex-1 bg-white/5 border border-white/10 rounded-lg h-10 flex items-center px-4 text-[9px] font-mono text-muted-foreground truncate">
+                      https://ajn.network/vault/sh/${result?.fileName.substring(0, 8)}
                    </div>
                    <Button size="icon" variant="outline" className="h-10 w-10 border-white/10 bg-white/5">
                       <ArrowRight className="w-4 h-4" />
