@@ -1,3 +1,4 @@
+
 "use client";
 
 import { 
@@ -22,7 +23,8 @@ import {
   ShieldCheck,
   LogIn,
   Activity,
-  Cpu
+  Cpu,
+  Grid2X2
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -36,6 +38,7 @@ import { signOut } from 'firebase/auth';
 
 const navItems = [
   { icon: Repeat, label: 'Converter', href: '/dashboard/convert', description: 'Universal format engine' },
+  { icon: Grid2X2, label: 'All Tools', href: '/dashboard/tools', description: 'Service directory hub' },
 ];
 
 const toolItems = [
