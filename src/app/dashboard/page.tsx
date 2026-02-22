@@ -1,79 +1,76 @@
-import { SmartHelper } from '@/components/dashboard/smart-helper';
+"use client";
+
+import { DashboardStatsGrid } from '@/components/dashboard/dashboard-stats-grid';
 import { FileGrid } from '@/components/dashboard/file-grid';
-import { Search, Filter, LayoutGrid, List } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { LayoutGrid, List, Filter, ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  DropdownMenu, 
+  DropdownMenuTrigger, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+} from '@/components/ui/dropdown-menu';
 
 export default function DashboardPage() {
   return (
-    <div className="max-w-7xl mx-auto space-y-10">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Welcome back, Alex</h1>
-          <p className="text-muted-foreground">Manage and transform your cloud assets seamlessly.</p>
-        </div>
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          <div className="relative flex-1 md:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Search files, tools, actions..." className="pl-9 h-11 border-primary/10 shadow-sm" />
-          </div>
-          <Button variant="outline" size="icon" className="h-11 w-11">
-            <Filter className="w-4 h-4" />
-          </Button>
-        </div>
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <header>
+        <h1 className="text-4xl font-black tracking-tighter mb-2">Hub</h1>
+        <p className="text-muted-foreground text-sm">Manage, transform, and optimize your workspace assets.</p>
       </header>
 
-      {/* AI Assistant Section */}
-      <SmartHelper />
+      {/* Quick Stats Section */}
+      <DashboardStatsGrid />
 
-      {/* File Management Section */}
+      {/* Recent Files Management */}
       <section className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-6">
-            <h2 className="text-xl font-bold">Recent Files</h2>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex flex-wrap items-center gap-6">
+            <h2 className="text-xl font-bold tracking-tight">Recent Files</h2>
             <Tabs defaultValue="all" className="w-auto">
-              <TabsList className="bg-muted/50">
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="images">Images</TabsTrigger>
-                <TabsTrigger value="docs">Docs</TabsTrigger>
-                <TabsTrigger value="video">Video</TabsTrigger>
+              <TabsList className="bg-white/5 border border-white/10 h-9 p-1">
+                <TabsTrigger value="all" className="text-[11px] h-7 px-3">All</TabsTrigger>
+                <TabsTrigger value="pdf" className="text-[11px] h-7 px-3">PDF</TabsTrigger>
+                <TabsTrigger value="images" className="text-[11px] h-7 px-3">Images</TabsTrigger>
+                <TabsTrigger value="video" className="text-[11px] h-7 px-3">Video</TabsTrigger>
+                <TabsTrigger value="audio" className="text-[11px] h-7 px-3">Audio</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
-          <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-lg">
-            <Button variant="ghost" size="icon" className="h-8 w-8 bg-white shadow-sm"><LayoutGrid className="w-4 h-4" /></Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8"><List className="w-4 h-4" /></Button>
+
+          <div className="flex items-center gap-2">
+            <div className="bg-white/5 p-1 rounded-lg border border-white/10 flex gap-1">
+              <Button variant="ghost" size="icon" className="h-7 w-7 bg-primary text-white shadow-sm">
+                <LayoutGrid className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground/60">
+                <List className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="h-9 gap-2 text-xs border-primary/20 bg-background/40">
+                  <ArrowUpDown className="w-4 h-4" /> Sort
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40 bg-card/80 backdrop-blur-xl">
+                <DropdownMenuItem className="text-xs">Recent</DropdownMenuItem>
+                <DropdownMenuItem className="text-xs">Name</DropdownMenuItem>
+                <DropdownMenuItem className="text-xs">Size</DropdownMenuItem>
+                <DropdownMenuItem className="text-xs">Type</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button variant="outline" className="h-9 gap-2 text-xs border-primary/20 bg-background/40">
+              <Filter className="w-4 h-4" /> Filter
+            </Button>
           </div>
         </div>
 
         <FileGrid />
       </section>
-
-      {/* Activity Log / Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="p-6 bg-card rounded-2xl border border-primary/5 shadow-sm">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Total Conversions</h3>
-          <div className="flex items-end gap-3">
-            <span className="text-4xl font-bold">1,284</span>
-            <span className="text-emerald-500 text-sm font-medium pb-1">+12% this month</span>
-          </div>
-        </div>
-        <div className="p-6 bg-card rounded-2xl border border-primary/5 shadow-sm">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Space Saved</h3>
-          <div className="flex items-end gap-3">
-            <span className="text-4xl font-bold">4.2 GB</span>
-            <span className="text-emerald-500 text-sm font-medium pb-1">via Compression</span>
-          </div>
-        </div>
-        <div className="p-6 bg-card rounded-2xl border border-primary/5 shadow-sm">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Collaboration Time</h3>
-          <div className="flex items-end gap-3">
-            <span className="text-4xl font-bold">142h</span>
-            <span className="text-primary text-sm font-medium pb-1">Total session time</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

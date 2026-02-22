@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, Download, FileText, ImageIcon, Video } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 
 const demos = [
   { from: 'PDF', to: 'Word', icon: FileText, color: 'text-red-400' },
