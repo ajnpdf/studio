@@ -13,10 +13,11 @@ import {
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { ServicesGrid } from '@/components/junction/services-grid';
+import { UnitScroller } from '@/components/junction/unit-scroller';
 
 /**
  * AJN Gateway - Professional Gateway Entry
- * Features functional search and real-time service discovery with invisible scroll.
+ * Features functional search, real-time service discovery with invisible scroll.
  */
 export default function AJNPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,6 +69,11 @@ export default function AJNPage() {
           <div className="transition-all duration-1000 animate-in zoom-in-95">
             <LogoAnimation className="w-64 h-28" />
           </div>
+        </section>
+
+        {/* Dynamic Infinite Scroller */}
+        <section className="animate-in fade-in duration-1000 delay-300">
+          <UnitScroller />
         </section>
 
         {/* Integrated Services Grid */}
