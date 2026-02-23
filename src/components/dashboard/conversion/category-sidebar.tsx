@@ -37,8 +37,8 @@ interface Props {
 }
 
 /**
- * AJN Category Sidebar - Refined Light Professional Theme
- * Removed all restricted technical terminology.
+ * AJN Category Sidebar - Refined Professional Theme
+ * Sanitized terminology and high-contrast Black Text standards.
  */
 export function CategorySidebar({ active, onSelect }: Props) {
   const [collapsed, setCollapsed] = useState(false);

@@ -5,6 +5,7 @@ import { CategorySidebar } from '@/components/dashboard/conversion/category-side
 import { DropZone } from '@/components/dashboard/conversion/drop-zone';
 import { ProgressSection } from '@/components/dashboard/conversion/progress-section';
 import { OutputSection } from '@/components/dashboard/conversion/output-section';
+import { UnitInfoCarousel } from './unit-info-carousel';
 import { engine, GlobalAppState } from '@/lib/engine';
 import { 
   Settings2, 
@@ -114,6 +115,8 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
     'summarize-pdf', 'digital-seal'
   ].includes(initialUnitId || '');
 
+  const unitDisplayName = initialUnitId?.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+
   return (
     <div className="flex h-full bg-transparent overflow-hidden relative text-slate-950 font-body">
       <CategorySidebar active={activeCategory} onSelect={setActiveCategory} />
@@ -128,15 +131,20 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                   <Cpu className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black tracking-tight text-slate-950 uppercase">{initialUnitId?.replace('-', ' ')}</h2>
-                  <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Smart Unit Active</p>
+                  <h2 className="text-xl font-black tracking-tight text-slate-950 uppercase">{unitDisplayName}</h2>
+                  <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Smart Service Unit</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">WASM System Active</span>
+                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Secure System Active</span>
               </div>
             </div>
+
+            {/* Instruction Carousel Section */}
+            <section className="animate-in fade-in duration-1000 delay-200">
+              <UnitInfoCarousel unitName={unitDisplayName} />
+            </section>
 
             {initialUnitId === 'merge-pdf' && (
               <section className="space-y-6 animate-in slide-in-from-bottom-4 duration-700">

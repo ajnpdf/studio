@@ -17,7 +17,7 @@ import { SpecializedConverter } from './converters/specialized-converter';
 import { PDFManipulator } from './converters/pdf-manipulator';
 
 /**
- * AJN System Identity - Core Intelligence Layer
+ * AJN System Identity - Core Engine
  * Stateful workflow orchestrator managing 35+ tools.
  * Enforces a strict one-to-one processing ratio via Job Locks and SHA-256 Fingerprinting.
  */
@@ -140,6 +140,7 @@ class ConversionEngine {
       const fingerprint = await this.generateFingerprint(file);
       const jobKey = `${fingerprint}_${operationId || 'convert'}_${toFmt}`;
 
+      // Strict one-to-one processing lock
       if (this.processedHashes.has(jobKey) || this.state.processingQueue.some(j => j.id === jobKey)) continue;
 
       const fileBuffer: FileBuffer = {

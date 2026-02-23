@@ -8,7 +8,8 @@ import {
   ShieldCheck, 
   Search,
   Command,
-  Workflow
+  Workflow,
+  Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
@@ -73,6 +74,10 @@ export default function AJNPage() {
 
         {/* Dynamic Infinite Scroller */}
         <section className="animate-in fade-in duration-1000 delay-300">
+          <div className="flex items-center gap-2 px-8 mb-4">
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
+            <span className="text-[10px] font-black text-slate-950/40 uppercase tracking-widest">Real-Time Service Stream</span>
+          </div>
           <UnitScroller />
         </section>
 
