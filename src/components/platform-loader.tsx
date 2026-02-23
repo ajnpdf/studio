@@ -43,7 +43,8 @@ export function PlatformLoader() {
     return () => clearInterval(interval);
   }, [textIndex]);
 
-  if (!isVisible || !mounted) return null;
+  // Prevent hydration error by rendering nothing until client-side is ready
+  if (!mounted || !isVisible) return null;
 
   return (
     <div className={cn(
@@ -67,9 +68,10 @@ export function PlatformLoader() {
           </defs>
 
           <g className="logo-paths">
-            <path d="M20 100 L55 20 L90 100" className="logo-path" />
-            <path d="M140 20 L140 80 Q140 105 115 100" className="logo-path delay-1" />
-            <path d="M190 100 L190 20 L250 100 L250 20" className="logo-path delay-2" />
+            {/* Using inline styles or Tailwind classes for animations to avoid styled-jsx hydration mismatches */}
+            <path d="M20 100 L55 20 L90 100" fill="none" stroke="url(#loader-grad)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" style={{ strokeDasharray: 400, strokeDashoffset: 400, animation: 'draw 1.2s ease forwards' }} />
+            <path d="M140 20 L140 80 Q140 105 115 100" fill="none" stroke="url(#loader-grad)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" style={{ strokeDasharray: 400, strokeDashoffset: 400, animation: 'draw 1.2s ease forwards 0.2s' }} />
+            <path d="M190 100 L190 20 L250 100 L250 20" fill="none" stroke="url(#loader-grad)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" style={{ strokeDasharray: 400, strokeDashoffset: 400, animation: 'draw 1.2s ease forwards 0.4s' }} />
           </g>
         </svg>
 
@@ -91,20 +93,7 @@ export function PlatformLoader() {
         </div>
       </div>
 
-      <style jsx>{`
-        .logo-path {
-          fill: none;
-          stroke: url(#loader-grad);
-          stroke-width: 6;
-          stroke-linecap: round;
-          stroke-linejoin: round;
-          stroke-dasharray: 400;
-          stroke-dashoffset: 400;
-          animation: draw 1.2s ease forwards;
-        }
-        .delay-1 { animation-delay: 0.2s; }
-        .delay-2 { animation-delay: 0.4s; }
-
+      <style>{`
         @keyframes draw {
           to { stroke-dashoffset: 0; }
         }

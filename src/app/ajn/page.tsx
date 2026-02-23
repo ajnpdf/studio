@@ -10,8 +10,7 @@ import {
   Search,
   Command,
   Workflow,
-  Activity,
-  Heart
+  Activity
 } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
@@ -102,14 +101,14 @@ export default function AJNPage() {
         </section>
 
         <footer className="py-16 flex flex-col items-center gap-6">
-          <div className="flex gap-12">
+          <div className="flex gap-12 flex-wrap justify-center">
             {['Story', 'Blog', 'Privacy', 'Terms'].map((link) => (
               <Link key={link} href={`/${link.toLowerCase()}`} className="text-[10px] font-black uppercase tracking-widest text-slate-950/40 hover:text-primary transition-colors">
                 {link}
               </Link>
             ))}
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col items-center gap-4">
             <p className="text-[11px] font-black text-slate-950/20 tracking-[0.6em] uppercase">
               AJN Engineering Core • 2025
             </p>

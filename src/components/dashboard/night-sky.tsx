@@ -15,14 +15,13 @@ interface Star {
 /**
  * AJN Night Sky - Optimized for Light Background
  * Stars now twinkle with a violet glow over the platform gradient.
- * Fixed Hydration Error via mounted state check.
+ * Robust hydration fix: Returns an empty div on server/initial client render.
  */
 export function NightSky() {
   const [stars, setStars] = useState<Star[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const generatedStars = [...Array(35)].map((_, i) => ({
       id: i,
       width: `${Math.random() * 1.5 + 1.2}px`,
@@ -33,6 +32,7 @@ export function NightSky() {
       animationDelay: `${Math.random() * 5}s`,
     }));
     setStars(generatedStars);
+    setMounted(true);
   }, []);
 
   if (!mounted) {
@@ -41,7 +41,8 @@ export function NightSky() {
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-transparent">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(139,92,246,0.1)_0%,transparent_60%)] opacity-50"></div>
+      {/* Visual Ambient Layer */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(139,92,246,0.1)_0%,transparent_60%)] opacity-50" />
       
       <div className="absolute inset-0">
         {stars.map((star) => (
@@ -59,16 +60,6 @@ export function NightSky() {
           />
         ))}
       </div>
-      
-      <style jsx global>{`
-        @keyframes twinkle {
-          0%, 100% { opacity: 0.3; transform: scale(0.8); }
-          50% { opacity: 0.8; transform: scale(1.2); }
-        }
-        .animate-twinkle {
-          animation: twinkle linear infinite;
-        }
-      `}</style>
     </div>
   );
 }

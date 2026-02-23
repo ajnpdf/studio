@@ -32,7 +32,7 @@ export default function TermsPage() {
           <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-widest">Last Updated: February 15, 2025</p>
         </section>
 
-        <div className="prose prose-slate max-w-none text-slate-950/80 font-medium space-y-8">
+        <div className="prose prose-slate max-w-none text-slate-950/80 font-medium space-y-8 uppercase tracking-widest text-sm">
           <section className="space-y-4">
             <h2 className="text-2xl font-black uppercase tracking-tight text-slate-950">1. Acceptance of Terms</h2>
             <p>
@@ -59,12 +59,12 @@ export default function TermsPage() {
 
           <section className="space-y-4 pt-12 border-t border-black/5">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-950/40">
-              For legal inquiries, please contact anjanpatel325@gmail.com
+              For legal inquiries, please contact <span className="text-primary select-all">anjanpatel325@gmail.com</span>
             </p>
           </section>
         </div>
 
-        <footer className="pt-20 pb-10 text-center">
+        <footer className="pt-20 pb-10 text-center space-y-4">
           <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.5em]">
             MADE BY INDIAN ❤️
           </p>
