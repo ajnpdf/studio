@@ -130,7 +130,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                 </div>
                 <div>
                   <h2 className="text-xl font-black tracking-tight text-slate-950 uppercase">{initialUnitId?.replace('-', ' ')}</h2>
-                  <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Neural Unit Active</p>
+                  <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Smart Unit Active</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
@@ -199,7 +199,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               <section className="bg-white/40 border border-white/60 p-8 rounded-[2rem] shadow-xl backdrop-blur-xl animate-in fade-in">
                 <div className="flex items-center gap-3 mb-6">
                   <Settings2 className="w-4 h-4 text-primary" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">Neural Parameters</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">System Parameters</span>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

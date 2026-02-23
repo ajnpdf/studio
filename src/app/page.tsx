@@ -13,7 +13,6 @@ export default function LandingPage() {
     <div className="h-screen w-full flex flex-col items-center justify-center p-6 overflow-hidden relative text-slate-950">
       <main className="w-full max-w-5xl flex flex-col items-center gap-10 md:gap-14 relative z-10 -mt-12 animate-in fade-in zoom-in-95 duration-1000">
         
-        {/* Centerpiece Navy Blue Logo */}
         <div className="relative">
           <LogoAnimation className="w-64 h-32 md:w-80 md:h-40" />
         </div>
@@ -45,22 +44,21 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Infrastructure Metrics */}
           <div className="pt-10 flex items-center justify-center gap-12 opacity-60 transition-all duration-700 hover:opacity-100">
             <div className="flex items-center gap-3">
               <ShieldCheck className="w-5 h-5 text-slate-950" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">Wasm Buffer</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">Secure Sandbox</span>
             </div>
             <div className="flex items-center gap-3">
               <Network className="w-5 h-5 text-slate-950" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">Neural Mesh</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">Smart Network</span>
             </div>
           </div>
         </div>
       </main>
 
       <footer className="absolute bottom-8 text-[10px] font-black text-slate-950/20 tracking-[0.5em] uppercase">
-        AJN Global Node • 2025
+        AJN Global Engine • 2025
       </footer>
     </div>
   );

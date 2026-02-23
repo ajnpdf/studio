@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
@@ -12,10 +13,8 @@ import {
   Search,
   Command,
   X,
-  Layers,
   ArrowRight,
   Zap,
-  FileText,
   Cpu,
   Lock,
   Network
@@ -74,7 +73,6 @@ export default function AJNPage() {
     >
       <NightSky />
       
-      {/* HUD Header - Fixed */}
       <header className="fixed top-0 left-0 right-0 h-16 border-b border-black/5 bg-white/40 backdrop-blur-xl z-[60] px-8 flex items-center justify-between shadow-sm">
         <Link href="/" className="flex items-center group">
           <LogoAnimation className="w-20 h-10" showGlow={false} />
@@ -89,15 +87,13 @@ export default function AJNPage() {
           <div className="h-6 w-px bg-black/5" />
           <div className="flex items-center gap-2 px-4 py-1.5 bg-white/5 rounded-xl border border-black/5">
             <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-            <span className="text-[10px] font-bold text-slate-950/60 tracking-widest uppercase">Protocol Secured</span>
+            <span className="text-[10px] font-bold text-slate-950/60 tracking-widest uppercase">System Secured</span>
           </div>
         </div>
       </header>
 
-      {/* Scrollable Content */}
       <main className="relative z-10 flex-1 overflow-y-auto p-6 mt-20 scrollbar-hide">
         <div className="flex flex-col items-center">
-          {/* Top Focal Search */}
           <div className="w-full max-w-xl relative group animate-in fade-in slide-in-from-top-8 duration-1000 mb-10">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-[2rem] blur opacity-25 group-hover:opacity-100 transition duration-1000" />
             <div className="relative flex items-center bg-white/60 backdrop-blur-3xl border border-black/10 rounded-[2rem] overflow-hidden shadow-2xl transition-all hover:border-primary/40">
@@ -115,7 +111,6 @@ export default function AJNPage() {
             </div>
           </div>
 
-          {/* Brand Centerpiece */}
           <div className={cn("transition-all duration-1000 mb-10 animate-in zoom-in-95", isDragging ? "scale-110" : "scale-100")}>
             <LogoAnimation className="w-64 h-28" />
           </div>
@@ -125,7 +120,6 @@ export default function AJNPage() {
             isProcessing || showSearch ? "scale-95 opacity-40 blur-sm" : "scale-100 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300"
           )}>
             
-            {/* Enhanced Drop Zone */}
             <div className="w-full max-w-xl space-y-4">
               <div 
                 onClick={() => fileInputRef.current?.click()}
@@ -154,7 +148,6 @@ export default function AJNPage() {
                 </div>
               </div>
               
-              {/* Micro-Hints */}
               <div className="flex justify-center gap-6 text-[10px] font-bold tracking-[0.2em] text-slate-950/30 animate-pulse">
                 <span>Drag files here</span>
                 <span>•</span>
@@ -164,13 +157,12 @@ export default function AJNPage() {
               </div>
             </div>
 
-            {/* Infrastructure Monitor */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full px-4 animate-in fade-in duration-1000 delay-500">
               {[
-                { label: 'Neural Ingestion', sub: 'Node 01 Active', icon: Cpu, color: 'text-blue-600' },
-                { label: 'Velocity Pipeline', sub: '14 ops/sec', icon: Zap, color: 'text-amber-600' },
-                { label: 'Buffer Isolation', sub: '256-bit Secure', icon: Lock, color: 'text-emerald-600' },
-                { label: 'Protocol Mesh', sub: '30+ Units Sync', icon: Network, color: 'text-indigo-600' },
+                { label: 'Smart Analysis', sub: 'System Ready', icon: Cpu, color: 'text-blue-600' },
+                { label: 'Processing Speed', sub: 'High Performance', icon: Zap, color: 'text-amber-600' },
+                { label: 'Security Sandbox', sub: 'Encrypted Layers', icon: Lock, color: 'text-emerald-600' },
+                { label: 'Service Network', sub: 'Complete Library', icon: Network, color: 'text-indigo-600' },
               ].map((stat, i) => (
                 <div key={i} className="p-4 bg-white/40 backdrop-blur-xl border border-black/5 rounded-2xl space-y-2 group hover:border-primary/20 transition-all cursor-default shadow-sm text-slate-950">
                   <div className="flex items-center justify-between">
@@ -185,7 +177,6 @@ export default function AJNPage() {
               ))}
             </div>
 
-            {/* Scroll Marquee */}
             <div className="w-full overflow-hidden mt-8 mb-32 relative group animate-in fade-in duration-1000 delay-700">
               <div className="flex animate-marquee-fast whitespace-nowrap gap-10 items-center mb-4">
                 {ALL_UNITS.map((s, i) => (
@@ -201,7 +192,6 @@ export default function AJNPage() {
           </div>
         </div>
 
-        {/* Global Search Overlay */}
         {showSearch && (
           <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] px-6 bg-white/60 backdrop-blur-md animate-in fade-in duration-300">
             <div className="w-full max-w-xl bg-white border border-black/5 rounded-[2rem] shadow-2xl overflow-hidden animate-in slide-in-from-top-4 duration-500">
@@ -247,7 +237,7 @@ export default function AJNPage() {
         )}
 
         <footer className="py-8 text-[10px] font-black text-slate-900/20 tracking-[0.5em] mt-auto text-center">
-          AJN Junction • Global Node • 2025
+          AJN Junction • Global Engine • 2025
         </footer>
       </main>
 

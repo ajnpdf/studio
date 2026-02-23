@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo } from 'react';
@@ -57,7 +58,7 @@ export const ALL_UNITS: ServiceUnit[] = [
   { id: 'scan-to-pdf', name: 'Scan to PDF', desc: 'Capture prints via Camera API and apply deskew, thresholding, and shadow removal.', icon: Scan, tag: 'Capture', cat: 'Optimize', complexity: 'WASM' },
   { id: 'compress-pdf', name: 'Compress PDF', desc: 'Re-encode bitstreams and subset fonts to achieve maximum storage efficiency.', icon: Shrink, tag: 'Minify', cat: 'Optimize', complexity: 'SMART' },
   { id: 'repair-pdf', name: 'Repair PDF', desc: 'Execute linear byte-scans to recover objects from corrupted cross-reference tables.', icon: Wrench, tag: 'Recovery', cat: 'Optimize', complexity: 'AI' },
-  { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Synthesize an invisible text layer over raster scans using neural character recognition.', icon: Search, tag: 'Vision', cat: 'Optimize', complexity: 'AI' },
+  { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Synthesize an invisible text layer over raster scans using smart character recognition.', icon: Search, tag: 'Vision', cat: 'Optimize', complexity: 'AI' },
 
   // --- CONVERT TO ---
   { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Wrap raster images into standardized, printable document containers.', icon: ImageIcon, tag: 'Raster', cat: 'Convert', complexity: 'WASM' },
@@ -81,14 +82,14 @@ export const ALL_UNITS: ServiceUnit[] = [
   { id: 'edit-pdf', name: 'Edit PDF', desc: 'Directly modify text and image objects within the existing PDF stream.', icon: Edit3, tag: 'Mastery', cat: 'Edit', complexity: 'SMART' },
 
   // --- SECURITY ---
-  { id: 'unlock-pdf', name: 'Unlock PDF', desc: 'Bypass protocol restrictions and purge owner passwords from document streams.', icon: Unlock, tag: 'Access', cat: 'Security', complexity: 'SMART' },
+  { id: 'unlock-pdf', name: 'Unlock PDF', desc: 'Bypass system restrictions and purge owner passwords from document streams.', icon: Unlock, tag: 'Access', cat: 'Security', complexity: 'SMART' },
   { id: 'protect-pdf', name: 'Protect PDF', desc: 'Seal documents with AES-256 encryption and custom user permissions.', icon: Lock, tag: 'Seal', cat: 'Security', complexity: 'SMART' },
   { id: 'sign-pdf', name: 'Sign PDF', desc: 'Apply digital signatures with verified audit trails and legal integrity.', icon: Signature, tag: 'Legal', cat: 'Security', complexity: 'SMART' },
   { id: 'redact-pdf', name: 'Redact PDF', desc: 'Permanently purge sensitive data from both the visual and binary layers.', icon: EyeOff, tag: 'Privacy', cat: 'Security', complexity: 'AI' },
   { id: 'compare-pdf', name: 'Compare PDF', desc: 'Detect semantic differences between two versions of a document.', icon: GitCompare, tag: 'Audit', cat: 'Security', complexity: 'AI' },
 
   // --- INTELLIGENCE ---
-  { id: 'translate-pdf', name: 'Translate PDF', desc: 'Map document content into 50+ languages via neural translation models.', icon: Globe, tag: 'Neural', cat: 'Intelligence', complexity: 'AI' },
+  { id: 'translate-pdf', name: 'Translate PDF', desc: 'Map document content into 50+ languages via smart translation models.', icon: Globe, tag: 'Smart', cat: 'Intelligence', complexity: 'AI' },
 ];
 
 export function ServicesGrid({ query, category }: { query: string, category: string }) {
@@ -151,7 +152,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
               <div className="pt-4 flex items-center justify-between border-t border-black/5 mt-4">
                 <div className="flex items-center gap-1.5">
                   <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[8px] font-bold text-slate-900/60 uppercase">Node Active</span>
+                  <span className="text-[8px] font-bold text-slate-900/60 uppercase">System Ready</span>
                 </div>
                 <span className="text-[8px] font-bold text-slate-900/40 uppercase">{unit.cat}</span>
               </div>

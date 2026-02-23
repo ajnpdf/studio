@@ -7,7 +7,6 @@ import { ExcelConverter } from './converters/excel-converter';
 import { PPTConverter } from './converters/ppt-converter';
 import { ODTConverter } from './converters/odt-converter';
 import { ImageConverter } from './converters/image-converter';
-import { RawConverter } from './converters/raw-converter';
 import { VideoConverter } from './converters/video-converter';
 import { AudioConverter } from './converters/audio-converter';
 import { ArchiveConverter } from './converters/archive-converter';
@@ -20,7 +19,7 @@ import { PDFManipulator } from './converters/pdf-manipulator';
 
 /**
  * AJN SYSTEM IDENTITY - CORE INTELLIGENCE LAYER
- * Stateful workflow orchestrator managing 35+ PDF tools across 6 domains.
+ * Stateful workflow orchestrator managing 35+ tools across 6 domains.
  * Enforces a strict one-to-one processing ratio via Job Locks and SHA-256 Fingerprinting.
  */
 
@@ -115,7 +114,6 @@ class ConversionEngine {
   }
 
   async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, operationId?: string) {
-    // --- SPECIAL CASE: MERGE PDF (One Job for All Files) ---
     if (operationId === 'merge-pdf') {
       const job: ConversionJob = {
         id: Math.random().toString(36).substr(2, 9),
@@ -125,7 +123,7 @@ class ConversionEngine {
         toFmt: 'PDF',
         status: 'queued',
         progress: 0,
-        stage: 'Calibrating Neural Merge...',
+        stage: 'Calibrating Smart Merge...',
         context: 'WASM',
         settings,
         operationId
@@ -136,14 +134,11 @@ class ConversionEngine {
       return;
     }
 
-    // --- STANDARD CASE: INDIVIDUAL CONVERSIONS ---
     const newJobs: ConversionJob[] = [];
-    
     for (const file of files) {
       const fingerprint = await this.generateFingerprint(file);
       const jobKey = `${fingerprint}_${operationId || 'convert'}_${toFmt}`;
 
-      // Prevent redundant identical processing
       if (this.processedHashes.has(jobKey)) continue;
 
       const fileBuffer: FileBuffer = {
@@ -219,7 +214,6 @@ class ConversionEngine {
       nextJob.progress = 100;
       nextJob.stage = 'Unit Mastered';
       
-      // Professional Naming Standard
       const originalBase = nextJob.operationId === 'merge-pdf' ? 'Merge' : nextJob.file.name.replace(/\.[^/.]+$/, "");
       const ext = result.fileName.split('.').pop() || nextJob.toFmt.toLowerCase();
       const finalFileName = `Mastered_${originalBase}.${ext}`;
