@@ -56,7 +56,7 @@
     height: 1000px;
     border-radius: 50%;
     filter: blur(160px);
-    opacity: 0.2;
+    opacity: 0.15;
     background: radial-gradient(circle, #d8b4fe 0%, transparent 70%);
     top: -400px;
     left: -400px;
@@ -72,7 +72,7 @@
     height: 1000px;
     border-radius: 50%;
     filter: blur(160px);
-    opacity: 0.2;
+    opacity: 0.15;
     background: radial-gradient(circle, #bae6fd 0%, transparent 70%);
     bottom: -400px;
     right: -400px;

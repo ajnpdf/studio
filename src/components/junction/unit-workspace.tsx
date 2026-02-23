@@ -12,17 +12,9 @@ import {
   ShieldCheck, 
   Cpu, 
   Zap, 
-  Activity, 
-  Lock, 
-  Globe, 
-  Maximize, 
-  Database,
-  Layers,
-  Wand2,
   LockKeyhole,
   FileCode,
   Languages,
-  EyeOff,
   History,
   Scan,
   ShieldX,
@@ -44,7 +36,7 @@ interface Props {
 }
 
 /**
- * AJN Advanced Unit Workspace
+ * AJN Advanced Unit Workspace - Production Environment
  * Industrial engineering interface for master transformation units.
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
@@ -66,9 +58,9 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
     let settings: any = { ...conversionConfig };
     
     if (initialUnitId?.includes('protect')) settings = securityConfig;
-    if (initialUnitId?.includes('compress')) settings = optimizeConfig;
-    if (initialUnitId?.includes('translate')) settings = translateConfig;
-    if (initialUnitId?.includes('ocr')) settings = ocrConfig;
+    else if (initialUnitId?.includes('compress')) settings = optimizeConfig;
+    else if (initialUnitId?.includes('translate')) settings = translateConfig;
+    else if (initialUnitId?.includes('ocr')) settings = ocrConfig;
 
     engine.addJobs(files, '', conversionConfig.toFmt, settings, initialUnitId);
   };

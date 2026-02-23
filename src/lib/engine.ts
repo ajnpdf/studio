@@ -70,7 +70,7 @@ export interface GlobalAppState {
 }
 
 /**
- * AJN Master System Engine
+ * AJN Master System Engine - Production Grade
  * Real-time high-concurrency engineering core.
  */
 class SystemEngine {
@@ -215,7 +215,6 @@ class SystemEngine {
 
     const manip = new PDFManipulator(files, update);
     const specialized = new SpecializedConverter(files[0], update);
-    const scanner = new ScannerConverter(files, update);
     const pdfConv = new PDFConverter(files[0], update);
     const wordConv = new WordConverter(files[0], update);
     const excelConv = new ExcelConverter(files[0], update);
@@ -224,44 +223,44 @@ class SystemEngine {
     const codeConv = new CodeConverter(files[0], update);
 
     switch (job.toolId) {
-      // ORGANIZE (Domain 1)
+      // ORGANIZE
       case 'merge-pdf': return manip.merge();
       case 'split-pdf': return manip.split(job.settings);
       case 'delete-pages': return manip.organize(job.settings.permutation || []);
       case 'extract-pages': return manip.organize(job.settings.permutation || []);
       case 'organize-pdf': return manip.organize(job.settings.permutation || []);
       
-      // OPTIMIZE (Domain 2)
+      // OPTIMIZE
       case 'compress-pdf': return manip.compress(job.settings);
       case 'repair-pdf': return manip.repair(job.settings);
       case 'ocr-pdf': return specialized.convertTo('OCR', job.settings);
       case 'pdf-pdfa': return manip.toPDFA(job.settings.conformance || '2b');
       
-      // CONVERT TO PDF (Domain 3)
+      // CONVERT TO PDF
       case 'jpg-pdf': return imgConv.toMasterPDF(files, job.settings);
       case 'word-pdf': return wordConv.convertTo('PDF', job.settings);
       case 'ppt-pdf': return pptConv.convertTo('PDF', job.settings);
       case 'excel-pdf': return excelConv.convertTo('PDF', job.settings);
       case 'html-pdf': return codeConv.convertTo('PDF', job.settings);
       
-      // EXPORT FROM PDF (Domain 4)
+      // EXPORT FROM PDF
       case 'pdf-jpg': return pdfConv.convertTo('JPG', job.settings);
       case 'pdf-word': return pdfConv.convertTo('WORD', job.settings);
       case 'pdf-pptx': return pdfConv.convertTo('PPTX', job.settings);
       case 'pdf-excel': return pdfConv.convertTo('EXCEL', job.settings);
       
-      // EDIT (Domain 5)
+      // EDIT
       case 'rotate-pdf': return manip.rotate(job.settings.rotationMap || {});
       case 'add-page-numbers': return manip.addPageNumbers(job.settings);
       case 'edit-pdf': return new Promise((resolve) => setTimeout(() => resolve({ blob: new Blob([]), fileName: 'edit_session.pdf', mimeType: 'application/pdf' }), 2000));
       
-      // SECURITY (Domain 6)
+      // SECURITY
       case 'unlock-pdf': return manip.unlock(job.settings.password);
       case 'protect-pdf': return manip.protect(job.settings);
       case 'sign-pdf': return manip.sign(job.settings.signatureData, job.settings.position);
       case 'redact-pdf': return manip.redact(job.settings.redactions || []);
       
-      // INTELLIGENCE (Domain 7)
+      // INTELLIGENCE
       case 'translate-pdf': return specialized.convertTo('TRANSLATE', job.settings);
       case 'compare-pdf': return specialized.convertTo('COMPARE', job.settings);
       case 'summarize-pdf': return specialized.convertTo('SUMMARIZE', job.settings);
