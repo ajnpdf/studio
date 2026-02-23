@@ -3,31 +3,9 @@
 import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Layout,
-  Scissors,
-  Trash2,
-  Copy,
-  Search,
-  Shrink,
-  Wrench,
-  Hash,
-  Unlock,
-  Lock,
-  PenTool,
-  EyeOff,
-  GitCompare,
-  Globe,
-  FolderOpen,
-  Presentation,
-  ShieldCheck,
-  MousePointer2,
-  History,
-  Paintbrush,
-  Layers,
-  ImageIcon,
-  FileText,
-  Table,
-  ArrowRight
+  Layout, Scissors, Trash2, Copy, Search, Shrink, Wrench, Hash, Unlock, Lock, 
+  PenTool, EyeOff, GitCompare, Globe, FolderOpen, Presentation, ShieldCheck, 
+  MousePointer2, History, Paintbrush, Layers, ImageIcon, FileText, Table, ArrowRight
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -49,7 +27,7 @@ export const ALL_UNITS: ServiceUnit[] = [
   { id: 'split-pdf', name: 'Split PDF', desc: 'Divide by ranges.', icon: Scissors, tag: 'Divide', cat: 'Organize', mode: 'WASM', color: '#6366F1' },
   { id: 'delete-pages', name: 'Remove Pages', desc: 'Prune unwanted pages.', icon: Trash2, tag: 'Prune', cat: 'Organize', mode: 'WASM', color: '#8B5CF6' },
   { id: 'extract-pages', name: 'Extract Pages', desc: 'Isolate page ranges.', icon: Copy, tag: 'Isolate', cat: 'Organize', mode: 'SMART', color: '#A78BFA' },
-  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Reorder structures.', icon: FolderOpen, tag: 'Structure', cat: 'Organize', mode: 'SMART', color: '#C084FC' },
+  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Reorder structures.', icon: FolderOpen, tag: 'Structure', cat: 'Organize', mode: 'SMART', color: '#7C3AED' },
   { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce file size.', icon: Shrink, tag: 'Minify', cat: 'Optimize', mode: 'SMART', color: '#10B981' },
   { id: 'repair-pdf', name: 'Repair PDF', desc: 'Recover corrupted files.', icon: Wrench, tag: 'Recovery', cat: 'Optimize', mode: 'AI', color: '#059669' },
   { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Text recognition.', icon: Search, tag: 'Vision', cat: 'Optimize', mode: 'AI', color: '#047857' },
@@ -79,20 +57,12 @@ export const ALL_UNITS: ServiceUnit[] = [
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.02 }
-  }
+  visible: { opacity: 1, transition: { staggerChildren: 0.02 } }
 };
 
 const cardVariants = {
   hidden: { y: 15, opacity: 0, scale: 0.98 },
-  visible: { 
-    y: 0, 
-    opacity: 1, 
-    scale: 1,
-    transition: { duration: 0.4, ease: "easeOut" }
-  }
+  visible: { y: 0, opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } }
 };
 
 export function ServicesGrid({ query, category }: { query: string, category: string }) {
@@ -117,12 +87,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
   }
 
   return (
-    <motion.div 
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 pb-32"
-    >
+    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 pb-32">
       <AnimatePresence mode="popLayout">
         {filteredUnits.map((unit) => (
           <motion.div key={unit.id} layout variants={cardVariants} className="group">
