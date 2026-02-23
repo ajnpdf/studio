@@ -15,14 +15,14 @@ import { Input } from '@/components/ui/input';
 import { ServicesGrid } from '@/components/junction/services-grid';
 
 /**
- * AJN Gateway - Professional Engineering Entrance
- * Features functional search and real-time service discovery.
+ * AJN Gateway - Professional Gateway Entry
+ * Features functional search and real-time service discovery with invisible scroll.
  */
 export default function AJNPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <div className="min-h-screen text-slate-950 selection:bg-primary/10 relative font-body flex flex-col bg-transparent overflow-x-hidden">
+    <div className="h-screen w-full text-slate-950 selection:bg-primary/10 relative font-body flex flex-col bg-transparent overflow-y-auto scrollbar-hide">
       <NightSky />
       
       {/* Professional Header */}
@@ -55,7 +55,7 @@ export default function AJNPage() {
               <Input 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search 30+ Service Units (e.g. 'Merge', 'Excel', 'OCR')..." 
+                placeholder="Search All Service Units (e.g. 'Merge', 'Excel', 'Translate')..." 
                 className="w-full h-16 bg-transparent pl-16 pr-20 text-base font-bold text-slate-950 border-none focus-visible:ring-0 placeholder:text-slate-950/30"
               />
               <div className="absolute right-6 flex items-center gap-2 px-2.5 py-1 bg-black/5 rounded-lg border border-black/5">
@@ -88,7 +88,7 @@ export default function AJNPage() {
         </section>
 
         <footer className="py-12 text-center text-[10px] font-black text-slate-950/20 tracking-[0.5em] uppercase">
-          AJN Junction • Global Engine • 2025
+          AJN Gateway • Global Engine • 2025
         </footer>
       </main>
     </div>

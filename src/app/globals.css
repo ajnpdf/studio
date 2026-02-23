@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -41,6 +40,15 @@
     animation: gradientShift 12s ease infinite;
     position: relative;
     @apply text-slate-950 font-body antialiased selection:bg-primary/10 selection:text-primary overflow-x-hidden;
+  }
+
+  /* Global Scrollbar Hiding but scroll enabled */
+  .invisible-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .invisible-scroll::-webkit-scrollbar {
+    display: none;
   }
 
   @keyframes gradientShift {

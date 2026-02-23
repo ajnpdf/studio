@@ -10,14 +10,14 @@ import { LogoAnimation } from '@/components/landing/logo-animation';
 import { Input } from '@/components/ui/input';
 
 /**
- * AJN Junction Page - Professional Light Theme with Scrolling Enabled
+ * AJN Junction Page - Professional Light Theme with Invisible Scroll
  */
 export default function JunctionPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('All');
 
   return (
-    <div className="h-screen text-slate-900 selection:bg-primary/10 relative font-body flex flex-col overflow-hidden">
+    <div className="h-screen text-slate-900 selection:bg-primary/10 relative font-body flex flex-col overflow-hidden bg-transparent">
       <NightSky />
       
       {/* HUD Header - Fixed */}
@@ -29,7 +29,7 @@ export default function JunctionPage() {
         <div className="flex items-center gap-4">
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/50 rounded-xl border border-black/5 shadow-sm">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Stable Protocol</span>
+            <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">System Stable</span>
           </div>
           <Link href="/ajn">
             <Button variant="ghost" className="h-8 md:h-10 gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 hover:bg-black/5">
@@ -39,7 +39,7 @@ export default function JunctionPage() {
         </div>
       </header>
 
-      {/* Scrollable Content Area */}
+      {/* Scrollable Content Area - Invisible Scrollbar */}
       <main className="relative z-10 flex-1 overflow-y-auto pt-24 md:pt-32 pb-20 scrollbar-hide">
         {/* Direct Access Controls */}
         <section className="max-w-7xl mx-auto w-full px-4 md:px-8 mb-12 space-y-8">
@@ -49,7 +49,7 @@ export default function JunctionPage() {
                 Service <span className="text-primary">Units</span>
               </h1>
               <p className="text-[11px] font-bold text-slate-900/40 uppercase tracking-[0.3em]">
-                Explore the complete high-fidelity PDF unit library.
+                Explore the complete high-fidelity system unit library.
               </p>
             </div>
 
@@ -94,7 +94,7 @@ export default function JunctionPage() {
 
         <footer className="py-12 text-center">
           <p className="text-[10px] font-black text-slate-900/20 uppercase tracking-[0.5em]">
-            AJN Junction • Global Access Node • 2025
+            AJN Junction • Global Access Hub • 2025
           </p>
         </footer>
       </main>
