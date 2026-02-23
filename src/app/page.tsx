@@ -2,7 +2,7 @@
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, Network, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Layers, ShieldCheck } from 'lucide-react';
 
 /**
  * AJN Landing Page - High-Fidelity Professional Entrance
@@ -39,18 +39,18 @@ export default function LandingPage() {
             </Link>
             <Link href="/junction">
               <Button variant="outline" className="h-14 md:h-16 px-10 md:px-12 border-slate-950/10 bg-white/40 backdrop-blur-xl text-slate-950 font-black text-xs rounded-2xl transition-all gap-3 shadow-xl hover:bg-white/60 hover:border-primary/40 active:scale-95">
-                <Network className="w-4 h-4 text-primary" /> Access Junction
+                <Layers className="w-4 h-4 text-primary" /> Access Junction
               </Button>
             </Link>
           </div>
 
-          <div className="pt-10 flex items-center justify-center gap-12 opacity-60 transition-all duration-700 hover:opacity-100">
+          <div className="pt-10 flex items-center justify-center gap-12 opacity-60">
             <div className="flex items-center gap-3">
               <ShieldCheck className="w-5 h-5 text-slate-950" />
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">Secure Sandbox</span>
             </div>
             <div className="flex items-center gap-3">
-              <Network className="w-5 h-5 text-slate-950" />
+              <Layers className="w-5 h-5 text-slate-950" />
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">Smart Network</span>
             </div>
           </div>

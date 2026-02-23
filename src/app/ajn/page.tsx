@@ -17,7 +17,7 @@ import {
   Zap,
   Cpu,
   Lock,
-  Network
+  Layers
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -162,7 +162,7 @@ export default function AJNPage() {
                 { label: 'Smart Analysis', sub: 'System Ready', icon: Cpu, color: 'text-blue-600' },
                 { label: 'Processing Speed', sub: 'High Performance', icon: Zap, color: 'text-amber-600' },
                 { label: 'Security Sandbox', sub: 'Encrypted Layers', icon: Lock, color: 'text-emerald-600' },
-                { label: 'Service Network', sub: 'Complete Library', icon: Network, color: 'text-indigo-600' },
+                { label: 'Service Network', sub: 'Complete Library', icon: Layers, color: 'text-indigo-600' },
               ].map((stat, i) => (
                 <div key={i} className="p-4 bg-white/40 backdrop-blur-xl border border-black/5 rounded-2xl space-y-2 group hover:border-primary/20 transition-all cursor-default shadow-sm text-slate-950">
                   <div className="flex items-center justify-between">

@@ -23,7 +23,7 @@ import { PDFManipulator } from './converters/pdf-manipulator';
  * Enforces a strict one-to-one processing ratio via Job Locks and SHA-256 Fingerprinting.
  */
 
-export type ExecutionContext = 'WASM' | 'SMART' | 'AI';
+export type ExecutionContext = 'Wasm' | 'Smart' | 'Ai';
 export type JobStatus = 'queued' | 'processing' | 'complete' | 'failed' | 'cancelled';
 
 export interface FileBuffer {
@@ -41,7 +41,7 @@ export interface ConversionJob {
   id: string;
   fileId?: string;
   file: File; 
-  sourceFiles?: File[]; // For multi-file ops like Merge
+  sourceFiles?: File[]; 
   fromFmt: string;
   toFmt: string;
   status: JobStatus;
@@ -114,23 +114,27 @@ class ConversionEngine {
   }
 
   async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, operationId?: string) {
+    // SPECIAL CASE: Merge PDF - All files become ONE job
     if (operationId === 'merge-pdf') {
       const job: ConversionJob = {
         id: Math.random().toString(36).substr(2, 9),
         file: files[0], 
         sourceFiles: files, 
-        fromFmt: 'multi',
+        fromFmt: 'Multi',
         toFmt: 'PDF',
         status: 'queued',
         progress: 0,
         stage: 'Calibrating Smart Merge...',
-        context: 'WASM',
+        context: 'Wasm',
         settings,
         operationId
       };
-      this.state.processingQueue = [...this.state.processingQueue, job];
-      this.notify();
-      this.processNext();
+      // Prevent duplicate merge queue
+      if (!this.state.processingQueue.some(j => j.operationId === 'merge-pdf')) {
+        this.state.processingQueue = [...this.state.processingQueue, job];
+        this.notify();
+        this.processNext();
+      }
       return;
     }
 
@@ -139,7 +143,8 @@ class ConversionEngine {
       const fingerprint = await this.generateFingerprint(file);
       const jobKey = `${fingerprint}_${operationId || 'convert'}_${toFmt}`;
 
-      if (this.processedHashes.has(jobKey)) continue;
+      // ONE-TO-ONE RATIO CHECK
+      if (this.processedHashes.has(jobKey) || this.state.processingQueue.some(j => j.id === jobKey)) continue;
 
       const fileBuffer: FileBuffer = {
         id: Math.random().toString(36).substr(2, 9),
@@ -153,7 +158,7 @@ class ConversionEngine {
       };
 
       const job: ConversionJob = {
-        id: Math.random().toString(36).substr(2, 9),
+        id: jobKey,
         fileId: fileBuffer.id,
         file: file,
         fromFmt: fromFmt || fileBuffer.metadata.format.toLowerCase(),
@@ -185,9 +190,9 @@ class ConversionEngine {
       'protect-pdf', 'word-pdf', 'excel-pdf', 'pptx-pdf',
       'pdf-word', 'pdf-excel', 'pdf-pptx', 'rotate-pdf', 'page-numbers'
     ];
-    if (opId && aiOps.includes(opId)) return 'AI';
-    if (opId && smartOps.includes(opId)) return 'SMART';
-    return 'WASM';
+    if (opId && aiOps.includes(opId)) return 'Ai';
+    if (opId && smartOps.includes(opId)) return 'Smart';
+    return 'Wasm';
   }
 
   private async processNext() {
@@ -212,11 +217,10 @@ class ConversionEngine {
       const objectUrl = URL.createObjectURL(result.blob);
       nextJob.status = 'complete';
       nextJob.progress = 100;
-      nextJob.stage = 'Unit Mastered';
+      nextJob.stage = 'Process Mastered';
       
       const originalBase = nextJob.operationId === 'merge-pdf' ? 'Merge' : nextJob.file.name.replace(/\.[^/.]+$/, "");
-      const ext = result.fileName.split('.').pop() || nextJob.toFmt.toLowerCase();
-      const finalFileName = `Mastered_${originalBase}.${ext}`;
+      const finalFileName = `Mastered_${originalBase}.${result.fileName.split('.').pop() || nextJob.toFmt.toLowerCase()}`;
 
       nextJob.result = {
         ...result,
@@ -230,7 +234,7 @@ class ConversionEngine {
     } catch (err: any) {
       nextJob.status = 'failed';
       nextJob.error = err.message || 'Processing Error';
-      nextJob.stage = 'Logic Fault';
+      nextJob.stage = 'System Fault';
     } finally {
       this.isProcessing = false;
       this.state.processingQueue = this.state.processingQueue.filter(j => j.id !== nextJob.id);
@@ -255,41 +259,27 @@ class ConversionEngine {
     });
 
     switch (job.operationId) {
-      case 'split-pdf': 
-        return manip.split(job.settings.splitMode || 'range', job.settings.splitValue || '1');
-      case 'extract-pages':
-        return manip.extractPages(job.settings.pages || [0]);
-      case 'remove-pages': 
-        return manip.removePages(job.settings.pages || []);
-      case 'rotate-pdf': 
-        return manip.rotate(job.settings.angle || 90);
-      case 'page-numbers': 
-        return manip.addPageNumbers(job.settings);
-      case 'watermark-pdf': 
-        return manip.addWatermark(job.settings.text || 'AJN Master');
-      case 'crop-pdf': 
-        return manip.crop(job.settings.margins || { top: 50, bottom: 50, left: 50, right: 50 });
-      case 'unlock-pdf': 
-        return manip.rotate(0); 
-      case 'protect-pdf': 
-        return manip.protect(job.settings.password || '1234');
-      case 'sign-pdf': 
-        return manip.addWatermark('Digitally Signed', 0.1);
-      case 'redact-pdf': 
-        return specialized.convertTo('REDACTED_PDF', job.settings);
-      case 'compare-pdf': 
-        return specialized.convertTo('TRANSCRIPT', job.settings); 
-      case 'translate-pdf': 
-        return specialized.convertTo('TRANSCRIPT', job.settings); 
-      default: 
-        return this.runConversion(job);
+      case 'split-pdf': return manip.split(job.settings.splitMode || 'range', job.settings.splitValue || '1');
+      case 'extract-pages': return manip.extractPages(job.settings.pages || [0]);
+      case 'remove-pages': return manip.removePages(job.settings.pages || []);
+      case 'rotate-pdf': return manip.rotate(job.settings.angle || 90);
+      case 'page-numbers': return manip.addPageNumbers(job.settings);
+      case 'watermark-pdf': return manip.addWatermark(job.settings.text || 'AJN Master');
+      case 'crop-pdf': return manip.crop(job.settings.margins || { top: 50, bottom: 50, left: 50, right: 50 });
+      case 'unlock-pdf': return manip.rotate(0); 
+      case 'protect-pdf': return manip.protect(job.settings.password || '1234');
+      case 'sign-pdf': return manip.addWatermark('Digitally Signed', 0.1);
+      case 'redact-pdf': return specialized.convertTo('REDACTED_PDF', job.settings);
+      case 'compare-pdf': return specialized.convertTo('TRANSCRIPT', job.settings); 
+      case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings); 
+      default: return this.runConversion(job);
     }
   }
 
   private async runConversion(job: ConversionJob) {
     const key = job.fromFmt.toLowerCase();
     const ConverterClass = this.converters[key];
-    if (!ConverterClass) throw new Error(`Protocol ${key.toUpperCase()} Not Found`);
+    if (!ConverterClass) throw new Error(`Process ${key.toUpperCase()} Not Supported`);
     const converter = new ConverterClass(job.file, (p: number, msg: string) => {
       job.progress = p; job.stage = msg; this.notify();
     });
