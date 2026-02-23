@@ -1,12 +1,11 @@
-
 "use client";
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { CategorySidebar } from '@/components/dashboard/conversion/category-sidebar';
 import { DropZone } from '@/components/dashboard/conversion/drop-zone';
 import { useAJNTool, ProgressBar, LogStream } from '@/hooks/use-ajn-tool';
-import { Settings2, ShieldCheck, Cpu, Zap, LockKeyhole, FileCode, Download, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Settings2, ShieldCheck, Cpu, Zap, Download, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -45,9 +44,18 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
     switch (unit.id) {
       case 'merge-pdf': return (
         <div className="space-y-6">
-          <div className="space-y-2"><Label className={S}>Output Filename</Label><input className="w-full h-10 px-3 bg-white/60 border border-black/5 rounded-xl font-bold text-xs" value={config.name||""} onChange={e=>set("name",e.target.value)} placeholder="merged.pdf" /></div>
-          <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10"><p className="text-[10px] font-black uppercase">Bookmark Per File</p><Switch checked={config.bookmarks} onCheckedChange={v=>set("bookmarks",v)} /></div>
-          <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10"><p className="text-[10px] font-black uppercase">Linearize Output</p><Switch checked={config.linearize} onCheckedChange={v=>set("linearize",v)} /></div>
+          <div className="space-y-2">
+            <Label className={S}>Output Filename</Label>
+            <input className="w-full h-10 px-3 bg-white/60 border border-black/5 rounded-xl font-bold text-xs" value={config.name||""} onChange={e=>set("name",e.target.value)} placeholder="merged.pdf" />
+          </div>
+          <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10">
+            <p className="text-[10px] font-black uppercase">Bookmark Per File</p>
+            <Switch checked={config.bookmarks} onCheckedChange={v=>set("bookmarks",v)} />
+          </div>
+          <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10">
+            <p className="text-[10px] font-black uppercase">Linearize Output</p>
+            <Switch checked={config.linearize} onCheckedChange={v=>set("linearize",v)} />
+          </div>
         </div>
       );
       case 'compress-pdf': return (
@@ -55,15 +63,28 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
           <div className="space-y-3">
             <Label className={S}>Compression Profile</Label>
             <Select value={config.profile||"ebook"} onValueChange={v=>set("profile",v)}>
-              <SelectTrigger className="h-11 bg-white/60 rounded-xl font-black text-[10px] uppercase"><SelectValue /></SelectTrigger>
-              <SelectContent>{["screen","ebook","print","hq","custom"].map(o=><SelectItem key={o} value={o} className="font-bold text-[10px] uppercase">{o}</SelectItem>)}</SelectContent>
+              <SelectTrigger className="h-11 bg-white/60 rounded-xl font-black text-[10px] uppercase">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {["screen","ebook","print","hq","custom"].map(o=><SelectItem key={o} value={o} className="font-bold text-[10px] uppercase">{o}</SelectItem>)}
+              </SelectContent>
             </Select>
           </div>
-          <div className="space-y-3"><Label className={S}>Quality Factor</Label><Slider value={[config.quality||75]} onValueChange={([v])=>set("quality",v)} max={100} /><div className="flex justify-between text-[8px] font-black opacity-40"><span>Smallest</span><span>Best</span></div></div>
+          <div className="space-y-3">
+            <Label className={S}>Quality Factor</Label>
+            <Slider value={[config.quality||75]} onValueChange={([v])=>set("quality",v)} max={100} />
+            <div className="flex justify-between text-[8px] font-black opacity-40">
+              <span>Smallest</span>
+              <span>Best</span>
+            </div>
+          </div>
         </div>
       );
       default: return (
-        <div className="p-10 border-2 border-dashed border-black/5 rounded-3xl text-center"><p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.2em]">Default Params Active</p></div>
+        <div className="p-10 border-2 border-dashed border-black/5 rounded-3xl text-center">
+          <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.2em]">Default Params Active</p>
+        </div>
       );
     }
   };
@@ -81,7 +102,10 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                 </div>
                 <div>
                   <h2 className="text-2xl md:text-3xl font-black tracking-tighter uppercase leading-none">{unit?.name || "Junction Node"}</h2>
-                  <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-[0.4em] mt-1.5 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />Active Mastery Instance</p>
+                  <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-[0.4em] mt-1.5 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Active Mastery Instance
+                  </p>
                 </div>
               </div>
               <div className="hidden sm:flex items-center gap-2 px-4 py-1.5 bg-white/60 border border-black/5 rounded-xl shadow-sm">
@@ -105,28 +129,9 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                       </Badge>
                     </div>
                     
-                    <div className="space-y-4">
-                      <div className="h-2 bg-black/5 rounded-full overflow-hidden">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: `${progress.pct}%` }}
-                          className="h-full bg-primary shadow-[0_0_15px_rgba(30,58,138,0.4)]"
-                        />
-                      </div>
-                      <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">{progress.detail}</p>
-                    </div>
+                    <ProgressBar pct={progress.pct} label={progress.detail} />
 
-                    <div className="bg-black rounded-2xl p-4 font-mono text-[10px] text-emerald-400 overflow-hidden h-48 flex flex-col border border-white/10">
-                      <div className="flex-1 overflow-y-auto scrollbar-hide space-y-1">
-                        {logs.map((log, i) => (
-                          <div key={i} className="flex gap-3">
-                            <span className="opacity-30">[{new Date(log.ts).toLocaleTimeString()}]</span>
-                            <span className={i === logs.length - 1 ? 'text-white font-bold' : ''}>{log.stage}</span>
-                          </div>
-                        ))}
-                        <div className="text-primary animate-pulse">▋</div>
-                      </div>
-                    </div>
+                    <LogStream logs={logs} />
                   </Card>
                 )}
 
@@ -157,7 +162,9 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               <aside className="lg:col-span-4 space-y-8">
                 <Card className="bg-white/60 border-2 border-black/5 p-8 rounded-[3.5rem] shadow-2xl backdrop-blur-3xl space-y-8">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2"><Settings2 className="w-3.5 h-3.5" /> Sector Params</h3>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2">
+                      <Settings2 className="w-3.5 h-3.5" /> Sector Params
+                    </h3>
                     <Zap className="w-3.5 h-3.5 text-primary/40 animate-pulse" />
                   </div>
                   {renderConfig()}
@@ -167,37 +174,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
           </motion.div>
         </div>
       </main>
-    </div>
-  );
-}
-
-// ─── HELPER COMPONENTS FROM SNIPPET ──────────────────────────
-export function ProgressBar({ pct, color = "#3B82F6", label }: { pct: number, color?: string, label?: string }) {
-  return (
-    <div className="w-full font-mono">
-      {label && <div className="flex justify-between mb-1.5 text-[10px] font-black uppercase text-slate-950/40 tracking-widest">
-        <span>{label}</span><span>{Math.round(pct)}%</span>
-      </div>}
-      <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
-        <div className="h-full transition-all duration-300 ease-out" style={{ width: `${pct}%`, backgroundColor: color }} />
-      </div>
-    </div>
-  );
-}
-
-export function LogStream({ logs, color = "#3B82F6" }: { logs: LogEntry[], color?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => { if (ref.current) ref.current.scrollTop = ref.current.scrollHeight; }, [logs]);
-
-  return (
-    <div ref={ref} className="h-32 overflow-y-auto p-3 bg-black/90 rounded-xl border border-white/5 font-mono text-[9px] leading-relaxed">
-      {logs.map((log, i) => (
-        <div key={i} className="mb-1 text-slate-400">
-          <span className="text-primary mr-2">[{((log.ts - (logs[0]?.ts || log.ts)) / 1000).toFixed(2)}s]</span>
-          <span className="text-white font-bold uppercase">{log.stage}</span>
-          {log.detail && <span className="text-slate-500 ml-2">{log.detail}</span>}
-        </div>
-      ))}
     </div>
   );
 }
