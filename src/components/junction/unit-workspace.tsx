@@ -18,7 +18,8 @@ import {
   History,
   Scan,
   ShieldX,
-  Target
+  Target,
+  Maximize
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -80,7 +81,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               key={initialUnitId}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-6 md:p-12 space-y-10 max-w-6xl mx-auto pb-40"
+              className="p-6 md:p-12 space-y-10 max-w-6xl mx-auto pb-32 min-h-full"
             >
               <header className="flex items-center justify-between px-4">
                 <div className="flex items-center gap-6">
@@ -147,12 +148,12 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           <div className="space-y-2">
                             <Label className="text-[9px] font-black uppercase text-slate-950/60 ml-1">Master Password</Label>
                             <div className="relative">
-                              <Input 
+                              <input 
                                 type="password"
                                 placeholder="Required to view..."
                                 value={securityConfig.userPassword}
                                 onChange={(e) => setSecurityConfig({...securityConfig, userPassword: e.target.value})}
-                                className="h-12 bg-white/60 border-black/5 rounded-2xl font-bold pl-10"
+                                className="w-full h-12 bg-white/60 border border-black/5 rounded-2xl font-bold pl-10 text-xs focus:ring-2 focus:ring-primary/20 outline-none"
                               />
                               <LockKeyhole className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-950/40" />
                             </div>

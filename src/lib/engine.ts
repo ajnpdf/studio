@@ -1,4 +1,3 @@
-
 'use client';
 
 import { PDFConverter } from './converters/pdf-converter';
@@ -235,6 +234,7 @@ class SystemEngine {
       case 'repair-pdf': return manip.repair(job.settings);
       case 'ocr-pdf': return specialized.convertTo('OCR', job.settings);
       case 'pdf-pdfa': return manip.toPDFA(job.settings.conformance || '2b');
+      case 'grayscale-pdf': return manip.compress({ ...job.settings, grayscale: true });
       
       // CONVERT TO PDF
       case 'jpg-pdf': return imgConv.toMasterPDF(files, job.settings);
@@ -259,6 +259,7 @@ class SystemEngine {
       case 'protect-pdf': return manip.protect(job.settings);
       case 'sign-pdf': return manip.sign(job.settings.signatureData, job.settings.position);
       case 'redact-pdf': return manip.redact(job.settings.redactions || []);
+      case 'flatten-pdf': return manip.toPDFA('flatten');
       
       // INTELLIGENCE
       case 'translate-pdf': return specialized.convertTo('TRANSLATE', job.settings);

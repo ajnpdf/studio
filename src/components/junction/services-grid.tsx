@@ -26,7 +26,9 @@ import {
   ShieldCheck,
   Cpu,
   MousePointer2,
-  History
+  History,
+  Paintbrush,
+  Layers
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -57,6 +59,7 @@ export const ALL_UNITS: ServiceUnit[] = [
   { id: 'repair-pdf', name: 'Repair PDF', desc: 'Execute deep byte-scans to recover corrupted objects.', icon: Wrench, tag: 'Recovery', cat: 'Optimize', mode: 'AI', color: '#059669' },
   { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Synthesize searchable text layers over raster scans.', icon: Search, tag: 'Vision', cat: 'Optimize', mode: 'AI', color: '#047857' },
   { id: 'pdf-pdfa', name: 'PDF to PDF/A', desc: 'Hardened archival conversion for ISO compliance.', icon: ShieldCheck, tag: 'Archive', cat: 'Optimize', mode: 'WASM', color: '#065F46' },
+  { id: 'grayscale-pdf', name: 'Grayscale PDF', desc: 'Convert all color streams to monochromatic luminosity.', icon: Paintbrush, tag: 'Tone', cat: 'Optimize', mode: 'WASM', color: '#4B5563' },
 
   // --- CONVERT ---
   { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Transform imagery sequences into pixel-perfect documents.', icon: ImageIcon, tag: 'Imagery', cat: 'Convert', mode: 'WASM', color: '#F59E0B' },
@@ -69,7 +72,7 @@ export const ALL_UNITS: ServiceUnit[] = [
   { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Export document pages as high-resolution imagery buffers.', icon: ImageIcon, tag: 'Raster', cat: 'Export', mode: 'WASM', color: '#EF4444' },
   { id: 'pdf-word', name: 'PDF to Word', desc: 'Reconstruct paragraph hierarchies from raw vectors.', icon: FileText, tag: 'Doc', cat: 'Export', mode: 'WASM', color: '#DC2626' },
   { id: 'pdf-pptx', name: 'PDF to PPTX', desc: 'Convert pages into editable presentation slides.', icon: Presentation, tag: 'Slides', cat: 'Export', mode: 'AI', color: '#B91C1C' },
-  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Extract grid data into structured spreadsheet workbooks.', icon: Table, tag: 'Grid', cat: 'Export', mode: 'AI', color: '#991B1B' },
+  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Extract grid data into structured spreadsheet workbooks.', icon: Table, tag: 'Grid', cat: 'Export', mode: 'AI', color: '#991B1C' },
 
   // --- EDIT ---
   { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Correct orientations via metadata transformation.', icon: History, tag: 'Geometry', cat: 'Edit', mode: 'WASM', color: '#EC4899' },
@@ -81,6 +84,7 @@ export const ALL_UNITS: ServiceUnit[] = [
   { id: 'protect-pdf', name: 'Protect PDF', desc: 'Hardened AES-256 encryption and permissions.', icon: Lock, tag: 'Encrypt', cat: 'Security', mode: 'WASM', color: '#111827' },
   { id: 'sign-pdf', name: 'Sign PDF', desc: 'Cryptographic digital signatures and e-signing.', icon: PenTool, tag: 'E-Sign', cat: 'Security', mode: 'SMART', color: '#1F2937' },
   { id: 'redact-pdf', name: 'Redact PDF', desc: 'Permanent surgical binary data removal.', icon: EyeOff, tag: 'Purge', cat: 'Security', mode: 'AI', color: '#374151' },
+  { id: 'flatten-pdf', name: 'Flatten PDF', desc: 'Hard-bake form fields and annotations into the raster layer.', icon: Layers, tag: 'Static', cat: 'Security', mode: 'WASM', color: '#4B5563' },
 
   // --- INTELLIGENCE ---
   { id: 'translate-pdf', name: 'Translate PDF', desc: 'Map document content into 50+ languages.', icon: Globe, tag: 'Smart', cat: 'Intelligence', mode: 'AI', color: '#3B82F6' },
@@ -132,7 +136,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-40"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-32"
     >
       <AnimatePresence mode="popLayout">
         {filteredUnits.map((unit) => (
