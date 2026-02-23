@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 275 75% 98%; /* Ultra Light Lavender Frost */
+    --background: 277 83% 98%; /* Lightened version of #e1b9fa */
     --foreground: 222 47% 2%; /* Deep Navy Black */
     --card: 0 0% 100% / 0.6;
     --card-foreground: 222 47% 2%;
@@ -35,20 +35,13 @@
   body {
     margin: 0;
     min-height: 100vh;
-    background: linear-gradient(175deg, #f3e8ff, #e0f2fe, #1e3a8a); /* Lavender to Navy Flow */
-    background-size: 200% 200%;
-    animation: gradientShift 20s ease infinite;
+    background: linear-gradient(175deg, rgba(225, 185, 250, 1) 0%, rgba(184, 225, 252, 1) 100%);
+    background-attachment: fixed;
     position: relative;
     @apply text-slate-950 font-body antialiased selection:bg-primary/10 selection:text-primary overflow-x-hidden;
   }
 
-  @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  /* High Fidelity Neural Blobs */
+  /* High Fidelity Neural Blobs adjusted for lighter background */
   body::before {
     content: "";
     position: absolute;
@@ -56,8 +49,8 @@
     height: 1200px;
     border-radius: 50%;
     filter: blur(180px);
-    opacity: 0.12;
-    background: radial-gradient(circle, #d8b4fe 0%, transparent 70%);
+    opacity: 0.15;
+    background: radial-gradient(circle, #ffffff 0%, transparent 70%);
     top: -500px;
     left: -500px;
     animation: floatBlob 30s infinite alternate ease-in-out;
@@ -72,8 +65,8 @@
     height: 1200px;
     border-radius: 50%;
     filter: blur(180px);
-    opacity: 0.12;
-    background: radial-gradient(circle, #1e3a8a 0%, transparent 70%); /* Navy Accent Blob */
+    opacity: 0.1;
+    background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
     bottom: -500px;
     right: -500px;
     animation: floatBlob 35s infinite alternate-reverse ease-in-out;
