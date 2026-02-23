@@ -1,6 +1,6 @@
 'use client';
 
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
 import JSZip from 'jszip';
 import { ProgressCallback, ConversionResult } from './pdf-converter';
 
@@ -23,7 +23,6 @@ export class PDFManipulator {
 
   /**
    * 1. MERGE PDF (100% Working)
-   * Combines multiple files into one master document.
    */
   async merge(): Promise<ConversionResult> {
     this.updateProgress(10, "Initializing master document container...");
@@ -54,7 +53,6 @@ export class PDFManipulator {
 
   /**
    * 2. SPLIT PDF
-   * Divides a document into individual page-level files.
    */
   async split(): Promise<ConversionResult> {
     this.updateProgress(10, "Deconstructing document tree...");
@@ -90,14 +88,12 @@ export class PDFManipulator {
 
   /**
    * 3. REMOVE PAGES
-   * Prunes specific indices from the document.
    */
   async removePages(pagesToRemove: number[]): Promise<ConversionResult> {
     this.updateProgress(20, "Analyzing target pruning indices...");
     const bytes = await this.files[0].arrayBuffer();
     const pdf = await PDFDocument.load(bytes);
 
-    // Logic: Sort descending to prevent index shifting issues
     this.updateProgress(50, "Executing surgical page removal...");
     pagesToRemove.sort((a, b) => b - a).forEach(index => {
       pdf.removePage(index);
@@ -115,7 +111,6 @@ export class PDFManipulator {
 
   /**
    * 4. EXTRACT PAGES
-   * Creates a new document containing only the selected pages.
    */
   async extractPages(pagesToExtract: number[]): Promise<ConversionResult> {
     this.updateProgress(20, "Initiating high-fidelity extraction...");
@@ -138,39 +133,103 @@ export class PDFManipulator {
   }
 
   /**
-   * Additional Mastery Operations (Synchronized)
+   * 5. ROTATE PDF
    */
-  async rotate(angle: number): Promise<ConversionResult> {
+  async rotate(angle: number = 90): Promise<ConversionResult> {
     this.updateProgress(30, `Applying geometric rotation: ${angle}°`);
-    const pdf = await PDFDocument.load(await this.files[0].arrayBuffer());
-    pdf.getPages().forEach(p => p.setRotation({ type: 'degrees', angle }));
+    const bytes = await this.files[0].arrayBuffer();
+    const pdf = await PDFDocument.load(bytes);
+
+    pdf.getPages().forEach(page => {
+      page.setRotation(degrees(angle));
+    });
+
+    this.updateProgress(90, "Finalizing rotated stream...");
+    const newBytes = await pdf.save();
     return {
-      blob: new Blob([await pdf.save()], { type: 'application/pdf' }),
+      blob: new Blob([newBytes], { type: "application/pdf" }),
       fileName: `Mastered_Rotated.pdf`,
-      mimeType: 'application/pdf'
+      mimeType: "application/pdf"
     };
   }
 
+  /**
+   * 6. ADD PAGE NUMBERS
+   */
+  async addPageNumbers(): Promise<ConversionResult> {
+    this.updateProgress(20, "Initializing indexing layer...");
+    const bytes = await this.files[0].arrayBuffer();
+    const pdf = await PDFDocument.load(bytes);
+    const font = await pdf.embedFont(StandardFonts.Helvetica);
+
+    pdf.getPages().forEach((page, index) => {
+      this.updateProgress(20 + Math.round((index / pdf.getPageCount()) * 70), `Stamping page ${index + 1}...`);
+      const { width } = page.getSize();
+      page.drawText(`Page ${index + 1}`, {
+        x: width - 100,
+        y: 20,
+        size: 12,
+        font,
+        color: rgb(0, 0, 0),
+      });
+    });
+
+    const newBytes = await pdf.save();
+    return {
+      blob: new Blob([newBytes], { type: "application/pdf" }),
+      fileName: `Mastered_Numbered.pdf`,
+      mimeType: "application/pdf"
+    };
+  }
+
+  /**
+   * 7. ADD WATERMARK
+   */
+  async addWatermark(text: string = "CONFIDENTIAL"): Promise<ConversionResult> {
+    this.updateProgress(20, "Calibrating identification layer...");
+    const bytes = await this.files[0].arrayBuffer();
+    const pdf = await PDFDocument.load(bytes);
+    const font = await pdf.embedFont(StandardFonts.Helvetica);
+
+    pdf.getPages().forEach((page, idx) => {
+      this.updateProgress(20 + Math.round((idx / pdf.getPageCount()) * 70), "Stamping watermark...");
+      const { width, height } = page.getSize();
+      page.drawText(text, {
+        x: width / 4,
+        y: height / 2,
+        size: 50,
+        opacity: 0.3,
+        font,
+        rotate: degrees(-45),
+      });
+    });
+
+    const newBytes = await pdf.save();
+    return {
+      blob: new Blob([newBytes], { type: "application/pdf" }),
+      fileName: `Mastered_Watermarked.pdf`,
+      mimeType: "application/pdf"
+    };
+  }
+
+  /**
+   * 8. PROTECT PDF (Password)
+   */
   async protect(password: string): Promise<ConversionResult> {
     this.updateProgress(20, "Applying cryptographic seal...");
-    const pdf = await PDFDocument.load(await this.files[0].arrayBuffer());
-    // Metadata-only protection for prototype
-    pdf.setProducer('AJN Secure System');
-    return {
-      blob: new Blob([await pdf.save()], { type: 'application/pdf' }),
-      fileName: `Mastered_Protected.pdf`,
-      mimeType: 'application/pdf'
-    };
-  }
+    const bytes = await this.files[0].arrayBuffer();
+    const pdf = await PDFDocument.load(bytes);
 
-  async addWatermark(text: string, opacity: number = 0.3): Promise<ConversionResult> {
-    this.updateProgress(40, "Stamping identification layer...");
-    const pdf = await PDFDocument.load(await this.files[0].arrayBuffer());
-    // Simple watermark injection
+    const newBytes = await pdf.save({
+      userPassword: password,
+      ownerPassword: password,
+    });
+
+    this.updateProgress(100, "Document secured.");
     return {
-      blob: new Blob([await pdf.save()], { type: 'application/pdf' }),
-      fileName: `Mastered_Watermarked.pdf`,
-      mimeType: 'application/pdf'
+      blob: new Blob([newBytes], { type: "application/pdf" }),
+      fileName: `Mastered_Protected.pdf`,
+      mimeType: "application/pdf"
     };
   }
 }

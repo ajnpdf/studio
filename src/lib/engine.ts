@@ -141,7 +141,7 @@ class SystemEngine {
   }
 
   async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, toolId?: string) {
-    const isMerge = toolId === 'merge-pdf';
+    const isMerge = toolId === 'merge-pdf' || toolId === 'merge';
     
     if (isMerge) {
       const job: ProcessingJob = {
@@ -222,7 +222,7 @@ class SystemEngine {
   }
 
   private determineMode(toolId?: string): ExecutionMode {
-    const aiTools = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'summarize-pdf', 'ai-qa'];
+    const aiTools = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'summarize-pdf', 'ai-qa', 'sign-pdf', 'sign'];
     if (toolId && aiTools.includes(toolId)) return 'AI';
     return 'WASM';
   }
@@ -240,7 +240,7 @@ class SystemEngine {
       let result;
       const startTime = Date.now();
 
-      if (nextJob.toolId === 'merge-pdf') {
+      if (nextJob.toolId === 'merge-pdf' || nextJob.toolId === 'merge') {
         const manip = new PDFManipulator(nextJob.inputs.map(i => i.file), (p, m) => {
           nextJob.progress = Math.min(p, 99);
           this.addLog(nextJob, m);
@@ -304,19 +304,26 @@ class SystemEngine {
     const specialized = new SpecializedConverter(file, update);
 
     switch (job.toolId) {
-      case 'split-pdf': return manip.split(job.settings.splitMode || 'range', job.settings.splitValue || '1');
-      case 'extract-pages': return manip.extractPages(job.settings.pages || [0]);
-      case 'remove-pages': return manip.removePages(job.settings.pages || []);
-      case 'rotate-pdf': return manip.rotate(job.settings.angle || 90);
-      case 'page-numbers': return manip.addPageNumbers(job.settings);
-      case 'watermark-pdf': return manip.addWatermark(job.settings.text || 'AJN Master');
-      case 'crop-pdf': return manip.crop(job.settings.margins || { top: 50, bottom: 50, left: 50, right: 50 });
-      case 'protect-pdf': return manip.protect(job.settings.password || '1234');
-      case 'digital-seal': return manip.addWatermark('Verified Integrity Seal', 0.2);
-      case 'metadata-purge': return specialized.convertTo('REPAIRED_PDF', job.settings);
-      case 'redact-pdf': return specialized.convertTo('REDACTED_PDF', job.settings);
-      case 'summarize-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
-      case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
+      case 'split-pdf':
+      case 'split': return manip.split();
+      case 'extract-pages':
+      case 'extract': return manip.extractPages(job.settings.pages || [0]);
+      case 'remove-pages':
+      case 'remove': return manip.removePages(job.settings.pages || []);
+      case 'rotate-pdf':
+      case 'rotate': return manip.rotate(job.settings.angle || 90);
+      case 'page-numbers':
+      case 'pagenums': return manip.addPageNumbers();
+      case 'watermark-pdf':
+      case 'watermark': return manip.addWatermark(job.settings.text || 'AJN Master');
+      case 'protect-pdf':
+      case 'protect': return manip.protect(job.settings.password || '1234');
+      case 'redact-pdf':
+      case 'redact': return specialized.convertTo('REDACTED_PDF', job.settings);
+      case 'summarize-pdf':
+      case 'summarize': return specialized.convertTo('TRANSCRIPT', job.settings);
+      case 'translate-pdf':
+      case 'translate': return specialized.convertTo('TRANSCRIPT', job.settings);
       default: return this.runConversion(job);
     }
   }
