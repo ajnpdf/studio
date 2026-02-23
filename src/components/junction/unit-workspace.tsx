@@ -229,13 +229,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                       <Settings2 className="w-32 h-32 text-primary" />
                     </div>
                     
-                    <div className="flex items-center gap-4 relative z-10">
-                      <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
-                        <Settings2 className="w-5 h-5 text-primary" />
-                      </div>
-                      <span className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-950">Master Parameters</span>
-                    </div>
-                    
                     <div className="space-y-6 relative z-10">
                       {initialUnitId === 'translate-pdf' && (
                         <div className="space-y-3">
@@ -284,16 +277,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           </div>
                         </div>
                       )}
-
-                      <div className="p-6 bg-primary/5 rounded-[2rem] border border-primary/10 shadow-inner">
-                        <div className="flex items-center gap-3 mb-2">
-                          <ShieldCheck className="w-4 h-4 text-primary" />
-                          <span className="text-[10px] font-black uppercase text-primary tracking-widest">Environment Secured</span>
-                        </div>
-                        <p className="text-[9px] leading-relaxed font-bold text-slate-950/50 uppercase tracking-wide">
-                          System executing in high-fidelity local memory buffer.
-                        </p>
-                      </div>
                     </div>
                   </section>
 
