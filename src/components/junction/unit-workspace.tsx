@@ -11,26 +11,15 @@ import {
   Lock, 
   Scissors, 
   RotateCw, 
-  Zap, 
-  Monitor,
-  Layout,
-  Maximize,
-  ShieldCheck,
-  Cpu,
-  Layers,
-  ArrowRight,
-  Hash,
-  Type,
-  Palette,
-  LayoutGrid
+  ShieldCheck, 
+  Cpu, 
+  Layers
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 
@@ -40,13 +29,12 @@ interface Props {
 }
 
 /**
- * AJN Unit Workspace - Autonomous Intelligence Engine
+ * AJN Unit Workspace - Professional Autonomous Hub
+ * Automatically configures protocol based on Tool Identity.
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [appState, setAppState] = useState<GlobalAppState | null>(null);
   const [activeCategory, setActiveCategory] = useState(defaultCategory);
-  const [fromFmt, setFromFmt] = useState('');
-  const [toFmt, setToFmt] = useState('');
   
   // Advanced Tool Parameters
   const [password, setPassword] = useState('');
@@ -72,23 +60,22 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
     return engine.subscribe(setAppState);
   }, []);
 
-  useEffect(() => {
-    if (!initialUnitId) return;
-    if (initialUnitId.includes('-pdf')) {
-      const from = initialUnitId.split('-')[0].toUpperCase();
-      setFromFmt(from === 'MERGE' || from === 'SPLIT' || from === 'ORGANIZE' || from === 'REMOVE' || from === 'EXTRACT' ? 'PDF' : from);
-      setToFmt('PDF');
-    } else if (initialUnitId.startsWith('pdf-')) {
-      const to = initialUnitId.split('-')[1].toUpperCase();
-      setFromFmt('PDF');
-      setToFmt(to === 'PDFA' ? 'PDF' : to);
-    } else {
-      setFromFmt('PDF');
-      setToFmt('PDF');
-    }
-  }, [initialUnitId]);
-
   const handleFilesAdded = (files: File[]) => {
+    // Determine From/To based on Unit ID
+    let from = '';
+    let to = 'PDF';
+
+    if (initialUnitId?.includes('-pdf')) {
+      from = initialUnitId.split('-')[0];
+    } else if (initialUnitId?.startsWith('pdf-')) {
+      from = 'pdf';
+      to = initialUnitId.split('-')[1].toUpperCase();
+      if (to === 'PDFA') to = 'PDF'; // Remediated PDF
+    } else {
+      from = 'pdf';
+      to = 'PDF';
+    }
+
     const settings = { 
       profile: compressionProfile,
       password,
@@ -108,7 +95,8 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       color: numColor,
       skipFirst
     };
-    engine.addJobs(files, fromFmt, toFmt, settings, initialUnitId);
+
+    engine.addJobs(files, from, to, settings, initialUnitId);
   };
 
   if (!appState) return null;
@@ -116,9 +104,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const hasControls = [
     'protect-pdf', 'split-pdf', 'extract-pages', 'remove-pages', 
     'rotate-pdf', 'watermark-pdf', 'translate-pdf', 'compress-pdf',
-    'unlock-pdf', 'redact-pdf', 'page-numbers', 'crop-pdf', 'jpg-pdf',
-    'word-pdf', 'pptx-pdf', 'excel-pdf', 'html-pdf', 'pdf-jpg', 'pdf-word',
-    'pdf-excel', 'pdf-pptx', 'pdf-pdfa'
+    'unlock-pdf', 'redact-pdf', 'page-numbers', 'crop-pdf', 'pdf-jpg'
   ].includes(initialUnitId || '');
 
   return (
@@ -138,13 +124,13 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                   <Cpu className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black tracking-tight text-slate-950 uppercase">{initialUnitId?.replace('-', ' ')} Node</h2>
-                  <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Autonomous Protocol Calibration</p>
+                  <h2 className="text-xl font-black tracking-tight text-slate-950 uppercase">{initialUnitId?.replace('-', ' ')}</h2>
+                  <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Autonomous Unit Calibration</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">WASM Stable</span>
+                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">WASM Layer Active</span>
               </div>
             </div>
 
@@ -172,105 +158,46 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                   )}
 
                   {initialUnitId === 'pdf-jpg' && (
-                    <>
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Export Resolution</Label>
-                        <Select value={dpi} onValueChange={setDpi}>
-                          <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="72" className="font-bold text-xs">72 DPI (Web)</SelectItem>
-                            <SelectItem value="150" className="font-bold text-xs">150 DPI (Print)</SelectItem>
-                            <SelectItem value="300" className="font-bold text-xs">300 DPI (High Res)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-4">
-                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Quality: {quality}%</Label>
-                        <Slider value={[quality]} max={100} onValueChange={([v]) => setQuality(v)} />
-                      </div>
-                    </>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Export Resolution</Label>
+                      <Select value={dpi} onValueChange={setDpi}>
+                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="72" className="font-bold text-xs">72 DPI (Web)</SelectItem>
+                          <SelectItem value="150" className="font-bold text-xs">150 DPI (Print)</SelectItem>
+                          <SelectItem value="300" className="font-bold text-xs">300 DPI (High Res)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   )}
 
                   {initialUnitId === 'page-numbers' && (
-                    <>
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Label Position</Label>
-                        <Select value={numPosition} onValueChange={setNumPosition}>
-                          <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="header-center">Header Center</SelectItem>
-                            <SelectItem value="footer-center">Footer Center</SelectItem>
-                            <SelectItem value="footer-right">Footer Right</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Number Style</Label>
-                        <Select value={numFormat} onValueChange={setNumFormat}>
-                          <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Page {n} of {N}">Standard Long</SelectItem>
-                            <SelectItem value="{n}">Page Only</SelectItem>
-                            <SelectItem value="- {n} -">Hyphenated</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-black/5 self-end h-11">
-                        <span className="text-[10px] font-bold uppercase text-slate-950/60">Skip Cover</span>
-                        <Switch checked={skipFirst} onCheckedChange={setSkipFirst} />
-                      </div>
-                    </>
-                  )}
-
-                  {(initialUnitId === 'jpg-pdf' || initialUnitId === 'word-pdf') && (
-                    <>
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Page Layout</Label>
-                        <Select value={pageSize} onValueChange={setPageSize}>
-                          <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="A4" className="font-bold text-xs">A4 Protocol</SelectItem>
-                            <SelectItem value="LETTER" className="font-bold text-xs">Letter Protocol</SelectItem>
-                            <SelectItem value="LEGAL" className="font-bold text-xs">Legal Protocol</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Orientation</Label>
-                        <Select value={orientation} onValueChange={setOrientation}>
-                          <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="auto" className="font-bold text-xs">Auto Detect</SelectItem>
-                            <SelectItem value="portrait" className="font-bold text-xs">Portrait</SelectItem>
-                            <SelectItem value="landscape" className="font-bold text-xs">Landscape</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Label Position</Label>
+                      <Select value={numPosition} onValueChange={setNumPosition}>
+                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="header-center" className="font-bold text-xs">Header Center</SelectItem>
+                          <SelectItem value="footer-center" className="font-bold text-xs">Footer Center</SelectItem>
+                          <SelectItem value="footer-right" className="font-bold text-xs">Footer Right</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   )}
 
                   {(initialUnitId === 'split-pdf' || initialUnitId === 'extract-pages' || initialUnitId === 'remove-pages') && (
                     <div className="space-y-2">
                       <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">{splitMode === 'every' ? 'N-Page Interval' : 'Page Range'}</Label>
-                      <div className="relative">
-                        <Input 
-                          value={pageRange}
-                          onChange={(e) => setPageRange(e.target.value)}
-                          placeholder={splitMode === 'every' ? "e.g. 2" : "e.g. 1-5, 8-10"} 
-                          className="bg-white/60 border-black/5 h-11 pl-10 font-black rounded-xl focus:ring-primary/20 text-slate-950"
-                        />
-                        <Scissors className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary" />
-                      </div>
+                      <Input 
+                        value={pageRange}
+                        onChange={(e) => setPageRange(e.target.value)}
+                        placeholder={splitMode === 'every' ? "e.g. 2" : "e.g. 1-5, 8-10"} 
+                        className="bg-white/60 border-black/5 h-11 font-black rounded-xl focus:ring-primary/20 text-slate-950"
+                      />
                     </div>
                   )}
 
@@ -282,9 +209,9 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="quality" className="font-bold text-xs">Maximum Fidelity (150 DPI)</SelectItem>
+                          <SelectItem value="quality" className="font-bold text-xs">High Fidelity (150 DPI)</SelectItem>
                           <SelectItem value="balanced" className="font-bold text-xs">Balanced (96 DPI)</SelectItem>
-                          <SelectItem value="extreme" className="font-bold text-xs">Extreme Compression (72 DPI)</SelectItem>
+                          <SelectItem value="extreme" className="font-bold text-xs">Extreme (72 DPI)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -292,17 +219,14 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
                   {(initialUnitId === 'protect-pdf' || initialUnitId === 'unlock-pdf') && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Cryptographic Key</Label>
-                      <div className="relative">
-                        <Input 
-                          type="password" 
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Passphrase..." 
-                          className="bg-white/60 border-black/5 h-11 pl-10 rounded-xl font-bold text-slate-950"
-                        />
-                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary" />
-                      </div>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Security Passphrase</Label>
+                      <Input 
+                        type="password" 
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Required for encryption..." 
+                        className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950"
+                      />
                     </div>
                   )}
 
@@ -311,7 +235,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                       <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Rotation Angle</Label>
                       <Select value={rotateAngle} onValueChange={setRotateAngle}>
                         <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
-                          <RotateCw className="w-3.5 h-3.5 mr-2 text-primary" />
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>

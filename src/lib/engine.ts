@@ -20,6 +20,7 @@ import { PDFManipulator } from './converters/pdf-manipulator';
 /**
  * AJN SYSTEM IDENTITY - CORE INTELLIGENCE LAYER
  * Stateful workflow orchestrator managing 35+ PDF tools across 6 domains.
+ * Enforces unique job locks and professional mastered naming.
  */
 
 export type ExecutionContext = 'WASM' | 'SMART' | 'AI';
@@ -79,7 +80,7 @@ class ConversionEngine {
   };
 
   private activeJobsCount: number = 0;
-  private maxConcurrent: number = 3;
+  private maxConcurrent: number = 2;
   private listeners: Set<(state: GlobalAppState) => void> = new Set();
 
   private converters: Record<string, any> = {
@@ -135,6 +136,10 @@ class ConversionEngine {
     
     for (const file of files) {
       const fingerprint = await this.generateFingerprint(file);
+      
+      // Prevent duplicates in active files
+      if (this.state.activeFiles.some(f => f.fingerprint === fingerprint)) continue;
+
       const fileBuffer: FileBuffer = {
         id: Math.random().toString(36).substr(2, 9),
         file,
@@ -148,6 +153,8 @@ class ConversionEngine {
       newFiles.push(fileBuffer);
     }
 
+    if (newFiles.length === 0) return;
+
     this.state.activeFiles = [...newFiles, ...this.state.activeFiles].slice(0, 50);
 
     const newJobs: ConversionJob[] = newFiles.map(fb => ({
@@ -158,7 +165,7 @@ class ConversionEngine {
       toFmt: toFmt || 'PDF',
       status: 'queued',
       progress: 0,
-      stage: 'Initializing Neural Buffer...',
+      stage: 'Calibrating Unit...',
       context: this.determineContext(operationId),
       settings,
       operationId
@@ -203,14 +210,15 @@ class ConversionEngine {
       const objectUrl = URL.createObjectURL(result.blob);
       nextJob.status = 'complete';
       nextJob.progress = 100;
-      nextJob.stage = 'Process Successful';
+      nextJob.stage = 'Unit Mastered';
       
       const originalBase = nextJob.file.name.replace(/\.[^/.]+$/, "");
-      const finalFileName = `Mastered_${originalBase}.${result.fileName.split('.').pop()}`;
+      const ext = result.fileName.split('.').pop() || nextJob.toFmt.toLowerCase();
+      const finalFileName = `Mastered_${originalBase}.${ext}`;
 
       nextJob.result = {
         ...result,
-        fileName: result.fileName || finalFileName,
+        fileName: finalFileName,
         size: (result.blob.size / (1024 * 1024)).toFixed(2) + ' MB',
         objectUrl
       };
@@ -219,7 +227,7 @@ class ConversionEngine {
     } catch (err: any) {
       nextJob.status = 'failed';
       nextJob.error = err.message || 'Processing Error';
-      nextJob.stage = 'Internal Logic Error';
+      nextJob.stage = 'Logic Fault';
     } finally {
       this.activeJobsCount--;
       this.state.processingQueue = this.state.processingQueue.filter(j => j.id !== nextJob.id);
@@ -290,7 +298,7 @@ class ConversionEngine {
   private async runConversion(job: ConversionJob) {
     const key = job.fromFmt.toLowerCase();
     const ConverterClass = this.converters[key];
-    if (!ConverterClass) throw new Error(`Protocol ${key.toUpperCase()} not found.`);
+    if (!ConverterClass) throw new Error(`Protocol ${key.toUpperCase()} Not Found`);
     const converter = new ConverterClass(job.file, (p: number, msg: string) => {
       job.progress = p; job.stage = msg; this.notify();
     });

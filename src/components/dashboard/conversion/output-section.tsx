@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { ConversionJob } from '@/lib/engine';
 import { Card, CardContent } from '@/components/ui/card';
@@ -22,8 +22,8 @@ const getIcon = (fmt: string) => {
 };
 
 /**
- * AJN Output Section - Real-Time Distribution HUD
- * Strictly enforced Black Text protocol for maximum clarity.
+ * AJN Output Section - Professional Mastered Results
+ * Enforces Black Text protocol and real-time distribution.
  */
 export function OutputSection({ jobs, onPreview, onClear }: Props) {
   const handleDownload = (job: ConversionJob) => {
@@ -36,8 +36,8 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
     document.body.removeChild(a);
     
     toast({
-      title: "Export Successful",
-      description: `${job.result.fileName} has been saved to your local drive.`,
+      title: "File Exported",
+      description: `${job.result.fileName} saved to local storage.`,
     });
   };
 
@@ -48,18 +48,18 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
       if (navigator.share) {
         await navigator.share({
           files: [file],
-          title: 'AJN Mastered Content',
-          text: `Processed via All-in-One Junction Network.`
+          title: 'AJN Mastered File',
+          text: `Processed via AJN Junction Network.`
         });
       } else {
         await navigator.clipboard.writeText(job.result.objectUrl);
         toast({
-          title: "Link Synchronized",
-          description: "Download link copied to clipboard for direct routing.",
+          title: "Link Synced",
+          description: "Download link copied to clipboard.",
         });
       }
     } catch (err) {
-      console.warn('Share operation cancelled', err);
+      console.warn('Share cancelled', err);
     }
   };
 
@@ -74,7 +74,7 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
             Mastered Output ({jobs.length})
           </h3>
         </div>
-        <button onClick={onClear} className="text-[10px] font-black uppercase text-red-500 hover:text-red-600 transition-colors flex items-center gap-2">
+        <button onClick={onClear} className="text-[10px] font-bold text-red-500 hover:text-red-600 transition-colors flex items-center gap-2">
           <Trash2 className="w-3.5 h-3.5" /> Clear Buffer
         </button>
       </div>
@@ -89,12 +89,12 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-1.5">
-                  <h4 className="text-sm font-black tracking-tighter truncate max-w-[280px] text-slate-950">{job.result?.fileName}</h4>
+                  <h4 className="text-sm font-black tracking-tight truncate max-w-[280px] text-slate-950">{job.result?.fileName}</h4>
                   <Badge className="bg-emerald-500 text-white border-none text-[8px] font-black px-2 h-5">READY</Badge>
                 </div>
                 <div className="flex items-center gap-4 text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">
                   <span className="flex items-center gap-1.5"><FileCode className="w-3 h-3" /> {job.result?.size}</span>
-                  <span className="text-emerald-600 font-black">Verified Checksum</span>
+                  <span className="text-emerald-600 font-black">Securely Mastered</span>
                 </div>
               </div>
 
@@ -103,7 +103,7 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
                   size="sm" 
                   variant="outline" 
                   onClick={() => onPreview(job)}
-                  className="h-10 border-black/10 bg-white/50 text-[10px] font-black uppercase gap-2 hover:bg-primary hover:text-white px-5 rounded-xl shadow-sm transition-all text-slate-950"
+                  className="h-10 border-black/10 bg-white/50 text-[10px] font-bold gap-2 hover:bg-primary hover:text-white px-5 rounded-xl transition-all text-slate-950"
                 >
                   <ExternalLink className="w-3.5 h-3.5" /> Preview
                 </Button>
@@ -128,12 +128,6 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
           </Card>
         ))}
       </div>
-
-      {jobs.length > 1 && (
-        <Button className="w-full h-16 bg-white border-black/5 text-slate-950 hover:bg-white/90 font-black text-sm uppercase tracking-widest shadow-xl rounded-2xl gap-3 transition-all">
-          <Download className="w-5 h-5 text-emerald-600" /> Export All To Vault
-        </Button>
-      )}
     </section>
   );
 }
