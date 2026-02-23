@@ -1,118 +1,190 @@
+
 "use client";
 
 import { motion } from 'framer-motion';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Zap, Heart, ShieldCheck, Cpu, User } from 'lucide-react';
+import { ArrowLeft, Zap, Heart, ShieldCheck, Cpu, User, Globe, Layers, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
+/**
+ * AJN About Us Page - Professional Mastery Design
+ * Modeled after iLovePDF but localized to the AJN Engineering Core.
+ */
 export default function OurStoryPage() {
+  const founderImage = PlaceHolderImages.find(img => img.id === 'founder-portrait');
+
   return (
-    <div className="min-h-screen text-slate-950 font-body relative overflow-x-hidden">
+    <div className="min-h-screen text-slate-950 font-body relative overflow-x-hidden bg-transparent">
       <NightSky />
       
-      <header className="h-20 flex items-center justify-between px-8 max-w-7xl mx-auto w-full relative z-50">
+      {/* HUD Header */}
+      <header className="fixed top-0 left-0 right-0 h-20 flex items-center justify-between px-8 max-w-7xl mx-auto w-full z-[60] bg-transparent">
         <Link href="/">
           <LogoAnimation className="w-24 h-12" showGlow={false} />
         </Link>
         <Link href="/">
-          <Button variant="ghost" className="font-black text-[10px] uppercase tracking-widest gap-2">
-            <ArrowLeft className="w-4 h-4" /> Back Home
+          <Button variant="outline" className="font-black text-[10px] uppercase tracking-widest gap-2 bg-white/40 border-black/5 rounded-xl px-6 h-10 shadow-sm">
+            <ArrowLeft className="w-4 h-4" /> Exit Story
           </Button>
         </Link>
       </header>
 
-      <main className="max-w-4xl mx-auto px-8 py-20 space-y-24 relative z-10">
-        <section className="space-y-8">
+      <main className="relative z-10 pt-32 pb-32">
+        {/* Mission Hero */}
+        <section className="max-w-5xl mx-auto px-8 space-y-12 text-center mb-32">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="space-y-4"
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
           >
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center justify-center gap-4">
               <div className="w-12 h-px bg-primary/20" />
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Master Mission</span>
+              <div className="w-12 h-px bg-primary/20" />
             </div>
-            <h1 className="text-5xl md:text-8xl font-black tracking-tighter uppercase leading-[0.85]">
-              The <span className="text-primary">AJN</span> <br /> Story
+            <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.85] text-slate-950">
+              Every File. One Smart <span className="text-primary">Network.</span>
             </h1>
-            <div className="pt-6 flex items-center gap-6">
-              <div className="w-16 h-16 bg-white/40 backdrop-blur-xl rounded-[1.5rem] border border-black/5 flex items-center justify-center shadow-xl">
-                <User className="w-8 h-8 text-primary" />
+            <p className="text-lg md:text-xl font-medium text-slate-950/60 max-w-2xl mx-auto leading-relaxed">
+              AJN (All-in-one Junction Network) is building the world's most advanced browser-native engineering environment for digital assets.
+            </p>
+          </motion.div>
+        </section>
+
+        {/* Meet the Founder - iLovePDF Style Inspiration */}
+        <section className="max-w-6xl mx-auto px-8 mb-40">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <motion.div 
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="relative aspect-[3/4] rounded-[3.5rem] overflow-hidden shadow-2xl border-4 border-white/60 group"
+            >
+              <Image 
+                src={founderImage?.imageUrl || "https://picsum.photos/seed/anjan/600/800"} 
+                alt="Anjan Patel" 
+                fill 
+                className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                data-ai-hint="founder portrait"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent opacity-60" />
+              <div className="absolute bottom-10 left-10 right-10 p-8 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-white/60 shadow-2xl">
+                <p className="text-2xl font-black text-slate-950 tracking-tighter">Anjan Patel</p>
+                <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mt-1">Founder & CEO</p>
               </div>
-              <div>
-                <p className="text-xl font-black uppercase tracking-tight text-slate-950">Founded by Anjan Patel</p>
-                <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest leading-relaxed">
-                  Founder & CEO • From Vision to Reality
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="space-y-8"
+            >
+              <h2 className="text-4xl md:text-5xl font-black tracking-tighter leading-none text-slate-950">
+                A Vision for Real-Time <span className="text-primary">Mastery</span>
+              </h2>
+              <div className="prose prose-slate max-w-none text-slate-950/70 font-medium space-y-6 leading-relaxed text-base md:text-lg">
+                <p>
+                  "Our journey started with a singular, powerful ambition: To dismantle the barriers between complex file engineering and the everyday professional. Traditionally, advanced transformations required heavy server side-processing or expensive desktop licenses."
+                </p>
+                <p>
+                  "AJN was designed to solve this by bringing high-concurrency WASM (WebAssembly) and Neural Intelligence directly into your local browser buffer. We believe your data should never leave your node unless you want it to."
+                </p>
+                <p className="font-bold text-slate-950 italic">
+                  — Anjan Patel, Founder & CEO
                 </p>
               </div>
-            </div>
-          </motion.div>
-
-          <div className="prose prose-slate max-w-none space-y-8 text-slate-950/80 font-medium leading-relaxed">
-            <p className="text-2xl font-black uppercase tracking-tight text-slate-900 leading-tight">
-              AJN (All-in-one Junction Network) started with a singular, powerful vision: 
-              To build the world's most advanced, real-time file engineering environment 
-              that operates entirely within the browser.
-            </p>
-            <p className="uppercase tracking-widest text-sm">
-              Our founder, Anjan Patel, recognized a massive gap in how modern professionals 
-              handle digital assets. Traditional tools were slow, server-dependent, or 
-              fragmented. AJN was designed to solve this by bringing high-concurrency 
-              WASM (WebAssembly) processing and Neural Intelligence into a unified "Junction".
-            </p>
-            <p className="uppercase tracking-widest text-sm">
-              Today, AJN serves thousands of nodes daily, providing hardware-accelerated 
-              transformations without ever compromising user privacy. We are committed to 
-              continuous development, with more modern features and units arriving every cycle.
-            </p>
-          </div>
-        </section>
-
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { icon: Zap, title: "Speed", desc: "Hardware-accelerated processing in your local buffer." },
-            { icon: ShieldCheck, title: "Security", desc: "No permanent storage. Your data remains yours." },
-            { icon: Heart, title: "Passion", desc: "Built with precision and pride by Indian engineers." }
-          ].map((item, i) => (
-            <motion.div 
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="p-8 bg-white/40 backdrop-blur-xl border border-black/5 rounded-[2.5rem] space-y-4 shadow-xl group hover:border-primary/20 transition-all"
-            >
-              <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <item.icon className="w-6 h-6 text-primary" />
+              <div className="flex gap-4 pt-4">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-14 h-14 bg-white/60 backdrop-blur-xl rounded-2xl border border-black/5 flex items-center justify-center shadow-xl">
+                    <Globe className="w-6 h-6 text-primary" />
+                  </div>
+                  <span className="text-[9px] font-black text-slate-950/40 uppercase tracking-widest">Global Ops</span>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-14 h-14 bg-white/60 backdrop-blur-xl rounded-2xl border border-black/5 flex items-center justify-center shadow-xl">
+                    <Cpu className="w-6 h-6 text-primary" />
+                  </div>
+                  <span className="text-[9px] font-black text-slate-950/40 uppercase tracking-widest">Neural v2.5</span>
+                </div>
               </div>
-              <h3 className="text-lg font-black uppercase tracking-tight">{item.title}</h3>
-              <p className="text-[11px] font-bold text-slate-950/40 uppercase tracking-widest">{item.desc}</p>
             </motion.div>
-          ))}
+          </div>
         </section>
 
-        <section className="py-20 border-t border-black/5 text-center space-y-8">
+        {/* Pillars Section */}
+        <section className="bg-white/40 backdrop-blur-3xl py-32 border-y border-black/5">
+          <div className="max-w-6xl mx-auto px-8">
+            <div className="text-center space-y-4 mb-20">
+              <h2 className="text-4xl font-black tracking-tighter uppercase text-slate-950">Our Engineering Pillars</h2>
+              <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-[0.4em]">The Architecture of Excellence</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              {[
+                { icon: Zap, title: "Velocity", desc: "Hardware-accelerated processing in your local browser sandbox." },
+                { icon: ShieldCheck, title: "Sovereignty", desc: "No permanent storage. Your data remains yours, always." },
+                { icon: Layers, title: "Intelligence", desc: "Integrating neural layers for smart layout and logic analysis." }
+              ].map((item, i) => (
+                <div key={i} className="p-10 bg-white/60 rounded-[3rem] border border-black/5 shadow-xl space-y-6 hover:border-primary/20 transition-all group">
+                  <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <item.icon className="w-7 h-7 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-black tracking-tight text-slate-950">{item.title}</h3>
+                  <p className="text-sm font-medium text-slate-950/50 leading-relaxed uppercase tracking-widest">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Coming Soon / Roadmap */}
+        <section className="max-w-4xl mx-auto px-8 py-40 text-center space-y-12">
           <div className="space-y-4">
-            <h2 className="text-4xl font-black uppercase tracking-tighter">More coming soon</h2>
-            <p className="text-sm font-bold text-slate-950/40 uppercase tracking-[0.3em]">
-              Our engineering roadmap is expanding every day.
-            </p>
+            <h2 className="text-5xl font-black tracking-tighter text-slate-950 leading-none">The Future is Already Here</h2>
+            <p className="text-[11px] font-black text-slate-950/40 uppercase tracking-[0.5em]">Upcoming Intelligence Nodes</p>
           </div>
-          <div className="flex items-center justify-center gap-4 text-[10px] font-black uppercase tracking-[0.5em] text-primary">
-            <Cpu className="w-4 h-4 animate-pulse" /> Global Scale Deployment
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {['Video AI', 'Audio Clean', 'Batch Sign', 'Team Sync'].map((unit) => (
+              <div key={unit} className="p-6 bg-white/40 border border-black/5 rounded-2xl shadow-sm text-[10px] font-black uppercase tracking-widest text-slate-950 opacity-60">
+                {unit}
+              </div>
+            ))}
+          </div>
+
+          <div className="pt-12">
+            <Link href="/ajn">
+              <Button className="h-16 px-12 bg-primary text-white hover:bg-primary/90 font-black text-xs rounded-2xl transition-all gap-4 shadow-2xl hover:scale-105 active:scale-95 uppercase tracking-widest">
+                Explore the Junction <CheckCircle2 className="w-4 h-4" />
+              </Button>
+            </Link>
           </div>
         </section>
 
-        <footer className="pt-20 pb-10 text-center space-y-6">
-          <div className="space-y-2">
-            <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.5em]">
-              MADE BY INDIAN ❤️
+        {/* Global Footer */}
+        <footer className="max-w-6xl mx-auto px-8 border-t border-black/5 pt-20 flex flex-col items-center gap-10">
+          <div className="flex gap-12 flex-wrap justify-center">
+            {['Blog', 'Privacy', 'Terms', 'Contact'].map((link) => (
+              <Link key={link} href={link === 'Contact' ? 'mailto:anjanpatel325@gmail.com' : `/${link.toLowerCase()}`} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-950/40 hover:text-primary transition-colors">
+                {link}
+              </Link>
+            ))}
+          </div>
+          
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-[11px] font-black text-slate-950/20 tracking-[0.5em] uppercase">
+              AJN Engineering Core • 2025
             </p>
-            <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-widest hover:text-primary transition-colors cursor-pointer">
-              anjanpatel325@gmail.com
+            <div className="flex items-center gap-2.5 px-5 py-2 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
+              <span className="text-[10px] font-black text-primary uppercase tracking-widest">Made by Indian ❤️</span>
+            </div>
+            <p className="text-[9px] font-bold text-slate-950/30 uppercase tracking-widest">
+              Contact: anjanpatel325@gmail.com
             </p>
           </div>
         </footer>

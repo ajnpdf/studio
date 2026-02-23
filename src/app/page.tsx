@@ -1,3 +1,4 @@
+
 "use client";
 
 import { motion } from 'framer-motion';
@@ -9,7 +10,8 @@ import { ArrowRight, Layers, ShieldCheck, User, CheckCircle2 } from 'lucide-reac
 import { NightSky } from '@/components/dashboard/night-sky';
 
 /**
- * AJN Landing Page - Proper Case Typography & Compact Design
+ * AJN Landing Page - Professional Standard
+ * Featuring Founder & CEO Anjan Patel and 'Made by Indian' signature.
  */
 export default function LandingPage() {
   return (
@@ -32,7 +34,7 @@ export default function LandingPage() {
         </Link>
       </header>
 
-      <main className="w-full max-w-5xl flex flex-col items-center gap-12 relative z-10 pt-20 md:pt-32 pb-32">
+      <main className="w-full max-w-5xl flex flex-col items-center gap-12 relative z-10 pt-20 md:pt-32 pb-32 text-center">
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -42,7 +44,7 @@ export default function LandingPage() {
           <LogoAnimation className="w-56 h-28 md:w-72 md:h-36" />
         </motion.div>
         
-        <div className="text-center space-y-8 md:space-y-10">
+        <div className="space-y-8 md:space-y-10">
           <div className="space-y-4">
             <h1 className="text-4xl md:text-7xl font-black tracking-tighter text-slate-950 leading-[0.85] uppercase">
               All-in-One <br className="hidden md:block" /> Junction Network
@@ -81,13 +83,13 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <section className="w-full pt-24 grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-10 rounded-[3rem] space-y-5 hover:border-primary/20 transition-all text-left shadow-2xl group">
+        <section className="w-full pt-24 grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+          <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-10 rounded-[3rem] space-y-5 hover:border-primary/20 transition-all shadow-2xl group">
             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"><User className="w-6 h-6 text-primary" /></div>
             <h3 className="text-2xl font-black tracking-tight">For Students</h3>
             <p className="text-xs font-bold text-slate-950/50 leading-relaxed uppercase tracking-[0.1em]">Master assignments with PDF merging, OCR extraction, and smart formatting. Complimentary for individual nodes.</p>
           </Card>
-          <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-10 rounded-[3rem] space-y-5 hover:border-primary/20 transition-all text-left shadow-2xl group">
+          <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-10 rounded-[3rem] space-y-5 hover:border-primary/20 transition-all shadow-2xl group">
             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"><CheckCircle2 className="w-6 h-6 text-primary" /></div>
             <h3 className="text-2xl font-black tracking-tight">For Business</h3>
             <p className="text-xs font-bold text-slate-950/50 leading-relaxed uppercase tracking-[0.1em]">Industrial-grade batch processing, team workspaces, and AES-256 encryption for corporate enterprise assets.</p>
@@ -95,9 +97,10 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <div className="absolute top-10 right-10 flex flex-col items-end gap-1 text-right opacity-40">
+      {/* Founder Recognition */}
+      <div className="absolute top-10 right-10 flex flex-col items-end gap-1 text-right opacity-40 group hover:opacity-100 transition-opacity">
         <span className="text-[9px] font-black uppercase tracking-[0.3em]">Founder & CEO</span>
-        <span className="text-sm font-black tracking-tighter text-primary">Anjan Patel</span>
+        <Link href="/story" className="text-sm font-black tracking-tighter text-primary hover:underline">Anjan Patel</Link>
       </div>
 
       <footer className="w-full py-16 mt-auto border-t border-black/5 flex flex-col items-center gap-8 relative z-10">
@@ -115,6 +118,9 @@ export default function LandingPage() {
           <div className="flex items-center gap-2.5 px-4 py-1.5 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
             <span className="text-[9px] font-black text-primary uppercase tracking-widest">Made by Indian ❤️</span>
           </div>
+          <p className="text-[9px] font-bold text-slate-950/30 uppercase tracking-widest">
+            Contact: anjanpatel325@gmail.com
+          </p>
         </div>
       </footer>
     </div>
