@@ -34,6 +34,7 @@ interface Props {
 /**
  * AJN Unit Workspace
  * Dynamic workflow engine for all specialized services.
+ * Featuring locked source protocol and editable target protocol.
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [jobs, setJobs] = useState<ConversionJob[]>([]);
@@ -91,7 +92,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const activeJobs = jobs.filter(j => ['queued', 'processing'].includes(j.status));
   const completedJobs = jobs.filter(j => j.status === 'complete');
 
-  // Check if we have any tool-specific controls to show
   const hasControls = [
     'protect-pdf', 'split-pdf', 'extract-pages', 'remove-pages', 
     'rotate-pdf', 'watermark-pdf', 'crop-pdf', 'translate-pdf', 'compress-pdf'
@@ -123,7 +123,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
             {hasControls && (
               <section className="bg-white/5 border border-white/10 p-6 md:p-10 rounded-[2.5rem] animate-in fade-in duration-700 shadow-2xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {/* TOOL SPECIFIC CONTROLS */}
                   {initialUnitId === 'protect-pdf' && (
                     <div className="space-y-3">
                       <Label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest ml-1">Master Password</Label>
@@ -163,7 +162,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           <RotateCw className="w-4 h-4 mr-2 text-primary" />
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-card border-white/10">
                           <SelectItem value="90">90° Clockwise</SelectItem>
                           <SelectItem value="180">180° Flip</SelectItem>
                           <SelectItem value="270">90° Counter-Clockwise</SelectItem>
@@ -211,7 +210,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           <Globe className="w-4 h-4 mr-2 text-primary" />
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-card border-white/10">
                           <SelectItem value="es">Spanish (ES)</SelectItem>
                           <SelectItem value="fr">French (FR)</SelectItem>
                           <SelectItem value="de">German (DE)</SelectItem>
@@ -246,7 +245,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               to={toFmt} 
               onFromChange={setFromFmt} 
               onToChange={setToFmt} 
-              isLocked={true}
+              isSourceLocked={true}
             />
 
             <DropZone onFiles={handleFilesAdded} />
