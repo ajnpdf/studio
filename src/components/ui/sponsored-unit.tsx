@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from 'react';
@@ -13,7 +12,10 @@ import { AD_CONFIG } from '@/lib/ad-config';
 export function SponsoredUnit() {
   return (
     <div className="mt-auto px-3 py-6 border-t border-black/5 bg-white/10">
-      <div className="p-4 rounded-2xl bg-white/40 border border-black/5 backdrop-blur-xl shadow-sm space-y-3 group cursor-pointer hover:border-primary/20 transition-all">
+      <div 
+        className="p-4 rounded-2xl bg-white/40 border border-black/5 backdrop-blur-xl shadow-sm space-y-3 group cursor-pointer hover:border-primary/20 transition-all"
+        onClick={() => window.open('https://ajn.io/pro', '_blank')}
+      >
         <div className="flex items-center justify-between">
           <Badge variant="outline" className="text-[7px] font-black tracking-widest uppercase border-black/10 text-slate-950/40">
             Sponsored Unit
@@ -37,6 +39,7 @@ export function SponsoredUnit() {
 
         {/* Hidden data for mediation mapping */}
         <span className="hidden" data-ad-unit={AD_CONFIG.units.banner}></span>
+        <span className="hidden" data-rewarded-unit={AD_CONFIG.units.rewardedInterstitial}></span>
       </div>
     </div>
   );

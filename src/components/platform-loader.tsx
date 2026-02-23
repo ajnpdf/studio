@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 const loadingSteps = [
-  "Initializing AJN Core...",
-  "Loading UI Engine...",
-  "Connecting to Cloud...",
-  "Fetching User Data...",
-  "Starting AI Modules...",
-  "Optimizing Performance...",
-  "Launching Platform..."
+  "Inhaling AJN Engineering Core...",
+  "Calibrating Neural UI Engine...",
+  "Synchronizing Cloud Nodes...",
+  "Provisioning Isolated Buffers...",
+  "Bootstrapping WASM Pipeline...",
+  "Optimizing Output Fidelity...",
+  "Launching Master Platform..."
 ];
 
 export function PlatformLoader() {
@@ -36,7 +36,7 @@ export function PlatformLoader() {
         
         return nextPercent;
       });
-    }, 20);
+    }, 15);
 
     return () => clearInterval(interval);
   }, [textIndex]);
@@ -45,16 +45,16 @@ export function PlatformLoader() {
 
   return (
     <div className={cn(
-      "fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-500 bg-transparent",
+      "fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-700 bg-[#f3e8ff]",
       isDone ? "opacity-0 pointer-events-none" : "opacity-100"
     )}>
       <div className="relative z-10 flex flex-col items-center">
-        {/* AJN LOGO - Navy Blue */}
+        {/* AJN LOGO - Navy Blue High Fidelity */}
         <svg 
           viewBox="0 0 300 120" 
           className={cn(
-            "w-[220px] mb-8 transition-all duration-700",
-            isDone && "filter drop-shadow-[0_0_25px_#1e3a8a]"
+            "w-[240px] mb-12 transition-all duration-1000",
+            isDone && "scale-110 filter drop-shadow-[0_0_35px_rgba(30,58,138,0.4)]"
           )}
         >
           <defs>
@@ -71,18 +71,18 @@ export function PlatformLoader() {
           </g>
         </svg>
 
-        <div className="space-y-4 text-center">
-          <p className="text-sm font-black text-slate-950/80 tracking-widest animate-pulse">
-            {isDone ? "Welcome to AJN Platform" : loadingSteps[textIndex]}
+        <div className="space-y-6 text-center">
+          <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-[0.5em] animate-pulse">
+            {isDone ? "Protocol Established" : loadingSteps[textIndex]}
           </p>
           
-          <div className="text-3xl font-black text-primary">
+          <div className="text-5xl font-black text-primary tracking-tighter tabular-nums">
             {percent}%
           </div>
 
-          <div className="w-[260px] h-1.5 bg-black/5 rounded-full overflow-hidden mx-auto border border-black/5">
+          <div className="w-[300px] h-1.5 bg-black/5 rounded-full overflow-hidden mx-auto border border-black/5 shadow-inner">
             <div 
-              className="h-full bg-primary transition-all duration-300 ease-out"
+              className="h-full bg-primary transition-all duration-300 ease-out shadow-[0_0_15px_rgba(30,58,138,0.5)]"
               style={{ width: `${percent}%` }}
             />
           </div>
@@ -93,15 +93,15 @@ export function PlatformLoader() {
         .logo-path {
           fill: none;
           stroke: url(#loader-grad);
-          stroke-width: 5;
+          stroke-width: 6;
           stroke-linecap: round;
           stroke-linejoin: round;
           stroke-dasharray: 400;
           stroke-dashoffset: 400;
-          animation: draw 1.5s ease forwards;
+          animation: draw 1.2s ease forwards;
         }
-        .delay-1 { animation-delay: 0.3s; }
-        .delay-2 { animation-delay: 0.6s; }
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
 
         @keyframes draw {
           to { stroke-dashoffset: 0; }
