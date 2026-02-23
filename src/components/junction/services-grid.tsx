@@ -27,15 +27,15 @@ export type ServiceUnit = {
 };
 
 /**
- * AJN Service Units - Curated PDF Focus
+ * AJN Service Units - Professional PDF Focus
  */
 export const ALL_UNITS: ServiceUnit[] = [
   // --- CONVERT TO PDF ---
-  { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Convert raster images to PDF with intelligent margin calibration.', icon: ImageIcon, tag: 'IMAGE', cat: 'Document', complexity: 'WASM' },
+  { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Convert raster images to PDF with intelligent margin calibration.', icon: ImageIcon, tag: 'Image', cat: 'Document', complexity: 'WASM' },
   { id: 'word-pdf', name: 'Word to PDF', desc: 'Convert DOC and DOCX files into professional A4 PDF documents.', icon: FileText, tag: 'OOXML', cat: 'Document', complexity: 'WASM' },
   { id: 'pptx-pdf', name: 'PowerPoint to PDF', desc: 'Transform slide decks into highly-compatible read-only PDF format.', icon: Presentation, tag: 'OOXML', cat: 'Document', complexity: 'WASM' },
   { id: 'excel-pdf', name: 'Excel to PDF', desc: 'Map spreadsheet grids into clean, printable PDF layouts.', icon: Table, tag: 'OOXML', cat: 'Document', complexity: 'SMART' },
-  { id: 'html-pdf', name: 'HTML to PDF', desc: 'Render web pages and HTML files directly into vector PDF buffers.', icon: Code2, tag: 'WEB', cat: 'Document', complexity: 'SMART' },
+  { id: 'html-pdf', name: 'HTML to PDF', desc: 'Render web pages and HTML files directly into vector PDF buffers.', icon: Code2, tag: 'Web', cat: 'Document', complexity: 'SMART' },
 
   // --- CONVERT FROM PDF ---
   { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Export PDF pages as high-resolution raster images.', icon: ImageIcon, tag: 'JPG', cat: 'Document', complexity: 'WASM' },
@@ -61,8 +61,8 @@ export function ServicesGrid({ query, category }: { query: string, category: str
       <div className="py-24 text-center space-y-4 opacity-40 animate-in fade-in duration-500">
         <Cpu className="w-16 h-16 mx-auto text-slate-950" />
         <div className="space-y-1">
-          <p className="text-sm font-black tracking-widest text-slate-950">Unit Not Found</p>
-          <p className="text-[10px] font-bold text-slate-950 tracking-widest">Adjust search parameters</p>
+          <p className="text-sm font-bold tracking-tight text-slate-950">Unit Not Found</p>
+          <p className="text-[10px] font-medium text-slate-950 uppercase tracking-widest">Adjust search parameters</p>
         </div>
       </div>
     );
@@ -84,20 +84,20 @@ export function ServicesGrid({ query, category }: { query: string, category: str
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
                   <Badge className={cn(
-                    "text-[7px] font-black h-4 px-1.5 border-none tracking-widest",
+                    "text-[8px] font-black h-4 px-1.5 border-none tracking-widest uppercase",
                     unit.complexity === 'WASM' ? "bg-emerald-500/10 text-emerald-600" :
                     unit.complexity === 'AI' ? "bg-primary/10 text-primary" :
                     "bg-orange-500/10 text-orange-600"
                   )}>
                     {unit.complexity}
                   </Badge>
-                  <span className="text-[8px] font-black text-slate-950/40 tracking-widest">{unit.tag}</span>
+                  <span className="text-[9px] font-bold text-slate-900/40 uppercase">{unit.tag}</span>
                 </div>
               </div>
 
               <div className="space-y-2 flex-1">
-                <h3 className="text-xs font-black tracking-tighter text-slate-950 group-hover:text-primary transition-colors leading-none">{unit.name}</h3>
-                <p className="text-[9px] text-slate-950 leading-relaxed font-bold tracking-wider line-clamp-3 opacity-60 group-hover:opacity-100 transition-opacity">
+                <h3 className="text-sm font-black tracking-tighter text-slate-950 group-hover:text-primary transition-colors leading-none">{unit.name}</h3>
+                <p className="text-[10px] text-slate-900 leading-relaxed font-medium tracking-wide line-clamp-3 opacity-60 group-hover:opacity-100 transition-opacity">
                   {unit.desc}
                 </p>
               </div>
@@ -105,9 +105,9 @@ export function ServicesGrid({ query, category }: { query: string, category: str
               <div className="pt-4 flex items-center justify-between border-t border-black/5 mt-4">
                 <div className="flex items-center gap-1.5">
                   <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[7px] font-black text-slate-950 tracking-widest">Active Node</span>
+                  <span className="text-[8px] font-bold text-slate-900/60 uppercase">Active Node</span>
                 </div>
-                <span className="text-[7px] font-bold text-slate-950/40 tracking-widest">{unit.cat}</span>
+                <span className="text-[8px] font-bold text-slate-900/40 uppercase">{unit.cat}</span>
               </div>
             </CardContent>
           </Card>
