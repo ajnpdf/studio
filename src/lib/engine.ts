@@ -171,7 +171,11 @@ class ConversionEngine {
 
   private determineContext(opId?: string): ExecutionContext {
     const aiOps = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'compare-pdf', 'repair-pdf'];
-    const smartOps = ['compress-pdf', 'extract-pages', 'organize-pdf', 'sign-pdf', 'protect-pdf', 'word-pdf', 'excel-pdf', 'pptx-pdf'];
+    const smartOps = [
+      'compress-pdf', 'extract-pages', 'organize-pdf', 'sign-pdf', 
+      'protect-pdf', 'word-pdf', 'excel-pdf', 'pptx-pdf',
+      'pdf-word', 'pdf-excel', 'pdf-pptx', 'rotate-pdf', 'page-numbers'
+    ];
     if (opId && aiOps.includes(opId)) return 'AI';
     if (opId && smartOps.includes(opId)) return 'SMART';
     return 'WASM';
@@ -259,7 +263,7 @@ class ConversionEngine {
       case 'rotate-pdf': 
         return manip.rotate(job.settings.angle || 90);
       case 'page-numbers': 
-        return manip.addPageNumbers();
+        return manip.addPageNumbers(job.settings);
       case 'watermark-pdf': 
         return manip.addWatermark(job.settings.text || 'AJN Master');
       case 'crop-pdf': 
@@ -276,6 +280,8 @@ class ConversionEngine {
         return specialized.convertTo('TRANSCRIPT', job.settings);
       case 'translate-pdf': 
         return specialized.convertTo('TRANSCRIPT', job.settings);
+      case 'pdf-pdfa':
+        return this.runConversion({ ...job, toFmt: 'PDFA' });
       default: 
         return this.runConversion(job);
     }

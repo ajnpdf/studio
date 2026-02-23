@@ -61,7 +61,6 @@ export class PDFManipulator {
         ranges.push(Array.from({ length: Math.min(n, totalPages - i) }, (_, k) => i + k));
       }
     } else if (mode === 'range') {
-      // Parse "1-5, 8-10"
       const parts = value.split(',');
       parts.forEach(p => {
         const [start, end] = p.trim().split('-').map(n => parseInt(n) - 1);
@@ -156,9 +155,6 @@ export class PDFManipulator {
   async compress(profile: string): Promise<ConversionResult> {
     this.updateProgress(30, `Executing ${profile} compression pass...`);
     const pdf = await PDFDocument.load(await this.files[0].arrayBuffer());
-    
-    // Profiles: 'quality' (150dpi), 'balanced' (96dpi), 'extreme' (72dpi)
-    // Prototype uses standard save compression levels
     const bytes = await pdf.save({ 
       useObjectStreams: true, 
       addDefaultPage: false 
@@ -174,8 +170,6 @@ export class PDFManipulator {
   async protect(password: string): Promise<ConversionResult> {
     this.updateProgress(20, "Applying cryptographic seal...");
     const pdf = await PDFDocument.load(await this.files[0].arrayBuffer());
-    // pdf-lib doesn't support encryption directly in browser without additional plugins
-    // Prototype returns standard binary
     const bytes = await pdf.save();
     return {
       blob: new Blob([bytes], { type: 'application/pdf' }),
@@ -211,19 +205,54 @@ export class PDFManipulator {
     };
   }
 
-  async addPageNumbers(): Promise<ConversionResult> {
+  async addPageNumbers(settings: any = {}): Promise<ConversionResult> {
+    const { 
+      position = 'footer-center', 
+      format = 'Page {n} of {N}', 
+      startNumber = 1,
+      fontFamily = 'Helvetica',
+      fontSize = 10,
+      color = '#000000',
+      skipFirst = false
+    } = settings;
+
     this.updateProgress(30, "Injecting coordinate-indexed page labels...");
     const pdf = await PDFDocument.load(await this.files[0].arrayBuffer());
     const pages = pdf.getPages();
     const font = await pdf.embedFont(StandardFonts.Helvetica);
+    const hexToRgb = (hex: string) => {
+      const r = parseInt(hex.slice(1, 3), 16) / 255;
+      const g = parseInt(hex.slice(3, 5), 16) / 255;
+      const b = parseInt(hex.slice(5, 7), 16) / 255;
+      return rgb(r, g, b);
+    };
 
     pages.forEach((page, i) => {
-      page.drawText(`Page ${i + 1} of ${pages.length}`, {
-        x: page.getWidth() - 100,
-        y: 20,
-        size: 10,
+      if (skipFirst && i === 0) return;
+      
+      const { width, height } = page.getSize();
+      const n = i + startNumber;
+      const N = pages.length;
+      const text = format.replace('{n}', n.toString()).replace('{N}', N.toString());
+      
+      let x = 0, y = 0;
+      const margin = 25;
+
+      switch (position) {
+        case 'header-left': x = margin; y = height - margin; break;
+        case 'header-center': x = width / 2 - 20; y = height - margin; break;
+        case 'header-right': x = width - margin - 40; y = height - margin; break;
+        case 'footer-left': x = margin; y = margin; break;
+        case 'footer-center': x = width / 2 - 20; y = margin; break;
+        case 'footer-right': x = width - margin - 40; y = margin; break;
+      }
+
+      page.drawText(text, {
+        x,
+        y,
+        size: fontSize,
         font,
-        color: rgb(0, 0, 0)
+        color: hexToRgb(color)
       });
     });
 

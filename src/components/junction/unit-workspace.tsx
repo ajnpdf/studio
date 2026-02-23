@@ -18,7 +18,11 @@ import {
   ShieldCheck,
   Cpu,
   Layers,
-  ArrowRight
+  ArrowRight,
+  Hash,
+  Type,
+  Palette,
+  LayoutGrid
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -27,6 +31,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 
 interface Props {
   defaultCategory: string;
@@ -35,7 +41,6 @@ interface Props {
 
 /**
  * AJN Unit Workspace - Autonomous Intelligence Engine
- * No manual protocol selection; tool understands transformation in real-time.
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [appState, setAppState] = useState<GlobalAppState | null>(null);
@@ -53,6 +58,15 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [compressionProfile, setCompressionProfile] = useState('balanced');
   const [pageSize, setPageSize] = useState('A4');
   const [orientation, setOrientation] = useState('auto');
+  const [dpi, setDpi] = useState('150');
+  const [quality, setQuality] = useState(90);
+  
+  // Page Numbering Settings
+  const [numPosition, setNumPosition] = useState('footer-center');
+  const [numFormat, setNumFormat] = useState('Page {n} of {N}');
+  const [numStart, setNumStart] = useState(1);
+  const [numColor, setNumColor] = useState('#000000');
+  const [skipFirst, setSkipFirst] = useState(false);
 
   useEffect(() => {
     return engine.subscribe(setAppState);
@@ -60,7 +74,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
   useEffect(() => {
     if (!initialUnitId) return;
-    // Autonomous logic setup based on Tool Identity
     if (initialUnitId.includes('-pdf')) {
       const from = initialUnitId.split('-')[0].toUpperCase();
       setFromFmt(from === 'MERGE' || from === 'SPLIT' || from === 'ORGANIZE' || from === 'REMOVE' || from === 'EXTRACT' ? 'PDF' : from);
@@ -86,7 +99,14 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       splitValue: pageRange,
       pages: pageRange.split(',').map(p => parseInt(p.trim()) - 1).filter(p => !isNaN(p)),
       pageSize,
-      orientation
+      orientation,
+      dpi: parseInt(dpi),
+      quality,
+      position: numPosition,
+      format: numFormat,
+      startNumber: numStart,
+      color: numColor,
+      skipFirst
     };
     engine.addJobs(files, fromFmt, toFmt, settings, initialUnitId);
   };
@@ -97,7 +117,8 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
     'protect-pdf', 'split-pdf', 'extract-pages', 'remove-pages', 
     'rotate-pdf', 'watermark-pdf', 'translate-pdf', 'compress-pdf',
     'unlock-pdf', 'redact-pdf', 'page-numbers', 'crop-pdf', 'jpg-pdf',
-    'word-pdf', 'pptx-pdf', 'excel-pdf', 'html-pdf'
+    'word-pdf', 'pptx-pdf', 'excel-pdf', 'html-pdf', 'pdf-jpg', 'pdf-word',
+    'pdf-excel', 'pdf-pptx', 'pdf-pdfa'
   ].includes(initialUnitId || '');
 
   return (
@@ -111,7 +132,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           <div className="p-4 md:p-10 space-y-10 max-w-4xl mx-auto pb-32">
             
-            {/* Contextual Status Header */}
             <div className="flex items-center justify-between px-2 animate-in fade-in duration-700">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
@@ -128,7 +148,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               </div>
             </div>
 
-            {/* Contextual Parameter Panel */}
             {hasControls && (
               <section className="bg-white/40 border border-white/60 p-6 md:p-8 rounded-[2rem] animate-in fade-in slide-in-from-bottom-2 duration-700 shadow-xl backdrop-blur-xl">
                 <div className="flex items-center gap-3 mb-6 px-1">
@@ -150,6 +169,63 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                         </SelectContent>
                       </Select>
                     </div>
+                  )}
+
+                  {initialUnitId === 'pdf-jpg' && (
+                    <>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Export Resolution</Label>
+                        <Select value={dpi} onValueChange={setDpi}>
+                          <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="72" className="font-bold text-xs">72 DPI (Web)</SelectItem>
+                            <SelectItem value="150" className="font-bold text-xs">150 DPI (Print)</SelectItem>
+                            <SelectItem value="300" className="font-bold text-xs">300 DPI (High Res)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-4">
+                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Quality: {quality}%</Label>
+                        <Slider value={[quality]} max={100} onValueChange={([v]) => setQuality(v)} />
+                      </div>
+                    </>
+                  )}
+
+                  {initialUnitId === 'page-numbers' && (
+                    <>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Label Position</Label>
+                        <Select value={numPosition} onValueChange={setNumPosition}>
+                          <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="header-center">Header Center</SelectItem>
+                            <SelectItem value="footer-center">Footer Center</SelectItem>
+                            <SelectItem value="footer-right">Footer Right</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Number Style</Label>
+                        <Select value={numFormat} onValueChange={setNumFormat}>
+                          <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Page {n} of {N}">Standard Long</SelectItem>
+                            <SelectItem value="{n}">Page Only</SelectItem>
+                            <SelectItem value="- {n} -">Hyphenated</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-black/5 self-end h-11">
+                        <span className="text-[10px] font-bold uppercase text-slate-950/60">Skip Cover</span>
+                        <Switch checked={skipFirst} onCheckedChange={setSkipFirst} />
+                      </div>
+                    </>
                   )}
 
                   {(initialUnitId === 'jpg-pdf' || initialUnitId === 'word-pdf') && (
