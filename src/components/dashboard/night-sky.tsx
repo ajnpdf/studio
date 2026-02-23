@@ -14,7 +14,6 @@ interface Star {
 
 /**
  * AJN Night Sky - Optimized for Light Background
- * Stars now twinkle with a violet glow over the platform gradient.
  * Robust hydration fix: Returns null on initial server/client pass to sync attributes.
  */
 export function NightSky() {
@@ -22,10 +21,10 @@ export function NightSky() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const generatedStars = [...Array(35)].map((_, i) => ({
+    const generatedStars = [...Array(25)].map((_, i) => ({
       id: i,
-      width: `${Math.random() * 1.5 + 1.2}px`,
-      height: `${Math.random() * 1.5 + 1.2}px`,
+      width: `${Math.random() * 1.5 + 1}px`,
+      height: `${Math.random() * 1.5 + 1}px`,
       top: `${Math.random() * 100}%`,
       left: `${Math.random() * 100}%`,
       animationDuration: `${Math.random() * 3 + 3}s`,
@@ -35,21 +34,16 @@ export function NightSky() {
     setMounted(true);
   }, []);
 
-  // Prevent hydration error by rendering nothing until client-side is ready
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-transparent">
-      {/* Visual Ambient Layer */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(139,92,246,0.1)_0%,transparent_60%)] opacity-50" />
-      
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(139,92,246,0.05)_0%,transparent_60%)] opacity-50" />
       <div className="absolute inset-0">
         {stars.map((star) => (
           <div
             key={star.id}
-            className="absolute bg-white rounded-full opacity-40 animate-twinkle shadow-[0_0_8px_rgba(139,92,246,0.5)]"
+            className="absolute bg-white rounded-full opacity-30 animate-twinkle shadow-[0_0_6px_rgba(139,92,246,0.3)]"
             style={{
               width: star.width,
               height: star.height,
