@@ -15,12 +15,14 @@ interface Star {
 /**
  * AJN Night Sky - Optimized for Light Background
  * Stars now twinkle with a violet glow over the platform gradient.
+ * Fixed Hydration Error via mounted state check.
  */
 export function NightSky() {
   const [stars, setStars] = useState<Star[]>([]);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // defer state update to after hydration to prevent mismatch
+    setMounted(true);
     const generatedStars = [...Array(35)].map((_, i) => ({
       id: i,
       width: `${Math.random() * 1.5 + 1.2}px`,
@@ -32,6 +34,10 @@ export function NightSky() {
     }));
     setStars(generatedStars);
   }, []);
+
+  if (!mounted) {
+    return <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-transparent" />;
+  }
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-transparent">
