@@ -1,9 +1,9 @@
+
 'use client';
 
 import { PDFConverter } from './converters/pdf-converter';
 import { SpecializedConverter } from './converters/specialized-converter';
 import { PDFManipulator } from './converters/pdf-manipulator';
-import { ScannerConverter } from './converters/scanner-converter';
 import { WordConverter } from './converters/word-converter';
 import { ExcelConverter } from './converters/excel-converter';
 import { PPTConverter } from './converters/ppt-converter';
