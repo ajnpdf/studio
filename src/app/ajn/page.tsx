@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { Button } from '@/components/ui/button';
@@ -10,41 +10,12 @@ import {
   Search,
   Command,
   Workflow,
-  Sparkles,
-  Zap,
   Activity
 } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { ServicesGrid } from '@/components/junction/services-grid';
 import { UnitScroller } from '@/components/junction/unit-scroller';
-
-/**
- * AJN System Title Component
- * Features high-fidelity 3D rotateX flip animations letter-by-letter.
- */
-function CharacterTitle({ text }: { text: string }) {
-  return (
-    <div className="flex flex-wrap justify-center gap-[0.05em] perspective-1000">
-      {text.split("").map((char, i) => (
-        <motion.span
-          key={i}
-          initial={{ rotateX: -110, opacity: 0, y: 30 }}
-          animate={{ rotateX: 0, opacity: 1, y: 0 }}
-          transition={{
-            type: "spring",
-            stiffness: 140,
-            damping: 14,
-            delay: i * 0.035
-          }}
-          className="inline-block origin-bottom preserve-3d"
-        >
-          {char === " " ? "\u00A0" : char}
-        </motion.span>
-      ))}
-    </div>
-  );
-}
 
 export default function AJNPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -76,13 +47,8 @@ export default function AJNPage() {
       <main className="relative z-10 flex-1 p-6 pt-32 max-w-7xl mx-auto w-full space-y-16">
         {/* CENTERED SEARCH & BRANDING SECTOR */}
         <section className="flex flex-col items-center gap-12 text-center">
-          <div className="space-y-6">
-            <div className="text-5xl md:text-7xl font-black tracking-tighter text-slate-950 uppercase leading-none">
-              <CharacterTitle text="AJN SYSTEM UNITS" />
-            </div>
-            <p className="text-[11px] font-black text-slate-950/40 uppercase tracking-[0.6em] max-w-2xl mx-auto">
-              Universal Engineering Fabric. One Smart Network.
-            </p>
+          <div className="space-y-2">
+            <LogoAnimation className="w-64 h-32 md:w-80 md:h-40 mx-auto" />
           </div>
 
           <motion.div 
