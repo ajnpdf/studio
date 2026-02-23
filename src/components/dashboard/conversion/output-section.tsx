@@ -7,6 +7,7 @@ import { Download, Share2, Trash2, CheckCircle2, FileCode, ExternalLink, Activit
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 interface Props {
   jobs: OutputBuffer[];
