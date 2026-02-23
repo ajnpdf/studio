@@ -36,6 +36,35 @@ interface Props {
   initialUnitId?: string;
 }
 
+const SUPPORTED_LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'es', label: 'Español' },
+  { code: 'fr', label: 'Français' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'it', label: 'Italiano' },
+  { code: 'pt', label: 'Português' },
+  { code: 'ja', label: '日本語' },
+  { code: 'ru', label: 'Pусский' },
+  { code: 'ko', label: '한국어' },
+  { code: 'zh-cn', label: 'Chinese (Simplified)' },
+  { code: 'zh-tw', label: 'Chinese (Traditional)' },
+  { code: 'ar', label: 'Arabic' },
+  { code: 'bg', label: 'Bulgarian' },
+  { code: 'ca', label: 'Catalan' },
+  { code: 'nl', label: 'Dutch' },
+  { code: 'el', label: 'Greek' },
+  { code: 'hi', label: 'Hindi' },
+  { code: 'id', label: 'Indonesian' },
+  { code: 'ms', label: 'Malay' },
+  { code: 'pl', label: 'Polski' },
+  { code: 'sv', label: 'Swedish' },
+  { code: 'th', label: 'Thai' },
+  { code: 'tr', label: 'Turkish' },
+  { code: 'uk', label: 'Ukrainian' },
+  { code: 'vi', label: 'Vietnamese' },
+  { code: 'te', label: 'Telugu' },
+];
+
 /**
  * AJN Advanced Unit Workspace - Production Environment
  * Industrial engineering interface for master transformation units.
@@ -49,7 +78,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [optimizeConfig, setOptimizeConfig] = useState({ quality: 85, stripMetadata: true });
   const [translateConfig, setTranslateConfig] = useState({ targetLanguage: 'Spanish', bilingual: false });
   const [conversionConfig, setConversionConfig] = useState({ toFmt: 'PDF' });
-  const [ocrConfig, setOcrConfig] = useState({ language: 'eng', autoRotate: true });
+  const [ocrConfig, setOcrConfig] = useState({ language: 'en', autoRotate: true });
 
   useEffect(() => {
     return engine.subscribe(setAppState);
@@ -178,7 +207,11 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {['English', 'Spanish', 'French', 'German', 'Chinese', 'Japanese'].map(l => <SelectItem key={l} value={l.toLowerCase().substring(0,3)} className="font-bold text-[10px] uppercase">{l}</SelectItem>)}
+                                {SUPPORTED_LANGUAGES.map(l => (
+                                  <SelectItem key={l.code} value={l.code} className="font-bold text-[10px] uppercase">
+                                    {l.label}
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                           </div>
@@ -196,7 +229,11 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {['Spanish', 'French', 'German', 'Chinese', 'Japanese', 'Arabic'].map(l => <SelectItem key={l} value={l} className="font-bold text-[10px] uppercase">{l}</SelectItem>)}
+                                {SUPPORTED_LANGUAGES.map(l => (
+                                  <SelectItem key={l.code} value={l.label} className="font-bold text-[10px] uppercase">
+                                    {l.label}
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                           </div>

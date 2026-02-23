@@ -18,8 +18,10 @@ export function PlatformLoader() {
   const [textIndex, setTextIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [isDone, setIsDone] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const interval = setInterval(() => {
       setPercent(prev => {
         if (prev >= 100) {
@@ -41,7 +43,7 @@ export function PlatformLoader() {
     return () => clearInterval(interval);
   }, [textIndex]);
 
-  if (!isVisible) return null;
+  if (!isVisible || !mounted) return null;
 
   return (
     <div className={cn(
