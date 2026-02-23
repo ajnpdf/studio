@@ -1,9 +1,8 @@
 "use client";
 
 import { useMemo } from 'react';
-import { ArrowRightLeft, Lock, ChevronDown } from 'lucide-react';
+import { ArrowRightLeft, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -22,8 +21,8 @@ interface Props {
 }
 
 /**
- * AJN Format Selector
- * Professional Protocol Management - Source is fixed, Target is dynamic.
+ * AJN Format Selector - Refined Light Theme
+ * Professional Protocol Management - Locked source, editable target.
  */
 export function FormatSelector({ category, from, to, onFromChange, onToChange, isSourceLocked = false }: Props) {
   const targets = useMemo(() => {
@@ -42,34 +41,34 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange, i
   }, [category, isSourceLocked]);
 
   return (
-    <section className="space-y-6 animate-in slide-in-from-top-4 duration-500 w-full">
-      <div className="flex flex-col md:flex-row items-center gap-4 bg-white/5 p-6 rounded-[2.5rem] border border-white/10 shadow-2xl relative overflow-hidden">
+    <section className="space-y-4 animate-in slide-in-from-top-4 duration-500 w-full">
+      <div className="flex flex-col md:flex-row items-center gap-3 bg-white/40 p-5 rounded-[2rem] border border-white/60 shadow-xl relative overflow-hidden backdrop-blur-xl">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent pointer-events-none" />
         
         {/* SOURCE PROTOCOL - LOCKED */}
-        <div className="flex-1 w-full space-y-2 relative z-10">
-          <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 ml-4">Source Protocol</label>
-          <div className="h-14 bg-background/40 border border-white/10 rounded-2xl flex items-center px-6 font-black text-sm uppercase text-white/90 group transition-all">
-            {from || 'AUTO DETECT'}
-            <Lock className="w-3.5 h-3.5 ml-auto text-primary/40 group-hover:text-primary transition-colors" />
+        <div className="flex-1 w-full space-y-1.5 relative z-10">
+          <label className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-3">Source Node</label>
+          <div className="h-12 bg-black/5 border border-black/5 rounded-xl flex items-center px-5 font-black text-xs uppercase text-slate-900 group transition-all">
+            {from || 'Detecting...'}
+            <Lock className="w-3 h-3 ml-auto text-primary/40 group-hover:text-primary transition-colors" />
           </div>
         </div>
 
-        <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-6 md:mt-0">
-          <ArrowRightLeft className="w-5 h-5 text-primary/40" />
+        <div className="w-10 h-10 rounded-full bg-white/60 border border-white/80 flex items-center justify-center shrink-0 mt-2 md:mt-4 shadow-sm">
+          <ArrowRightLeft className="w-4 h-4 text-primary/40" />
         </div>
 
         {/* TARGET PROTOCOL - EDITABLE */}
-        <div className="flex-1 w-full space-y-2 relative z-10">
-          <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 ml-4">Target Protocol</label>
+        <div className="flex-1 w-full space-y-1.5 relative z-10">
+          <label className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-3">Target Node</label>
           <Select value={to} onValueChange={onToChange}>
-            <SelectTrigger className="h-14 bg-background/40 border border-white/10 rounded-2xl flex items-center px-6 font-black text-sm uppercase text-primary focus:ring-primary/40">
-              <SelectValue placeholder="SELECT TARGET" />
+            <SelectTrigger className="h-12 bg-white/60 border border-black/5 rounded-xl flex items-center px-5 font-black text-xs uppercase text-primary focus:ring-primary/20 shadow-sm transition-all hover:border-primary/20">
+              <SelectValue placeholder="SELECT OUTPUT" />
             </SelectTrigger>
-            <SelectContent className="bg-[#0d1225]/95 backdrop-blur-xl border-white/10 max-h-[300px]">
+            <SelectContent className="bg-white/95 backdrop-blur-xl border-black/5 max-h-[300px] rounded-xl shadow-2xl">
               {targets.map(t => (
-                <SelectItem key={t} value={t} className="text-xs font-black uppercase tracking-widest py-3">
-                  {t} PROTOCOL
+                <SelectItem key={t} value={t} className="text-[10px] font-black uppercase tracking-widest py-2.5">
+                  {t} Protocol
                 </SelectItem>
               ))}
             </SelectContent>
@@ -78,9 +77,9 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange, i
       </div>
 
       {!isSourceLocked && quickPills.length > 0 && (
-        <div className="flex flex-wrap items-center gap-3 px-4">
-          <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-            Top {category.toUpperCase()} Tools:
+        <div className="flex flex-wrap items-center gap-2 px-2">
+          <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2 mr-1">
+            Presets:
           </span>
           {quickPills.map(pill => (
             <button 
@@ -90,7 +89,7 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange, i
                 onFromChange(f);
                 onToChange(t);
               }}
-              className="px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-[9px] font-bold text-muted-foreground hover:bg-primary hover:text-white transition-all uppercase tracking-widest"
+              className="px-3 py-1 bg-white/40 border border-white/60 rounded-full text-[8px] font-bold text-muted-foreground hover:bg-primary hover:text-white transition-all uppercase tracking-widest shadow-sm"
             >
               {pill}
             </button>

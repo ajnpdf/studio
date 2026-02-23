@@ -13,23 +13,23 @@ import {
   Layers,
   ChevronLeft,
   ChevronRight,
-  Cpu
+  ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 const categories = [
-  { id: 'Document', icon: FileText, label: 'Document Services', color: 'text-blue-600' },
-  { id: 'Image', icon: ImageIcon, label: 'Image Services', color: 'text-indigo-600' },
-  { id: 'Video', icon: Video, label: 'Video Services', color: 'text-purple-600' },
-  { id: 'Audio', icon: Music, label: 'Audio Services', color: 'text-pink-600' },
-  { id: 'Archive', icon: Archive, label: 'Archive Hub', color: 'text-amber-600' },
+  { id: 'Document', icon: FileText, label: 'Documents', color: 'text-blue-600' },
+  { id: 'Image', icon: ImageIcon, label: 'Imagery', color: 'text-indigo-600' },
+  { id: 'Video', icon: Video, label: 'Motion', color: 'text-purple-600' },
+  { id: 'Audio', icon: Music, label: 'Audio', color: 'text-pink-600' },
+  { id: 'Archive', icon: Archive, label: 'Archives', color: 'text-amber-600' },
   { id: 'Code', icon: Code, label: 'Data & Code', color: 'text-emerald-600' },
-  { id: 'eBook', icon: BookOpen, label: 'Ebook Services', color: 'text-cyan-600' },
-  { id: 'Design', icon: Wand2, label: 'Design Vector', color: 'text-orange-600' },
-  { id: '3D/CAD', icon: Layers, label: 'Technical CAD', color: 'text-red-600' },
-  { id: 'Specialized', icon: Box, label: 'Specialized Tools', color: 'text-slate-600' },
+  { id: 'eBook', icon: BookOpen, label: 'Ebooks', color: 'text-cyan-600' },
+  { id: 'Design', icon: Wand2, label: 'Design', color: 'text-orange-600' },
+  { id: '3D/CAD', icon: Layers, label: 'Technical', color: 'text-red-600' },
+  { id: 'Specialized', icon: Box, label: 'Specialized', color: 'text-slate-600' },
 ];
 
 interface Props {
@@ -37,16 +37,20 @@ interface Props {
   onSelect: (id: string) => void;
 }
 
+/**
+ * AJN Category Sidebar - Refined Light Professional Theme
+ * Compact, proper case, and modern glassmorphism.
+ */
 export function CategorySidebar({ active, onSelect }: Props) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
     <aside className={cn(
-      "h-full border-r border-black/5 bg-white/40 backdrop-blur-3xl flex flex-col shrink-0 transition-all duration-500 z-30",
+      "h-full border-r border-black/5 bg-white/40 backdrop-blur-3xl flex flex-col shrink-0 transition-all duration-500 z-30 shadow-sm",
       collapsed ? "w-20" : "w-64"
     )}>
-      <div className="p-6 border-b border-black/5 flex items-center justify-between">
-        {!collapsed && <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">Toolsets</h3>}
+      <div className="p-5 border-b border-black/5 flex items-center justify-between">
+        {!collapsed && <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Unit Cluster</h3>}
         <Button 
           variant="ghost" 
           size="icon" 
@@ -57,16 +61,16 @@ export function CategorySidebar({ active, onSelect }: Props) {
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3 space-y-1.5 scrollbar-hide">
+      <div className="flex-1 overflow-y-auto p-2.5 space-y-1 scrollbar-hide">
         {categories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => onSelect(cat.id)}
             className={cn(
-              "w-full flex items-center gap-3 px-3 py-3 rounded-xl text-xs font-bold transition-all group relative",
+              "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all group relative",
               active === cat.id 
-                ? "bg-primary text-white shadow-xl shadow-primary/20" 
-                : "text-muted-foreground/60 hover:bg-black/5 hover:text-slate-900"
+                ? "bg-primary text-white shadow-lg shadow-primary/10" 
+                : "text-muted-foreground hover:bg-black/5 hover:text-slate-900"
             )}
           >
             <div className={cn(
@@ -80,7 +84,11 @@ export function CategorySidebar({ active, onSelect }: Props) {
             </div>
             
             {!collapsed && (
-              <span className="flex-1 text-left uppercase tracking-widest text-[10px] font-black">{cat.label}</span>
+              <span className="flex-1 text-left font-black tracking-tight uppercase text-[10px]">{cat.label}</span>
+            )}
+            
+            {active === cat.id && !collapsed && (
+              <div className="w-1 h-1 rounded-full bg-white animate-pulse mr-1" />
             )}
           </button>
         ))}
@@ -88,17 +96,17 @@ export function CategorySidebar({ active, onSelect }: Props) {
 
       <div className="p-4 border-t border-black/5 bg-white/20">
         <div className={cn(
-          "bg-white/40 rounded-2xl p-4 border border-white/60 flex flex-col gap-3 relative overflow-hidden shadow-sm",
-          collapsed && "items-center"
+          "bg-white/60 rounded-2xl p-4 border border-white/80 flex flex-col gap-3 relative overflow-hidden shadow-sm",
+          collapsed && "items-center px-2"
         )}>
           <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center relative z-10">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           </div>
           
           {!collapsed && (
             <div className="relative z-10">
-              <p className="text-[10px] font-black uppercase text-slate-900">System Optimal</p>
-              <p className="text-[8px] font-bold text-muted-foreground/60 uppercase tracking-widest">Active Processing</p>
+              <p className="text-[10px] font-black uppercase text-slate-900 leading-none">System Stable</p>
+              <p className="text-[8px] font-bold text-muted-foreground/60 uppercase tracking-widest mt-1">Global Node Node</p>
             </div>
           )}
         </div>
