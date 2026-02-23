@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -25,7 +24,8 @@ import {
   Wand2,
   Database,
   Layers,
-  Activity
+  Activity,
+  History
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -40,8 +40,8 @@ interface Props {
 }
 
 /**
- * AJN Unit Workspace - High-Fidelity Bento Grid
- * Features hardware-accelerated animations and sanitized technical terminology.
+ * AJN Unit Workspace - Professional Bento Infrastructure
+ * Features hardware-accelerated transitions and real-time state synchronization.
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [appState, setAppState] = useState<GlobalAppState | null>(null);
@@ -52,7 +52,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [watermarkText, setWatermarkText] = useState('AJN Private');
   const [targetLang, setTargetLang] = useState('es');
   const [pageRange, setPageRange] = useState('1-5');
-  const [splitMode, setSplitMode] = useState<'range' | 'every' | 'range'>('range');
+  const [splitMode, setSplitMode] = useState<'range' | 'every' | 'equal'>('range');
   const [rotateAngle, setRotateAngle] = useState('90');
   const [summaryLength, setSummaryLength] = useState('medium');
 
@@ -123,88 +123,96 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       <CategorySidebar active={activeCategory} onSelect={setActiveCategory} />
 
       <main className="flex-1 flex flex-col min-w-0 border-r border-black/5 relative h-full">
-        <div className="flex-1 overflow-y-auto scrollbar-hide">
+        <div className="flex-1 overflow-y-auto scrollbar-hide invisible-scroll">
           <AnimatePresence mode="wait">
             <motion.div 
               key={initialUnitId}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 100, damping: 20 }}
-              className="p-4 md:p-10 space-y-8 max-w-5xl mx-auto pb-32"
+              transition={{ type: "spring", stiffness: 120, damping: 22 }}
+              className="p-6 md:p-12 space-y-10 max-w-6xl mx-auto pb-40"
             >
-              <div className="flex items-center justify-between px-2">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
-                    <Cpu className="w-5 h-5 text-primary" />
+              <div className="flex items-center justify-between px-4">
+                <div className="flex items-center gap-6">
+                  <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-xl">
+                    <Cpu className="w-7 h-7 text-primary animate-pulse" />
                   </div>
-                  <div className="space-y-0.5">
-                    <h2 className="text-xl font-black tracking-tight text-slate-950 uppercase">{unitDisplayName}</h2>
-                    <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Active Smart Instance</p>
+                  <div className="space-y-1">
+                    <h2 className="text-2xl font-black tracking-tighter text-slate-950 uppercase leading-none">{unitDisplayName}</h2>
+                    <p className="text-[11px] font-black text-slate-950/40 uppercase tracking-[0.4em]">Operational System Instance</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                <div className="flex items-center gap-3 px-5 py-2.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 shadow-inner">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Secure Master System</span>
+                  <span className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">Master System Active</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div className="lg:col-span-8 space-y-8">
+                  {/* SEQUENTIAL MERGE HUD */}
                   {initialUnitId === 'merge-pdf' && (
-                    <section className="space-y-4">
-                      <div className="flex items-center justify-between px-2">
-                        <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-950/60">Sequence Assembly</h3>
-                        <Badge className="bg-primary text-white border-none text-[9px] h-5">{prepQueue.length} Assets</Badge>
+                    <section className="space-y-6">
+                      <div className="flex items-center justify-between px-4">
+                        <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-950/60">Sequence Assembly Logic</h3>
+                        <Badge className="bg-primary text-white border-none text-[10px] font-black px-3 h-6 rounded-full">{prepQueue.length} Active Assets</Badge>
                       </div>
 
                       <AnimatePresence mode="popLayout">
                         {prepQueue.length > 0 ? (
-                          <div className="space-y-2">
+                          <div className="space-y-3">
                             {prepQueue.map((file, i) => (
                               <motion.div 
                                 key={i}
                                 layout
-                                initial={{ opacity: 0, x: -10 }}
+                                initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, scale: 0.9 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="group"
                               >
-                                <Card className="bg-white/40 backdrop-blur-xl border-black/5 group hover:border-primary/20 transition-all shadow-sm">
-                                  <CardContent className="p-3 flex items-center gap-4">
-                                    <div className="flex flex-col gap-1 text-slate-950/20 group-hover:text-primary transition-colors cursor-grab">
-                                      <GripVertical className="w-4 h-4" />
+                                <Card className="bg-white/50 backdrop-blur-2xl border-black/5 hover:border-primary/30 transition-all shadow-xl rounded-2xl overflow-hidden border-2">
+                                  <CardContent className="p-4 flex items-center gap-6">
+                                    <div className="flex flex-col gap-1.5 text-slate-950/20 group-hover:text-primary transition-colors cursor-grab px-2">
+                                      <GripVertical className="w-5 h-5" />
                                     </div>
-                                    <div className="flex-1 overflow-hidden">
-                                      <p className="text-xs font-black truncate text-slate-950 uppercase">{file.name}</p>
-                                      <p className="text-[8px] font-bold text-slate-950/40 uppercase tracking-widest">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                    <div className="w-10 h-10 bg-black/5 rounded-xl flex items-center justify-center font-black text-xs border border-black/5">
+                                      {i + 1}
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => reorderPrep(i, 'up')} disabled={i === 0}><RotateCw className="w-3 h-3 rotate-[-90deg]" /></Button>
-                                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => reorderPrep(i, 'down')} disabled={i === prepQueue.length - 1}><RotateCw className="w-3 h-3 rotate(90deg)" /></Button>
-                                      <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-red-50 text-red-400" onClick={() => removePrepItem(i)}><X className="w-3.5 h-3.5" /></Button>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-black truncate text-slate-950 uppercase tracking-tighter">{file.name}</p>
+                                      <p className="text-[9px] font-black text-slate-950/40 uppercase tracking-widest">{(file.size / (1024 * 1024)).toFixed(2)} MB • Verification Stable</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-primary/10 rounded-xl" onClick={() => reorderPrep(i, 'up')} disabled={i === 0}><RotateCw className="w-4 h-4 rotate-[-90deg]" /></Button>
+                                      <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-primary/10 rounded-xl" onClick={() => reorderPrep(i, 'down')} disabled={i === prepQueue.length - 1}><RotateCw className="w-4 h-4 rotate(90deg)" /></Button>
+                                      <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-red-50 text-red-400 rounded-xl" onClick={() => removePrepItem(i)}><X className="w-4 h-4" /></Button>
                                     </div>
                                   </CardContent>
                                 </Card>
                               </motion.div>
                             ))}
                             
-                            <div className="flex gap-3 pt-4">
+                            <div className="flex gap-4 pt-6">
                               <Button 
                                 onClick={handleMergeStart} 
                                 disabled={prepQueue.length < 2}
-                                className="flex-1 h-12 bg-primary hover:bg-primary/90 text-white font-black text-xs uppercase tracking-widest gap-2 rounded-xl shadow-xl"
+                                className="flex-1 h-14 bg-primary hover:bg-primary/90 text-white font-black text-sm uppercase tracking-widest gap-3 rounded-2xl shadow-2xl shadow-primary/30"
                               >
-                                <Play className="w-3.5 h-3.5 fill-current" /> Execute Master Merge
+                                <Play className="w-4 h-4 fill-current" /> Execute Master Merge
                               </Button>
-                              <Button variant="outline" className="h-12 px-6 border-black/5 bg-white/40 text-[10px] font-black uppercase rounded-xl">
-                                Add Assets
+                              <Button variant="outline" onClick={() => document.getElementById('dropzone-input')?.click()} className="h-14 px-10 border-black/10 bg-white/40 text-[11px] font-black uppercase tracking-widest rounded-2xl hover:bg-white/60">
+                                <Plus className="w-4 h-4 mr-2" /> Add Assets
                               </Button>
                             </div>
                           </div>
                         ) : (
-                          <div className="py-12 text-center border-2 border-dashed border-black/5 rounded-[2rem] space-y-3 opacity-40">
-                            <Plus className="w-8 h-8 mx-auto" />
-                            <p className="text-[9px] font-black uppercase tracking-widest">Queue assets to enable assembly logic</p>
+                          <div className="py-20 text-center border-4 border-dashed border-black/5 rounded-[3rem] space-y-4 opacity-30 group hover:opacity-100 transition-opacity">
+                            <Layers className="w-12 h-12 mx-auto" />
+                            <div className="space-y-1">
+                              <p className="text-[11px] font-black uppercase tracking-[0.4em]">Queue Assembly Logic</p>
+                              <p className="text-[9px] font-bold uppercase">Load assets below to initialize merge sequence</p>
+                            </div>
                           </div>
                         )}
                       </AnimatePresence>
@@ -214,24 +222,31 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                   <DropZone onFiles={handleFilesAdded} />
                 </div>
 
-                <div className="space-y-6">
-                  <section className="bg-white/40 border border-white/60 p-6 rounded-[2.5rem] shadow-xl backdrop-blur-xl space-y-6">
-                    <div className="flex items-center gap-3">
-                      <Settings2 className="w-4 h-4 text-primary" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">System Parameters</span>
+                <div className="lg:col-span-4 space-y-8">
+                  {/* PARAMETER CONFIGURATION BENTO */}
+                  <section className="bg-white/50 border border-white/80 p-8 rounded-[3rem] shadow-2xl backdrop-blur-3xl space-y-8 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 rotate-12">
+                      <Settings2 className="w-32 h-32 text-primary" />
                     </div>
                     
-                    <div className="space-y-5">
+                    <div className="flex items-center gap-4 relative z-10">
+                      <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
+                        <Settings2 className="w-5 h-5 text-primary" />
+                      </div>
+                      <span className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-950">System Parameters</span>
+                    </div>
+                    
+                    <div className="space-y-6 relative z-10">
                       {initialUnitId === 'translate-pdf' && (
-                        <div className="space-y-2">
-                          <Label className="text-[9px] font-black text-slate-950/60 uppercase tracking-widest">Target Language</Label>
+                        <div className="space-y-3">
+                          <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Target Language Profile</Label>
                           <Select value={targetLang} onValueChange={setTargetLang}>
-                            <SelectTrigger className="bg-white/60 border-black/5 h-10 rounded-xl font-bold">
+                            <SelectTrigger className="bg-white/60 border-black/5 h-12 rounded-2xl font-black text-xs uppercase shadow-sm">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
-                              {['Spanish', 'French', 'German', 'Chinese', 'Japanese'].map(l => (
-                                <SelectItem key={l} value={l.toLowerCase().substring(0,2)} className="font-bold text-xs">{l}</SelectItem>
+                            <SelectContent className="rounded-2xl border-black/10">
+                              {['Spanish', 'French', 'German', 'Chinese', 'Japanese', 'Arabic', 'Hindi'].map(l => (
+                                <SelectItem key={l} value={l.toLowerCase().substring(0,2)} className="font-black text-[10px] uppercase">{l}</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
@@ -239,50 +254,55 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                       )}
 
                       {initialUnitId === 'summarize-pdf' && (
-                        <div className="space-y-2">
-                          <Label className="text-[9px] font-black text-slate-950/60 uppercase tracking-widest">Mastery Level</Label>
+                        <div className="space-y-3">
+                          <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Mastery Fidelity Level</Label>
                           <Select value={summaryLength} onValueChange={setSummaryLength}>
-                            <SelectTrigger className="bg-white/60 border-black/5 h-10 rounded-xl font-bold">
+                            <SelectTrigger className="bg-white/60 border-black/5 h-12 rounded-2xl font-black text-xs uppercase shadow-sm">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="short" className="font-bold text-xs">Essential (Bullets)</SelectItem>
-                              <SelectItem value="medium" className="font-bold text-xs">Standard Brief</SelectItem>
-                              <SelectItem value="long" className="font-bold text-xs">Deep Analysis</SelectItem>
+                            <SelectContent className="rounded-2xl border-black/10">
+                              <SelectItem value="short" className="font-black text-[10px] uppercase">Essential (Bullets)</SelectItem>
+                              <SelectItem value="medium" className="font-black text-[10px] uppercase">Standard Brief</SelectItem>
+                              <SelectItem value="long" className="font-black text-[10px] uppercase">Deep Analysis</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       )}
 
                       {initialUnitId === 'protect-pdf' && (
-                        <div className="space-y-2">
-                          <Label className="text-[9px] font-black text-slate-950/60 uppercase tracking-widest">Security Pin</Label>
-                          <Input 
-                            type="password" 
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••" 
-                            className="bg-white/60 border-black/5 h-10 rounded-xl font-bold"
-                          />
+                        <div className="space-y-3">
+                          <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">System Security Pin</Label>
+                          <div className="relative">
+                            <Input 
+                              type="password" 
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              placeholder="••••••••" 
+                              className="bg-white/60 border-black/5 h-12 rounded-2xl font-black text-xs shadow-sm pl-12"
+                            />
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-40" />
+                          </div>
                         </div>
                       )}
 
-                      <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
-                        <div className="flex items-center gap-2 mb-2">
-                          <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                          <span className="text-[9px] font-black uppercase text-primary">System Status</span>
+                      <div className="p-6 bg-primary/5 rounded-[2rem] border border-primary/10 shadow-inner space-y-3">
+                        <div className="flex items-center gap-3 mb-1">
+                          <ShieldCheck className="w-4 h-4 text-primary" />
+                          <span className="text-[10px] font-black uppercase text-primary tracking-widest">Environment Status</span>
                         </div>
-                        <p className="text-[8px] leading-relaxed font-bold text-slate-950/60 uppercase">
-                          All operations are executed in a secure browser sandbox. No data is cached on AJN servers.
+                        <p className="text-[9px] leading-relaxed font-bold text-slate-950/50 uppercase tracking-wide">
+                          All operations execute in hardware-accelerated local sandboxes. No binary data is cached on AJN infrastructure.
                         </p>
                       </div>
                     </div>
                   </section>
 
+                  {/* REAL-TIME PROGRESS BENTO */}
                   <ProgressSection jobs={appState.queue} />
                 </div>
               </div>
 
+              {/* OUTPUT SECTOR */}
               {appState.outputs.length > 0 && (
                 <OutputSection 
                   jobs={appState.outputs} 

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from 'react';
@@ -35,7 +34,10 @@ import {
   CheckCircle2,
   Accessibility,
   FolderOpen,
-  Workflow
+  Workflow,
+  Sparkles,
+  Zap,
+  Activity
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -87,25 +89,29 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.06,
+      staggerChildren: 0.08,
       delayChildren: 0.1,
     }
   }
 };
 
 const cardVariants = {
-  hidden: { y: 50, opacity: 0, scale: 0.9 },
+  hidden: { y: 60, opacity: 0, scale: 0.92 },
   visible: { 
     y: 0, 
     opacity: 1, 
     scale: 1,
     transition: {
       type: "spring",
-      stiffness: 110,
-      damping: 14
+      stiffness: 120,
+      damping: 16
     }
   },
-  exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } }
+  exit: { 
+    opacity: 0, 
+    scale: 0.95, 
+    transition: { duration: 0.2 } 
+  }
 };
 
 export function ServicesGrid({ query, category }: { query: string, category: string }) {
@@ -129,13 +135,13 @@ export function ServicesGrid({ query, category }: { query: string, category: str
 
   if (filteredUnits.length === 0) {
     return (
-      <div className="py-24 text-center space-y-4 opacity-40 animate-in fade-in duration-500">
-        <div className="w-16 h-16 mx-auto text-slate-950 flex items-center justify-center">
+      <div className="py-32 text-center space-y-6 opacity-30 animate-in fade-in zoom-in-95 duration-700">
+        <div className="w-24 h-24 mx-auto text-slate-950 flex items-center justify-center bg-black/5 rounded-[3rem]">
           <Search className="w-12 h-12" />
         </div>
-        <div className="space-y-1">
-          <p className="text-sm font-bold tracking-tight text-slate-950">Unit Not Found</p>
-          <p className="text-[10px] font-medium text-slate-950 uppercase tracking-widest">Adjust Search Parameters</p>
+        <div className="space-y-2">
+          <p className="text-xl font-black tracking-tight text-slate-950 uppercase">Instance Not Found</p>
+          <p className="text-[11px] font-bold text-slate-950/60 uppercase tracking-[0.4em]">Calibrate search parameters for sector match</p>
         </div>
       </div>
     );
@@ -146,7 +152,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-32"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-40"
     >
       <AnimatePresence mode="popLayout">
         {filteredUnits.map((unit) => (
@@ -161,43 +167,48 @@ export function ServicesGrid({ query, category }: { query: string, category: str
             className="group h-full"
           >
             <Link href={`/tools/${unit.id}`}>
-              <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 hover:bg-white/60 transition-all duration-500 cursor-pointer overflow-hidden border-2 relative backdrop-blur-xl shadow-sm glow-border group">
-                <div className="scan-line opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0">
-                  <ArrowRight className="w-3 h-3 text-primary" />
+              <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 hover:bg-white/60 transition-all duration-700 cursor-pointer overflow-hidden border-2 relative backdrop-blur-2xl shadow-xl glow-border group/card">
+                <div className="scan-line opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
+                <div className="absolute top-0 right-0 p-4 opacity-0 group-hover/card:opacity-100 transition-all duration-500 translate-x-4 group-hover/card:translate-x-0">
+                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 shadow-lg">
+                    <ArrowRight className="w-5 h-5 text-primary" />
+                  </div>
                 </div>
                 
-                <CardContent className="p-6 flex flex-col h-full text-slate-950">
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="w-12 h-12 bg-black/5 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500 border border-black/5">
-                      <unit.icon className="w-6 h-6 text-slate-950 group-hover:text-primary transition-colors" />
+                <CardContent className="p-8 flex flex-col h-full text-slate-950 relative z-10">
+                  <div className="flex items-start justify-between mb-8">
+                    <div className="w-16 h-16 bg-white/60 rounded-[1.5rem] flex items-center justify-center group-hover/card:scale-110 group-hover/card:bg-primary/10 transition-all duration-700 border-2 border-black/5 shadow-inner">
+                      <unit.icon className="w-8 h-8 text-slate-950 group-hover/card:text-primary transition-colors duration-500" />
                     </div>
-                    <div className="flex flex-col items-end gap-1.5">
+                    <div className="flex flex-col items-end gap-2">
                       <Badge className={cn(
-                        "text-[8px] font-black h-4 px-1.5 border-none tracking-widest uppercase shadow-sm",
+                        "text-[9px] font-black h-5 px-2.5 border-none tracking-[0.2em] uppercase shadow-sm rounded-full",
                         unit.complexity === 'System' ? "bg-emerald-500/10 text-emerald-600" :
                         unit.complexity === 'Ai' ? "bg-primary/10 text-primary" :
                         "bg-orange-500/10 text-orange-600"
                       )}>
                         {unit.complexity}
                       </Badge>
-                      <span className="text-[9px] font-bold text-slate-900/40 uppercase tracking-tighter">{unit.tag}</span>
+                      <span className="text-[10px] font-black text-slate-950/30 uppercase tracking-[0.3em]">{unit.tag}</span>
                     </div>
                   </div>
 
-                  <div className="space-y-2 flex-1">
-                    <h3 className="text-sm font-black tracking-tighter group-hover:text-primary transition-colors leading-none uppercase">{unit.name}</h3>
-                    <p className="text-[10px] leading-relaxed font-medium tracking-wide line-clamp-3 opacity-60 group-hover:opacity-100 transition-opacity uppercase">
+                  <div className="space-y-3 flex-1">
+                    <h3 className="text-lg font-black tracking-tighter group-hover/card:text-primary transition-colors duration-500 leading-none uppercase">{unit.name}</h3>
+                    <p className="text-[11px] leading-relaxed font-bold tracking-wide line-clamp-3 text-slate-950/50 group-hover/card:text-slate-950/80 transition-colors duration-500 uppercase">
                       {unit.desc}
                     </p>
                   </div>
 
-                  <div className="pt-4 flex items-center justify-between border-t border-black/5 mt-4">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-[8px] font-bold text-slate-900/60 uppercase">System Ready</span>
+                  <div className="pt-6 flex items-center justify-between border-t border-black/5 mt-8">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[9px] font-black text-slate-950/60 uppercase tracking-widest">Instance Ready</span>
                     </div>
-                    <span className="text-[8px] font-bold text-slate-900/40 uppercase tracking-widest">{unit.cat}</span>
+                    <div className="flex items-center gap-1.5">
+                      <Activity className="w-3 h-3 text-slate-950/20" />
+                      <span className="text-[9px] font-black text-slate-950/40 uppercase tracking-[0.2em]">{unit.cat}</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

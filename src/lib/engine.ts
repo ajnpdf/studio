@@ -1,4 +1,3 @@
-
 'use client';
 
 import { PDFConverter } from './converters/pdf-converter';
@@ -20,7 +19,7 @@ import { PDFManipulator } from './converters/pdf-manipulator';
 /**
  * AJN MASTER ARCHITECTURE — CORE ENGINE
  * Stateful workflow orchestrator managing 45+ tools.
- * Enforces strict one-to-one processing via SHA-256 Fingerprinting and Processing Locks.
+ * Enforces high-fidelity processing with real-time logging and sequential mastery.
  */
 
 export type ExecutionMode = 'wasm' | 'smart' | 'ai';
