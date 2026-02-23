@@ -16,7 +16,11 @@ import {
   Layers,
   Globe,
   GitCompare,
-  EyeOff
+  EyeOff,
+  GripVertical,
+  X,
+  Plus,
+  Play
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -24,7 +28,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface Props {
   defaultCategory: string;
@@ -39,12 +44,15 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [appState, setAppState] = useState<GlobalAppState | null>(null);
   const [activeCategory, setActiveCategory] = useState(defaultCategory);
   
+  // Prep Queue for Multi-file Ops (Merge)
+  const [prepQueue, setPrepQueue] = useState<File[]>([]);
+  
   // Advanced Tool Parameters
   const [password, setPassword] = useState('');
   const [watermarkText, setWatermarkText] = useState('AJN Private');
   const [targetLang, setTargetLang] = useState('es');
   const [pageRange, setPageRange] = useState('1-5');
-  const [splitMode, setSplitMode] = useState<'range' | 'every'>('range');
+  const [splitMode, setSplitMode] = useState<'range' | 'every' | 'range'>('range');
   const [rotateAngle, setRotateAngle] = useState('90');
   const [compressionProfile, setCompressionProfile] = useState('balanced');
   const [dpi, setDpi] = useState('150');
@@ -59,6 +67,16 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   }, []);
 
   const handleFilesAdded = (files: File[]) => {
+    if (initialUnitId === 'merge-pdf') {
+      setPrepQueue(prev => [...prev, ...files]);
+      return;
+    }
+
+    // Direct process for single-file tools
+    executeJob(files);
+  };
+
+  const executeJob = (files: File[]) => {
     let from = '';
     let to = 'PDF';
 
@@ -91,6 +109,24 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
     engine.addJobs(files, from, to, settings, initialUnitId);
   };
 
+  const handleMergeStart = () => {
+    if (prepQueue.length < 2) return;
+    executeJob(prepQueue);
+    setPrepQueue([]); // Clear prep once sent to engine
+  };
+
+  const removePrepItem = (idx: number) => {
+    setPrepQueue(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const reorderPrep = (idx: number, dir: 'up' | 'down') => {
+    const newQueue = [...prepQueue];
+    const target = dir === 'up' ? idx - 1 : idx + 1;
+    if (target < 0 || target >= newQueue.length) return;
+    [newQueue[idx], newQueue[target]] = [newQueue[target], newQueue[idx]];
+    setPrepQueue(newQueue);
+  };
+
   if (!appState) return null;
 
   const hasControls = [
@@ -111,6 +147,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           <div className="p-4 md:p-10 space-y-10 max-w-4xl mx-auto pb-32">
             
+            {/* UNIT HEADER */}
             <div className="flex items-center justify-between px-2 animate-in fade-in duration-700">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 shadow-sm">
@@ -126,6 +163,63 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                 <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">WASM Layer Active</span>
               </div>
             </div>
+
+            {/* MERGE QUEUE / SEQUENCE MANAGER */}
+            {initialUnitId === 'merge-pdf' && (
+              <section className="space-y-6 animate-in slide-in-from-bottom-4 duration-700">
+                <div className="flex items-center justify-between px-2">
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-950/60">Preparation Sequence</h3>
+                  <Badge className="bg-primary/10 text-primary border-none">{prepQueue.length} Files Ready</Badge>
+                </div>
+
+                {prepQueue.length > 0 ? (
+                  <div className="space-y-3">
+                    {prepQueue.map((file, i) => (
+                      <Card key={i} className="bg-white/40 backdrop-blur-xl border-white/60 group hover:border-primary/20 transition-all shadow-sm">
+                        <CardContent className="p-4 flex items-center gap-4">
+                          <div className="flex flex-col gap-1 text-slate-950/20 group-hover:text-primary transition-colors cursor-grab active:cursor-grabbing">
+                            <GripVertical className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 overflow-hidden">
+                            <p className="text-sm font-black truncate text-slate-950">{file.name}</p>
+                            <p className="text-[9px] font-bold text-slate-950/40 uppercase tracking-widest">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-black/5" onClick={() => reorderPrep(i, 'up')} disabled={i === 0}>
+                              <RotateCw className="w-3.5 h-3.5 rotate-[-90deg]" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-black/5" onClick={() => reorderPrep(i, 'down')} disabled={i === prepQueue.length - 1}>
+                              <RotateCw className="w-3.5 h-3.5 rotate-90" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-red-50 text-red-400" onClick={() => removePrepItem(i)}>
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    
+                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                      <Button 
+                        onClick={handleMergeStart} 
+                        disabled={prepQueue.length < 2}
+                        className="flex-1 h-14 bg-primary hover:bg-primary/90 text-white font-black text-xs uppercase tracking-widest gap-3 rounded-2xl shadow-xl shadow-primary/20"
+                      >
+                        <Play className="w-4 h-4 fill-current" /> Master Merge & Execute
+                      </Button>
+                      <Button variant="outline" className="h-14 px-8 border-black/10 bg-white/40 text-[10px] font-black uppercase rounded-2xl gap-2">
+                        <Plus className="w-4 h-4" /> Add More
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="py-16 text-center border-2 border-dashed border-black/5 rounded-[2.5rem] space-y-4 opacity-40">
+                    <Layers className="w-12 h-12 mx-auto" />
+                    <p className="text-[10px] font-black uppercase tracking-widest">Add at least 2 files to enable merge logic</p>
+                  </div>
+                )}
+              </section>
+            )}
 
             {hasControls && (
               <section className="bg-white/40 border border-white/60 p-6 md:p-8 rounded-[2rem] animate-in fade-in slide-in-from-bottom-2 duration-700 shadow-xl backdrop-blur-xl">

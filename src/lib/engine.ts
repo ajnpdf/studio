@@ -42,7 +42,8 @@ export interface FileBuffer {
 export interface ConversionJob {
   id: string;
   fileId?: string;
-  file: File;
+  file: File; 
+  sourceFiles?: File[]; // For multi-file ops like Merge
   fromFmt: string;
   toFmt: string;
   status: JobStatus;
@@ -140,17 +141,36 @@ class ConversionEngine {
   }
 
   async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, operationId?: string) {
+    // --- SPECIAL CASE: MERGE PDF ---
+    // Dropping N files for merge should create exactly ONE job
+    if (operationId === 'merge-pdf') {
+      const job: ConversionJob = {
+        id: Math.random().toString(36).substr(2, 9),
+        file: files[0], // Display reference
+        sourceFiles: files, // The actual batch to merge
+        fromFmt: 'multi',
+        toFmt: 'PDF',
+        status: 'queued',
+        progress: 0,
+        stage: 'Calibrating Neural Merge...',
+        context: 'WASM',
+        settings,
+        operationId
+      };
+      this.state.processingQueue = [...this.state.processingQueue, job];
+      this.notify();
+      this.processNext();
+      return;
+    }
+
+    // --- STANDARD CASE: INDIVIDUAL CONVERSIONS ---
     const newJobs: ConversionJob[] = [];
     
     for (const file of files) {
       const fingerprint = await this.generateFingerprint(file);
       const jobKey = `${fingerprint}_${operationId || 'convert'}_${toFmt}`;
 
-      // CRITICAL: Prevent duplicate job generation for the same file/operation pair
-      if (this.processedHashes.has(jobKey)) {
-        console.warn(`Job ${jobKey} is already in buffer or active.`);
-        continue;
-      }
+      if (this.processedHashes.has(jobKey)) continue;
 
       const fileBuffer: FileBuffer = {
         id: Math.random().toString(36).substr(2, 9),
@@ -171,7 +191,7 @@ class ConversionEngine {
         toFmt: toFmt || 'PDF',
         status: 'queued',
         progress: 0,
-        stage: 'Calibrating Intelligence...',
+        stage: 'Initial Calibration...',
         context: this.determineContext(operationId),
         settings,
         operationId
@@ -212,8 +232,8 @@ class ConversionEngine {
 
     try {
       let result;
-      if (nextJob.operationId === 'merge-pdf') {
-        result = await this.executeMerge(this.state.activeFiles.map(f => f.file), nextJob);
+      if (nextJob.operationId === 'merge-pdf' && nextJob.sourceFiles) {
+        result = await this.executeMerge(nextJob.sourceFiles, nextJob);
       } else if (nextJob.operationId) {
         result = await this.runOperation(nextJob);
       } else {
@@ -225,7 +245,7 @@ class ConversionEngine {
       nextJob.progress = 100;
       nextJob.stage = 'Unit Mastered';
       
-      const originalBase = nextJob.file.name.replace(/\.[^/.]+$/, "");
+      const originalBase = nextJob.operationId === 'merge-pdf' ? 'Merge' : nextJob.file.name.replace(/\.[^/.]+$/, "");
       const ext = result.fileName.split('.').pop() || nextJob.toFmt.toLowerCase();
       const finalFileName = `Mastered_${originalBase}.${ext}`;
 
