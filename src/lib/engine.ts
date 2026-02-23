@@ -224,44 +224,44 @@ class SystemEngine {
     const codeConv = new CodeConverter(files[0], update);
 
     switch (job.toolId) {
-      // Organize
+      // ORGANIZE (Domain 1)
       case 'merge-pdf': return manip.merge();
       case 'split-pdf': return manip.split(job.settings);
       case 'delete-pages': return manip.organize(job.settings.permutation || []);
       case 'extract-pages': return manip.organize(job.settings.permutation || []);
       case 'organize-pdf': return manip.organize(job.settings.permutation || []);
       
-      // Optimize
+      // OPTIMIZE (Domain 2)
       case 'compress-pdf': return manip.compress(job.settings);
       case 'repair-pdf': return manip.repair(job.settings);
       case 'ocr-pdf': return specialized.convertTo('OCR', job.settings);
       case 'pdf-pdfa': return manip.toPDFA(job.settings.conformance || '2b');
       
-      // Convert TO PDF
+      // CONVERT TO PDF (Domain 3)
       case 'jpg-pdf': return imgConv.toMasterPDF(files, job.settings);
       case 'word-pdf': return wordConv.convertTo('PDF', job.settings);
       case 'ppt-pdf': return pptConv.convertTo('PDF', job.settings);
       case 'excel-pdf': return excelConv.convertTo('PDF', job.settings);
       case 'html-pdf': return codeConv.convertTo('PDF', job.settings);
       
-      // Export FROM PDF
+      // EXPORT FROM PDF (Domain 4)
       case 'pdf-jpg': return pdfConv.convertTo('JPG', job.settings);
       case 'pdf-word': return pdfConv.convertTo('WORD', job.settings);
       case 'pdf-pptx': return pdfConv.convertTo('PPTX', job.settings);
       case 'pdf-excel': return pdfConv.convertTo('EXCEL', job.settings);
       
-      // Edit
+      // EDIT (Domain 5)
       case 'rotate-pdf': return manip.rotate(job.settings.rotationMap || {});
       case 'add-page-numbers': return manip.addPageNumbers(job.settings);
       case 'edit-pdf': return new Promise((resolve) => setTimeout(() => resolve({ blob: new Blob([]), fileName: 'edit_session.pdf', mimeType: 'application/pdf' }), 2000));
       
-      // Security
+      // SECURITY (Domain 6)
       case 'unlock-pdf': return manip.unlock(job.settings.password);
       case 'protect-pdf': return manip.protect(job.settings);
       case 'sign-pdf': return manip.sign(job.settings.signatureData, job.settings.position);
       case 'redact-pdf': return manip.redact(job.settings.redactions || []);
       
-      // Intelligence
+      // INTELLIGENCE (Domain 7)
       case 'translate-pdf': return specialized.convertTo('TRANSLATE', job.settings);
       case 'compare-pdf': return specialized.convertTo('COMPARE', job.settings);
       case 'summarize-pdf': return specialized.convertTo('SUMMARIZE', job.settings);

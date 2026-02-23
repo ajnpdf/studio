@@ -98,7 +98,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                   <div>
                     <h2 className="text-2xl md:text-3xl font-black tracking-tighter uppercase leading-none text-slate-950">{unitDisplayName}</h2>
                     <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-[0.4em] mt-1.5 flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                       Operational Unit Node
                     </p>
                   </div>
