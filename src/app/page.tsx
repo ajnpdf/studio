@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { ArrowRight, Network, ShieldCheck } from 'lucide-react';
 
 /**
- * AJN Landing Page - High-Fidelity Professional Light Theme
- * Strictly Non-Scrollable, Black Text, Proper Case.
+ * AJN Landing Page - High-Fidelity Professional Entrance
+ * Strictly Non-Scrollable, High-Contrast Black Text, Proper Case.
  */
 export default function LandingPage() {
   return (
-    <div className="h-screen w-full flex flex-col items-center justify-center p-6 overflow-hidden relative">
+    <div className="h-screen w-full flex flex-col items-center justify-center p-6 overflow-hidden relative text-slate-950">
       <main className="w-full max-w-5xl flex flex-col items-center gap-10 md:gap-14 relative z-10 -mt-12 animate-in fade-in zoom-in-95 duration-1000">
         
         {/* Centerpiece Navy Blue Logo */}

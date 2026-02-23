@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { CategorySidebar } from '@/components/dashboard/conversion/category-sidebar';
-import { FormatSelector } from '@/components/dashboard/conversion/format-selector';
 import { DropZone } from '@/components/dashboard/conversion/drop-zone';
 import { ProgressSection } from '@/components/dashboard/conversion/progress-section';
 import { OutputSection } from '@/components/dashboard/conversion/output-section';
@@ -10,28 +9,21 @@ import { engine, GlobalAppState } from '@/lib/engine';
 import { 
   Settings2, 
   Lock, 
-  Type, 
   Scissors, 
   RotateCw, 
-  Globe, 
   Zap, 
-  Workflow, 
-  Hash, 
-  Crop, 
-  Trash2, 
-  GripVertical, 
-  X,
-  Layers,
-  ChevronDown,
   Monitor,
   Layout,
-  Maximize
+  Maximize,
+  ShieldCheck,
+  Cpu,
+  Layers,
+  ArrowRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -41,6 +33,10 @@ interface Props {
   initialUnitId?: string;
 }
 
+/**
+ * AJN Unit Workspace - Autonomous Intelligence Engine
+ * No manual protocol selection; tool understands transformation in real-time.
+ */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [appState, setAppState] = useState<GlobalAppState | null>(null);
   const [activeCategory, setActiveCategory] = useState(defaultCategory);
@@ -64,6 +60,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
   useEffect(() => {
     if (!initialUnitId) return;
+    // Autonomous logic setup based on Tool Identity
     if (initialUnitId.includes('-pdf')) {
       const from = initialUnitId.split('-')[0].toUpperCase();
       setFromFmt(from === 'MERGE' || from === 'SPLIT' || from === 'ORGANIZE' || from === 'REMOVE' || from === 'EXTRACT' ? 'PDF' : from);
@@ -112,8 +109,25 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
       <main className="flex-1 flex flex-col min-w-0 border-r border-black/5 relative h-full">
         <div className="flex-1 overflow-y-auto scrollbar-hide">
-          <div className="p-4 md:p-10 space-y-8 max-w-4xl mx-auto pb-32">
+          <div className="p-4 md:p-10 space-y-10 max-w-4xl mx-auto pb-32">
             
+            {/* Contextual Status Header */}
+            <div className="flex items-center justify-between px-2 animate-in fade-in duration-700">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
+                  <Cpu className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black tracking-tight text-slate-950 uppercase">{initialUnitId?.replace('-', ' ')} Node</h2>
+                  <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Autonomous Protocol Calibration</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">WASM Stable</span>
+              </div>
+            </div>
+
             {/* Contextual Parameter Panel */}
             {hasControls && (
               <section className="bg-white/40 border border-white/60 p-6 md:p-8 rounded-[2rem] animate-in fade-in slide-in-from-bottom-2 duration-700 shadow-xl backdrop-blur-xl">
@@ -235,15 +249,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                 </div>
               </section>
             )}
-
-            <FormatSelector 
-              category={activeCategory} 
-              from={fromFmt} 
-              to={toFmt} 
-              onFromChange={setFromFmt} 
-              onToChange={setToFmt} 
-              isSourceLocked={true}
-            />
 
             <DropZone onFiles={handleFilesAdded} />
 
