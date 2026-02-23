@@ -1,4 +1,3 @@
-
 'use client';
 
 import { PDFConverter } from './converters/pdf-converter';
@@ -288,8 +287,11 @@ class SystemEngine {
     const pdfConv = new PDFConverter(files[0], update);
     const imgConv = new ImageConverter(files[0], update);
     const scanner = new ScannerConverter(files, update);
+    const wordConv = new WordConverter(files[0], update);
 
     switch (job.toolId) {
+      case 'word-pdf':
+      case 'word2pdf': return wordConv.convertTo('PDF');
       case 'scan-to-pdf':
       case 'scan': return scanner.process(job.settings);
       case 'organize-pdf':
