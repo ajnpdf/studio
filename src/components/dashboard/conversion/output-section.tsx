@@ -1,7 +1,7 @@
 
 'use client';
 
-import { ConversionJob } from '@/lib/engine';
+import { OutputBuffer } from '@/lib/engine';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Share2, Trash2, CheckCircle2, FileCode, ImageIcon, Video, Music, ExternalLink } from 'lucide-react';
@@ -9,8 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 
 interface Props {
-  jobs: ConversionJob[];
-  onPreview: (j: ConversionJob) => void;
+  jobs: OutputBuffer[];
+  onPreview: (j: OutputBuffer) => void;
   onClear: () => void;
 }
 
@@ -24,28 +24,28 @@ const getIcon = (fmt: string) => {
 
 /**
  * AJN Output Section - Professional Mastered Results
- * Enforces Black Text protocol and real-time distribution.
+ * Enforces Black Text and real-time distribution.
  */
 export function OutputSection({ jobs, onPreview, onClear }: Props) {
-  const handleDownload = (job: ConversionJob) => {
-    if (!job.result?.objectUrl) return;
+  const handleDownload = (job: OutputBuffer) => {
+    if (!job.objectUrl) return;
     const a = document.createElement('a');
-    a.href = job.result.objectUrl;
-    a.download = job.result.fileName;
+    a.href = job.objectUrl;
+    a.download = job.fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     
     toast({
       title: "File Exported",
-      description: `${job.result.fileName} saved to local storage.`,
+      description: `${job.fileName} saved to local storage.`,
     });
   };
 
-  const handleShare = async (job: ConversionJob) => {
-    if (!job.result?.objectUrl) return;
+  const handleShare = async (job: OutputBuffer) => {
+    if (!job.objectUrl) return;
     try {
-      const file = new File([job.result.blob], job.result.fileName, { type: job.result.mimeType });
+      const file = new File([job.blob], job.fileName, { type: job.mimeType });
       if (navigator.share) {
         await navigator.share({
           files: [file],
@@ -53,7 +53,7 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
           text: `Processed via AJN Junction Network.`
         });
       } else {
-        await navigator.clipboard.writeText(job.result.objectUrl);
+        await navigator.clipboard.writeText(job.objectUrl);
         toast({
           title: "Link Synced",
           description: "Download link copied to clipboard.",
@@ -82,7 +82,7 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
 
       <div className="grid grid-cols-1 gap-4">
         {jobs.map((job) => (
-          <Card key={job.id} className="bg-white/40 backdrop-blur-3xl border-emerald-500/20 border-2 overflow-hidden hover:border-emerald-500/40 transition-all group relative shadow-xl">
+          <Card key={job.id} className="bg-white/40 backdrop-blur-xl border-emerald-500/20 border-2 overflow-hidden hover:border-emerald-500/40 transition-all group relative shadow-xl">
             <CardContent className="p-6 flex items-center gap-6 relative z-10">
               <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500 border border-emerald-500/10">
                 {getIcon(job.toFmt)}
@@ -90,11 +90,11 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-1.5">
-                  <h4 className="text-sm font-black tracking-tight truncate max-w-[280px] text-slate-950">{job.result?.fileName}</h4>
+                  <h4 className="text-sm font-black tracking-tight truncate max-w-[280px] text-slate-950">{job.fileName}</h4>
                   <Badge className="bg-emerald-500 text-white border-none text-[8px] font-black px-2 h-5">READY</Badge>
                 </div>
                 <div className="flex items-center gap-4 text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">
-                  <span className="flex items-center gap-1.5"><FileCode className="w-3 h-3" /> {job.result?.size}</span>
+                  <span className="flex items-center gap-1.5"><FileCode className="w-3 h-3" /> {job.sizeFormatted}</span>
                   <span className="text-emerald-600 font-black">Securely Mastered</span>
                 </div>
               </div>

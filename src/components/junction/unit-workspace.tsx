@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -82,7 +83,8 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       angle: parseInt(rotateAngle),
       splitMode,
       splitValue: pageRange,
-      length: summaryLength
+      length: summaryLength,
+      toFmt: to
     };
 
     engine.addJobs(files, from, to, settings, initialUnitId);
@@ -287,12 +289,12 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
             <DropZone onFiles={handleFilesAdded} />
 
-            {appState.processingQueue.length > 0 && <ProgressSection jobs={appState.processingQueue} />}
+            {appState.queue.length > 0 && <ProgressSection jobs={appState.queue} />}
 
-            {appState.outputBuffer.length > 0 && (
+            {appState.outputs.length > 0 && (
               <OutputSection 
-                jobs={appState.outputBuffer} 
-                onPreview={(j) => window.open(j.result?.objectUrl)} 
+                jobs={appState.outputs} 
+                onPreview={(j) => window.open(j.objectUrl)} 
                 onClear={() => engine.clearQueue()} 
               />
             )}

@@ -51,9 +51,11 @@ export interface OutputBuffer {
   fileName: string;
   mimeType: string;
   size: number;
+  sizeFormatted: string;
   objectUrl: string;
   checksum: string;
   completedAt: number;
+  toFmt: string;
 }
 
 export interface ProcessingJob {
@@ -142,7 +144,7 @@ class SystemEngine {
         mode: 'wasm',
         status: 'queued',
         progress: 0,
-        stage: 'Calibrating Merge Engine...',
+        stage: 'Calibrating Merge System...',
         logs: [],
         inputs: [],
         output: null,
@@ -245,12 +247,14 @@ class SystemEngine {
         id: Math.random().toString(36).substr(2, 9),
         jobId: nextJob.id,
         blob: result.blob,
-        fileName: `Mastered_${result.fileName}`,
+        fileName: result.fileName.startsWith('Mastered_') ? result.fileName : `Mastered_${result.fileName}`,
         mimeType: result.mimeType,
         size: result.blob.size,
+        sizeFormatted: (result.blob.size / (1024 * 1024)).toFixed(2) + ' MB',
         objectUrl,
         checksum: nextJob.id,
-        completedAt: Date.now()
+        completedAt: Date.now(),
+        toFmt: result.fileName.split('.').pop()?.toUpperCase() || 'PDF'
       };
 
       nextJob.status = 'done';

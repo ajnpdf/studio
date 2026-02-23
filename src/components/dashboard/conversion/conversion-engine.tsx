@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -16,7 +17,7 @@ import { LogoAnimation } from '@/components/landing/logo-animation';
 
 /**
  * AJN Conversion Engine - Autonomous Flow
- * Automatically identifies input and target protocol based on dropped files.
+ * Automatically identifies input and target system based on dropped files.
  */
 export function ConversionEngine({ initialFileId }: { initialFileId: string | null }) {
   const [appState, setAppState] = useState<GlobalAppState | null>(null);
@@ -36,8 +37,8 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
 
   if (!appState) return null;
 
-  const completedJobs = appState.outputBuffer;
-  const activeJobs = appState.processingQueue;
+  const completedJobs = appState.outputs;
+  const activeJobs = appState.queue;
 
   return (
     <div className="flex h-full bg-transparent overflow-hidden animate-in fade-in duration-700 text-slate-950">
@@ -65,7 +66,7 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
           <div className="flex items-center gap-2">
             <div className="hidden md:flex items-center gap-2 mr-4 px-3 py-1.5 bg-white/5 rounded-lg border border-black/5">
               <ShieldCheck className="w-3 h-3 text-emerald-600" />
-              <span className="text-[9px] font-black text-slate-950/60 uppercase">Local Node Active</span>
+              <span className="text-[9px] font-black text-slate-950/60 uppercase">System Active</span>
             </div>
             <Button variant="ghost" size="icon" onClick={() => setHistoryOpen(true)} className="h-9 w-9 hover:bg-black/5 relative text-slate-950">
               <History className="w-4 h-4" />
@@ -82,7 +83,7 @@ export function ConversionEngine({ initialFileId }: { initialFileId: string | nu
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           <div className="p-8 space-y-10 max-w-5xl mx-auto">
             
-            {/* CENTRAL DROP ZONE - Automatically maps to best protocol */}
+            {/* CENTRAL DROP ZONE - Automatically maps to best service */}
             <DropZone onFiles={handleFilesAdded} />
 
             {/* PROCESSING QUEUE */}
