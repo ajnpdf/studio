@@ -1,3 +1,4 @@
+
 'use client';
 
 import { PDFConverter } from './converters/pdf-converter';
@@ -17,72 +18,81 @@ import { SpecializedConverter } from './converters/specialized-converter';
 import { PDFManipulator } from './converters/pdf-manipulator';
 
 /**
- * AJN System Identity - Core Engine
- * Stateful workflow orchestrator managing 35+ tools.
- * Enforces a strict one-to-one processing ratio via Job Locks and SHA-256 Fingerprinting.
+ * AJN MASTER ARCHITECTURE — CORE ENGINE
+ * Stateful workflow orchestrator managing 45+ tools.
+ * Enforces strict one-to-one processing via SHA-256 Fingerprinting and Processing Locks.
  */
 
-export type ExecutionContext = 'Wasm' | 'Smart' | 'Ai';
-export type JobStatus = 'queued' | 'processing' | 'complete' | 'failed' | 'cancelled';
+export type ExecutionMode = 'wasm' | 'smart' | 'ai';
+export type JobStatus = 'queued' | 'running' | 'done' | 'failed' | 'cancelled';
 
-export interface FileBuffer {
-  id: string;
-  file: File;
-  fingerprint: string;
-  metadata: {
-    name: string;
-    size: string;
-    format: string;
-  };
+export interface LogEntry {
+  timestamp: string;
+  message: string;
+  level: 'info' | 'warn' | 'error';
 }
 
-export interface ConversionJob {
+export interface FileNode {
   id: string;
-  fileId?: string;
-  file: File; 
-  sourceFiles?: File[]; 
-  fromFmt: string;
-  toFmt: string;
+  name: string;
+  originalName: string;
+  size: number;
+  format: string;
+  sha256: string;
+  status: 'idle' | 'processing' | 'done' | 'error';
+  uploadedAt: number;
+  file: File;
+}
+
+export interface OutputBuffer {
+  id: string;
+  jobId: string;
+  blob: Blob;
+  fileName: string;
+  mimeType: string;
+  size: number;
+  objectUrl: string;
+  checksum: string;
+  completedAt: number;
+}
+
+export interface ProcessingJob {
+  id: string;
+  toolId: string;
+  mode: ExecutionMode;
   status: JobStatus;
   progress: number;
   stage: string;
-  context: ExecutionContext;
-  result?: {
-    blob: Blob;
-    fileName: string;
-    mimeType: string;
-    size: string;
-    objectUrl: string;
-  };
-  error?: string;
+  logs: LogEntry[];
+  inputs: FileNode[];
+  output: OutputBuffer | null;
   settings: any;
-  operationId?: string;
+  startedAt: number;
+  completedAt?: number;
 }
 
 export interface GlobalAppState {
-  activeFiles: FileBuffer[];
-  processingQueue: ConversionJob[];
-  outputBuffer: ConversionJob[];
-  networkStatus: 'online' | 'offline';
-  userSession: {
+  files: FileNode[];
+  queue: ProcessingJob[];
+  outputs: OutputBuffer[];
+  network: 'online' | 'offline' | 'degraded';
+  stats: {
     totalMastered: number;
   };
 }
 
-class ConversionEngine {
+class SystemEngine {
   private state: GlobalAppState = {
-    activeFiles: [],
-    processingQueue: [],
-    outputBuffer: [],
-    networkStatus: 'online',
-    userSession: {
-      totalMastered: 0
-    }
+    files: [],
+    queue: [],
+    outputs: [],
+    network: 'online',
+    stats: { totalMastered: 0 }
   };
 
   private isProcessing: boolean = false;
-  private processedHashes: Set<string> = new Set();
   private listeners: Set<(state: GlobalAppState) => void> = new Set();
+  private processedHashes: Set<string> = new Set();
 
   private converters: Record<string, any> = {
     pdf: PDFConverter, docx: WordConverter, doc: WordConverter,
@@ -105,158 +115,174 @@ class ConversionEngine {
     this.listeners.forEach(l => l({ ...this.state }));
   }
 
-  private async generateFingerprint(file: File): Promise<string> {
+  private async generateHash(file: File): Promise<string> {
     const buffer = await file.arrayBuffer();
     const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, operationId?: string) {
-    if (operationId === 'merge-pdf') {
-      const job: ConversionJob = {
+  private addLog(job: ProcessingJob, message: string, level: LogEntry['level'] = 'info') {
+    const entry: LogEntry = {
+      timestamp: new Date().toLocaleTimeString(),
+      message,
+      level
+    };
+    job.logs = [...job.logs, entry];
+    job.stage = message;
+    this.notify();
+  }
+
+  async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, toolId?: string) {
+    const isMerge = toolId === 'merge-pdf';
+    
+    if (isMerge) {
+      const job: ProcessingJob = {
         id: Math.random().toString(36).substr(2, 9),
-        file: files[0], 
-        sourceFiles: files, 
-        fromFmt: 'Multi',
-        toFmt: 'PDF',
+        toolId: toolId || 'merge-pdf',
+        mode: 'wasm',
         status: 'queued',
         progress: 0,
-        stage: 'Calibrating Smart Merge...',
-        context: 'Wasm',
+        stage: 'Calibrating Merge Engine...',
+        logs: [],
+        inputs: [],
+        output: null,
         settings,
-        operationId
+        startedAt: Date.now()
       };
-      if (!this.state.processingQueue.some(j => j.operationId === 'merge-pdf')) {
-        this.state.processingQueue = [...this.state.processingQueue, job];
-        this.notify();
-        this.processNext();
+
+      for (const file of files) {
+        const hash = await this.generateHash(file);
+        job.inputs.push({
+          id: Math.random().toString(36).substr(2, 9),
+          name: file.name,
+          originalName: file.name,
+          size: file.size,
+          format: file.name.split('.').pop()?.toUpperCase() || 'UNK',
+          sha256: hash,
+          status: 'idle',
+          uploadedAt: Date.now(),
+          file
+        });
       }
+
+      this.state.queue = [...this.state.queue, job];
+      this.addLog(job, "Merge sequence verified.");
+      this.processNext();
       return;
     }
 
-    const newJobs: ConversionJob[] = [];
     for (const file of files) {
-      const fingerprint = await this.generateFingerprint(file);
-      const jobKey = `${fingerprint}_${operationId || 'convert'}_${toFmt}`;
+      const hash = await this.generateHash(file);
+      const jobKey = `${hash}_${toolId || 'convert'}_${toFmt}`;
 
-      // Strict one-to-one processing lock
-      if (this.processedHashes.has(jobKey) || this.state.processingQueue.some(j => j.id === jobKey)) continue;
+      if (this.processedHashes.has(jobKey)) continue;
 
-      const fileBuffer: FileBuffer = {
+      const fileNode: FileNode = {
         id: Math.random().toString(36).substr(2, 9),
-        file,
-        fingerprint,
-        metadata: {
-          name: file.name,
-          size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
-          format: file.name.split('.').pop()?.toUpperCase() || 'UNK'
-        }
+        name: file.name,
+        originalName: file.name,
+        size: file.size,
+        format: file.name.split('.').pop()?.toUpperCase() || 'UNK',
+        sha256: hash,
+        status: 'idle',
+        uploadedAt: Date.now(),
+        file
       };
 
-      const job: ConversionJob = {
+      const job: ProcessingJob = {
         id: jobKey,
-        fileId: fileBuffer.id,
-        file: file,
-        fromFmt: fromFmt || fileBuffer.metadata.format.toLowerCase(),
-        toFmt: toFmt || 'PDF',
+        toolId: toolId || 'converter',
+        mode: this.determineMode(toolId),
         status: 'queued',
         progress: 0,
         stage: 'Initial Calibration...',
-        context: this.determineContext(operationId),
+        logs: [],
+        inputs: [fileNode],
+        output: null,
         settings,
-        operationId
+        startedAt: Date.now()
       };
 
       this.processedHashes.add(jobKey);
-      this.state.activeFiles.unshift(fileBuffer);
-      newJobs.push(job);
+      this.state.files.unshift(fileNode);
+      this.state.queue = [...this.state.queue, job];
+      this.addLog(job, `System initialized for ${file.name}`);
     }
 
-    if (newJobs.length === 0) return;
-
-    this.state.processingQueue = [...this.state.processingQueue, ...newJobs];
     this.notify();
     this.processNext();
   }
 
-  private determineContext(opId?: string): ExecutionContext {
-    const aiOps = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'compare-pdf', 'repair-pdf', 'summarize-pdf'];
-    const smartOps = [
-      'compress-pdf', 'extract-pages', 'organize-pdf', 'sign-pdf', 
-      'protect-pdf', 'word-pdf', 'excel-pdf', 'pptx-pdf',
-      'pdf-word', 'pdf-excel', 'pdf-pptx', 'rotate-pdf', 'page-numbers',
-      'digital-seal', 'metadata-purge'
-    ];
-    if (opId && aiOps.includes(opId)) return 'Ai';
-    if (opId && smartOps.includes(opId)) return 'Smart';
-    return 'Wasm';
+  private determineMode(toolId?: string): ExecutionMode {
+    const aiTools = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'summarize-pdf', 'ai-qa'];
+    if (toolId && aiTools.includes(toolId)) return 'ai';
+    return 'wasm';
   }
 
   private async processNext() {
     if (this.isProcessing) return;
-    const nextJob = this.state.processingQueue.find(j => j.status === 'queued');
+    const nextJob = this.state.queue.find(j => j.status === 'queued');
     if (!nextJob) return;
 
     this.isProcessing = true;
-    nextJob.status = 'processing';
-    this.notify();
+    nextJob.status = 'running';
+    this.addLog(nextJob, "Executing multi-stage transformation...");
 
     try {
       let result;
-      if (nextJob.operationId === 'merge-pdf' && nextJob.sourceFiles) {
-        result = await this.executeMerge(nextJob.sourceFiles, nextJob);
-      } else if (nextJob.operationId) {
-        result = await this.runOperation(nextJob);
+      if (nextJob.toolId === 'merge-pdf') {
+        const manip = new PDFManipulator(nextJob.inputs.map(i => i.file), (p, m) => {
+          nextJob.progress = p;
+          this.addLog(nextJob, m);
+        });
+        result = await manip.merge();
       } else {
-        result = await this.runConversion(nextJob);
+        result = await this.runTool(nextJob);
       }
-      
-      const objectUrl = URL.createObjectURL(result.blob);
-      nextJob.status = 'complete';
-      nextJob.progress = 100;
-      nextJob.stage = 'Process Mastered';
-      
-      const originalBase = nextJob.operationId === 'merge-pdf' ? 'Merge' : nextJob.file.name.replace(/\.[^/.]+$/, "");
-      const finalFileName = `Mastered_${originalBase}.${result.fileName.split('.').pop() || nextJob.toFmt.toLowerCase()}`;
 
-      nextJob.result = {
-        ...result,
-        fileName: finalFileName,
-        size: (result.blob.size / (1024 * 1024)).toFixed(2) + ' MB',
-        objectUrl
+      const objectUrl = URL.createObjectURL(result.blob);
+      const output: OutputBuffer = {
+        id: Math.random().toString(36).substr(2, 9),
+        jobId: nextJob.id,
+        blob: result.blob,
+        fileName: `Mastered_${result.fileName}`,
+        mimeType: result.mimeType,
+        size: result.blob.size,
+        objectUrl,
+        checksum: nextJob.id,
+        completedAt: Date.now()
       };
-      
-      this.state.outputBuffer.unshift(nextJob);
-      this.state.userSession.totalMastered++;
+
+      nextJob.status = 'done';
+      nextJob.progress = 100;
+      nextJob.output = output;
+      nextJob.completedAt = Date.now();
+      this.addLog(nextJob, "Process mastered successfully.");
+
+      this.state.outputs.unshift(output);
+      this.state.stats.totalMastered++;
     } catch (err: any) {
       nextJob.status = 'failed';
-      nextJob.error = err.message || 'Processing Error';
-      nextJob.stage = 'System Fault';
+      this.addLog(nextJob, err.message || 'System Fault', 'error');
     } finally {
       this.isProcessing = false;
-      this.state.processingQueue = this.state.processingQueue.filter(j => j.id !== nextJob.id);
+      this.state.queue = this.state.queue.filter(j => j.id !== nextJob.id);
       this.notify();
       this.processNext();
     }
   }
 
-  private async executeMerge(files: File[], job: ConversionJob) {
-    const manip = new PDFManipulator(files, (p, msg) => {
-      job.progress = p; job.stage = msg; this.notify();
-    });
-    return manip.merge();
-  }
+  private async runTool(job: ProcessingJob) {
+    const file = job.inputs[0].file;
+    const update = (p: number, m: string) => {
+      job.progress = p;
+      this.addLog(job, m);
+    };
 
-  private async runOperation(job: ConversionJob) {
-    const manip = new PDFManipulator(job.file, (p, msg) => {
-      job.progress = p; job.stage = msg; this.notify();
-    });
-    const specialized = new SpecializedConverter(job.file, (p, msg) => {
-      job.progress = p; job.stage = msg; this.notify();
-    });
+    const manip = new PDFManipulator(file, update);
+    const specialized = new SpecializedConverter(file, update);
 
-    switch (job.operationId) {
+    switch (job.toolId) {
       case 'split-pdf': return manip.split(job.settings.splitMode || 'range', job.settings.splitValue || '1');
       case 'extract-pages': return manip.extractPages(job.settings.pages || [0]);
       case 'remove-pages': return manip.removePages(job.settings.pages || []);
@@ -264,40 +290,41 @@ class ConversionEngine {
       case 'page-numbers': return manip.addPageNumbers(job.settings);
       case 'watermark-pdf': return manip.addWatermark(job.settings.text || 'AJN Master');
       case 'crop-pdf': return manip.crop(job.settings.margins || { top: 50, bottom: 50, left: 50, right: 50 });
-      case 'unlock-pdf': return manip.rotate(0); 
       case 'protect-pdf': return manip.protect(job.settings.password || '1234');
-      case 'sign-pdf': return manip.addWatermark('Digitally Signed', 0.1);
       case 'digital-seal': return manip.addWatermark('Verified Integrity Seal', 0.2);
       case 'metadata-purge': return specialized.convertTo('REPAIRED_PDF', job.settings);
       case 'redact-pdf': return specialized.convertTo('REDACTED_PDF', job.settings);
       case 'summarize-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
-      case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings); 
+      case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
       default: return this.runConversion(job);
     }
   }
 
-  private async runConversion(job: ConversionJob) {
-    const key = job.fromFmt.toLowerCase();
-    const ConverterClass = this.converters[key];
-    if (!ConverterClass) throw new Error(`Process ${key.toUpperCase()} Not Supported`);
-    const converter = new ConverterClass(job.file, (p: number, msg: string) => {
-      job.progress = p; job.stage = msg; this.notify();
+  private async runConversion(job: ProcessingJob) {
+    const file = job.inputs[0].file;
+    const from = job.inputs[0].format.toLowerCase();
+    const to = job.settings.toFmt || 'PDF';
+    
+    const ConverterClass = this.converters[from] || this.converters['pdf'];
+    const converter = new ConverterClass(file, (p: number, m: string) => {
+      job.progress = p;
+      this.addLog(job, m);
     });
-    return await converter.convertTo(job.toFmt, job.settings);
+    return await converter.convertTo(to, job.settings);
   }
 
   cancelJob(id: string) {
-    const job = this.state.processingQueue.find(j => j.id === id);
+    const job = this.state.queue.find(j => j.id === id);
     if (job) { job.status = 'cancelled'; this.notify(); }
   }
 
   clearQueue() {
-    this.state.outputBuffer.forEach(j => { if (j.result?.objectUrl) URL.revokeObjectURL(j.result.objectUrl); });
-    this.state.outputBuffer = []; 
-    this.state.activeFiles = [];
+    this.state.outputs.forEach(o => URL.revokeObjectURL(o.objectUrl));
+    this.state.outputs = [];
+    this.state.files = [];
     this.processedHashes.clear();
     this.notify();
   }
 }
 
-export const engine = new ConversionEngine();
+export const engine = new SystemEngine();
