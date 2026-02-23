@@ -19,7 +19,7 @@ import { PDFManipulator } from './converters/pdf-manipulator';
 
 /**
  * AJN SYSTEM IDENTITY - CORE INTELLIGENCE LAYER
- * Stateful workflow orchestrator managing 35+ PDF tools across 6 domains.
+ * Stateful workflow orchestrator managing 30+ PDF tools across 6 domains.
  * Enforces a strict one-to-one processing ratio via Job Locks and SHA-256 Fingerprinting.
  */
 
@@ -33,8 +33,6 @@ export interface FileBuffer {
   metadata: {
     name: string;
     size: string;
-    pageCount?: number;
-    thumbnail?: string;
     format: string;
   };
 }
@@ -56,7 +54,6 @@ export interface ConversionJob {
     mimeType: string;
     size: string;
     objectUrl: string;
-    isZip?: boolean;
   };
   error?: string;
   settings: any;
@@ -68,9 +65,7 @@ export interface GlobalAppState {
   processingQueue: ConversionJob[];
   outputBuffer: ConversionJob[];
   networkStatus: 'online' | 'offline';
-  processingMode: 'wasm' | 'smart' | 'ai' | 'auto';
   userSession: {
-    lastProcessAt: string | null;
     totalMastered: number;
   };
 }
@@ -81,9 +76,7 @@ class ConversionEngine {
     processingQueue: [],
     outputBuffer: [],
     networkStatus: 'online',
-    processingMode: 'auto',
     userSession: {
-      lastProcessAt: null,
       totalMastered: 0
     }
   };
@@ -93,35 +86,15 @@ class ConversionEngine {
   private listeners: Set<(state: GlobalAppState) => void> = new Set();
 
   private converters: Record<string, any> = {
-    pdf: PDFConverter,
-    docx: WordConverter, doc: WordConverter,
+    pdf: PDFConverter, docx: WordConverter, doc: WordConverter,
     xlsx: ExcelConverter, xls: ExcelConverter, csv: ExcelConverter,
-    pptx: PPTConverter, ppt: PPTConverter,
-    odt: ODTConverter, ods: ODTConverter, odp: ODTConverter,
+    pptx: PPTConverter, ppt: PPTConverter, odt: ODTConverter,
     jpg: ImageConverter, jpeg: ImageConverter, png: ImageConverter, webp: ImageConverter,
-    gif: ImageConverter, heic: ImageConverter, heif: ImageConverter, avif: ImageConverter, 
-    bmp: ImageConverter, tiff: ImageConverter, tif: ImageConverter,
-    cr2: RawConverter, nef: RawConverter, arw: RawConverter, dng: RawConverter,
-    mp4: VideoConverter, mov: VideoConverter, avi: VideoConverter, mkv: VideoConverter,
-    mp3: AudioConverter, wav: AudioConverter, flac: AudioConverter, aac: AudioConverter,
-    zip: ArchiveConverter, rar: ArchiveConverter, '7z': ArchiveConverter,
-    json: CodeConverter, xml: CodeConverter, html: CodeConverter, md: CodeConverter,
-    epub: EbookConverter, mobi: EbookConverter, azw: EbookConverter, fb2: EbookConverter,
-    psd: DesignConverter, ai: DesignConverter, svg: ImageConverter,
-    stl: CADConverter, obj: CADConverter, dxf: CADConverter
+    mp4: VideoConverter, mp3: AudioConverter, zip: ArchiveConverter,
+    json: CodeConverter, html: CodeConverter, md: CodeConverter,
+    epub: EbookConverter, psd: DesignConverter, ai: DesignConverter,
+    stl: CADConverter, dxf: CADConverter
   };
-
-  constructor() {
-    if (typeof window !== 'undefined') {
-      window.addEventListener('online', () => this.updateNetworkStatus('online'));
-      window.addEventListener('offline', () => this.updateNetworkStatus('offline'));
-    }
-  }
-
-  private updateNetworkStatus(status: 'online' | 'offline') {
-    this.state.networkStatus = status;
-    this.notify();
-  }
 
   subscribe(listener: (state: GlobalAppState) => void) {
     this.listeners.add(listener);
@@ -142,12 +115,11 @@ class ConversionEngine {
 
   async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, operationId?: string) {
     // --- SPECIAL CASE: MERGE PDF ---
-    // Dropping N files for merge should create exactly ONE job
     if (operationId === 'merge-pdf') {
       const job: ConversionJob = {
         id: Math.random().toString(36).substr(2, 9),
-        file: files[0], // Display reference
-        sourceFiles: files, // The actual batch to merge
+        file: files[0], 
+        sourceFiles: files, 
         fromFmt: 'multi',
         toFmt: 'PDF',
         status: 'queued',
@@ -258,7 +230,6 @@ class ConversionEngine {
       
       this.state.outputBuffer.unshift(nextJob);
       this.state.userSession.totalMastered++;
-      this.state.userSession.lastProcessAt = new Date().toISOString();
     } catch (err: any) {
       nextJob.status = 'failed';
       nextJob.error = err.message || 'Processing Error';
@@ -293,16 +264,6 @@ class ConversionEngine {
         return manip.extractPages(job.settings.pages || [0]);
       case 'remove-pages': 
         return manip.removePages(job.settings.pages || []);
-      case 'organize-pdf': 
-        return manip.reorderPages(job.settings.newOrder || []);
-      case 'scan-to-pdf': 
-        return specialized.convertTo('SEARCHABLE_PDF');
-      case 'compress-pdf': 
-        return manip.compress(job.settings.profile || 'balanced');
-      case 'repair-pdf': 
-        return specialized.convertTo('REPAIRED_PDF');
-      case 'ocr-pdf': 
-        return specialized.convertTo('SEARCHABLE_PDF');
       case 'rotate-pdf': 
         return manip.rotate(job.settings.angle || 90);
       case 'page-numbers': 
@@ -312,7 +273,7 @@ class ConversionEngine {
       case 'crop-pdf': 
         return manip.crop(job.settings.margins || { top: 50, bottom: 50, left: 50, right: 50 });
       case 'unlock-pdf': 
-        return manip.rotate(0); // Mock bypass
+        return manip.rotate(0); 
       case 'protect-pdf': 
         return manip.protect(job.settings.password || '1234');
       case 'sign-pdf': 
@@ -320,11 +281,9 @@ class ConversionEngine {
       case 'redact-pdf': 
         return specialized.convertTo('REDACTED_PDF', job.settings);
       case 'compare-pdf': 
-        return specialized.convertTo('TRANSCRIPT', job.settings); // AI Mock
+        return specialized.convertTo('TRANSCRIPT', job.settings); 
       case 'translate-pdf': 
-        return specialized.convertTo('TRANSCRIPT', job.settings); // AI Mock
-      case 'pdf-pdfa':
-        return this.runConversion({ ...job, toFmt: 'PDFA' });
+        return specialized.convertTo('TRANSCRIPT', job.settings); 
       default: 
         return this.runConversion(job);
     }

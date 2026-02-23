@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --background: 275 75% 95%; /* Lavender base */
-    --foreground: 222 47% 2%; /* Deep Black/Slate */
+    --foreground: 222 47% 2%; /* Deep Slate/Black */
     --card: 0 0% 100% / 0.4;
     --card-foreground: 222 47% 2%;
     --popover: 0 0% 100%;
@@ -43,14 +43,12 @@
     @apply text-slate-950 font-body antialiased selection:bg-primary/10 selection:text-primary;
   }
 
-  /* Main gradient movement */
   @keyframes gradientShift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
 
-  /* Floating animated blobs */
   body::before,
   body::after {
     content: "";
@@ -65,20 +63,17 @@
     pointer-events: none;
   }
 
-  /* Purple blob */
   body::before {
     background: #d29bff;
     top: -200px;
     left: -200px;
   }
 
-  /* Blue blob */
   body::after {
     background: #8fd3ff;
     bottom: -200px;
     right: -200px;
     animation-duration: 22s;
-    box-shadow: 0 0 200px rgba(255,255,255,0.2) inset;
   }
 }
 
@@ -89,19 +84,11 @@
 }
 
 @layer utilities {
-  .glass-card {
-    @apply bg-white/40 backdrop-blur-2xl border border-white/40 shadow-2xl;
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
-  
-  .text-shadow-sm {
-    text-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
 }
