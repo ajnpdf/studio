@@ -175,7 +175,7 @@ class SystemEngine {
       if (this.processedHashes.has(jobKey)) continue;
 
       const fileNode: FileNode = {
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).substring(7),
         name: file.name,
         originalName: file.name,
         size: file.size,
@@ -287,6 +287,8 @@ class SystemEngine {
     const imgConv = new ImageConverter(files[0], update);
 
     switch (job.toolId) {
+      case 'organize-pdf':
+      case 'organize': return manip.organize(job.settings.actions || []);
       case 'merge-pdf':
       case 'merge': return manip.merge();
       case 'split-pdf':

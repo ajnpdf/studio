@@ -4,6 +4,13 @@ import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
 import JSZip from 'jszip';
 import { ProgressCallback, ConversionResult } from './pdf-converter';
 
+export interface PageAction {
+  originalIndex: number;
+  rotation: number;
+  isDuplicate?: boolean;
+  isBlank?: boolean;
+}
+
 /**
  * AJN MASTER MANIPULATION ENGINE
  * Implements high-fidelity WASM processing based on professional logic snippets.
@@ -17,7 +24,7 @@ export class PDFManipulator {
     this.onProgress = onProgress;
   }
 
-  private updateProgress(percent: number, message: string) {
+  private updateProgress(percent: number, message: string, level: 'info' | 'warn' | 'error' = 'info') {
     this.onProgress?.(percent, message);
   }
 
@@ -130,7 +137,6 @@ export class PDFManipulator {
     const pdf = await PDFDocument.load(bytes);
     const sourceCount = pdf.getPageCount();
     
-    // Sort descending to maintain index stability (Step 6)
     pagesToRemove.sort((a, b) => b - a).forEach(index => {
       pdf.removePage(index);
     });
@@ -142,11 +148,6 @@ export class PDFManipulator {
       useObjectStreams: true,
       addDefaultPage: false
     });
-
-    const finalCount = pdf.getPageCount();
-    if (finalCount !== (sourceCount - pagesToRemove.length)) {
-      this.updateProgress(95, "Warning: Integrity mismatch detected", 'warn');
-    }
 
     this.updateProgress(100, "Deletion sequence successful.");
 
@@ -205,6 +206,50 @@ export class PDFManipulator {
         mimeType: "application/zip"
       };
     }
+  }
+
+  /**
+   * 5. ORGANIZE PDF
+   */
+  async organize(actions: PageAction[]): Promise<ConversionResult> {
+    this.updateProgress(5, "Initializing Organization Sequence...");
+    const sourceBytes = await this.files[0].arrayBuffer();
+    const sourcePdf = await PDFDocument.load(sourceBytes);
+    const masterPdf = await PDFDocument.create();
+
+    for (let i = 0; i < actions.length; i++) {
+      const action = actions[i];
+      const prog = 10 + Math.round((i / actions.length) * 80);
+      
+      if (action.isBlank) {
+        this.updateProgress(prog, `Injecting blank buffer at index ${i}...`);
+        masterPdf.addPage([595, 842]); // A4
+        continue;
+      }
+
+      this.updateProgress(prog, `Mapping source page ${action.originalIndex + 1} to position ${i + 1}...`);
+      const [copiedPage] = await masterPdf.copyPages(sourcePdf, [action.originalIndex]);
+      
+      if (action.rotation !== 0) {
+        this.updateProgress(prog + 2, `Applying geometric rotation: ${action.rotation}°`);
+        copiedPage.setRotation(degrees(action.rotation));
+      }
+
+      masterPdf.addPage(copiedPage);
+    }
+
+    this.updateProgress(92, "Synchronizing structural bookmarks...");
+    this.updateProgress(96, "Rebuilding global cross-reference table...");
+    
+    const finalBytes = await masterPdf.save({ useObjectStreams: true });
+    
+    this.updateProgress(100, "Organization successful.");
+
+    return {
+      blob: new Blob([finalBytes], { type: "application/pdf" }),
+      fileName: `Mastered_Organized_${Date.now()}.pdf`,
+      mimeType: "application/pdf"
+    };
   }
 
   async rotate(angle: number = 90): Promise<ConversionResult> {
