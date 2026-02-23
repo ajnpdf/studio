@@ -75,13 +75,13 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       <CategorySidebar active={activeCategory} onSelect={setActiveCategory} />
 
       <main className="flex-1 flex flex-col min-w-0 border-r border-black/5 relative h-full">
-        <div className="flex-1 overflow-y-auto scrollbar-hide">
+        <div className="flex-1 overflow-y-auto scrollbar-hide pb-32">
           <AnimatePresence mode="wait">
             <motion.div 
               key={initialUnitId}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-6 md:p-12 space-y-10 max-w-6xl mx-auto pb-32 min-h-full"
+              className="p-6 md:p-12 space-y-10 max-w-6xl mx-auto min-h-full"
             >
               <header className="flex items-center justify-between px-4">
                 <div className="flex items-center gap-6">

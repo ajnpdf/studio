@@ -194,9 +194,13 @@ class SystemEngine {
       nextJob.progress = 100;
       this.state.outputs.unshift(output);
       this.state.stats.totalMastered++;
+      
+      // Professional delay before removing from visual queue
+      await new Promise(r => setTimeout(r, 1500));
     } catch (err: any) {
       nextJob.status = 'failed';
       this.addLog(nextJob, err.message || 'System Pipeline Fault', 'error');
+      await new Promise(r => setTimeout(r, 3000));
     } finally {
       this.isProcessing = false;
       this.state.queue = this.state.queue.filter(j => j.id !== nextJob.id);
