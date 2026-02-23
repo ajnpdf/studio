@@ -1,3 +1,4 @@
+
 'use client';
 
 import { PDFConverter } from './converters/pdf-converter';
@@ -19,7 +20,7 @@ import { PDFManipulator } from './converters/pdf-manipulator';
 
 /**
  * AJN SYSTEM IDENTITY - CORE INTELLIGENCE LAYER
- * Stateful workflow orchestrator managing 30+ PDF tools across 6 domains.
+ * Stateful workflow orchestrator managing 35+ PDF tools across 6 domains.
  * Enforces a strict one-to-one processing ratio via Job Locks and SHA-256 Fingerprinting.
  */
 
@@ -114,7 +115,7 @@ class ConversionEngine {
   }
 
   async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, operationId?: string) {
-    // --- SPECIAL CASE: MERGE PDF ---
+    // --- SPECIAL CASE: MERGE PDF (One Job for All Files) ---
     if (operationId === 'merge-pdf') {
       const job: ConversionJob = {
         id: Math.random().toString(36).substr(2, 9),
@@ -142,6 +143,7 @@ class ConversionEngine {
       const fingerprint = await this.generateFingerprint(file);
       const jobKey = `${fingerprint}_${operationId || 'convert'}_${toFmt}`;
 
+      // Prevent redundant identical processing
       if (this.processedHashes.has(jobKey)) continue;
 
       const fileBuffer: FileBuffer = {
@@ -217,6 +219,7 @@ class ConversionEngine {
       nextJob.progress = 100;
       nextJob.stage = 'Unit Mastered';
       
+      // Professional Naming Standard
       const originalBase = nextJob.operationId === 'merge-pdf' ? 'Merge' : nextJob.file.name.replace(/\.[^/.]+$/, "");
       const ext = result.fileName.split('.').pop() || nextJob.toFmt.toLowerCase();
       const finalFileName = `Mastered_${originalBase}.${ext}`;

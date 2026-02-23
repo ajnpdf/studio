@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -11,8 +12,6 @@ import {
   ShieldCheck, 
   Cpu, 
   Layers,
-  Globe,
-  GitCompare,
   GripVertical,
   X,
   Plus,
@@ -48,8 +47,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [splitMode, setSplitMode] = useState<'range' | 'every' | 'range'>('range');
   const [rotateAngle, setRotateAngle] = useState('90');
   const [compressionProfile, setCompressionProfile] = useState('balanced');
-  
-  const [compareMode, setCompareMode] = useState('visual');
   const [redactSensitive, setRedactSensitive] = useState(true);
 
   useEffect(() => {
@@ -86,7 +83,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       angle: parseInt(rotateAngle),
       splitMode,
       splitValue: pageRange,
-      compareMode,
       redactSensitive
     };
 
@@ -116,8 +112,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const hasControls = [
     'protect-pdf', 'split-pdf', 'extract-pages', 'remove-pages', 
     'rotate-pdf', 'watermark-pdf', 'translate-pdf', 'compress-pdf',
-    'unlock-pdf', 'redact-pdf', 'page-numbers', 'crop-pdf',
-    'compare-pdf'
+    'unlock-pdf', 'redact-pdf', 'page-numbers', 'crop-pdf'
   ].includes(initialUnitId || '');
 
   return (
@@ -140,7 +135,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               </div>
               <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">WASM Layer Active</span>
+                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Wasm Layer Active</span>
               </div>
             </div>
 
@@ -168,7 +163,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                               <RotateCw className="w-3.5 h-3.5 rotate-[-90deg]" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-black/5" onClick={() => reorderPrep(i, 'down')} disabled={i === prepQueue.length - 1}>
-                              <RotateCw className="w-3.5 h-3.5 rotate-90" />
+                              <RotateCw className="w-3.5 h-3.5 rotate(90deg)" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-red-50 text-red-400" onClick={() => removePrepItem(i)}>
                               <X className="w-4 h-4" />

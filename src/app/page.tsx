@@ -1,3 +1,4 @@
+
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';

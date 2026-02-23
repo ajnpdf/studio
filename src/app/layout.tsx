@@ -3,7 +3,6 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { FirebaseClientProvider } from '@/firebase';
-import { PlatformLoader } from '@/components/platform-loader';
 
 export const metadata: Metadata = {
   title: 'AJN – All-in-one Junction Network | Every File. One Smart Network.',
@@ -24,7 +23,6 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <FirebaseClientProvider>
-          <PlatformLoader />
           {children}
           <Toaster />
         </FirebaseClientProvider>
