@@ -31,7 +31,9 @@ import {
   Type,
   FileText,
   Trash2,
-  CheckCircle2
+  CheckCircle2,
+  ArrowUpDown,
+  Files
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -39,6 +41,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import * as pdfjsLib from 'pdfjs-dist';
 import { cn } from '@/lib/utils';
 
@@ -66,11 +69,12 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [password, setPassword] = useState('');
   const [watermarkText, setWatermarkText] = useState('AJN Private');
   const [targetLang, setTargetLang] = useState('es');
-  const [pageRange, setPageRange] = useState('1-5');
+  const [pageRange, setPageRange] = useState('');
   const [splitMode, setSplitMode] = useState<'range' | 'every' | 'equal'>('every');
   const [splitValue, setSplitValue] = useState('1');
   const [rotateAngle, setRotateAngle] = useState('90');
   const [summaryLength, setSummaryLength] = useState('medium');
+  const [extractionMode, setExtractionMode] = useState<'single' | 'batch'>('single');
 
   useEffect(() => {
     return engine.subscribe(setAppState);
@@ -146,7 +150,8 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       splitValue: splitMode === 'range' ? pageRange : splitValue,
       length: summaryLength,
       pages: Array.from(selectedPages),
-      toFmt: to
+      toFmt: to,
+      extractionMode
     };
 
     engine.addJobs(files, from, to, settings, initialUnitId);
@@ -164,6 +169,14 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
     if (prepQueue.length < 2) return;
     executeJob(prepQueue);
     setPrepQueue([]);
+  };
+
+  const reorderPrep = (idx: number, dir: 'up' | 'down') => {
+    const newQueue = [...prepQueue];
+    const target = dir === 'up' ? idx - 1 : idx + 1;
+    if (target < 0 || target >= newQueue.length) return;
+    [newQueue[idx], newQueue[target]] = [newQueue[target], newQueue[idx]];
+    setPrepQueue(newQueue);
   };
 
   if (!appState) return null;
@@ -208,21 +221,38 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     <section className="space-y-6">
                       {prepQueue.length > 0 && (
                         <div className="space-y-3">
-                          {prepQueue.map((file, i) => (
-                            <Card key={i} className="bg-white/50 backdrop-blur-2xl border-black/5 hover:border-primary/30 transition-all rounded-2xl overflow-hidden border-2">
-                              <CardContent className="p-4 flex items-center gap-6">
-                                <div className="w-10 h-10 bg-black/5 rounded-xl flex items-center justify-center font-black text-xs border border-black/5">{i + 1}</div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-black truncate text-slate-950 uppercase">{file.name}</p>
-                                  <p className="text-[9px] font-black text-slate-950/40 uppercase tracking-widest">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
-                                </div>
-                                <Button variant="ghost" size="icon" onClick={() => setPrepQueue(prev => prev.filter((_, idx) => idx !== i))}><X className="w-4 h-4" /></Button>
-                              </CardContent>
-                            </Card>
-                          ))}
-                          <Button onClick={handleMergeStart} className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-black text-sm uppercase tracking-widest gap-3 rounded-2xl shadow-2xl shadow-primary/30">
-                            <Play className="w-4 h-4 fill-current" /> Execute Master Merge
-                          </Button>
+                          <AnimatePresence mode="popLayout">
+                            {prepQueue.map((file, i) => (
+                              <motion.div 
+                                key={`${file.name}-${i}`} 
+                                layout 
+                                initial={{ x: -20, opacity: 0 }} 
+                                animate={{ x: 0, opacity: 1 }}
+                                exit={{ x: 20, opacity: 0 }}
+                              >
+                                <Card className="bg-white/50 backdrop-blur-2xl border-black/5 hover:border-primary/30 transition-all rounded-2xl overflow-hidden border-2">
+                                  <CardContent className="p-4 flex items-center gap-6">
+                                    <div className="flex flex-col gap-1">
+                                      <button onClick={() => reorderPrep(i, 'up')} disabled={i === 0} className="p-1 hover:bg-black/5 rounded disabled:opacity-20"><ArrowUpDown className="w-3.5 h-3.5 rotate-180" /></button>
+                                      <button onClick={() => reorderPrep(i, 'down')} disabled={i === prepQueue.length - 1} className="p-1 hover:bg-black/5 rounded disabled:opacity-20"><ArrowUpDown className="w-3.5 h-3.5" /></button>
+                                    </div>
+                                    <div className="w-10 h-10 bg-black/5 rounded-xl flex items-center justify-center font-black text-xs border border-black/5">{i + 1}</div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-black truncate text-slate-950 uppercase">{file.name}</p>
+                                      <p className="text-[9px] font-black text-slate-950/40 uppercase tracking-widest">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                    </div>
+                                    <Button variant="ghost" size="icon" onClick={() => setPrepQueue(prev => prev.filter((_, idx) => idx !== i))} className="h-10 w-10 text-slate-950/20 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"><X className="w-5 h-5" /></Button>
+                                  </CardContent>
+                                </Card>
+                              </motion.div>
+                            ))}
+                          </AnimatePresence>
+                          <div className="pt-4 flex gap-4">
+                            <Button onClick={handleMergeStart} className="flex-1 h-14 bg-primary hover:bg-primary/90 text-white font-black text-sm uppercase tracking-widest gap-3 rounded-2xl shadow-2xl shadow-primary/30">
+                              <Play className="w-4 h-4 fill-current" /> Execute Master Merge
+                            </Button>
+                            <Button variant="outline" onClick={() => setPrepQueue([])} className="h-14 px-8 border-black/10 text-[11px] font-black uppercase tracking-widest rounded-2xl hover:bg-red-50 hover:text-red-500">Reset</Button>
+                          </div>
                         </div>
                       )}
                     </section>
@@ -252,7 +282,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           <p className="text-[10px] font-black uppercase tracking-widest">Generating Visual Grid...</p>
                         </div>
                       ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[600px] overflow-y-auto scrollbar-hide p-2 bg-black/5 rounded-[2rem] border border-black/5">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[600px] overflow-y-auto scrollbar-hide p-4 bg-black/5 rounded-[2rem] border border-black/5">
                           {thumbnails.map((thumb, i) => (
                             <div 
                               key={i} 
@@ -261,7 +291,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                                 "relative aspect-[1/1.4] rounded-xl overflow-hidden cursor-pointer border-2 transition-all shadow-lg hover:scale-[1.02]",
                                 selectedPages.has(i) 
                                   ? initialUnitId === 'remove-pages' ? "border-red-500 scale-95 opacity-80" : "border-emerald-500 scale-105"
-                                  : "border-white/20"
+                                  : "border-white/20 hover:border-primary/40"
                               )}
                             >
                               <img src={thumb} className="w-full h-full object-cover" />
@@ -289,7 +319,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           {initialUnitId === 'remove-pages' ? 'Execute Master Purge' : 'Execute Extraction'}
                         </Button>
                         <Button variant="outline" onClick={() => { setSelectionFile(null); setThumbnails([]); setSelectedPages(new Set()); }} className="h-14 px-8 border-black/10 text-[11px] font-black uppercase tracking-widest rounded-2xl hover:bg-red-50 hover:text-red-500">
-                          Discard
+                          Discard Selection
                         </Button>
                       </div>
                     </section>
@@ -319,14 +349,33 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                               ))}
                             </div>
                           </div>
-                          <Input value={splitMode === 'range' ? pageRange : splitValue} onChange={(e) => splitMode === 'range' ? setPageRange(e.target.value) : setSplitValue(e.target.value)} className="bg-white/60 border-black/5 h-12 rounded-2xl font-black text-xs shadow-sm" placeholder="Pages..." />
+                          <Input value={splitMode === 'range' ? pageRange : splitValue} onChange={(e) => splitMode === 'range' ? setPageRange(e.target.value) : setSplitValue(e.target.value)} className="bg-white/60 border-black/5 h-12 rounded-2xl font-black text-xs shadow-sm" placeholder={splitMode === 'range' ? "e.g. 1-5, 8-12" : "Number of pages..."} />
+                        </div>
+                      )}
+
+                      {initialUnitId === 'extract-pages' && (
+                        <div className="space-y-6">
+                          <div className="flex items-center justify-between p-5 bg-white/60 rounded-2xl border border-black/5 shadow-sm">
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-black uppercase text-slate-900 tracking-widest">Discrete Extraction</p>
+                              <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest opacity-60">Output ZIP of Individual PDFs</p>
+                            </div>
+                            <Switch 
+                              checked={extractionMode === 'batch'} 
+                              onCheckedChange={(v) => setExtractionMode(v ? 'batch' : 'single')} 
+                              className="data-[state=checked]:bg-primary"
+                            />
+                          </div>
                         </div>
                       )}
 
                       {initialUnitId === 'protect-pdf' && (
-                        <div className="relative">
-                          <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="bg-white/60 border-black/5 h-12 rounded-2xl font-black text-xs shadow-sm pl-12" />
-                          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-40" />
+                        <div className="space-y-3">
+                          <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Master Password</Label>
+                          <div className="relative">
+                            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="bg-white/60 border-black/5 h-12 rounded-2xl font-black text-xs shadow-sm pl-12" />
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-40" />
+                          </div>
                         </div>
                       )}
                     </div>

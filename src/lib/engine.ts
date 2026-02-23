@@ -229,15 +229,7 @@ class SystemEngine {
       let result;
       const startTime = Date.now();
 
-      if (nextJob.toolId === 'merge-pdf' || nextJob.toolId === 'merge') {
-        const manip = new PDFManipulator(nextJob.inputs.map(i => i.file), (p, m) => {
-          nextJob.progress = Math.min(p, 99);
-          this.addLog(nextJob, m);
-        });
-        result = await manip.merge();
-      } else {
-        result = await this.runTool(nextJob);
-      }
+      result = await this.runTool(nextJob);
 
       const duration = ((Date.now() - startTime) / 1000).toFixed(1);
       const originalSize = nextJob.inputs.reduce((sum, f) => sum + f.size, 0);
@@ -283,22 +275,24 @@ class SystemEngine {
   }
 
   private async runTool(job: ProcessingJob) {
-    const file = job.inputs[0].file;
+    const files = job.inputs.map(i => i.file);
     const update = (p: number, m: string) => {
       job.progress = Math.min(p, 99);
       this.addLog(job, m);
     };
 
-    const manip = new PDFManipulator(file, update);
-    const specialized = new SpecializedConverter(file, update);
-    const pdfConv = new PDFConverter(file, update);
-    const imgConv = new ImageConverter(file, update);
+    const manip = new PDFManipulator(files, update);
+    const specialized = new SpecializedConverter(files[0], update);
+    const pdfConv = new PDFConverter(files[0], update);
+    const imgConv = new ImageConverter(files[0], update);
 
     switch (job.toolId) {
+      case 'merge-pdf':
+      case 'merge': return manip.merge();
       case 'split-pdf':
       case 'split': return manip.split({ mode: job.settings.splitMode, value: job.settings.splitValue });
       case 'extract-pages':
-      case 'extract': return manip.extractPages(job.settings.pages || [0]);
+      case 'extract': return manip.extractPages(job.settings.pages || [0], job.settings.extractionMode);
       case 'remove-pages':
       case 'remove': return manip.removePages(job.settings.pages || []);
       case 'rotate-pdf':
@@ -319,7 +313,7 @@ class SystemEngine {
       case 'ocr': return specialized.convertTo('OCR', job.settings);
       case 'redact-pdf':
       case 'redact': return specialized.convertTo('REDACTED_PDF', job.settings);
-      default: return this.runConversion(job);
+      default: return pdfConv.convertTo(job.settings.toFmt || 'PDF', job.settings);
     }
   }
 

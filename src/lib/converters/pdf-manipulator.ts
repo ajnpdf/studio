@@ -122,49 +122,30 @@ export class PDFManipulator {
   }
 
   /**
-   * 3. REMOVE PAGES (Master Logic)
-   * STEP 6: WASM execution
+   * 3. REMOVE PAGES
    */
   async removePages(pagesToRemove: number[]): Promise<ConversionResult> {
     this.updateProgress(10, "Initializing Surgical Deletion...");
     const bytes = await this.files[0].arrayBuffer();
-    
-    // Validate Header (Step 1)
     const pdf = await PDFDocument.load(bytes);
     const sourceCount = pdf.getPageCount();
-    const newPdf = await PDFDocument.create();
-
-    const exclusionSet = new Set(pagesToRemove);
-    this.updateProgress(20, `Targeting ${exclusionSet.size} pages for removal...`);
-
-    const indicesToKeep = [];
-    for (let i = 0; i < sourceCount; i++) {
-      if (!exclusionSet.has(i)) {
-        indicesToKeep.push(i);
-      }
-    }
-
-    this.updateProgress(40, `Cloning ${indicesToKeep.length} persistent pages...`);
-    const copiedPages = await newPdf.copyPages(pdf, indicesToKeep);
-    copiedPages.forEach(p => newPdf.addPage(p));
+    
+    // Sort descending to maintain index stability (Step 6)
+    pagesToRemove.sort((a, b) => b - a).forEach(index => {
+      pdf.removePage(index);
+    });
 
     this.updateProgress(70, "Synchronizing structural bookmarks...");
-    // Outlines pruning and remapping is handled internally by copyPages for standard outlines.
-    // For manual removal, we verify the remaining tree.
-
     this.updateProgress(85, "Compacting cross-reference table...");
     
-    const newBytes = await newPdf.save({
+    const newBytes = await pdf.save({
       useObjectStreams: true,
       addDefaultPage: false
     });
 
-    // Integrity Check (Step 7)
-    const finalCount = newPdf.getPageCount();
-    if (finalCount !== (sourceCount - exclusionSet.size)) {
+    const finalCount = pdf.getPageCount();
+    if (finalCount !== (sourceCount - pagesToRemove.length)) {
       this.updateProgress(95, "Warning: Integrity mismatch detected", 'warn');
-    } else {
-      this.updateProgress(95, "Integrity check verified.");
     }
 
     this.updateProgress(100, "Deletion sequence successful.");
@@ -177,26 +158,53 @@ export class PDFManipulator {
   }
 
   /**
-   * 4. EXTRACT PAGES (Master Logic)
+   * 4. EXTRACT PAGES
    */
-  async extractPages(pagesToKeep: number[]): Promise<ConversionResult> {
+  async extractPages(pagesToKeep: number[], mode: 'single' | 'batch' = 'single'): Promise<ConversionResult> {
     this.updateProgress(10, "Initializing Extraction Engine...");
     const bytes = await this.files[0].arrayBuffer();
     const pdf = await PDFDocument.load(bytes);
-    const newPdf = await PDFDocument.create();
+    const baseName = this.files[0].name.replace(/\.[^/.]+$/, "");
 
-    this.updateProgress(40, `Isolating ${pagesToKeep.length} targeted layers...`);
-    const copiedPages = await newPdf.copyPages(pdf, pagesToKeep);
-    copiedPages.forEach(p => newPdf.addPage(p));
-
-    this.updateProgress(80, "Finalizing extracted stream...");
-    const newBytes = await newPdf.save();
-
-    return {
-      blob: new Blob([newBytes], { type: "application/pdf" }),
-      fileName: `Mastered_Extraction_${Date.now()}.pdf`,
-      mimeType: "application/pdf"
-    };
+    if (mode === 'single') {
+      const newPdf = await PDFDocument.create();
+      this.updateProgress(40, `Isolating ${pagesToKeep.length} targeted layers...`);
+      const copiedPages = await newPdf.copyPages(pdf, pagesToKeep);
+      copiedPages.forEach(p => newPdf.addPage(p));
+      
+      this.updateProgress(80, "Finalizing extracted stream...");
+      const newBytes = await newPdf.save();
+      
+      return {
+        blob: new Blob([newBytes], { type: "application/pdf" }),
+        fileName: `Mastered_Extraction_${Date.now()}.pdf`,
+        mimeType: "application/pdf"
+      };
+    } else {
+      const zip = new JSZip();
+      
+      for (let i = 0; i < pagesToKeep.length; i++) {
+        const pageIdx = pagesToKeep[i];
+        const prog = 20 + Math.round((i / pagesToKeep.length) * 70);
+        this.updateProgress(prog, `Synthesizing Page ${pageIdx + 1} Buffer...`);
+        
+        const newPdf = await PDFDocument.create();
+        const [copiedPage] = await newPdf.copyPages(pdf, [pageIdx]);
+        newPdf.addPage(copiedPage);
+        
+        const chunkBytes = await newPdf.save();
+        zip.file(`${baseName}_Page_${pageIdx + 1}.pdf`, chunkBytes);
+      }
+      
+      this.updateProgress(95, "Packaging Extraction Archive...");
+      const zipBlob = await zip.generateAsync({ type: "blob", compression: "DEFLATE" });
+      
+      return {
+        blob: zipBlob,
+        fileName: `${baseName}_Extracted_Pages.zip`,
+        mimeType: "application/zip"
+      };
+    }
   }
 
   async rotate(angle: number = 90): Promise<ConversionResult> {
@@ -209,6 +217,7 @@ export class PDFManipulator {
   }
 
   async addPageNumbers(): Promise<ConversionResult> {
+    this.updateProgress(30, "Injecting Index Layer...");
     const bytes = await this.files[0].arrayBuffer();
     const pdf = await PDFDocument.load(bytes);
     const font = await pdf.embedFont(StandardFonts.Helvetica);
@@ -221,6 +230,7 @@ export class PDFManipulator {
   }
 
   async addWatermark(text: string = "CONFIDENTIAL"): Promise<ConversionResult> {
+    this.updateProgress(30, "Applying Branding Mask...");
     const bytes = await this.files[0].arrayBuffer();
     const pdf = await PDFDocument.load(bytes);
     const font = await pdf.embedFont(StandardFonts.Helvetica);
@@ -233,6 +243,7 @@ export class PDFManipulator {
   }
 
   async protect(password: string): Promise<ConversionResult> {
+    this.updateProgress(30, "Applying Cryptographic Seal...");
     const bytes = await this.files[0].arrayBuffer();
     const pdf = await PDFDocument.load(bytes);
     const newBytes = await pdf.save({ userPassword: password, ownerPassword: password });
@@ -240,6 +251,7 @@ export class PDFManipulator {
   }
 
   async unlock(password: string): Promise<ConversionResult> {
+    this.updateProgress(30, "Decrypting Stream...");
     const bytes = await this.files[0].arrayBuffer();
     const pdf = await PDFDocument.load(bytes, { password });
     const newBytes = await pdf.save();
