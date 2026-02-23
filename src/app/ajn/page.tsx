@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
@@ -104,7 +103,7 @@ export default function AJNPage() {
 
   return (
     <div 
-      className="min-h-screen bg-[#020617] text-foreground selection:bg-primary/30 relative overflow-hidden font-body flex flex-col"
+      className="min-h-screen text-foreground selection:bg-primary/10 relative overflow-hidden font-body flex flex-col"
       onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
       onDragLeave={() => setIsDragging(false)}
       onDrop={(e) => { e.preventDefault(); setIsDragging(false); if(e.dataTransfer.files[0]) simulateProcessing(e.dataTransfer.files[0]); }}
@@ -112,40 +111,40 @@ export default function AJNPage() {
       <NightSky />
       
       {/* HUD HEADER */}
-      <header className="fixed top-0 left-0 right-0 h-16 md:h-20 border-b border-white/5 bg-background/20 backdrop-blur-xl z-[60] px-4 md:px-8 flex items-center justify-between">
+      <header className="fixed top-0 left-0 right-0 h-16 md:h-20 border-b border-black/5 bg-white/40 backdrop-blur-xl z-[60] px-4 md:px-8 flex items-center justify-between shadow-sm">
         <Link href="/" className="flex items-center gap-2 md:gap-3 group">
           <LogoAnimation className="w-16 h-8 md:w-20 md:h-10" showGlow={false} />
-          <span className="font-black text-lg md:text-xl tracking-tighter text-white uppercase ml-[-8px]">AJN</span>
+          <span className="font-black text-lg md:text-xl tracking-tighter text-slate-900 uppercase ml-[-8px]">AJN</span>
         </Link>
         
         <div className="flex items-center gap-2 md:gap-6">
           <Link href="/junction">
-            <Button variant="outline" className="h-8 md:h-9 border-white/10 bg-white/5 hover:bg-white hover:text-black font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-xl transition-all gap-2 px-3 md:px-4 shadow-2xl">
+            <Button variant="outline" className="h-8 md:h-9 border-black/10 bg-white/50 hover:bg-primary hover:text-white font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-xl transition-all gap-2 px-3 md:px-4 shadow-sm">
               <Workflow className="w-3 md:w-3.5 h-3 md:h-3.5" /> <span className="hidden sm:inline">Services</span> Hub
             </Button>
           </Link>
-          <div className="h-6 md:h-8 w-px bg-white/10 hidden sm:block" />
-          <div className="flex items-center gap-2 px-2 md:px-3 py-1 md:py-1.5 bg-white/5 rounded-xl border border-white/10">
-            <ShieldCheck className="w-3 md:w-3.5 h-3 md:h-3.5 text-emerald-500" />
-            <span className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest hidden xs:inline">WASM ACTIVE</span>
+          <div className="h-6 md:h-8 w-px bg-black/5 hidden sm:block" />
+          <div className="flex items-center gap-2 px-2 md:px-3 py-1 md:py-1.5 bg-white/50 rounded-xl border border-black/5">
+            <ShieldCheck className="w-3 md:w-3.5 h-3 md:h-3.5 text-emerald-600" />
+            <span className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest hidden xs:inline">STABLE PROTOCOL</span>
           </div>
         </div>
       </header>
 
       {/* GLOBAL SEARCH OVERLAY */}
       {showSearch && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-0 md:pt-[15vh] px-0 md:px-6 bg-background/80 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="w-full h-full md:h-auto md:max-w-2xl bg-[#0d1225] border-none md:border md:border-white/10 md:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in slide-in-from-top-4 duration-500">
-            <div className="p-4 md:p-6 border-b border-white/5 relative flex items-center">
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-0 md:pt-[15vh] px-0 md:px-6 bg-white/60 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="w-full h-full md:h-auto md:max-w-2xl bg-white border-none md:border md:border-black/5 md:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in slide-in-from-top-4 duration-500">
+            <div className="p-4 md:p-6 border-b border-black/5 relative flex items-center">
               <Search className="absolute left-6 md:left-8 w-5 h-5 text-primary" />
               <Input 
                 autoFocus
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Find a smart service..." 
-                className="h-12 md:h-14 pl-12 md:pl-14 pr-12 bg-transparent border-none text-base md:text-lg font-bold placeholder:opacity-30 focus-visible:ring-0"
+                className="h-12 md:h-14 pl-12 md:pl-14 pr-12 bg-transparent border-none text-base md:text-lg font-bold placeholder:opacity-30 focus-visible:ring-0 text-slate-900"
               />
-              <button onClick={() => setShowSearch(false)} className="absolute right-6 md:right-8 p-2 hover:bg-white/5 rounded-xl transition-colors">
+              <button onClick={() => setShowSearch(false)} className="absolute right-6 md:right-8 p-2 hover:bg-black/5 rounded-xl transition-colors">
                 <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
@@ -156,18 +155,18 @@ export default function AJNPage() {
                   <div className="grid grid-cols-1 gap-1 md:gap-2">
                     {filteredServices.map((s) => (
                       <Link key={s.id} href={`/junction/units?cat=${s.cat}`} onClick={() => setShowSearch(false)}>
-                        <div className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl hover:bg-white/5 transition-all group cursor-pointer border border-transparent hover:border-white/5">
-                          <div className="w-10 h-10 md:w-12 md:h-12 bg-white/5 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <div className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl hover:bg-primary/5 transition-all group cursor-pointer border border-transparent hover:border-primary/10">
+                          <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                             <s.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                           </div>
                           <div className="flex-1 overflow-hidden">
                             <div className="flex items-center gap-2 md:gap-3">
-                              <h4 className="text-xs md:text-sm font-black uppercase tracking-tighter text-white/90">{s.name}</h4>
-                              <Badge className="bg-primary/20 text-primary border-none text-[7px] md:text-[8px] font-black">{s.tag}</Badge>
+                              <h4 className="text-xs md:text-sm font-black uppercase tracking-tighter text-slate-800">{s.name}</h4>
+                              <Badge className="bg-primary/10 text-primary border-none text-[7px] md:text-[8px] font-black">{s.tag}</Badge>
                             </div>
                             <p className="text-[8px] md:text-[10px] text-muted-foreground font-bold uppercase tracking-widest truncate">{s.desc}</p>
                           </div>
-                          <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-white/10 group-hover:text-primary transition-colors" />
+                          <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-black/10 group-hover:text-primary transition-colors" />
                         </div>
                       </Link>
                     ))}
@@ -189,8 +188,8 @@ export default function AJNPage() {
         "fixed inset-0 pointer-events-none transition-all duration-1000 z-0",
         isDragging ? "opacity-100 scale-100" : "opacity-0 scale-110"
       )}>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1)_0%,transparent_70%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.05)_0%,transparent_70%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
       </div>
 
       <main className="relative z-10 flex-1 flex flex-col items-center p-4 md:p-6 mt-24 md:mt-32">
@@ -200,12 +199,12 @@ export default function AJNPage() {
             {[...TICKER_SERVICES, ...TICKER_SERVICES].map((s, i) => (
               <div key={i} className="flex items-center gap-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                <span className="text-[9px] md:text-[11px] font-black text-white/40 tracking-[0.3em] uppercase group-hover:text-white/80 transition-colors">{s}</span>
+                <span className="text-[9px] md:text-[11px] font-black text-slate-900/40 tracking-[0.3em] uppercase group-hover:text-slate-900 transition-colors">{s}</span>
               </div>
             ))}
           </div>
-          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#020617] to-transparent z-10" />
-          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#020617] to-transparent z-10" />
+          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#e9cdfa] to-transparent z-10" />
+          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#c8e4f7] to-transparent z-10" />
         </div>
 
         <div className={cn(
@@ -216,15 +215,15 @@ export default function AJNPage() {
           {/* LARGE GLOBAL SEARCH BOX */}
           <div className="w-full max-w-2xl relative group animate-in fade-in slide-in-from-top-4 duration-1000">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-[2.5rem] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
-            <div className="relative flex items-center bg-[#0d1225]/80 backdrop-blur-3xl border border-white/10 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all hover:border-primary/40">
+            <div className="relative flex items-center bg-white/60 backdrop-blur-3xl border border-black/5 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all hover:border-primary/40">
               <Search className="absolute left-6 md:left-8 w-6 h-6 text-primary" />
               <input 
                 readOnly
                 onClick={() => setShowSearch(true)}
                 placeholder="Search 300+ Service Units..." 
-                className="w-full h-16 md:h-20 bg-transparent pl-16 md:pl-20 pr-24 text-base md:text-xl font-black uppercase tracking-widest text-white placeholder:text-muted-foreground/30 cursor-pointer outline-none"
+                className="w-full h-16 md:h-20 bg-transparent pl-16 md:pl-20 pr-24 text-base md:text-xl font-black uppercase tracking-widest text-slate-900 placeholder:text-slate-900/30 cursor-pointer outline-none"
               />
-              <div className="absolute right-6 md:right-8 flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-xl border border-white/10">
+              <div className="absolute right-6 md:right-8 flex items-center gap-2 px-3 py-1.5 bg-black/5 rounded-xl border border-black/5">
                 <Command className="w-3 h-3 text-muted-foreground" />
                 <span className="text-[10px] font-black text-muted-foreground">K</span>
               </div>
@@ -240,38 +239,38 @@ export default function AJNPage() {
           <div 
             onClick={() => fileInputRef.current?.click()}
             className={cn(
-              "group relative w-full max-w-2xl min-h-[280px] md:min-h-[340px] bg-white/[0.02] border-2 border-dashed border-white/5 rounded-[2rem] md:rounded-[3rem] flex flex-col items-center justify-center cursor-pointer transition-all duration-500 hover:border-primary/40 hover:bg-white/[0.04] overflow-hidden shadow-2xl",
+              "group relative w-full max-w-2xl min-h-[280px] md:min-h-[340px] bg-white/40 backdrop-blur-md border-2 border-dashed border-black/5 rounded-[2rem] md:rounded-[3rem] flex flex-col items-center justify-center cursor-pointer transition-all duration-500 hover:border-primary/40 hover:bg-white/60 overflow-hidden shadow-xl",
               isDragging && "border-primary bg-primary/10 scale-[0.98]"
             )}
           >
             <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => e.target.files && simulateProcessing(e.target.files[0])} />
             
             <div className={cn(
-              "w-16 h-16 md:w-20 md:h-20 bg-white/5 rounded-2xl md:rounded-3xl flex items-center justify-center mb-6 md:mb-8 shadow-2xl transition-all duration-500",
+              "w-16 h-16 md:w-20 md:h-20 bg-primary/10 rounded-2xl md:rounded-3xl flex items-center justify-center mb-6 md:mb-8 shadow-sm transition-all duration-500",
               isDragging ? "scale-125 rotate-6 bg-primary" : "group-hover:scale-110"
             )}>
-              <Upload className={cn("w-8 h-8 md:w-10 md:h-10 transition-colors", isDragging ? "text-white" : "text-white/40")} />
+              <Upload className={cn("w-8 h-8 md:w-10 md:h-10 transition-colors", isDragging ? "text-white" : "text-primary")} />
             </div>
 
             <div className="text-center space-y-2 md:space-y-3 px-6 md:px-8">
-              <h2 className="text-2xl md:text-4xl font-black tracking-tight text-white uppercase leading-none">Drop to Optimize</h2>
-              <p className="text-[8px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-60">Professional Smart Transcoding System</p>
+              <h2 className="text-2xl md:text-4xl font-black tracking-tight text-slate-900 uppercase leading-none">Drop to Optimize</h2>
+              <p className="text-[8px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-60">Professional Smart Processing System</p>
             </div>
 
             <div className="mt-8 md:mt-12 flex flex-wrap justify-center gap-4 md:gap-8 text-[8px] md:text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em]">
               <span className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 md:w-3.5 md:h-3.5" /> Encrypted</span>
-              <span className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 md:w-3.5 md:h-3.5" /> Scanned</span>
+              <span className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 md:w-3.5 md:h-3.5" /> Local</span>
             </div>
           </div>
 
           {/* PROFESSIONAL CAPABILITIES GRID */}
           <section className="w-full max-w-5xl py-12 md:py-24 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
             {FEATURES.map((f, i) => (
-              <div key={i} className="p-6 md:p-8 rounded-[2rem] bg-white/[0.02] border border-white/5 hover:border-primary/20 transition-all group">
+              <div key={i} className="p-6 md:p-8 rounded-[2rem] bg-white/40 backdrop-blur-md border border-black/5 hover:border-primary/20 transition-all group shadow-sm">
                 <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <f.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                 </div>
-                <h3 className="text-xs md:text-sm font-black uppercase tracking-widest text-white mb-3">{f.title}</h3>
+                <h3 className="text-xs md:text-sm font-black uppercase tracking-widest text-slate-900 mb-3">{f.title}</h3>
                 <p className="text-[10px] md:text-xs text-muted-foreground font-bold leading-relaxed uppercase tracking-wider opacity-60">{f.desc}</p>
               </div>
             ))}
@@ -280,7 +279,7 @@ export default function AJNPage() {
 
         {/* PROCESSING OVERLAY */}
         {isProcessing && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#020617]/80 backdrop-blur-3xl animate-in fade-in duration-500">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-3xl animate-in fade-in duration-500">
             <div className="w-full max-w-md space-y-8 md:space-y-12 text-center p-8 md:p-12">
               <div className="relative mx-auto w-24 h-24 md:w-32 md:h-32 flex items-center justify-center">
                 <div className="absolute inset-0 border-2 border-primary/20 rounded-full animate-ping" />
@@ -290,7 +289,7 @@ export default function AJNPage() {
 
               <div className="space-y-4 md:space-y-6">
                 <div className="space-y-1">
-                  <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-white italic">Processing Engine</h2>
+                  <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-slate-900 italic">Processing Engine</h2>
                   <p className="text-[8px] md:text-[10px] font-black text-primary uppercase tracking-widest truncate max-w-[200px] mx-auto">{fileMeta?.name}</p>
                 </div>
                 
@@ -299,7 +298,7 @@ export default function AJNPage() {
                     <span>{progress}% SYNCHRONIZED</span>
                     <span>{fileMeta?.size}</span>
                   </div>
-                  <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                  <div className="h-1.5 w-full bg-black/5 rounded-full overflow-hidden border border-black/5">
                     <div 
                       className="h-full bg-primary transition-all duration-300 ease-out"
                       style={{ width: `${progress}%` }}
@@ -311,7 +310,7 @@ export default function AJNPage() {
           </div>
         )}
 
-        <footer className="py-8 text-[8px] md:text-[9px] font-black text-muted-foreground/20 uppercase tracking-[0.3em] md:tracking-[0.5em] mt-auto">
+        <footer className="py-8 text-[8px] md:text-[9px] font-black text-slate-900/20 uppercase tracking-[0.3em] md:tracking-[0.5em] mt-auto">
           AJN JUNCTION • GLOBAL NODE • 2025
         </footer>
       </main>

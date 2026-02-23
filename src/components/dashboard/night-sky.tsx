@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -13,6 +12,10 @@ interface Star {
   animationDelay: string;
 }
 
+/**
+ * AJN Night Sky - Optimized for Light Background
+ * Stars now twinkle with a violet glow over the platform gradient.
+ */
 export function NightSky() {
   const [stars, setStars] = useState<Star[]>([]);
 
@@ -20,8 +23,8 @@ export function NightSky() {
     // defer state update to after hydration to prevent mismatch
     const generatedStars = [...Array(35)].map((_, i) => ({
       id: i,
-      width: `${Math.random() * 1.5 + 0.8}px`,
-      height: `${Math.random() * 1.5 + 0.8}px`,
+      width: `${Math.random() * 1.5 + 1.2}px`,
+      height: `${Math.random() * 1.5 + 1.2}px`,
       top: `${Math.random() * 100}%`,
       left: `${Math.random() * 100}%`,
       animationDuration: `${Math.random() * 3 + 3}s`,
@@ -31,20 +34,19 @@ export function NightSky() {
   }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-[#0a0e1f]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(30,58,138,0.15)_0%,transparent_60%),radial-gradient(circle_at_70%_20%,rgba(59,130,246,0.1)_0%,transparent_70%)] opacity-70"></div>
+    <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-transparent">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(139,92,246,0.1)_0%,transparent_60%)] opacity-50"></div>
       
       <div className="absolute inset-0">
         {stars.map((star) => (
           <div
             key={star.id}
-            className="absolute bg-[#f0f9ff] rounded-full opacity-30 animate-twinkle"
+            className="absolute bg-white rounded-full opacity-40 animate-twinkle shadow-[0_0_8px_rgba(139,92,246,0.5)]"
             style={{
               width: star.width,
               height: star.height,
               top: star.top,
               left: star.left,
-              boxShadow: '0 0 4px #e0f2fe, 0 0 10px #93c5fd',
               animationDuration: star.animationDuration,
               animationDelay: star.animationDelay,
             }}
@@ -54,8 +56,8 @@ export function NightSky() {
       
       <style jsx global>{`
         @keyframes twinkle {
-          0%, 100% { opacity: 0.2; transform: scale(0.7); }
-          50% { opacity: 1; transform: scale(1.3); }
+          0%, 100% { opacity: 0.3; transform: scale(0.8); }
+          50% { opacity: 0.8; transform: scale(1.2); }
         }
         .animate-twinkle {
           animation: twinkle linear infinite;
