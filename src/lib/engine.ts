@@ -82,7 +82,7 @@ class ConversionEngine {
       toFmt: toFmt || 'PDF',
       status: 'queued',
       progress: 0,
-      stage: 'Initializing buffer...',
+      stage: 'Initializing neural buffer...',
       settings,
       operationId
     }));
@@ -112,9 +112,8 @@ class ConversionEngine {
       const objectUrl = URL.createObjectURL(result.blob);
       nextJob.status = 'complete';
       nextJob.progress = 100;
-      nextJob.stage = 'Process successful';
+      nextJob.stage = 'Unit process successful';
       
-      // Professional Content Naming
       const originalBase = nextJob.file.name.replace(/\.[^/.]+$/, "");
       const finalFileName = `Mastered_${originalBase}.${nextJob.toFmt.toLowerCase()}`;
 
@@ -126,8 +125,8 @@ class ConversionEngine {
       };
     } catch (err: any) {
       nextJob.status = 'failed';
-      nextJob.error = err.message || 'Error during optimization';
-      nextJob.stage = 'Internal Error';
+      nextJob.error = err.message || 'Error during unit execution';
+      nextJob.stage = 'Internal node error';
     } finally {
       this.activeJobs--;
       this.notify();
@@ -144,23 +143,37 @@ class ConversionEngine {
     });
 
     switch (job.operationId) {
+      // Organize
       case 'merge-pdf': return manip.merge();
       case 'split-pdf': 
       case 'extract-pages':
         return manip.split(job.settings.pages || [0]);
-      case 'rotate-pdf': return manip.rotate(job.settings.angle || 90);
-      case 'protect-pdf': return manip.protect(job.settings.password || '1234');
-      case 'unlock-pdf': return manip.rotate(0);
-      case 'watermark-pdf': return manip.addWatermark(job.settings.text || 'AJN');
-      case 'page-numbers': return manip.addPageNumbers();
-      case 'crop-pdf': return manip.crop(job.settings.margins || { top: 50, bottom: 50, left: 50, right: 50 });
-      case 'ocr-pdf': return specialized.convertTo('SEARCHABLE_PDF');
-      case 'redact-pdf': return specialized.convertTo('REDACTED_PDF', job.settings);
-      case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
-      case 'repair-pdf': return specialized.convertTo('REPAIRED_PDF'); 
-      case 'compress-pdf': return manip.rotate(0);
       case 'remove-pages': return manip.removePages(job.settings.pages || []);
       case 'organize-pdf': return manip.rotate(0);
+      
+      // Optimize
+      case 'scan-to-pdf': return specialized.convertTo('SEARCHABLE_PDF');
+      case 'compress-pdf': return manip.rotate(0);
+      case 'repair-pdf': return specialized.convertTo('REPAIRED_PDF');
+      case 'ocr-pdf': return specialized.convertTo('SEARCHABLE_PDF');
+
+      // Edit
+      case 'rotate-pdf': return manip.rotate(job.settings.angle || 90);
+      case 'page-numbers': return manip.addPageNumbers();
+      case 'watermark-pdf': return manip.addWatermark(job.settings.text || 'AJN Pro');
+      case 'crop-pdf': return manip.crop(job.settings.margins || { top: 50, bottom: 50, left: 50, right: 50 });
+      case 'edit-pdf': return manip.rotate(0);
+
+      // Security
+      case 'unlock-pdf': return manip.rotate(0);
+      case 'protect-pdf': return manip.protect(job.settings.password || '1234');
+      case 'sign-pdf': return manip.addWatermark('Digitally Signed', 0.1);
+      case 'redact-pdf': return specialized.convertTo('REDACTED_PDF', job.settings);
+      case 'compare-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
+
+      // Intelligence
+      case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
+
       default: return this.runConversion(job);
     }
   }
@@ -168,7 +181,7 @@ class ConversionEngine {
   private async runConversion(job: ConversionJob) {
     const key = job.fromFmt.toLowerCase();
     const ConverterClass = this.converters[key];
-    if (!ConverterClass) throw new Error(`Protocol ${key.toUpperCase()} not supported.`);
+    if (!ConverterClass) throw new Error(`Protocol ${key.toUpperCase()} not calibrated.`);
     const converter = new ConverterClass(job.file, (p: number, msg: string) => {
       job.progress = p; job.stage = msg; this.notify();
     });

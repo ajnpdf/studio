@@ -18,7 +18,14 @@ import {
   ShieldCheck,
   Zap,
   Activity,
-  Workflow
+  Workflow,
+  Hash,
+  Crop,
+  Search,
+  Signature,
+  EyeOff,
+  GitCompare,
+  Trash2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -88,7 +95,8 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
   const hasControls = [
     'protect-pdf', 'split-pdf', 'extract-pages', 'remove-pages', 
-    'rotate-pdf', 'watermark-pdf', 'translate-pdf', 'compress-pdf'
+    'rotate-pdf', 'watermark-pdf', 'translate-pdf', 'compress-pdf',
+    'unlock-pdf', 'redact-pdf', 'page-numbers', 'crop-pdf'
   ].includes(initialUnitId || '');
 
   return (
@@ -123,15 +131,15 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {initialUnitId === 'protect-pdf' && (
+                  {(initialUnitId === 'protect-pdf' || initialUnitId === 'unlock-pdf') && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Seal Password</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Protocol Key</Label>
                       <div className="relative group">
                         <Input 
                           type="password" 
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Cryptographic key..." 
+                          placeholder="Passphrase..." 
                           className="bg-white/60 border-black/5 h-11 pl-10 focus:ring-primary/20 rounded-xl font-bold text-slate-950"
                         />
                         <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary transition-colors" />
@@ -139,9 +147,9 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     </div>
                   )}
 
-                  {(initialUnitId === 'split-pdf' || initialUnitId === 'extract-pages') && (
+                  {(initialUnitId === 'split-pdf' || initialUnitId === 'extract-pages' || initialUnitId === 'remove-pages') && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Page Indices</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Page Selection</Label>
                       <div className="relative group">
                         <Input 
                           value={pageRange}
@@ -156,7 +164,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
                   {initialUnitId === 'rotate-pdf' && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Rotation</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Rotation Angle</Label>
                       <Select value={rotateAngle} onValueChange={setRotateAngle}>
                         <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl focus:ring-primary/20 text-slate-950 font-bold">
                           <RotateCw className="w-3.5 h-3.5 mr-2 text-primary" />
@@ -173,12 +181,12 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
                   {initialUnitId === 'watermark-pdf' && (
                     <div className="space-y-2 md:col-span-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Stamp Text</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Neural Stamp Text</Label>
                       <div className="relative group">
                         <Input 
                           value={watermarkText}
                           onChange={(e) => setWatermarkText(e.target.value)}
-                          placeholder="Enter neural stamp..." 
+                          placeholder="Enter text..." 
                           className="bg-white/60 border-black/5 h-11 pl-10 font-black rounded-xl focus:ring-primary/20 text-slate-950"
                         />
                         <Type className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary transition-colors" />
@@ -207,7 +215,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                   {initialUnitId === 'compress-pdf' && (
                     <div className="space-y-4 md:col-span-2">
                       <div className="flex justify-between items-center px-1">
-                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Mastery Level</Label>
+                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Mastery Intensity</Label>
                         <span className="text-[10px] font-black text-primary">{compressionLevel}%</span>
                       </div>
                       <Slider 

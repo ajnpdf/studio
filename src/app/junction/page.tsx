@@ -33,7 +33,7 @@ export default function JunctionPage() {
           </div>
           <Link href="/ajn">
             <Button variant="ghost" className="h-8 md:h-10 gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 hover:bg-black/5">
-              <ArrowLeft className="w-3.5 h-3.5" /> <span className="hidden xs:inline">Sector Exit</span>
+              <ArrowLeft className="w-3.5 h-3.5" /> Sector Exit
             </Button>
           </Link>
         </div>
@@ -49,7 +49,7 @@ export default function JunctionPage() {
                 Service <span className="text-primary">Units</span>
               </h1>
               <p className="text-[11px] font-bold text-slate-900/40 uppercase tracking-[0.3em]">
-                Direct access to the 300+ unit smart network.
+                Explore the complete high-fidelity PDF unit library.
               </p>
             </div>
 
@@ -59,7 +59,7 @@ export default function JunctionPage() {
                 <Input 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Find unit (e.g. 'PDF', 'Word')..." 
+                  placeholder="Find unit (e.g. 'OCR', 'Sign')..." 
                   className="h-12 pl-12 bg-white/60 border-black/5 text-sm font-bold focus:ring-primary/20 rounded-2xl shadow-sm text-slate-950"
                 />
               </div>
@@ -71,7 +71,7 @@ export default function JunctionPage() {
 
           {/* Category Pills */}
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
-            {['All', 'Document', 'Image', 'Video', 'Audio', 'Data', 'Archive'].map((tab) => (
+            {['All', 'Organize', 'Optimize', 'Convert', 'Edit', 'Security', 'Intelligence'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}

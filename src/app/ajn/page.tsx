@@ -25,17 +25,7 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
-const PDF_SERVICES = [
-  "JPG to PDF", "Word to PDF", "PowerPoint to PDF", "Excel to PDF", "HTML to PDF",
-  "PDF to JPG", "PDF to Word", "PDF to PowerPoint", "PDF to Excel", "PDF to PDF/A"
-];
-
-const QUICK_UNITS = [
-  { id: 'pdf-word', name: 'PDF to Word Master', desc: 'Reconstruct layouts via Smart OCR', cat: 'Document', icon: FileText, tag: 'WASM' },
-  { id: 'pdf-excel', name: 'PDF to Excel Grid', desc: 'Smart table detection & extraction', cat: 'Document', icon: Layers, tag: 'AI' },
-  { id: 'word-pdf', name: 'Universal Word to PDF', desc: 'High-fidelity OOXML reconstruction', cat: 'Document', icon: ShieldCheck, tag: 'WASM' },
-];
+import { ALL_UNITS } from '@/components/junction/services-grid';
 
 export default function AJNPage() {
   const [isDragging, setIsDragging] = useState(false);
@@ -115,7 +105,7 @@ export default function AJNPage() {
               <input 
                 readOnly
                 onClick={() => setShowSearch(true)}
-                placeholder="Search 300+ service units..." 
+                placeholder="Search 30+ service units..." 
                 className="w-full h-14 bg-transparent pl-16 pr-20 text-sm font-bold text-slate-950 placeholder:text-slate-950/30 cursor-pointer outline-none"
               />
               <div className="absolute right-6 flex items-center gap-2 px-2.5 py-1 bg-black/5 rounded-lg border border-black/5">
@@ -140,17 +130,17 @@ export default function AJNPage() {
               <div 
                 onClick={() => fileInputRef.current?.click()}
                 className={cn(
-                  "group relative w-full min-h-[200px] bg-white/40 backdrop-blur-md border-2 border-dashed border-black/10 rounded-[2.5rem] flex flex-col items-center justify-center cursor-pointer transition-all duration-500 hover:border-primary/40 hover:bg-white/60 overflow-hidden shadow-xl",
+                  "group relative w-full min-h-[180px] bg-white/40 backdrop-blur-md border-2 border-dashed border-black/10 rounded-[2.5rem] flex flex-col items-center justify-center cursor-pointer transition-all duration-500 hover:border-primary/40 hover:bg-white/60 overflow-hidden shadow-xl",
                   isDragging && "border-primary bg-primary/5 scale-[0.98]"
                 )}
               >
                 <input type="file" multiple ref={fileInputRef} className="hidden" onChange={(e) => e.target.files && simulateProcessing(e.target.files[0])} />
                 
                 <div className={cn(
-                  "w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center mb-4 shadow-sm transition-all duration-500",
+                  "w-12 h-12 bg-primary/5 rounded-2xl flex items-center justify-center mb-4 shadow-sm transition-all duration-500",
                   isDragging ? "scale-125 rotate-6 bg-primary" : "group-hover:scale-110"
                 )}>
-                  <Upload className={cn("w-7 h-7 transition-colors", isDragging ? "text-white" : "text-primary")} />
+                  <Upload className={cn("w-6 h-6 transition-colors", isDragging ? "text-white" : "text-primary")} />
                 </div>
 
                 <div className="text-center space-y-1.5 px-8">
@@ -178,9 +168,9 @@ export default function AJNPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full px-4 animate-in fade-in duration-1000 delay-500">
               {[
                 { label: 'Neural Ingestion', sub: 'Node 01 Active', icon: Cpu, color: 'text-blue-600' },
-                { label: 'Velocity Pipeline', sub: 'Optimal Velocity', icon: Zap, color: 'text-amber-600' },
+                { label: 'Velocity Pipeline', sub: '14 ops/sec', icon: Zap, color: 'text-amber-600' },
                 { label: 'Buffer Isolation', sub: '256-bit Secure', icon: Lock, color: 'text-emerald-600' },
-                { label: 'Protocol Mesh', sub: '300+ Units Sync', icon: Network, color: 'text-indigo-600' },
+                { label: 'Protocol Mesh', sub: '30+ Units Sync', icon: Network, color: 'text-indigo-600' },
               ].map((stat, i) => (
                 <div key={i} className="p-4 bg-white/40 backdrop-blur-xl border border-black/5 rounded-2xl space-y-2 group hover:border-primary/20 transition-all cursor-default shadow-sm text-slate-950">
                   <div className="flex items-center justify-between">
@@ -196,12 +186,12 @@ export default function AJNPage() {
             </div>
 
             {/* Scroll Marquee */}
-            <div className="w-full overflow-hidden mt-8 mb-16 relative group animate-in fade-in duration-1000 delay-700">
+            <div className="w-full overflow-hidden mt-8 mb-32 relative group animate-in fade-in duration-1000 delay-700">
               <div className="flex animate-marquee-fast whitespace-nowrap gap-10 items-center mb-4">
-                {[...PDF_SERVICES, ...PDF_SERVICES].map((s, i) => (
+                {ALL_UNITS.map((s, i) => (
                   <div key={i} className="flex items-center gap-3 bg-white/30 backdrop-blur-md px-5 py-2.5 rounded-full border border-black/5 shadow-sm">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                    <span className="text-[11px] font-black text-slate-950 tracking-wider uppercase">{s}</span>
+                    <span className="text-[11px] font-black text-slate-950 tracking-wider uppercase">{s.name}</span>
                   </div>
                 ))}
               </div>
@@ -232,7 +222,7 @@ export default function AJNPage() {
               <ScrollArea className="max-h-[50vh]">
                 <div className="p-3 space-y-5">
                   <div className="grid grid-cols-1 gap-1.5">
-                    {QUICK_UNITS.map((s) => (
+                    {ALL_UNITS.filter(u => u.name.toLowerCase().includes(searchQuery.toLowerCase())).map((s) => (
                       <Link key={s.id} href={`/tools/${s.id}`} onClick={() => setShowSearch(false)}>
                         <div className="flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 transition-all group cursor-pointer border border-transparent hover:border-primary/10">
                           <div className="w-10 h-10 bg-primary/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform border border-primary/10">
@@ -241,7 +231,7 @@ export default function AJNPage() {
                           <div className="flex-1 overflow-hidden text-slate-950">
                             <div className="flex items-center gap-2">
                               <h4 className="text-sm font-black uppercase">{s.name}</h4>
-                              <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black">{s.tag}</Badge>
+                              <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black">{s.complexity}</Badge>
                             </div>
                             <p className="text-[10px] opacity-60 font-black uppercase truncate tracking-widest">{s.desc}</p>
                           </div>
