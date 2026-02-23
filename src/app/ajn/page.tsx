@@ -44,7 +44,8 @@ const ALL_SERVICES = [
 const TICKER_SERVICES = [
   "4K VIDEO TRANSCODE", "SMART LAYOUT RECONSTRUCTION", "RAW CAMERA DEVELOPMENT", 
   "SVG VECTOR MASTERING", "BATCH DOCUMENT SIGNING", "UNIVERSAL WASM ENGINE", 
-  "HIGH-FIDELITY AUDIO NORMALIZATION", "CROSS-NODE FILE MAPPING"
+  "HIGH-FIDELITY AUDIO NORMALIZATION", "CROSS-NODE FILE MAPPING", "NEURAL TRANSLATION PASS",
+  "ISO-STANDARD PDF/A ARCHIVAL", "CRYPTOGRAPHIC REDACTION", "AUTOMATED GRID DETECTION"
 ];
 
 const FEATURES = [
@@ -107,7 +108,7 @@ export default function AJNPage() {
     >
       <NightSky />
       
-      {/* HUD HEADER */}
+      {/* HEADER - MINIMALIST NAVY LOGO ONLY */}
       <header className="fixed top-0 left-0 right-0 h-16 md:h-20 border-b border-black/5 bg-white/40 backdrop-blur-xl z-[60] px-4 md:px-8 flex items-center justify-between shadow-sm">
         <Link href="/" className="flex items-center group">
           <LogoAnimation className="w-16 h-8 md:w-24 md:h-12" showGlow={false} />
@@ -157,7 +158,7 @@ export default function AJNPage() {
                           </div>
                           <div className="flex-1 overflow-hidden">
                             <div className="flex items-center gap-2 md:gap-3">
-                              <h4 className="text-xs md:text-sm font-black uppercase tracking-tighter text-slate-800">{s.name}</h4>
+                              <h4 className="text-xs md:sm font-black uppercase tracking-tighter text-slate-800">{s.name}</h4>
                               <Badge className="bg-primary/10 text-primary border-none text-[7px] md:text-[8px] font-black">{s.tag}</Badge>
                             </div>
                             <p className="text-[8px] md:text-[10px] text-muted-foreground font-bold uppercase tracking-widest truncate">{s.desc}</p>
@@ -189,18 +190,26 @@ export default function AJNPage() {
       </div>
 
       <main className="relative z-10 flex-1 flex flex-col items-center p-4 md:p-6 mt-24 md:mt-32">
-        {/* SERVICE TICKER MARQUEE */}
-        <div className="w-full overflow-hidden mb-12 relative group">
-          <div className="flex animate-marquee whitespace-nowrap gap-12 items-center">
+        {/* ADVANCED MULTI-LAYER SERVICE TICKER */}
+        <div className="w-full overflow-hidden mb-16 relative group">
+          <div className="flex animate-marquee-fast whitespace-nowrap gap-12 items-center mb-4">
             {[...TICKER_SERVICES, ...TICKER_SERVICES].map((s, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                <span className="text-[9px] md:text-[11px] font-black text-slate-900/40 tracking-[0.3em] uppercase group-hover:text-slate-900 transition-colors">{s}</span>
+              <div key={i} className="flex items-center gap-4 bg-white/20 backdrop-blur-md px-6 py-2.5 rounded-full border border-black/5 shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(30,58,138,0.5)]" />
+                <span className="text-[10px] md:text-[12px] font-black text-slate-900 tracking-[0.2em] uppercase">{s}</span>
               </div>
             ))}
           </div>
-          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#e9cdfa] to-transparent z-10" />
-          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#c8e4f7] to-transparent z-10" />
+          <div className="flex animate-marquee-slow-reverse whitespace-nowrap gap-12 items-center opacity-40">
+            {[...TICKER_SERVICES, ...TICKER_SERVICES].reverse().map((s, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <span className="text-[9px] font-bold text-slate-600 tracking-[0.4em] uppercase">{s}</span>
+                <span className="w-1 h-1 rounded-full bg-slate-400" />
+              </div>
+            ))}
+          </div>
+          <div className="absolute inset-y-0 left-0 w-48 bg-gradient-to-r from-[#e9cdfa] via-[#e9cdfa]/80 to-transparent z-10" />
+          <div className="absolute inset-y-0 right-0 w-48 bg-gradient-to-l from-[#c8e4f7] via-[#c8e4f7]/80 to-transparent z-10" />
         </div>
 
         <div className={cn(
@@ -226,7 +235,7 @@ export default function AJNPage() {
             </div>
           </div>
 
-          {/* AJN ANIMATION */}
+          {/* AJN ANIMATION (NAVY BLUE) */}
           <div className={cn("transition-all duration-700", isDragging ? "scale-110" : "scale-100")}>
             <LogoAnimation />
           </div>
@@ -312,12 +321,19 @@ export default function AJNPage() {
       </main>
 
       <style jsx global>{`
-        @keyframes marquee {
+        @keyframes marquee-fast {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
-        .animate-marquee {
-          animation: marquee 40s linear infinite;
+        @keyframes marquee-slow-reverse {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
+        }
+        .animate-marquee-fast {
+          animation: marquee-fast 30s linear infinite;
+        }
+        .animate-marquee-slow-reverse {
+          animation: marquee-slow-reverse 50s linear infinite;
         }
       `}</style>
     </div>

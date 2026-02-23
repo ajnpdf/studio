@@ -120,22 +120,22 @@ export function ServicesGrid({ query, category }: { query: string, category: str
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       {filteredUnits.map((unit) => (
         <Link key={unit.id} href={`/tools/${unit.id}`}>
-          <Card className="h-full bg-white/[0.02] border-white/5 hover:border-primary/40 hover:bg-white/[0.04] transition-all duration-500 group cursor-pointer overflow-hidden border-2 relative">
+          <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 hover:bg-white/60 transition-all duration-500 group cursor-pointer overflow-hidden border-2 relative backdrop-blur-xl">
             <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
               <ArrowRight className="w-3 h-3 text-primary" />
             </div>
             
             <CardContent className="p-6 flex flex-col h-full">
               <div className="flex items-start justify-between mb-6">
-                <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500">
-                  <unit.icon className="w-6 h-6 text-white/60 group-hover:text-primary transition-colors" />
+                <div className="w-12 h-12 bg-black/5 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500">
+                  <unit.icon className="w-6 h-6 text-slate-600 group-hover:text-primary transition-colors" />
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
                   <Badge className={cn(
                     "text-[7px] font-black h-4 px-1.5 border-none tracking-widest",
-                    unit.complexity === 'WASM' ? "bg-emerald-500/10 text-emerald-500" :
+                    unit.complexity === 'WASM' ? "bg-emerald-500/10 text-emerald-600" :
                     unit.complexity === 'AI' ? "bg-primary/10 text-primary" :
-                    "bg-orange-500/10 text-orange-500"
+                    "bg-orange-500/10 text-orange-600"
                   )}>
                     {unit.complexity}
                   </Badge>
@@ -144,18 +144,18 @@ export function ServicesGrid({ query, category }: { query: string, category: str
               </div>
 
               <div className="space-y-2 flex-1">
-                <h3 className="text-xs font-black uppercase tracking-tighter text-white group-hover:text-primary transition-colors">{unit.name}</h3>
+                <h3 className="text-xs font-black uppercase tracking-tighter text-slate-800 group-hover:text-primary transition-colors">{unit.name}</h3>
                 <p className="text-[9px] text-muted-foreground leading-relaxed font-bold uppercase tracking-wider line-clamp-3 opacity-60 group-hover:opacity-100 transition-opacity">
                   {unit.desc}
                 </p>
               </div>
 
-              <div className="pt-4 flex items-center justify-between border-t border-white/5 mt-4">
+              <div className="pt-4 flex items-center justify-between border-t border-black/5 mt-4">
                 <div className="flex items-center gap-1.5">
                   <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="text-[7px] font-black text-muted-foreground uppercase tracking-widest">READY</span>
                 </div>
-                <span className="text-[7px] font-bold text-white/10 uppercase tracking-widest">{unit.cat}</span>
+                <span className="text-[7px] font-bold text-slate-400 uppercase tracking-widest">{unit.cat}</span>
               </div>
             </CardContent>
           </Card>
