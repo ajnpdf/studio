@@ -20,7 +20,14 @@ import {
   Type,
   Hash,
   Shield,
-  FileText
+  FileText,
+  Lock,
+  Unlock,
+  PenTool,
+  Scissors,
+  Globe,
+  GitCompare,
+  Zap
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -40,25 +47,21 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [appState, setAppState] = useState<GlobalAppState | null>(null);
   const [activeCategory, setActiveCategory] = useState(defaultCategory);
   
-  // Custom tool states
-  const [rotationMap, setRotationMap] = useState<Record<number, number>>({});
-  const [numberingConfig, setNumberingConfig] = useState({ position: 'bottom-center', format: 'numeric', startNumber: 1, skipFirst: false });
-  const [pdfaConfig, setPdfaConfig] = useState({ conformance: '2b' });
+  // Security & Intelligence Configs
+  const [securityConfig, setSecurityConfig] = useState({ openPassword: '', ownerPassword: '', allowPrint: true, allowCopy: true });
+  const [translateConfig, setTranslateConfig] = useState({ targetLanguage: 'Spanish', formality: 'neutral' });
+  const [redactionConfig, setRedactionConfig] = useState({ aiAutoDetect: true, metadataRedaction: true });
 
   useEffect(() => {
     return engine.subscribe(setAppState);
   }, []);
 
   const handleFilesAdded = (files: File[]) => {
-    executeJob(files);
-  };
-
-  const executeJob = (files: File[]) => {
     let settings: any = { toFmt: 'PDF' };
     
-    if (initialUnitId === 'rotate-pdf') settings = { rotationMap };
-    if (initialUnitId === 'add-page-numbers') settings = numberingConfig;
-    if (initialUnitId === 'pdf-pdfa') settings = pdfaConfig;
+    if (initialUnitId === 'protect-pdf') settings = securityConfig;
+    if (initialUnitId === 'translate-pdf') settings = translateConfig;
+    if (initialUnitId === 'redact-pdf') settings = redactionConfig;
 
     engine.addJobs(files, 'pdf', 'PDF', settings, initialUnitId);
   };
@@ -107,55 +110,71 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                         <Settings2 className="w-3.5 h-3.5" /> Parameter Engine
                       </h3>
 
-                      {initialUnitId === 'add-page-numbers' && (
+                      {initialUnitId === 'protect-pdf' && (
                         <div className="space-y-6">
                           <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase text-slate-950/60 ml-1">Grid Position</Label>
-                            <Select value={numberingConfig.position} onValueChange={(v) => setNumberingConfig({...numberingConfig, position: v})}>
-                              <SelectTrigger className="h-12 bg-white/60 border-black/5 rounded-2xl font-black text-[10px] uppercase">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="bottom-center">Bottom Center</SelectItem>
-                                <SelectItem value="bottom-right">Bottom Right</SelectItem>
-                                <SelectItem value="top-right">Top Right</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <Label className="text-[10px] font-black uppercase text-slate-950/60 ml-1">Open Password</Label>
+                            <Input 
+                              type="password"
+                              placeholder="Required to view..."
+                              value={securityConfig.openPassword}
+                              onChange={(e) => setSecurityConfig({...securityConfig, openPassword: e.target.value})}
+                              className="h-12 bg-white/60 border-black/5 rounded-2xl font-bold"
+                            />
                           </div>
-                          <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10">
-                            <span className="text-[10px] font-black uppercase text-primary">Skip First Page</span>
-                            <Switch checked={numberingConfig.skipFirst} onCheckedChange={(v) => setNumberingConfig({...numberingConfig, skipFirst: v})} />
+                          <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-4">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black uppercase text-primary">Allow Printing</span>
+                              <Switch checked={securityConfig.allowPrint} onCheckedChange={(v) => setSecurityConfig({...securityConfig, allowPrint: v})} />
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black uppercase text-primary">Allow Copying</span>
+                              <Switch checked={securityConfig.allowCopy} onCheckedChange={(v) => setSecurityConfig({...securityConfig, allowCopy: v})} />
+                            </div>
                           </div>
                         </div>
                       )}
 
-                      {initialUnitId === 'pdf-pdfa' && (
+                      {initialUnitId === 'translate-pdf' && (
                         <div className="space-y-6">
                           <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase text-slate-950/60 ml-1">Conformance Level</Label>
-                            <Select value={pdfaConfig.conformance} onValueChange={(v) => setPdfaConfig({...pdfaConfig, conformance: v})}>
+                            <Label className="text-[10px] font-black uppercase text-slate-950/60 ml-1">Target Language</Label>
+                            <Select value={translateConfig.targetLanguage} onValueChange={(v) => setTranslateConfig({...translateConfig, targetLanguage: v})}>
                               <SelectTrigger className="h-12 bg-white/60 border-black/5 rounded-2xl font-black text-[10px] uppercase">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="1b">PDF/A-1b (ISO 19005-1)</SelectItem>
-                                <SelectItem value="2b">PDF/A-2b (ISO 19005-2)</SelectItem>
-                                <SelectItem value="3b">PDF/A-3b (ISO 19005-3)</SelectItem>
+                                {['Spanish', 'French', 'German', 'Chinese', 'Japanese', 'Arabic'].map(l => (
+                                  <SelectItem key={l} value={l}>{l}</SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                           </div>
                           <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
-                            <p className="text-[9px] font-bold text-emerald-600 uppercase leading-relaxed">
-                              Enabling this protocol will flatten transparency layers and embed ICC output intents for archival stability.
-                            </p>
+                            <p className="text-[9px] font-bold text-emerald-600 uppercase">Neural engine will preserve original coordinate matrices.</p>
                           </div>
                         </div>
                       )}
 
-                      {initialUnitId === 'rotate-pdf' && (
+                      {initialUnitId === 'redact-pdf' && (
+                        <div className="space-y-6">
+                          <div className="flex items-center justify-between p-4 bg-black/5 rounded-2xl border border-black/5">
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-black uppercase text-slate-950">AI Auto-Detect</p>
+                              <p className="text-[8px] font-bold text-slate-950/40 uppercase">Find PII/Financials</p>
+                            </div>
+                            <Switch checked={redactionConfig.aiAutoDetect} onCheckedChange={(v) => setRedactionConfig({...redactionConfig, aiAutoDetect: v})} />
+                          </div>
+                          <div className="p-4 bg-red-500/5 border border-red-500/10 rounded-2xl">
+                            <p className="text-[9px] font-bold text-red-600 uppercase">Warning: Redaction is permanent. Binary data is deleted.</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {!['protect-pdf', 'translate-pdf', 'redact-pdf'].includes(initialUnitId || '') && (
                         <div className="p-6 bg-white/60 border border-black/5 rounded-[2rem] text-center space-y-4">
-                          <RotateCw className="w-8 h-8 mx-auto text-primary animate-spin-slow" />
-                          <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-widest">Select pages in the sequence to apply 90° increments.</p>
+                          <Zap className="w-8 h-8 mx-auto text-primary animate-pulse" />
+                          <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-widest">Execute Mastery to initialize system units.</p>
                         </div>
                       )}
                     </div>

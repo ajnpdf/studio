@@ -1,21 +1,8 @@
 'use client';
 
 import { PDFConverter } from './converters/pdf-converter';
-import { WordConverter } from './converters/word-converter';
-import { ExcelConverter } from './converters/excel-converter';
-import { PPTConverter } from './converters/ppt-converter';
-import { ODTConverter } from './converters/odt-converter';
-import { ImageConverter } from './converters/image-converter';
-import { VideoConverter } from './converters/video-converter';
-import { AudioConverter } from './converters/audio-converter';
-import { ArchiveConverter } from './converters/archive-converter';
-import { CodeConverter } from './converters/code-converter';
-import { EbookConverter } from './converters/ebook-converter';
-import { DesignConverter } from './converters/design-converter';
-import { CADConverter } from './converters/cad-converter';
 import { SpecializedConverter } from './converters/specialized-converter';
 import { PDFManipulator } from './converters/pdf-manipulator';
-import { ScannerConverter } from './converters/scanner-converter';
 
 export type ExecutionMode = 'WASM' | 'SMART' | 'AI';
 export type JobStatus = 'queued' | 'running' | 'done' | 'failed' | 'cancelled';
@@ -30,12 +17,10 @@ export interface LogEntry {
 export interface FileNode {
   id: string;
   name: string;
-  originalName: string;
   size: number;
   format: string;
   sha256: string;
   status: 'idle' | 'processing' | 'done' | 'error';
-  uploadedAt: number;
   file: File;
 }
 
@@ -45,10 +30,8 @@ export interface OutputBuffer {
   blob: Blob;
   fileName: string;
   mimeType: string;
-  size: number;
   sizeFormatted: string;
   objectUrl: string;
-  checksum: string;
   completedAt: number;
   toFmt: string;
   stats: {
@@ -70,7 +53,6 @@ export interface ProcessingJob {
   output: OutputBuffer | null;
   settings: any;
   startedAt: Date;
-  completedAt?: Date;
 }
 
 export interface GlobalAppState {
@@ -78,23 +60,16 @@ export interface GlobalAppState {
   queue: ProcessingJob[];
   outputs: OutputBuffer[];
   network: 'online' | 'offline' | 'degraded';
-  stats: {
-    totalMastered: number;
-  };
+  stats: { totalMastered: number; };
 }
 
 class SystemEngine {
   private state: GlobalAppState = {
-    files: [],
-    queue: [],
-    outputs: [],
-    network: 'online',
-    stats: { totalMastered: 0 }
+    files: [], queue: [], outputs: [], network: 'online', stats: { totalMastered: 0 }
   };
 
   private isProcessing: boolean = false;
   private listeners: Set<(state: GlobalAppState) => void> = new Set();
-  private processedHashes: Set<string> = new Set();
 
   subscribe(listener: (state: GlobalAppState) => void) {
     this.listeners.add(listener);
@@ -127,17 +102,15 @@ class SystemEngine {
   async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, toolId?: string) {
     for (const file of files) {
       const hash = await this.generateHash(file);
-      const jobKey = `${hash}_${toolId || 'convert'}_${toFmt}_${Date.now()}`;
+      const jobKey = `${hash}_${toolId || 'convert'}_${Date.now()}`;
 
       const fileNode: FileNode = {
         id: Math.random().toString(36).substring(7),
         name: file.name,
-        originalName: file.name,
         size: file.size,
         format: file.name.split('.').pop()?.toUpperCase() || 'UNK',
         sha256: hash,
         status: 'idle',
-        uploadedAt: Date.now(),
         file
       };
 
@@ -164,7 +137,7 @@ class SystemEngine {
   }
 
   private determineMode(toolId?: string): ExecutionMode {
-    const aiTools = ['ocr-pdf', 'translate-pdf', 'summarize-pdf', 'pdf-excel', 'pdf-pptx'];
+    const aiTools = ['ocr-pdf', 'translate-pdf', 'summarize-pdf', 'pdf-excel', 'pdf-pptx', 'compare-pdf'];
     if (toolId && aiTools.includes(toolId)) return 'AI';
     return 'WASM';
   }
@@ -191,12 +164,10 @@ class SystemEngine {
         id: Math.random().toString(36).substr(2, 9),
         jobId: nextJob.id,
         blob: result.blob,
-        fileName: result.fileName.startsWith('Mastered_') ? result.fileName : `Mastered_${result.fileName}`,
+        fileName: `Mastered_${result.fileName}`,
         mimeType: result.mimeType,
-        size: result.blob.size,
         sizeFormatted: (result.blob.size / (1024 * 1024)).toFixed(2) + ' MB',
         objectUrl,
-        checksum: nextJob.id,
         completedAt: Date.now(),
         toFmt: result.fileName.split('.').pop()?.toUpperCase() || 'PDF',
         stats: {
@@ -208,7 +179,6 @@ class SystemEngine {
 
       nextJob.status = 'done';
       nextJob.progress = 100;
-      nextJob.output = output;
       this.state.outputs.unshift(output);
       this.state.stats.totalMastered++;
     } catch (err: any) {
@@ -234,14 +204,18 @@ class SystemEngine {
     const pdfConv = new PDFConverter(files[0], update);
 
     switch (job.toolId) {
+      case 'unlock-pdf': return manip.unlock(job.settings.password);
+      case 'protect-pdf': return manip.protect(job.settings);
+      case 'sign-pdf': return manip.sign(job.settings.signatureData, job.settings.position);
+      case 'redact-pdf': return manip.redact(job.settings.redactions || []);
+      case 'translate-pdf': return specialized.convertTo('TRANSLATE', job.settings);
+      case 'compare-pdf': return specialized.convertTo('COMPARE', job.settings);
+      case 'ocr-pdf': return specialized.convertTo('OCR', job.settings);
       case 'rotate-pdf': return manip.rotate(job.settings.rotationMap || {});
       case 'add-page-numbers': return manip.addPageNumbers(job.settings);
       case 'pdf-pdfa': return manip.toPDFA(job.settings.conformance);
       case 'merge-pdf': return manip.merge();
       case 'split-pdf': return manip.split(job.settings);
-      case 'ocr-pdf': return specialized.convertTo('OCR', job.settings);
-      case 'compress-pdf': return manip.compress(job.settings);
-      case 'repair-pdf': return manip.repair(job.settings);
       default: return pdfConv.convertTo(job.settings.toFmt || 'PDF', job.settings);
     }
   }
