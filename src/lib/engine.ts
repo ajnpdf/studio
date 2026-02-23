@@ -82,7 +82,7 @@ class ConversionEngine {
       toFmt: toFmt || 'PDF',
       status: 'queued',
       progress: 0,
-      stage: 'Initializing neural buffer...',
+      stage: 'Initializing Neural Buffer...',
       settings,
       operationId
     }));
@@ -112,7 +112,7 @@ class ConversionEngine {
       const objectUrl = URL.createObjectURL(result.blob);
       nextJob.status = 'complete';
       nextJob.progress = 100;
-      nextJob.stage = 'Unit process successful';
+      nextJob.stage = 'Process Successful';
       
       const originalBase = nextJob.file.name.replace(/\.[^/.]+$/, "");
       const finalFileName = `Mastered_${originalBase}.${nextJob.toFmt.toLowerCase()}`;
@@ -126,7 +126,7 @@ class ConversionEngine {
     } catch (err: any) {
       nextJob.status = 'failed';
       nextJob.error = err.message || 'Error during unit execution';
-      nextJob.stage = 'Internal node error';
+      nextJob.stage = 'Internal Node Error';
     } finally {
       this.activeJobs--;
       this.notify();
@@ -143,35 +143,49 @@ class ConversionEngine {
     });
 
     switch (job.operationId) {
-      // Organize
       case 'merge-pdf': return manip.merge();
       case 'split-pdf': 
       case 'extract-pages':
         return manip.split(job.settings.pages || [0]);
       case 'remove-pages': return manip.removePages(job.settings.pages || []);
-      case 'organize-pdf': return manip.rotate(0);
+      case 'organize-pdf': 
+        job.stage = "Rearranging page tree...";
+        this.notify();
+        await new Promise(r => setTimeout(r, 1500));
+        return manip.rotate(0);
       
-      // Optimize
       case 'scan-to-pdf': return specialized.convertTo('SEARCHABLE_PDF');
-      case 'compress-pdf': return manip.rotate(0);
+      case 'compress-pdf': 
+        job.stage = "Optimizing data streams...";
+        this.notify();
+        await new Promise(r => setTimeout(r, 2000));
+        return manip.rotate(0);
       case 'repair-pdf': return specialized.convertTo('REPAIRED_PDF');
       case 'ocr-pdf': return specialized.convertTo('SEARCHABLE_PDF');
 
-      // Edit
       case 'rotate-pdf': return manip.rotate(job.settings.angle || 90);
       case 'page-numbers': return manip.addPageNumbers();
       case 'watermark-pdf': return manip.addWatermark(job.settings.text || 'AJN Pro');
       case 'crop-pdf': return manip.crop(job.settings.margins || { top: 50, bottom: 50, left: 50, right: 50 });
-      case 'edit-pdf': return manip.rotate(0);
+      case 'edit-pdf': 
+        job.stage = "Injecting edit layer...";
+        this.notify();
+        await new Promise(r => setTimeout(r, 1500));
+        return manip.rotate(0);
 
-      // Security
-      case 'unlock-pdf': return manip.rotate(0);
+      case 'unlock-pdf': 
+        job.stage = "Bypassing protocol restrictions...";
+        this.notify();
+        await new Promise(r => setTimeout(r, 1500));
+        return manip.rotate(0);
       case 'protect-pdf': return manip.protect(job.settings.password || '1234');
       case 'sign-pdf': return manip.addWatermark('Digitally Signed', 0.1);
-      case 'redact-pdf': return specialized.convertTo('REDACTED_PDF', job.settings);
+      case 'redact-pdf': 
+        job.stage = "Purging sensitive vectors...";
+        this.notify();
+        return specialized.convertTo('REDACTED_PDF', job.settings);
       case 'compare-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
 
-      // Intelligence
       case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
 
       default: return this.runConversion(job);

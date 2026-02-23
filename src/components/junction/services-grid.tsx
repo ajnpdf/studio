@@ -46,38 +46,38 @@ export type ServiceUnit = {
 };
 
 /**
- * AJN Service Units - Professional PDF Matrix
- * High-fidelity transformation units following Proper Case standards.
+ * AJN Service Units - Complete 30-Unit PDF Matrix
+ * Strictly Proper Case, High-Contrast Black Text.
  */
 export const ALL_UNITS: ServiceUnit[] = [
-  // --- ORGANIZE PDF ---
+  // --- ORGANIZE ---
   { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple files into a single, mastered PDF document.', icon: Layout, tag: 'Merge', cat: 'Organize', complexity: 'WASM' },
   { id: 'split-pdf', name: 'Split PDF', desc: 'Separate PDF pages into individual files or extract a specific range.', icon: Scissors, tag: 'Split', cat: 'Organize', complexity: 'WASM' },
   { id: 'remove-pages', name: 'Remove Pages', desc: 'Prune unwanted pages from your document with pinpoint accuracy.', icon: Trash2, tag: 'Prune', cat: 'Organize', complexity: 'WASM' },
   { id: 'extract-pages', name: 'Extract Pages', desc: 'Isolate and export specific pages into a new high-fidelity buffer.', icon: Copy, tag: 'Extract', cat: 'Organize', complexity: 'WASM' },
-  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Rearrange, rotate, and manage the hierarchical structure of your PDF.', icon: Layout, tag: 'Structure', cat: 'Organize', complexity: 'SMART' },
+  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Rearrange and manage the hierarchical structure of your PDF.', icon: Layout, tag: 'Structure', cat: 'Organize', complexity: 'SMART' },
 
-  // --- OPTIMIZE PDF ---
+  // --- OPTIMIZE ---
   { id: 'scan-to-pdf', name: 'Scan to PDF', desc: 'Convert physical scans and photos into professional vector PDFs.', icon: Scan, tag: 'Capture', cat: 'Optimize', complexity: 'SMART' },
   { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce file size while preserving high-fidelity visual assets.', icon: Shrink, tag: 'Optimize', cat: 'Optimize', complexity: 'WASM' },
   { id: 'repair-pdf', name: 'Repair PDF', desc: 'Rebuild damaged cross-reference tables and recover corrupted streams.', icon: Wrench, tag: 'Recovery', cat: 'Optimize', complexity: 'SMART' },
   { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Apply neural character recognition to unlock editable text layers.', icon: Search, tag: 'Vision', cat: 'Optimize', complexity: 'AI' },
 
-  // --- CONVERT TO PDF ---
+  // --- CONVERT TO ---
   { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Transform raster images into standardized, printable documents.', icon: ImageIcon, tag: 'Image', cat: 'Convert', complexity: 'WASM' },
   { id: 'word-pdf', name: 'Word to PDF', desc: 'Convert Word documents into professional, layout-locked PDFs.', icon: FileText, tag: 'OOXML', cat: 'Convert', complexity: 'WASM' },
   { id: 'pptx-pdf', name: 'PowerPoint to PDF', desc: 'Transform slide decks into highly-compatible presentation PDFs.', icon: Presentation, tag: 'OOXML', cat: 'Convert', complexity: 'WASM' },
   { id: 'excel-pdf', name: 'Excel to PDF', desc: 'Map spreadsheet grids into clean, printable tabular layouts.', icon: Table, tag: 'OOXML', cat: 'Convert', complexity: 'SMART' },
   { id: 'html-pdf', name: 'HTML to PDF', desc: 'Render web pages directly into optimized vector PDF buffers.', icon: Code2, tag: 'Web', cat: 'Convert', complexity: 'SMART' },
 
-  // --- CONVERT FROM PDF ---
+  // --- CONVERT FROM ---
   { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Export document pages as high-resolution raster images.', icon: ImageIcon, tag: 'JPG', cat: 'Convert', complexity: 'WASM' },
   { id: 'pdf-word', name: 'PDF to Word', desc: 'Deconstruct PDF layers into editable document structures.', icon: FileText, tag: 'DOCX', cat: 'Convert', complexity: 'WASM' },
   { id: 'pdf-pptx', name: 'PDF to PowerPoint', desc: 'Rebuild PDF pages as high-fidelity presentation slides.', icon: Presentation, tag: 'PPTX', cat: 'Convert', complexity: 'WASM' },
   { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Extract grid data from documents into clean spreadsheet files.', icon: Table, tag: 'XLSX', cat: 'Convert', complexity: 'SMART' },
   { id: 'pdf-pdfa', name: 'PDF to PDF/A', desc: 'Standardize documents for ISO-compliant long-term archiving.', icon: ShieldCheck, tag: 'ISO', cat: 'Convert', complexity: 'SMART' },
 
-  // --- EDIT PDF ---
+  // --- EDIT ---
   { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Apply geometric rotation to individual pages or entire documents.', icon: RotateCw, tag: 'Geometry', cat: 'Edit', complexity: 'WASM' },
   { id: 'page-numbers', name: 'Add Page Numbers', desc: 'Inject dynamic page indices into the document header or footer.', icon: Hash, tag: 'Stamping', cat: 'Edit', complexity: 'SMART' },
   { id: 'watermark-pdf', name: 'Add Watermark', desc: 'Apply custom text or image overlays for brand protection.', icon: Type, tag: 'Brand', cat: 'Edit', complexity: 'SMART' },

@@ -39,8 +39,8 @@ interface Props {
 }
 
 /**
- * AJN Unit Workspace - Professional Overhaul
- * Strictly Black Text, Proper Case, and High-Fidelity Logic
+ * AJN Unit Workspace - End-to-End Real-Time Service Hub
+ * Strictly Black Text, Proper Case, and Advanced Neural Parameters
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [jobs, setJobs] = useState<ConversionJob[]>([]);
@@ -49,9 +49,9 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [toFmt, setToFmt] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  // Contextual Settings
+  // Advanced Contextual Parameters
   const [password, setPassword] = useState('');
-  const [watermarkText, setWatermarkText] = useState('AJN Pro');
+  const [watermarkText, setWatermarkText] = useState('AJN Private');
   const [targetLang, setTargetLang] = useState('es');
   const [pageRange, setPageRange] = useState('1');
   const [rotateAngle, setRotateAngle] = useState('90');
@@ -122,18 +122,18 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           <div className="p-4 md:p-10 space-y-8 max-w-4xl mx-auto pb-32">
             
-            {/* Contextual Advanced Controls */}
+            {/* Contextual Advanced Parameters */}
             {hasControls && (
               <section className="bg-white/40 border border-white/60 p-6 md:p-8 rounded-[2rem] animate-in fade-in slide-in-from-bottom-2 duration-700 shadow-xl backdrop-blur-xl">
                 <div className="flex items-center gap-3 mb-6 px-1">
                   <Settings2 className="w-4 h-4 text-primary" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">Unit Parameters</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">Neural Parameters</span>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {(initialUnitId === 'protect-pdf' || initialUnitId === 'unlock-pdf') && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Protocol Key</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Cryptographic Key</Label>
                       <div className="relative group">
                         <Input 
                           type="password" 
@@ -149,7 +149,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
                   {(initialUnitId === 'split-pdf' || initialUnitId === 'extract-pages' || initialUnitId === 'remove-pages') && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Page Selection</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Neural Page Range</Label>
                       <div className="relative group">
                         <Input 
                           value={pageRange}
@@ -164,7 +164,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
                   {initialUnitId === 'rotate-pdf' && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Rotation Angle</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Geometric Angle</Label>
                       <Select value={rotateAngle} onValueChange={setRotateAngle}>
                         <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl focus:ring-primary/20 text-slate-950 font-bold">
                           <RotateCw className="w-3.5 h-3.5 mr-2 text-primary" />
@@ -181,7 +181,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
                   {initialUnitId === 'watermark-pdf' && (
                     <div className="space-y-2 md:col-span-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Neural Stamp Text</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Stamp Identification</Label>
                       <div className="relative group">
                         <Input 
                           value={watermarkText}
@@ -196,7 +196,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
                   {initialUnitId === 'translate-pdf' && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Target Language</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Neural Language</Label>
                       <Select value={targetLang} onValueChange={setTargetLang}>
                         <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl focus:ring-primary/20 text-slate-950 font-bold">
                           <Globe className="w-3.5 h-3.5 mr-2 text-primary" />
@@ -241,17 +241,17 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               isSourceLocked={true}
             />
 
-            {/* Main Processing Entry */}
+            {/* Main Processing Buffer */}
             <DropZone onFiles={handleFilesAdded} />
 
-            {/* Real-time Task Streams */}
+            {/* Real-time Processing Streams */}
             {activeJobs.length > 0 && <ProgressSection jobs={activeJobs} />}
 
-            {/* Final Export Layer */}
+            {/* Final Mastering Layer */}
             {completedJobs.length > 0 && (
               <OutputSection 
                 jobs={completedJobs} 
-                onPreview={(j) => console.log('Inspecting Unit', j)} 
+                onPreview={(j) => console.log('Neural Inspect', j)} 
                 onClear={() => engine.clearQueue()} 
               />
             )}
