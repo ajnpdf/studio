@@ -109,8 +109,8 @@ export function ServicesGrid({ query, category }: { query: string, category: str
       <div className="py-24 text-center space-y-4 opacity-40 animate-in fade-in duration-500">
         <Cpu className="w-16 h-16 mx-auto text-muted-foreground" />
         <div className="space-y-1">
-          <p className="text-sm font-black uppercase tracking-widest">No Unit Found</p>
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Re-calibrate search parameters</p>
+          <p className="text-sm font-black tracking-widest">No Unit Found</p>
+          <p className="text-[10px] font-bold text-muted-foreground tracking-widest">Re-calibrate search parameters</p>
         </div>
       </div>
     );
@@ -139,13 +139,13 @@ export function ServicesGrid({ query, category }: { query: string, category: str
                   )}>
                     {unit.complexity}
                   </Badge>
-                  <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest">{unit.tag}</span>
+                  <span className="text-[8px] font-black text-muted-foreground/40 tracking-widest">{unit.tag}</span>
                 </div>
               </div>
 
               <div className="space-y-2 flex-1">
-                <h3 className="text-xs font-black uppercase tracking-tighter text-slate-800 group-hover:text-primary transition-colors">{unit.name}</h3>
-                <p className="text-[9px] text-muted-foreground leading-relaxed font-bold uppercase tracking-wider line-clamp-3 opacity-60 group-hover:opacity-100 transition-opacity">
+                <h3 className="text-xs font-black tracking-tighter text-slate-800 group-hover:text-primary transition-colors">{unit.name}</h3>
+                <p className="text-[9px] text-muted-foreground leading-relaxed font-bold tracking-wider line-clamp-3 opacity-60 group-hover:opacity-100 transition-opacity">
                   {unit.desc}
                 </p>
               </div>
@@ -153,9 +153,9 @@ export function ServicesGrid({ query, category }: { query: string, category: str
               <div className="pt-4 flex items-center justify-between border-t border-black/5 mt-4">
                 <div className="flex items-center gap-1.5">
                   <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[7px] font-black text-muted-foreground uppercase tracking-widest">READY</span>
+                  <span className="text-[7px] font-black text-muted-foreground tracking-widest">Ready</span>
                 </div>
-                <span className="text-[7px] font-bold text-slate-400 uppercase tracking-widest">{unit.cat}</span>
+                <span className="text-[7px] font-bold text-slate-400 tracking-widest">{unit.cat}</span>
               </div>
             </CardContent>
           </Card>

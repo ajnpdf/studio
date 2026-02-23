@@ -104,20 +104,20 @@ export default function AJNPage() {
         
         <div className="flex items-center gap-2 md:gap-6">
           <Link href="/junction">
-            <Button variant="outline" className="h-8 md:h-9 border-black/10 bg-white/50 hover:bg-primary hover:text-white font-bold text-[10px] md:text-[11px] uppercase tracking-widest rounded-xl transition-all gap-2 px-3 md:px-4 shadow-sm">
+            <Button variant="outline" className="h-8 md:h-9 border-black/10 bg-white/50 hover:bg-primary hover:text-white font-bold text-[10px] md:text-[11px] tracking-widest rounded-xl transition-all gap-2 px-3 md:px-4 shadow-sm">
               <Workflow className="w-3 md:w-3.5 h-3 md:h-3.5" /> <span className="hidden sm:inline">Services</span> Hub
             </Button>
           </Link>
           <div className="h-6 md:h-8 w-px bg-black/5 hidden sm:block" />
           <div className="flex items-center gap-2 px-3 md:px-4 py-1.5 bg-white/5 rounded-xl border border-black/5">
             <ShieldCheck className="w-3.5 h-3.5 text-[#000080]" />
-            <span className="text-[9px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-widest hidden xs:inline">Stable Protocol</span>
+            <span className="text-[9px] md:text-[10px] font-bold text-muted-foreground tracking-widest hidden xs:inline">Stable Protocol</span>
           </div>
         </div>
       </header>
 
       <main className="relative z-10 flex-1 flex flex-col items-center p-4 md:p-6 mt-24 md:mt-32">
-        {/* Global Search Box - Reduced Size */}
+        {/* Global Search Box */}
         <div className="w-full max-w-xl relative group animate-in fade-in slide-in-from-top-8 duration-1000 mb-10">
           <div className="absolute -inset-1 bg-gradient-to-r from-[#000080]/20 to-blue-500/20 rounded-[2rem] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
           <div className="relative flex items-center bg-white/60 backdrop-blur-3xl border border-black/5 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-2xl transition-all hover:border-[#000080]/40">
@@ -135,7 +135,7 @@ export default function AJNPage() {
           </div>
         </div>
 
-        {/* AJN Animation - Centered */}
+        {/* AJN Animation */}
         <div className={cn("transition-all duration-1000 mb-10 animate-in zoom-in-95 duration-1000", isDragging ? "scale-110" : "scale-100")}>
           <LogoAnimation className="w-48 h-20 md:w-64 md:h-28" />
         </div>
@@ -145,7 +145,7 @@ export default function AJNPage() {
           isProcessing || showSearch ? "scale-95 opacity-40 blur-sm" : "scale-100 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300"
         )}>
           
-          {/* Drop Zone Area - Reduced Size */}
+          {/* Drop Zone Area */}
           <div className="w-full max-w-xl space-y-4">
             <div 
               onClick={() => fileInputRef.current?.click()}
@@ -165,17 +165,17 @@ export default function AJNPage() {
 
               <div className="text-center space-y-1.5 md:space-y-2 px-6 md:px-8">
                 <h2 className="text-xl md:text-2xl font-black tracking-tight text-slate-900 leading-none">Drop to Optimize</h2>
-                <p className="text-[9px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] opacity-60">Smart Processing Gateway</p>
+                <p className="text-[9px] md:text-[10px] font-bold text-muted-foreground tracking-[0.2em] opacity-60">Smart Processing Gateway</p>
               </div>
 
-              <div className="mt-6 md:mt-8 flex flex-wrap justify-center gap-4 md:gap-6 text-[8px] md:text-[9px] font-bold uppercase text-muted-foreground/40 tracking-widest">
+              <div className="mt-6 md:mt-8 flex flex-wrap justify-center gap-4 md:gap-6 text-[8px] md:text-[9px] font-bold text-muted-foreground/40 tracking-widest">
                 <span className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3" /> Encrypted</span>
                 <span className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3" /> Local</span>
               </div>
             </div>
             
-            {/* Small Letters Hint - Proper Casing */}
-            <div className="flex justify-center gap-6 text-[8px] font-bold uppercase tracking-[0.3em] text-slate-900/30 animate-pulse">
+            {/* Professional Micro-hints */}
+            <div className="flex justify-center gap-6 text-[8px] font-bold tracking-[0.3em] text-slate-900/30 animate-pulse">
               <span>Drag files here</span>
               <span>•</span>
               <span>Auto-detect format</span>
@@ -184,7 +184,7 @@ export default function AJNPage() {
             </div>
           </div>
 
-          {/* Infrastructure Monitor - Professional Advance Content Setup */}
+          {/* Infrastructure Monitor */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full px-4 animate-in fade-in duration-1000 delay-500">
             {[
               { label: 'Neural ingestion core', sub: 'Node 01 active', icon: Cpu, color: 'text-blue-600' },
@@ -192,14 +192,14 @@ export default function AJNPage() {
               { label: 'Buffer isolation', sub: '256-bit AES secure', icon: Lock, color: 'text-emerald-600' },
               { label: 'Protocol mesh', sub: '300+ units sync', icon: Network, color: 'text-indigo-600' },
             ].map((stat, i) => (
-              <div key={i} className="p-4 bg-white/40 backdrop-blur-xl border border-black/5 rounded-2xl space-y-2 group hover:border-primary/20 transition-all cursor-default">
+              <div key={i} className="p-4 bg-white/40 backdrop-blur-xl border border-black/5 rounded-2xl space-y-2 group hover:border-primary/20 transition-all cursor-default shadow-sm">
                 <div className="flex items-center justify-between">
                   <stat.icon className={cn("w-4 h-4", stat.color)} />
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-[10px] font-black text-slate-900 tracking-tight leading-tight">{stat.label}</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">{stat.sub}</p>
+                  <p className="text-[8px] font-bold text-muted-foreground tracking-widest opacity-60">{stat.sub}</p>
                 </div>
               </div>
             ))}
@@ -271,7 +271,7 @@ export default function AJNPage() {
                   ) : (
                     <div className="py-16 text-center space-y-3 opacity-40">
                       <Search className="w-10 h-10 mx-auto text-muted-foreground" />
-                      <p className="text-[10px] font-bold uppercase tracking-widest">No matching service units</p>
+                      <p className="text-[10px] font-bold tracking-widest">No matching service units</p>
                     </div>
                   )}
                 </div>
@@ -293,11 +293,11 @@ export default function AJNPage() {
               <div className="space-y-4">
                 <div className="space-y-1">
                   <h2 className="text-xl font-bold text-slate-900">Processing Engine</h2>
-                  <p className="text-[10px] font-bold text-[#000080] uppercase tracking-widest truncate max-w-[200px] mx-auto">{fileMeta?.name}</p>
+                  <p className="text-[10px] font-bold text-[#000080] tracking-widest truncate max-w-[200px] mx-auto">{fileMeta?.name}</p>
                 </div>
                 
                 <div className="space-y-3">
-                  <div className="flex justify-between text-[9px] font-bold uppercase text-muted-foreground px-1 tracking-widest">
+                  <div className="flex justify-between text-[9px] font-bold text-muted-foreground px-1 tracking-widest">
                     <span>{progress}% Synchronized</span>
                     <span>{fileMeta?.size}</span>
                   </div>
@@ -313,7 +313,7 @@ export default function AJNPage() {
           </div>
         )}
 
-        <footer className="py-8 text-[9px] font-bold text-slate-900/20 uppercase tracking-[0.4em] mt-auto animate-in fade-in duration-1000 delay-1000">
+        <footer className="py-8 text-[9px] font-bold text-slate-900/20 tracking-[0.4em] mt-auto animate-in fade-in duration-1000 delay-1000">
           AJN Junction • Global Node • 2025
         </footer>
       </main>

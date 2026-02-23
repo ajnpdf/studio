@@ -41,7 +41,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   
   // Contextual Tool Settings
   const [password, setPassword] = useState('');
-  const [watermarkText, setWatermarkText] = useState('AJN TOOLS');
+  const [watermarkText, setWatermarkText] = useState('AJN Tools');
   const [targetLang, setTargetLang] = useState('es');
   const [pageRange, setPageRange] = useState('1');
   const [rotateAngle, setRotateAngle] = useState('90');
