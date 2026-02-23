@@ -170,7 +170,7 @@ class SystemEngine {
 
     for (const file of files) {
       const hash = await this.generateHash(file);
-      const jobKey = `${hash}_${toolId || 'convert'}_${toFmt}`;
+      const jobKey = `${hash}_${toolId || 'convert'}_${toFmt}_${JSON.stringify(settings)}`;
 
       if (this.processedHashes.has(jobKey)) continue;
 
@@ -296,7 +296,7 @@ class SystemEngine {
 
     switch (job.toolId) {
       case 'split-pdf':
-      case 'split': return manip.split();
+      case 'split': return manip.split({ mode: job.settings.splitMode, value: job.settings.splitValue });
       case 'extract-pages':
       case 'extract': return manip.extractPages(job.settings.pages || [0]);
       case 'remove-pages':
@@ -321,27 +321,6 @@ class SystemEngine {
       case 'redact': return specialized.convertTo('REDACTED_PDF', job.settings);
       default: return this.runConversion(job);
     }
-  }
-
-  private async runConversion(job: ProcessingJob) {
-    const file = job.inputs[0].file;
-    const from = job.inputs[0].format.toLowerCase();
-    const to = job.settings.toFmt || 'PDF';
-    
-    // Dynamic routing to appropriate class
-    let ConverterClass;
-    if (['jpg', 'jpeg', 'png', 'webp'].includes(from)) ConverterClass = ImageConverter;
-    else if (from === 'pdf') ConverterClass = PDFConverter;
-    else if (['docx', 'doc'].includes(from)) ConverterClass = WordConverter;
-    else if (['xlsx', 'xls', 'csv'].includes(from)) ConverterClass = ExcelConverter;
-    else if (['pptx', 'ppt'].includes(from)) ConverterClass = PPTConverter;
-    else ConverterClass = PDFConverter;
-
-    const converter = new ConverterClass(file, (p: number, m: string) => {
-      job.progress = Math.min(p, 99);
-      this.addLog(job, m);
-    });
-    return await converter.convertTo(to, job.settings);
   }
 
   cancelJob(id: string) {

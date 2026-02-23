@@ -25,7 +25,11 @@ import {
   Database,
   Layers,
   Activity,
-  History
+  History,
+  Scissors,
+  Layout,
+  Type,
+  FileText
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -51,7 +55,8 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [watermarkText, setWatermarkText] = useState('AJN Private');
   const [targetLang, setTargetLang] = useState('es');
   const [pageRange, setPageRange] = useState('1-5');
-  const [splitMode, setSplitMode] = useState<'range' | 'every' | 'equal'>('range');
+  const [splitMode, setSplitMode] = useState<'range' | 'every' | 'equal'>('every');
+  const [splitValue, setSplitValue] = useState('1');
   const [rotateAngle, setRotateAngle] = useState('90');
   const [summaryLength, setSummaryLength] = useState('medium');
 
@@ -87,7 +92,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       targetLang,
       angle: parseInt(rotateAngle),
       splitMode,
-      splitValue: pageRange,
+      splitValue: splitMode === 'range' ? pageRange : splitValue,
       length: summaryLength,
       toFmt: to
     };
@@ -230,6 +235,55 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     </div>
                     
                     <div className="space-y-6 relative z-10">
+                      {initialUnitId === 'split-pdf' && (
+                        <div className="space-y-6">
+                          <div className="space-y-3">
+                            <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Split Protocol</Label>
+                            <div className="grid grid-cols-3 gap-2">
+                              {[
+                                { id: 'every', label: 'Every N', icon: Scissors },
+                                { id: 'range', label: 'Range', icon: Layout },
+                                { id: 'equal', label: 'Equal', icon: FileText }
+                              ].map(m => (
+                                <button
+                                  key={m.id}
+                                  onClick={() => setSplitMode(m.id as any)}
+                                  className={cn(
+                                    "flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all gap-2",
+                                    splitMode === m.id ? "bg-primary text-white border-primary shadow-lg" : "bg-white/40 border-black/5 text-slate-950/40 hover:bg-white/60"
+                                  )}
+                                >
+                                  <m.icon className="w-4 h-4" />
+                                  <span className="text-[8px] font-black uppercase">{m.label}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="space-y-3">
+                            <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">
+                              {splitMode === 'every' ? 'Pages Per File' : splitMode === 'equal' ? 'Number of Chunks' : 'Range Pattern'}
+                            </Label>
+                            {splitMode === 'range' ? (
+                              <Input 
+                                value={pageRange}
+                                onChange={(e) => setPageRange(e.target.value)}
+                                placeholder="e.g. 1-5, 6-10"
+                                className="bg-white/60 border-black/5 h-12 rounded-2xl font-black text-xs shadow-sm"
+                              />
+                            ) : (
+                              <Input 
+                                type="number"
+                                value={splitValue}
+                                onChange={(e) => setSplitValue(e.target.value)}
+                                min="1"
+                                className="bg-white/60 border-black/5 h-12 rounded-2xl font-black text-xs shadow-sm"
+                              />
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                       {initialUnitId === 'translate-pdf' && (
                         <div className="space-y-3">
                           <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Target Language Profile</Label>
