@@ -288,10 +288,13 @@ class SystemEngine {
     const imgConv = new ImageConverter(files[0], update);
     const scanner = new ScannerConverter(files, update);
     const wordConv = new WordConverter(files[0], update);
+    const pptConv = new PPTConverter(files[0], update);
 
     switch (job.toolId) {
       case 'word-pdf':
       case 'word2pdf': return wordConv.convertTo('PDF');
+      case 'ppt-pdf':
+      case 'ppt2pdf': return pptConv.convertTo('PDF', job.settings);
       case 'scan-to-pdf':
       case 'scan': return scanner.process(job.settings);
       case 'organize-pdf':

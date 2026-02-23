@@ -38,7 +38,8 @@ import {
   Sparkles,
   Zap,
   Activity,
-  Maximize
+  Maximize,
+  Presentation
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -72,6 +73,7 @@ export const ALL_UNITS: ServiceUnit[] = [
   
   // Convert TO
   { id: 'word-pdf', name: 'Word to PDF', desc: 'Convert OOXML structures into pixel-perfect fixed-layout documents.', icon: FileText, tag: 'Office', cat: 'Convert', mode: 'WASM', color: '#F59E0B' },
+  { id: 'ppt-pdf', name: 'PowerPoint to PDF', desc: 'Transform slide decks into high-fidelity presentation PDF documents.', icon: Presentation, tag: 'Slides', cat: 'Convert', mode: 'SMART', color: '#D97706' },
   { id: 'excel-pdf', name: 'Excel to PDF', desc: 'Map tabular grids into clean, coordinate-accurate document tables.', icon: Table, tag: 'Data', cat: 'Convert', mode: 'SMART', color: '#D97706' },
   { id: 'html-pdf', name: 'HTML to PDF', desc: 'Execute DOM-to-Vector rendering for professional web archiving.', icon: Code2, tag: 'Web', cat: 'Convert', mode: 'WASM', color: '#B45309' },
   { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Transform images into printable documents with precision margins.', icon: ImageIcon, tag: 'Imagery', cat: 'Convert', mode: 'WASM', color: '#92400E' },

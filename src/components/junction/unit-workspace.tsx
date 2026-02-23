@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
@@ -96,6 +95,9 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [fitMode, setFitMode] = useState<'FIT' | 'FILL' | 'STRETCH' | 'ORIGINAL'>('FIT');
   const [orientation, setOrientation] = useState<'portrait' | 'landscape' | 'auto'>('portrait');
   const [margins, setMargins] = useState(40);
+
+  // Presentation Parameters
+  const [handoutMode, setHandoutMode] = useState(false);
 
   useEffect(() => {
     return engine.subscribe(setAppState);
@@ -220,7 +222,8 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       aiAssist,
       fitMode,
       orientation,
-      margins
+      margins,
+      handoutMode
     };
 
     engine.addJobs(files, from, to, settings, initialUnitId);
@@ -412,7 +415,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                             {prepQueue.map((file, i) => (
                               <Card key={i} className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-black/5 group relative">
                                 <img src={URL.createObjectURL(file)} className="aspect-[1/1.4] object-cover" />
-                                <div className="absolute top-2 left-2 bg-black/60 px-2 py-0.5 rounded text-[9px] font-black text-white">{i + 1}</div>
+                                <div className="absolute top-2 left-2 bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[9px] font-black text-white">{i + 1}</div>
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                   <Button size="icon" variant="destructive" onClick={() => setPrepQueue(prev => prev.filter((_, idx) => idx !== i))} className="h-8 w-8 rounded-lg"><Trash2 className="w-4 h-4" /></Button>
                                 </div>
@@ -655,6 +658,18 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           <div className="space-y-3">
                             <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Master Quality ({quality}%)</Label>
                             <Slider value={[quality]} max={100} onValueChange={([v]) => setQuality(v)} />
+                          </div>
+                        </div>
+                      )}
+
+                      {initialUnitId === 'ppt-pdf' || initialUnitId === 'ppt2pdf' && (
+                        <div className="space-y-6">
+                          <div className="flex items-center justify-between p-5 bg-white/60 rounded-2xl border border-black/5 shadow-sm">
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-black uppercase text-slate-900 tracking-widest">Handout Mode</p>
+                              <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest opacity-60">Arrange multiple slides per page</p>
+                            </div>
+                            <Switch checked={handoutMode} onCheckedChange={setHandoutMode} className="data-[state=checked]:bg-primary" />
                           </div>
                         </div>
                       )}
