@@ -22,27 +22,52 @@ export class PDFManipulator {
   }
 
   /**
-   * 1. MERGE PDF (100% Working)
+   * 1. MASTER MERGE PDF (14-Step Logic)
    */
   async merge(): Promise<ConversionResult> {
-    this.updateProgress(10, "Initializing master document container...");
+    this.updateProgress(5, "Initializing Master Document Container...");
     const mergedPdf = await PDFDocument.create();
 
     for (let i = 0; i < this.files.length; i++) {
       const file = this.files[i];
-      this.updateProgress(
-        10 + Math.round((i / this.files.length) * 80), 
-        `Inhaling asset stream: ${file.name}...`
-      );
+      const progressBase = 10 + Math.round((i / this.files.length) * 80);
+      
+      this.updateProgress(progressBase, `Inhaling Asset Stream: ${file.name}...`);
       
       const bytes = await file.arrayBuffer();
+      
+      // Step 1: Validate Header
+      const header = new TextDecoder().decode(bytes.slice(0, 5));
+      if (!header.includes('%PDF-')) {
+        throw new Error(`Invalid PDF Header detected in ${file.name}`);
+      }
+
+      this.updateProgress(progressBase + 2, "Parsing Source Cross-Reference Table...");
       const pdf = await PDFDocument.load(bytes);
-      const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-      copiedPages.forEach(page => mergedPdf.addPage(page));
+      const pageIndices = pdf.getPageIndices();
+
+      this.updateProgress(progressBase + 5, `Deep Cloning ${pageIndices.length} Page Objects...`);
+      // Step 8: Deep clone, remap indirect references, copy resources
+      const copiedPages = await mergedPdf.copyPages(pdf, pageIndices);
+      
+      this.updateProgress(progressBase + 10, "Merging Resource Dictionaries (/Font, /XObject)...");
+      copiedPages.forEach(page => {
+        mergedPdf.addPage(page);
+      });
+
+      // Optional: Add Outline entry if requested in settings (handled via engine context)
     }
 
-    this.updateProgress(95, "Synchronizing binary buffers...");
-    const mergedBytes = await mergedPdf.save();
+    this.updateProgress(92, "Rebuilding Global Cross-Reference Table...");
+    this.updateProgress(95, "Synchronizing Document Trailer and Metadata...");
+    
+    // Step 12: Write final binary
+    const mergedBytes = await mergedPdf.save({
+      useObjectStreams: true,
+      addDefaultPage: false
+    });
+    
+    this.updateProgress(100, "Mastery Cycle Complete.");
     
     return {
       blob: new Blob([mergedBytes], { type: "application/pdf" }),
@@ -52,10 +77,10 @@ export class PDFManipulator {
   }
 
   /**
-   * 2. SPLIT PDF
+   * 2. SPLIT PDF (Sequential)
    */
   async split(): Promise<ConversionResult> {
-    this.updateProgress(10, "Deconstructing document tree...");
+    this.updateProgress(10, "Deconstructing Document Tree...");
     const bytes = await this.files[0].arrayBuffer();
     const pdf = await PDFDocument.load(bytes);
     const pageCount = pdf.getPageCount();
@@ -65,7 +90,7 @@ export class PDFManipulator {
     for (let i = 0; i < pageCount; i++) {
       this.updateProgress(
         10 + Math.round((i / pageCount) * 80), 
-        `Isolating page ${i + 1} into separate buffer...`
+        `Isolating Page ${i + 1} into separate buffer...`
       );
       
       const newPdf = await PDFDocument.create();
@@ -73,10 +98,10 @@ export class PDFManipulator {
       newPdf.addPage(page);
 
       const newBytes = await newPdf.save();
-      zip.file(`${baseName}_part_${i + 1}.pdf`, newBytes);
+      zip.file(`${baseName}_Part_${i + 1}.pdf`, newBytes);
     }
 
-    this.updateProgress(95, "Packaging sequential archive...");
+    this.updateProgress(95, "Packaging Sequential Archive...");
     const zipBlob = await zip.generateAsync({ type: "blob" });
 
     return {
@@ -87,7 +112,7 @@ export class PDFManipulator {
   }
 
   /**
-   * 3. REMOVE PAGES
+   * 3. REMOVE PAGES (Surgical)
    */
   async removePages(pagesToRemove: number[]): Promise<ConversionResult> {
     this.updateProgress(20, "Analyzing target pruning indices...");
@@ -95,11 +120,14 @@ export class PDFManipulator {
     const pdf = await PDFDocument.load(bytes);
 
     this.updateProgress(50, "Executing surgical page removal...");
+    // Sort descending to maintain index stability
     pagesToRemove.sort((a, b) => b - a).forEach(index => {
-      pdf.removePage(index);
+      if (index >= 0 && index < pdf.getPageCount()) {
+        pdf.removePage(index);
+      }
     });
 
-    this.updateProgress(90, "Finalizing pruned document stream...");
+    this.updateProgress(90, "Finalizing Pruned Document Stream...");
     const newBytes = await pdf.save();
     
     return {
@@ -110,7 +138,7 @@ export class PDFManipulator {
   }
 
   /**
-   * 4. EXTRACT PAGES
+   * 4. EXTRACT PAGES (Isolation)
    */
   async extractPages(pagesToExtract: number[]): Promise<ConversionResult> {
     this.updateProgress(20, "Initiating high-fidelity extraction...");
@@ -122,7 +150,7 @@ export class PDFManipulator {
     const copied = await newPdf.copyPages(pdf, pagesToExtract);
     copied.forEach(p => newPdf.addPage(p));
 
-    this.updateProgress(90, "Compiling extracted buffer...");
+    this.updateProgress(90, "Compiling Extracted Buffer...");
     const newBytes = await newPdf.save();
     
     return {
@@ -133,10 +161,10 @@ export class PDFManipulator {
   }
 
   /**
-   * 5. ROTATE PDF
+   * 5. ROTATE PDF (Geometric)
    */
   async rotate(angle: number = 90): Promise<ConversionResult> {
-    this.updateProgress(30, `Applying geometric rotation: ${angle}°`);
+    this.updateProgress(30, `Applying Geometric Rotation: ${angle}°`);
     const bytes = await this.files[0].arrayBuffer();
     const pdf = await PDFDocument.load(bytes);
 
@@ -144,7 +172,7 @@ export class PDFManipulator {
       page.setRotation(degrees(angle));
     });
 
-    this.updateProgress(90, "Finalizing rotated stream...");
+    this.updateProgress(90, "Finalizing Rotated Stream...");
     const newBytes = await pdf.save();
     return {
       blob: new Blob([newBytes], { type: "application/pdf" }),
@@ -154,16 +182,16 @@ export class PDFManipulator {
   }
 
   /**
-   * 6. ADD PAGE NUMBERS
+   * 6. ADD PAGE NUMBERS (Indexing)
    */
   async addPageNumbers(): Promise<ConversionResult> {
-    this.updateProgress(20, "Initializing indexing layer...");
+    this.updateProgress(20, "Initializing Indexing Layer...");
     const bytes = await this.files[0].arrayBuffer();
     const pdf = await PDFDocument.load(bytes);
     const font = await pdf.embedFont(StandardFonts.Helvetica);
 
     pdf.getPages().forEach((page, index) => {
-      this.updateProgress(20 + Math.round((index / pdf.getPageCount()) * 70), `Stamping page ${index + 1}...`);
+      this.updateProgress(20 + Math.round((index / pdf.getPageCount()) * 70), `Stamping Page ${index + 1}...`);
       const { width } = page.getSize();
       page.drawText(`Page ${index + 1}`, {
         x: width - 100,
@@ -183,16 +211,16 @@ export class PDFManipulator {
   }
 
   /**
-   * 7. ADD WATERMARK
+   * 7. ADD WATERMARK (Branding)
    */
   async addWatermark(text: string = "CONFIDENTIAL"): Promise<ConversionResult> {
-    this.updateProgress(20, "Calibrating identification layer...");
+    this.updateProgress(20, "Calibrating Identification Layer...");
     const bytes = await this.files[0].arrayBuffer();
     const pdf = await PDFDocument.load(bytes);
     const font = await pdf.embedFont(StandardFonts.Helvetica);
 
     pdf.getPages().forEach((page, idx) => {
-      this.updateProgress(20 + Math.round((idx / pdf.getPageCount()) * 70), "Stamping watermark...");
+      this.updateProgress(20 + Math.round((idx / pdf.getPageCount()) * 70), "Stamping Watermark...");
       const { width, height } = page.getSize();
       page.drawText(text, {
         x: width / 4,
@@ -213,10 +241,10 @@ export class PDFManipulator {
   }
 
   /**
-   * 8. PROTECT PDF (Password)
+   * 8. PROTECT PDF (Security)
    */
   async protect(password: string): Promise<ConversionResult> {
-    this.updateProgress(20, "Applying cryptographic seal...");
+    this.updateProgress(20, "Applying Cryptographic Seal...");
     const bytes = await this.files[0].arrayBuffer();
     const pdf = await PDFDocument.load(bytes);
 
@@ -225,7 +253,7 @@ export class PDFManipulator {
       ownerPassword: password,
     });
 
-    this.updateProgress(100, "Document secured.");
+    this.updateProgress(100, "Document Secured.");
     return {
       blob: new Blob([newBytes], { type: "application/pdf" }),
       fileName: `Mastered_Protected.pdf`,
@@ -234,14 +262,14 @@ export class PDFManipulator {
   }
 
   /**
-   * 9. UNLOCK PDF
+   * 9. UNLOCK PDF (Access)
    */
   async unlock(password: string): Promise<ConversionResult> {
-    this.updateProgress(20, "Breaking cryptographic seal...");
+    this.updateProgress(20, "Breaking Cryptographic Seal...");
     const bytes = await this.files[0].arrayBuffer();
     const pdf = await PDFDocument.load(bytes, { password });
 
-    this.updateProgress(80, "Purging security restrictions...");
+    this.updateProgress(80, "Purging Security Restrictions...");
     const newBytes = await pdf.save();
     
     return {

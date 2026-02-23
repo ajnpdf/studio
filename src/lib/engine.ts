@@ -19,6 +19,7 @@ import { PDFManipulator } from './converters/pdf-manipulator';
 /**
  * AJN MASTER ARCHITECTURE — CORE ENGINE
  * Stateful workflow orchestrator managing 45+ tools.
+ * Implements strict deduplication and multi-stage logic.
  */
 
 export type ExecutionMode = 'WASM' | 'SMART' | 'AI';
@@ -266,7 +267,7 @@ class SystemEngine {
       nextJob.progress = 100;
       nextJob.output = output;
       nextJob.completedAt = Date.now();
-      this.addLog(nextJob, "Mastery cycle complete.");
+      this.addLog(nextJob, "Mastery Cycle Complete.");
 
       this.state.outputs.unshift(output);
       this.state.stats.totalMastered++;
