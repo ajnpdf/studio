@@ -11,20 +11,14 @@ import {
   Workflow,
   Search,
   Command,
-  ArrowRight,
-  Zap,
-  FileText,
-  ImageIcon,
-  Video,
-  Music,
   X,
   Layers,
   BrainCircuit,
-  Wand2,
   Cpu,
   Lock,
   Globe,
-  Gauge
+  Gauge,
+  ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -32,20 +26,19 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-const ALL_SERVICES = [
-  { id: 'pdf-docx', name: 'PDF to Word Master', desc: 'Reconstruct layouts via Smart OCR', cat: 'Document', icon: FileText, tag: 'WASM' },
-  { id: 'pdf-xlsx', name: 'PDF to Excel Grid', desc: 'Smart table detection & extraction', cat: 'Document', icon: Layers, tag: 'AI' },
-  { id: 'img-webp', name: 'Universal WebP Transcode', desc: 'Lossless compression for web nodes', cat: 'Image', icon: ImageIcon, tag: 'WASM' },
-  { id: 'bg-remove', name: 'Smart BG Removal', desc: 'AI-driven subject isolation', cat: 'Image', icon: Wand2, tag: 'Smart' },
-  { id: 'vid-gif', name: 'Video to Smart GIF', desc: 'Frame-accurate temporal mapping', cat: 'Video', icon: Video, tag: 'FFmpeg' },
-  { id: 'aud-trim', name: 'Audio Waveform Surgery', desc: 'Precise sample-level trimming', cat: 'Audio', icon: Music, tag: 'WASM' },
+const PDF_SERVICES = [
+  "Merge PDF", "Split PDF", "Compress PDF", "PDF to Word", "PDF to PowerPoint", 
+  "PDF to Excel", "Word to PDF", "PowerPoint to PDF", "Excel to PDF", "Edit PDF", 
+  "PDF to JPG", "JPG to PDF", "Sign PDF", "Watermark", "Rotate PDF", 
+  "HTML to PDF", "Unlock PDF", "Protect PDF", "Organize PDF", "PDF to PDF/A", 
+  "Repair PDF", "Page numbers", "Scan to PDF", "OCR PDF", "Compare PDF", 
+  "Redact PDF", "Crop PDF", "Translate PDF"
 ];
 
-const TICKER_SERVICES = [
-  "4K VIDEO TRANSCODE", "SMART LAYOUT RECONSTRUCTION", "RAW CAMERA DEVELOPMENT", 
-  "SVG VECTOR MASTERING", "BATCH DOCUMENT SIGNING", "UNIVERSAL WASM ENGINE", 
-  "HIGH-FIDELITY AUDIO NORMALIZATION", "CROSS-NODE FILE MAPPING", "NEURAL TRANSLATION PASS",
-  "ISO-STANDARD PDF/A ARCHIVAL", "CRYPTOGRAPHIC REDACTION", "AUTOMATED GRID DETECTION"
+const ALL_SERVICES = [
+  { id: 'pdf-docx', name: 'PDF to Word Master', desc: 'Reconstruct layouts via Smart OCR', cat: 'Document', icon: ShieldCheck, tag: 'WASM' },
+  { id: 'pdf-xlsx', name: 'PDF to Excel Grid', desc: 'Smart table detection & extraction', cat: 'Document', icon: Layers, tag: 'AI' },
+  { id: 'img-webp', name: 'Universal WebP Transcode', desc: 'Lossless compression for web nodes', cat: 'Image', icon: ShieldCheck, tag: 'WASM' },
 ];
 
 const FEATURES = [
@@ -108,7 +101,7 @@ export default function AJNPage() {
     >
       <NightSky />
       
-      {/* HEADER - MINIMALIST NAVY LOGO ONLY */}
+      {/* HEADER */}
       <header className="fixed top-0 left-0 right-0 h-16 md:h-20 border-b border-black/5 bg-white/40 backdrop-blur-xl z-[60] px-4 md:px-8 flex items-center justify-between shadow-sm">
         <Link href="/" className="flex items-center group">
           <LogoAnimation className="w-16 h-8 md:w-24 md:h-12" showGlow={false} />
@@ -128,7 +121,7 @@ export default function AJNPage() {
         </div>
       </header>
 
-      {/* GLOBAL SEARCH OVERLAY */}
+      {/* SEARCH OVERLAY */}
       {showSearch && (
         <div className="fixed inset-0 z-[100] flex items-start justify-center pt-0 md:pt-[15vh] px-0 md:px-6 bg-white/60 backdrop-blur-md animate-in fade-in duration-300">
           <div className="w-full h-full md:h-auto md:max-w-2xl bg-white border-none md:border md:border-black/5 md:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in slide-in-from-top-4 duration-500">
@@ -163,7 +156,7 @@ export default function AJNPage() {
                             </div>
                             <p className="text-[8px] md:text-[10px] text-muted-foreground font-bold uppercase tracking-widest truncate">{s.desc}</p>
                           </div>
-                          <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-black/10 group-hover:text-primary transition-colors" />
+                          <ArrowRight className="w-3 h-3 md:w-4 h-4 text-black/10 group-hover:text-primary transition-colors" />
                         </div>
                       </Link>
                     ))}
@@ -180,20 +173,11 @@ export default function AJNPage() {
         </div>
       )}
 
-      {/* DYNAMIC BACKGROUND */}
-      <div className={cn(
-        "fixed inset-0 pointer-events-none transition-all duration-1000 z-0",
-        isDragging ? "opacity-100 scale-100" : "opacity-0 scale-110"
-      )}>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.05)_0%,transparent_70%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
-      </div>
-
       <main className="relative z-10 flex-1 flex flex-col items-center p-4 md:p-6 mt-24 md:mt-32">
-        {/* ADVANCED MULTI-LAYER SERVICE TICKER */}
-        <div className="w-full overflow-hidden mb-16 relative group">
+        {/* ADVANCED PDF SERVICE TICKER */}
+        <div className="w-full overflow-hidden mb-12 relative group">
           <div className="flex animate-marquee-fast whitespace-nowrap gap-12 items-center mb-4">
-            {[...TICKER_SERVICES, ...TICKER_SERVICES].map((s, i) => (
+            {[...PDF_SERVICES, ...PDF_SERVICES].map((s, i) => (
               <div key={i} className="flex items-center gap-4 bg-white/20 backdrop-blur-md px-6 py-2.5 rounded-full border border-black/5 shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(30,58,138,0.5)]" />
                 <span className="text-[10px] md:text-[12px] font-black text-slate-900 tracking-[0.2em] uppercase">{s}</span>
@@ -201,7 +185,7 @@ export default function AJNPage() {
             ))}
           </div>
           <div className="flex animate-marquee-slow-reverse whitespace-nowrap gap-12 items-center opacity-40">
-            {[...TICKER_SERVICES, ...TICKER_SERVICES].reverse().map((s, i) => (
+            {[...PDF_SERVICES, ...PDF_SERVICES].reverse().map((s, i) => (
               <div key={i} className="flex items-center gap-3">
                 <span className="text-[9px] font-bold text-slate-600 tracking-[0.4em] uppercase">{s}</span>
                 <span className="w-1 h-1 rounded-full bg-slate-400" />
@@ -217,7 +201,7 @@ export default function AJNPage() {
           isProcessing || showSearch ? "scale-95 opacity-40 blur-sm" : "scale-100"
         )}>
           
-          {/* LARGE GLOBAL SEARCH BOX */}
+          {/* 1. LARGE GLOBAL SEARCH BOX - FIRST */}
           <div className="w-full max-w-2xl relative group animate-in fade-in slide-in-from-top-4 duration-1000">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-[2.5rem] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
             <div className="relative flex items-center bg-white/60 backdrop-blur-3xl border border-black/5 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all hover:border-primary/40">
@@ -235,41 +219,51 @@ export default function AJNPage() {
             </div>
           </div>
 
-          {/* AJN ANIMATION (NAVY BLUE) */}
+          {/* 2. AJN ANIMATION - MIDDLE */}
           <div className={cn("transition-all duration-700", isDragging ? "scale-110" : "scale-100")}>
             <LogoAnimation />
           </div>
 
-          {/* DROP ZONE Area */}
-          <div 
-            onClick={() => fileInputRef.current?.click()}
-            className={cn(
-              "group relative w-full max-w-2xl min-h-[280px] md:min-h-[340px] bg-white/40 backdrop-blur-md border-2 border-dashed border-black/5 rounded-[2rem] md:rounded-[3rem] flex flex-col items-center justify-center cursor-pointer transition-all duration-500 hover:border-primary/40 hover:bg-white/60 overflow-hidden shadow-xl",
-              isDragging && "border-primary bg-primary/10 scale-[0.98]"
-            )}
-          >
-            <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => e.target.files && simulateProcessing(e.target.files[0])} />
-            
-            <div className={cn(
-              "w-16 h-16 md:w-20 md:h-20 bg-primary/10 rounded-2xl md:rounded-3xl flex items-center justify-center mb-6 md:mb-8 shadow-sm transition-all duration-500",
-              isDragging ? "scale-125 rotate-6 bg-primary" : "group-hover:scale-110"
-            )}>
-              <Upload className={cn("w-8 h-8 md:w-10 md:h-10 transition-colors", isDragging ? "text-white" : "text-primary")} />
-            </div>
+          {/* 3. DROP ZONE Area */}
+          <div className="w-full max-w-2xl space-y-4">
+            <div 
+              onClick={() => fileInputRef.current?.click()}
+              className={cn(
+                "group relative w-full min-h-[280px] md:min-h-[340px] bg-white/40 backdrop-blur-md border-2 border-dashed border-black/5 rounded-[2rem] md:rounded-[3rem] flex flex-col items-center justify-center cursor-pointer transition-all duration-500 hover:border-primary/40 hover:bg-white/60 overflow-hidden shadow-xl",
+                isDragging && "border-primary bg-primary/10 scale-[0.98]"
+              )}
+            >
+              <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => e.target.files && simulateProcessing(e.target.files[0])} />
+              
+              <div className={cn(
+                "w-16 h-16 md:w-20 md:h-20 bg-primary/10 rounded-2xl md:rounded-3xl flex items-center justify-center mb-6 md:mb-8 shadow-sm transition-all duration-500",
+                isDragging ? "scale-125 rotate-6 bg-primary" : "group-hover:scale-110"
+              )}>
+                <Upload className={cn("w-8 h-8 md:w-10 md:h-10 transition-colors", isDragging ? "text-white" : "text-primary")} />
+              </div>
 
-            <div className="text-center space-y-2 md:space-y-3 px-6 md:px-8">
-              <h2 className="text-2xl md:text-4xl font-black tracking-tight text-slate-900 uppercase leading-none">Drop to Optimize</h2>
-              <p className="text-[8px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-60">Professional Smart Processing System</p>
-            </div>
+              <div className="text-center space-y-2 md:space-y-3 px-6 md:px-8">
+                <h2 className="text-2xl md:text-4xl font-black tracking-tight text-slate-900 uppercase leading-none">Drop to Optimize</h2>
+                <p className="text-[8px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-60">Professional Smart Processing System</p>
+              </div>
 
-            <div className="mt-8 md:mt-12 flex flex-wrap justify-center gap-4 md:gap-8 text-[8px] md:text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em]">
-              <span className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 md:w-3.5 md:h-3.5" /> Encrypted</span>
-              <span className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 md:w-3.5 md:h-3.5" /> Local</span>
+              <div className="mt-8 md:mt-12 flex flex-wrap justify-center gap-4 md:gap-8 text-[8px] md:text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em]">
+                <span className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 md:w-3.5 md:h-3.5" /> Encrypted</span>
+                <span className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 md:w-3.5 md:h-3.5" /> Local</span>
+              </div>
+            </div>
+            {/* Small Letters Hint */}
+            <div className="flex justify-center gap-6 text-[7px] font-black uppercase tracking-[0.4em] text-slate-900/30 animate-pulse">
+              <span>Drag files here</span>
+              <span>•</span>
+              <span>Auto-detect format</span>
+              <span>•</span>
+              <span>Secure buffer</span>
             </div>
           </div>
 
-          {/* PROFESSIONAL CAPABILITIES GRID */}
-          <section className="w-full max-w-5xl py-12 md:py-24 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+          {/* 4. PROFESSIONAL CAPABILITIES GRID */}
+          <section className="w-full max-w-5xl py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
             {FEATURES.map((f, i) => (
               <div key={i} className="p-6 md:p-8 rounded-[2rem] bg-white/40 backdrop-blur-md border border-black/5 hover:border-primary/20 transition-all group shadow-sm">
                 <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -330,10 +324,10 @@ export default function AJNPage() {
           100% { transform: translateX(0); }
         }
         .animate-marquee-fast {
-          animation: marquee-fast 30s linear infinite;
+          animation: marquee-fast 40s linear infinite;
         }
         .animate-marquee-slow-reverse {
-          animation: marquee-slow-reverse 50s linear infinite;
+          animation: marquee-slow-reverse 60s linear infinite;
         }
       `}</style>
     </div>
