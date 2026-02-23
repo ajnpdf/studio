@@ -1,3 +1,4 @@
+
 export type PDFTool = 
   | 'select' 
   | 'edit-text' 
@@ -14,9 +15,12 @@ export type PDFTool =
   | 'link'
   | 'redact';
 
+/**
+ * Step 1: Editable object model schema
+ */
 export interface PDFElement {
   id: string;
-  type: 'text' | 'image' | 'shape' | 'signature' | 'form-field' | 'link' | 'markup';
+  type: 'text' | 'image' | 'shape' | 'signature' | 'form-field' | 'link' | 'markup' | 'path';
   x: number;
   y: number;
   width: number;
@@ -31,12 +35,19 @@ export interface PDFElement {
   opacity?: number;
   rotation?: number;
   zIndex: number;
+  
+  // Path objects: bezier data
+  pathData?: string;
+  strokeWidth?: number;
+  
   // Signature specific
   signatureType?: 'draw' | 'type' | 'upload';
   signatureData?: string;
+  
   // Form field specific
   fieldType?: 'text' | 'checkbox' | 'radio' | 'dropdown';
   isRequired?: boolean;
+  
   // Link specific
   url?: string;
 }

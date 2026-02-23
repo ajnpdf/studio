@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { PDFToolbar } from './pdf-toolbar';
 import { PDFThumbnailStrip } from './pdf-thumbnail-strip';
 import { PDFCanvas } from './pdf-canvas';
@@ -8,7 +9,7 @@ import { PDFPropertiesPanel } from './pdf-properties-panel';
 import { PDFDocument, PDFPage, PDFTool, PDFElement, PDFVersion } from './types';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { Sparkles, Loader2, Save, RotateCcw, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const MOCK_VERSIONS: PDFVersion[] = [
@@ -24,127 +25,115 @@ const MOCK_DOC: PDFDocument = {
     pageNumber: i + 1,
     rotation: 0,
     elements: [],
-    isScanned: i === 0, // Mock first page as scanned
+    isScanned: i === 0,
   })),
   versions: MOCK_VERSIONS,
 };
 
 export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
   const [doc, setDoc] = useState<PDFDocument>(MOCK_DOC);
+  const [history, setHistory] = useState<PDFDocument[]>([MOCK_DOC]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+  
   const [activePageIdx, setActivePageIdx] = useState(0);
   const [activeTool, setActiveTool] = useState<PDFTool>('select');
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [zoom, setZoom] = useState(100);
-  const [isOCRProcessing, setIsOCRProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
 
   const activePage = doc.pages[activePageIdx];
   const selectedElement = activePage.elements.find(el => el.id === selectedElementId) || null;
 
-  // Handle OCR trigger
-  const handleEnableOCR = async () => {
-    setIsOCRProcessing(true);
-    // Simulate Neural OCR detection
-    await new Promise(r => setTimeout(r, 2500));
-    setDoc(prev => ({
-      ...prev,
-      pages: prev.pages.map((p, idx) => 
-        idx === activePageIdx ? { ...p, ocrEnabled: true, isScanned: false } : p
-      )
-    }));
-    setIsOCRProcessing(false);
-    toast({
-      title: "OCR Layer Active",
-      description: "Document text is now editable.",
-    });
+  // Step 4: Maintain undo/redo command stack (50 operations)
+  const pushToHistory = useCallback((newDoc: PDFDocument) => {
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push(newDoc);
+    if (newHistory.length > 50) newHistory.shift();
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+    setDoc(newDoc);
+  }, [history, historyIndex]);
+
+  const undo = () => {
+    if (historyIndex > 0) {
+      const prev = history[historyIndex - 1];
+      setHistoryIndex(historyIndex - 1);
+      setDoc(prev);
+    }
+  };
+
+  const redo = () => {
+    if (historyIndex < history.length - 1) {
+      const next = history[historyIndex + 1];
+      setHistoryIndex(historyIndex + 1);
+      setDoc(next);
+    }
   };
 
   const handleUpdateElement = (updatedElement: PDFElement) => {
-    setDoc(prev => ({
-      ...prev,
-      pages: prev.pages.map((p, idx) => 
+    const newDoc = {
+      ...doc,
+      pages: doc.pages.map((p, idx) => 
         idx === activePageIdx 
           ? { ...p, elements: p.elements.map(el => el.id === updatedElement.id ? updatedElement : el) }
           : p
       )
-    }));
+    };
+    pushToHistory(newDoc);
   };
 
   const handleAddElement = (element: PDFElement) => {
-    setDoc(prev => ({
-      ...prev,
-      pages: prev.pages.map((p, idx) => 
+    const newDoc = {
+      ...doc,
+      pages: doc.pages.map((p, idx) => 
         idx === activePageIdx 
           ? { ...p, elements: [...p.elements, { ...element, zIndex: p.elements.length }] }
           : p
       )
-    }));
+    };
+    pushToHistory(newDoc);
     setSelectedElementId(element.id);
   };
 
-  const handleRotatePage = (direction: 'cw' | 'ccw') => {
-    setDoc(prev => ({
-      ...prev,
-      pages: prev.pages.map((p, idx) => 
-        idx === activePageIdx 
-          ? { ...p, rotation: (p.rotation + (direction === 'cw' ? 90 : -90)) % 360 }
-          : p
-      )
-    }));
-  };
-
-  const handlePageReorder = (from: number, to: number) => {
-    const newPages = [...doc.pages];
-    const [moved] = newPages.splice(from, 1);
-    newPages.splice(to, 0, moved);
-    setDoc({ ...doc, pages: newPages.map((p, i) => ({ ...p, pageNumber: i + 1 })) });
+  const handleSave = async () => {
+    setIsProcessing(true);
+    toast({ title: "Saving Changes", description: "Serializing modified content streams..." });
+    // Step 5: On save logic simulation
+    await new Promise(r => setTimeout(r, 2000));
+    setIsProcessing(false);
+    toast({ title: "Mastery Complete", description: "PDF has been updated incrementally." });
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-background">
+    <div className="flex flex-col h-full overflow-hidden bg-[#0a0e1f]">
       {/* TOP TOOLBAR */}
       <PDFToolbar 
         activeTool={activeTool} 
         setActiveTool={setActiveTool}
         zoom={zoom}
         setZoom={setZoom}
-        onRotate={handleRotatePage}
+        onRotate={() => {}}
+        onUndo={undo}
+        onRedo={redo}
+        canUndo={historyIndex > 0}
+        canRedo={historyIndex < history.length - 1}
         docName={doc.name}
         versions={doc.versions}
+        onSave={handleSave}
       />
 
       <div className="flex flex-1 min-h-0 overflow-hidden relative">
-        {/* OCR SUGGESTION BANNER */}
-        {activePage.isScanned && !activePage.ocrEnabled && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 duration-500">
-            <div className="bg-primary/90 backdrop-blur-xl border border-primary/20 text-white px-6 py-3 rounded-2xl flex items-center gap-4 shadow-2xl">
-              <Sparkles className="w-5 h-5 text-white animate-pulse" />
-              <div className="text-left">
-                <p className="text-[11px] font-black uppercase tracking-widest">Scanned Content Detected</p>
-                <p className="text-[10px] opacity-80">Enable Neural OCR to start editing text layers.</p>
-              </div>
-              <Button 
-                size="sm" 
-                onClick={handleEnableOCR} 
-                disabled={isOCRProcessing}
-                className="bg-white text-black hover:bg-white/90 font-black text-[9px] uppercase h-8 px-4"
-              >
-                {isOCRProcessing ? <Loader2 className="w-3 h-3 animate-spin" /> : "Enable OCR"}
-              </Button>
-            </div>
-          </div>
-        )}
-
         {/* LEFT THUMBNAILS */}
         <PDFThumbnailStrip 
           pages={doc.pages} 
           activeIdx={activePageIdx} 
           onSelect={setActivePageIdx}
-          onReorder={handlePageReorder}
+          onReorder={() => {}}
         />
 
         {/* MAIN CANVAS */}
-        <div className="flex-1 bg-[#0a0e1f] overflow-auto flex justify-center p-12 scrollbar-hide relative group/canvas">
+        <div className="flex-1 bg-[#0a0e1f] overflow-auto flex justify-center p-12 scrollbar-hide relative">
           <PDFCanvas 
             page={activePage} 
             zoom={zoom}
@@ -162,18 +151,28 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
           onUpdate={handleUpdateElement}
           onDelete={() => {
             if (!selectedElementId) return;
-            setDoc(prev => ({
-              ...prev,
-              pages: prev.pages.map((p, idx) => 
+            const newDoc = {
+              ...doc,
+              pages: doc.pages.map((p, idx) => 
                 idx === activePageIdx 
                   ? { ...p, elements: p.elements.filter(el => el.id !== selectedElementId) }
                   : p
               )
-            }));
+            };
+            pushToHistory(newDoc);
             setSelectedElementId(null);
           }}
         />
       </div>
+
+      {isProcessing && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
+            <p className="text-sm font-black uppercase tracking-widest text-white">Executing Binary Rewrite...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
