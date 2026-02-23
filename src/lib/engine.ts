@@ -1,3 +1,4 @@
+
 'use client';
 
 /**
@@ -13,7 +14,7 @@ if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 }
 
-// ─── CORE PDF UTILITIES ───────────────────────────────────────────────────────
+// ─── PDF PARSING ENGINE ───────────────────────────────────────────────────────
 export class PDFEngine {
   static validateHeader(buffer: ArrayBuffer) {
     const bytes = new Uint8Array(buffer.slice(0, 8));

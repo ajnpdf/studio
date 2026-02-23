@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -22,7 +23,6 @@ interface Props {
 
 /**
  * AJN Unit Workspace - Real-Time Engineering Layout
- * Uses useAJNTool hook for 100% logic execution and live logging.
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [activeCategory, setActiveCategory] = useState(defaultCategory);
