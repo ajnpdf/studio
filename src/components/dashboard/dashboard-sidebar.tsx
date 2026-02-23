@@ -1,3 +1,4 @@
+
 "use client";
 
 import { 
@@ -30,6 +31,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useUser, useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { LogoAnimation } from '@/components/landing/logo-animation';
+import { SponsoredUnit } from '@/components/ui/sponsored-unit';
 
 const navItems = [
   { icon: Repeat, label: 'Junction Core', href: '/dashboard/convert', description: 'Universal format engine' },
@@ -164,6 +166,8 @@ export function DashboardSidebar() {
           </div>
         </div>
       </div>
+
+      {!collapsed && <SponsoredUnit />}
 
       <div className="p-4 border-t border-black/5 bg-white/20">
         <button 

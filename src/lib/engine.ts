@@ -1,3 +1,4 @@
+
 'use client';
 
 import { PDFConverter } from './converters/pdf-converter';
@@ -70,7 +71,7 @@ export interface GlobalAppState {
 
 /**
  * AJN Master System Engine
- * Hardened for 30+ real-time transformation protocols.
+ * Real-time high-concurrency engineering core.
  */
 class SystemEngine {
   private state: GlobalAppState = {
@@ -129,7 +130,7 @@ class SystemEngine {
         mode: this.determineMode(toolId),
         status: 'queued',
         progress: 0,
-        stage: 'Calibration...',
+        stage: 'Inhaling architecture...',
         logs: [],
         inputs: [fileNode],
         output: null,
@@ -170,7 +171,7 @@ class SystemEngine {
 
       const duration = ((Date.now() - startTime) / 1000).toFixed(1);
       const originalSize = nextJob.inputs.reduce((sum, f) => sum + f.size, 0);
-      const reduction = Math.max(0, Math.round(((originalSize - result.blob.size) / originalSize) * 100));
+      const reduction = originalSize > 0 ? Math.max(0, Math.round(((originalSize - result.blob.size) / originalSize) * 100)) : 0;
 
       const objectUrl = URL.createObjectURL(result.blob);
       const output: OutputBuffer = {
@@ -243,6 +244,9 @@ class SystemEngine {
       case 'redact-pdf': return manip.redact(job.settings.redactions || []);
       case 'translate-pdf': return specialized.convertTo('TRANSLATE', job.settings);
       case 'compare-pdf': return specialized.convertTo('COMPARE', job.settings);
+      case 'pdf-pdfa': return manip.toPDFA(job.settings.conformance || '2b');
+      case 'add-page-numbers': return manip.addPageNumbers(job.settings);
+      case 'rotate-pdf': return manip.rotate(job.settings.rotationMap || {});
       default: return pdfConv.convertTo(job.settings.toFmt || 'PDF', job.settings);
     }
   }
