@@ -4,18 +4,18 @@
 
 @layer base {
   :root {
-    --background: 275 75% 95%; /* #e9cdfa equivalent base */
-    --foreground: 222 47% 12%;
+    --background: 275 75% 95%; /* Lavender base */
+    --foreground: 222 47% 5%; /* High-contrast black */
     --card: 0 0% 100% / 0.4;
-    --card-foreground: 222 47% 12%;
+    --card-foreground: 222 47% 5%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 12%;
-    --primary: 222 47% 25%; /* Navy Blue Variant */
+    --popover-foreground: 222 47% 5%;
+    --primary: 222 47% 25%; /* Navy Blue */
     --primary-foreground: 0 0% 100%;
     --secondary: 275 20% 92%;
-    --secondary-foreground: 222 47% 12%;
+    --secondary-foreground: 222 47% 5%;
     --muted: 275 20% 92%;
-    --muted-foreground: 275 10% 40%;
+    --muted-foreground: 275 10% 20%;
     --accent: 222 47% 25%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
@@ -65,36 +65,13 @@
     left: -200px;
   }
 
-  /* Blue blob & Noise Overlay combined */
+  /* Blue blob */
   body::after {
     background: #8fd3ff;
     bottom: -200px;
     right: -200px;
     animation-duration: 22s;
     box-shadow: 0 0 200px rgba(255,255,255,0.2) inset;
-  }
-  
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    @apply bg-black/10 rounded-full hover:bg-black/20 transition-colors;
-  }
-}
-
-@layer utilities {
-  .glass-card {
-    @apply bg-white/40 backdrop-blur-2xl border border-white/40 shadow-2xl;
-  }
-  .animate-shimmer {
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
   }
 }
 
@@ -110,18 +87,10 @@
   100% { transform: translate(-60px, 120px) scale(0.9); }
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+@layer utilities {
+  .glass-card {
+    @apply bg-white/40 backdrop-blur-2xl border border-white/40 shadow-2xl;
+  }
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -130,8 +99,4 @@
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-.text-glow {
-  text-shadow: 0 0 20px rgba(0, 0, 128, 0.2);
 }

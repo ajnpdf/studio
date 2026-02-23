@@ -21,8 +21,7 @@ interface Props {
 }
 
 /**
- * AJN Format Selector - Refined Light Theme
- * Professional Protocol Management - Locked source, editable target.
+ * AJN Format Selector - Advanced Input/Output Protocol Logic
  */
 export function FormatSelector({ category, from, to, onFromChange, onToChange, isSourceLocked = false }: Props) {
   const targets = useMemo(() => {
@@ -45,11 +44,11 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange, i
       <div className="flex flex-col md:flex-row items-center gap-3 bg-white/40 p-5 rounded-[2rem] border border-white/60 shadow-xl relative overflow-hidden backdrop-blur-xl">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent pointer-events-none" />
         
-        {/* SOURCE PROTOCOL - LOCKED */}
+        {/* INPUT PROTOCOL */}
         <div className="flex-1 w-full space-y-1.5 relative z-10">
-          <label className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-3">Source Node</label>
+          <label className="text-[10px] font-black uppercase tracking-widest text-slate-900 ml-3">Input Protocol</label>
           <div className="h-12 bg-black/5 border border-black/5 rounded-xl flex items-center px-5 font-black text-xs uppercase text-slate-900 group transition-all">
-            {from || 'Detecting...'}
+            {from || 'Analyzing Input...'}
             <Lock className="w-3 h-3 ml-auto text-primary/40 group-hover:text-primary transition-colors" />
           </div>
         </div>
@@ -58,17 +57,17 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange, i
           <ArrowRightLeft className="w-4 h-4 text-primary/40" />
         </div>
 
-        {/* TARGET PROTOCOL - EDITABLE */}
+        {/* OUTPUT PROTOCOL */}
         <div className="flex-1 w-full space-y-1.5 relative z-10">
-          <label className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-3">Target Node</label>
+          <label className="text-[10px] font-black uppercase tracking-widest text-slate-900 ml-3">Output Protocol</label>
           <Select value={to} onValueChange={onToChange}>
-            <SelectTrigger className="h-12 bg-white/60 border border-black/5 rounded-xl flex items-center px-5 font-black text-xs uppercase text-primary focus:ring-primary/20 shadow-sm transition-all hover:border-primary/20">
-              <SelectValue placeholder="SELECT OUTPUT" />
+            <SelectTrigger className="h-12 bg-white/60 border-black/5 rounded-xl flex items-center px-5 font-black text-xs uppercase text-slate-900 focus:ring-primary/20 shadow-sm transition-all hover:border-primary/20">
+              <SelectValue placeholder="SELECT TARGET" />
             </SelectTrigger>
             <SelectContent className="bg-white/95 backdrop-blur-xl border-black/5 max-h-[300px] rounded-xl shadow-2xl">
               {targets.map(t => (
-                <SelectItem key={t} value={t} className="text-[10px] font-black uppercase tracking-widest py-2.5">
-                  {t} Protocol
+                <SelectItem key={t} value={t} className="text-[10px] font-black uppercase tracking-widest py-2.5 text-slate-900">
+                  {t} Target
                 </SelectItem>
               ))}
             </SelectContent>
@@ -78,9 +77,7 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange, i
 
       {!isSourceLocked && quickPills.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 px-2">
-          <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2 mr-1">
-            Presets:
-          </span>
+          <span className="text-[9px] font-black text-slate-900 uppercase tracking-widest mr-1">Presets:</span>
           {quickPills.map(pill => (
             <button 
               key={pill}
@@ -89,7 +86,7 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange, i
                 onFromChange(f);
                 onToChange(t);
               }}
-              className="px-3 py-1 bg-white/40 border border-white/60 rounded-full text-[8px] font-bold text-muted-foreground hover:bg-primary hover:text-white transition-all uppercase tracking-widest shadow-sm"
+              className="px-3 py-1 bg-white/40 border border-white/60 rounded-full text-[9px] font-bold text-slate-900 hover:bg-primary hover:text-white transition-all uppercase tracking-widest shadow-sm"
             >
               {pill}
             </button>

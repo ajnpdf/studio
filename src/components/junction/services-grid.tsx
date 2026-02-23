@@ -107,10 +107,10 @@ export function ServicesGrid({ query, category }: { query: string, category: str
   if (filteredUnits.length === 0) {
     return (
       <div className="py-24 text-center space-y-4 opacity-40 animate-in fade-in duration-500">
-        <Cpu className="w-16 h-16 mx-auto text-muted-foreground" />
+        <Cpu className="w-16 h-16 mx-auto text-slate-900" />
         <div className="space-y-1">
-          <p className="text-sm font-black tracking-widest">No Unit Found</p>
-          <p className="text-[10px] font-bold text-muted-foreground tracking-widest">Re-calibrate search parameters</p>
+          <p className="text-sm font-black tracking-widest text-slate-900">No Unit Found</p>
+          <p className="text-[10px] font-bold text-slate-900 tracking-widest">Re-calibrate search parameters</p>
         </div>
       </div>
     );
@@ -128,7 +128,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
             <CardContent className="p-6 flex flex-col h-full">
               <div className="flex items-start justify-between mb-6">
                 <div className="w-12 h-12 bg-black/5 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500">
-                  <unit.icon className="w-6 h-6 text-slate-600 group-hover:text-primary transition-colors" />
+                  <unit.icon className="w-6 h-6 text-slate-900 group-hover:text-primary transition-colors" />
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
                   <Badge className={cn(
@@ -139,13 +139,13 @@ export function ServicesGrid({ query, category }: { query: string, category: str
                   )}>
                     {unit.complexity}
                   </Badge>
-                  <span className="text-[8px] font-black text-muted-foreground/40 tracking-widest">{unit.tag}</span>
+                  <span className="text-[8px] font-black text-slate-900/40 tracking-widest">{unit.tag}</span>
                 </div>
               </div>
 
               <div className="space-y-2 flex-1">
-                <h3 className="text-xs font-black tracking-tighter text-slate-800 group-hover:text-primary transition-colors">{unit.name}</h3>
-                <p className="text-[9px] text-muted-foreground leading-relaxed font-bold tracking-wider line-clamp-3 opacity-60 group-hover:opacity-100 transition-opacity">
+                <h3 className="text-xs font-black tracking-tighter text-slate-900 group-hover:text-primary transition-colors">{unit.name}</h3>
+                <p className="text-[9px] text-slate-900 leading-relaxed font-bold tracking-wider line-clamp-3 opacity-60 group-hover:opacity-100 transition-opacity">
                   {unit.desc}
                 </p>
               </div>
@@ -153,9 +153,9 @@ export function ServicesGrid({ query, category }: { query: string, category: str
               <div className="pt-4 flex items-center justify-between border-t border-black/5 mt-4">
                 <div className="flex items-center gap-1.5">
                   <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[7px] font-black text-muted-foreground tracking-widest">Ready</span>
+                  <span className="text-[7px] font-black text-slate-900 tracking-widest">Ready</span>
                 </div>
-                <span className="text-[7px] font-bold text-slate-400 tracking-widest">{unit.cat}</span>
+                <span className="text-[7px] font-bold text-slate-900/40 tracking-widest">{unit.cat}</span>
               </div>
             </CardContent>
           </Card>
