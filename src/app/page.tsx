@@ -1,12 +1,12 @@
 "use client";
 
+import { motion } from 'framer-motion';
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { ArrowRight, Layers, ShieldCheck, Heart, User, CheckCircle2 } from 'lucide-react';
-import { NightSky } from '@/components/dashboard/night-sky';
-import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
+import Link from 'next/link';
+import { ArrowRight, Layers, ShieldCheck, User, CheckCircle2 } from 'lucide-react';
+import { NightSky } from '@/components/dashboard/night-sky';
 
 /**
  * AJN Landing Page - High-Fidelity Professional Entrance
@@ -26,7 +26,7 @@ export default function LandingPage() {
           ))}
         </nav>
         <Link href="/ajn">
-          <Button variant="outline" className="h-10 border-black/10 bg-white/40 font-black text-[10px] tracking-widest rounded-xl">
+          <Button variant="outline" className="h-10 border-black/10 bg-white/40 font-black text-[10px] tracking-widest rounded-xl uppercase">
             Access Hub
           </Button>
         </Link>

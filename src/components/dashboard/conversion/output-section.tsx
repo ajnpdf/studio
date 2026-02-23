@@ -3,7 +3,7 @@
 import { OutputBuffer } from '@/lib/engine';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Share2, Trash2, CheckCircle2, FileCode, ExternalLink, Activity } from 'lucide-react';
+import { Download, Share2, Trash2, CheckCircle2, FileCode, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -84,7 +84,7 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1.5">
                         <h4 className="text-base font-black tracking-tight truncate text-slate-950 uppercase">{job.fileName}</h4>
-                        <Badge className="bg-emerald-500 text-white border-none text-[8px] font-black px-2 h-5 rounded-full tracking-widest">MASTERED</Badge>
+                        <Badge className="bg-emerald-500 text-white border-none text-[8px] font-black px-2.5 h-5 rounded-full tracking-widest">MASTERED</Badge>
                       </div>
                       <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">
                         {job.sizeFormatted} • Environment Secured

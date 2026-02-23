@@ -15,7 +15,7 @@ interface Star {
 /**
  * AJN Night Sky - Optimized for Light Background
  * Stars now twinkle with a violet glow over the platform gradient.
- * Robust hydration fix: Returns an empty div on server/initial client render.
+ * Robust hydration fix: Returns null on initial server/client pass to sync attributes.
  */
 export function NightSky() {
   const [stars, setStars] = useState<Star[]>([]);
@@ -36,7 +36,7 @@ export function NightSky() {
   }, []);
 
   if (!mounted) {
-    return <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-transparent" />;
+    return null;
   }
 
   return (
