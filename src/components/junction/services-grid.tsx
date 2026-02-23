@@ -37,7 +37,8 @@ import {
   Workflow,
   Sparkles,
   Zap,
-  Activity
+  Activity,
+  Maximize
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -50,38 +51,53 @@ export type ServiceUnit = {
   desc: string;
   icon: any;
   tag: string;
-  cat: 'Organize' | 'Optimize' | 'Convert' | 'Edit' | 'Security' | 'Intelligence';
-  complexity: 'System' | 'Smart' | 'Ai';
+  cat: 'Organize' | 'Optimize' | 'Convert' | 'Edit' | 'Security' | 'Intelligence' | 'Export';
+  mode: 'WASM' | 'SMART' | 'AI';
+  color: string;
 };
 
 export const ALL_UNITS: ServiceUnit[] = [
-  { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple documents and images into a single master document buffer.', icon: Layout, tag: 'Sequence', cat: 'Organize', complexity: 'System' },
-  { id: 'split-pdf', name: 'Split PDF', desc: 'Divide documents by ranges or auto-detected chapters into individual files.', icon: Scissors, tag: 'Divide', cat: 'Organize', complexity: 'System' },
-  { id: 'remove-pages', name: 'Remove Pages', desc: 'Prune unwanted pages and purge orphaned resources from the document tree.', icon: Trash2, tag: 'Prune', cat: 'Organize', complexity: 'System' },
-  { id: 'extract-pages', name: 'Extract Pages', desc: 'Isolate specific page ranges while maintaining full transparency groups.', icon: Copy, tag: 'Isolate', cat: 'Organize', complexity: 'Smart' },
-  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Restructure the document tree with high-fidelity visual management.', icon: Layout, tag: 'Tree', cat: 'Organize', complexity: 'Smart' },
-  { id: 'scan-to-pdf', name: 'Scan to PDF', desc: 'Capture prints via Camera API with adaptive shadow and skew removal.', icon: Scan, tag: 'Capture', cat: 'Optimize', complexity: 'System' },
-  { id: 'compress-pdf', name: 'Compress PDF', desc: 'Re-encode bitstreams and subset fonts for maximum storage efficiency.', icon: Shrink, tag: 'Minify', cat: 'Optimize', complexity: 'Smart' },
-  { id: 'repair-pdf', name: 'Repair PDF', desc: 'Execute deep byte-scans to recover objects from corrupted cross-reference tables.', icon: Wrench, tag: 'Recovery', cat: 'Optimize', complexity: 'Ai' },
-  { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Synthesize searchable text layers over raster scans using smart recognition.', icon: Search, tag: 'Vision', cat: 'Optimize', complexity: 'Ai' },
-  { id: 'word-pdf', name: 'Word to PDF', desc: 'Convert OOXML structures into pixel-perfect fixed-layout documents.', icon: FileText, tag: 'Office', cat: 'Convert', complexity: 'System' },
-  { id: 'pdf-word', name: 'PDF to Word', desc: 'Reconstruct paragraph hierarchies and editable runs from raw vectors.', icon: FileText, tag: 'Reconstruct', cat: 'Convert', complexity: 'Smart' },
-  { id: 'excel-pdf', name: 'Excel to PDF', desc: 'Map tabular grids into clean, coordinate-accurate document tables.', icon: Table, tag: 'Data', cat: 'Convert', complexity: 'Smart' },
-  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Extract grid data into structured spreadsheet workbooks with type inference.', icon: Table, tag: 'Grid', cat: 'Convert', complexity: 'Ai' },
-  { id: 'html-pdf', name: 'HTML to PDF', desc: 'Execute DOM-to-Vector rendering for professional web archiving.', icon: Code2, tag: 'Web', cat: 'Convert', complexity: 'Smart' },
-  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Directly modify text, image, and vector objects within the live stream.', icon: Edit3, tag: 'Mastery', cat: 'Edit', complexity: 'Smart' },
-  { id: 'watermark-pdf', name: 'Add Watermark', desc: 'Stamp identification text or image layers with precision opacity.', icon: Type, tag: 'Brand', cat: 'Edit', complexity: 'Smart' },
-  { id: 'page-numbers', name: 'Add Page Numbers', desc: 'Inject dynamic page indices into header or footer coordinate slots.', icon: Hash, tag: 'Indexing', cat: 'Edit', complexity: 'Smart' },
-  { id: 'protect-pdf', name: 'Protect PDF', desc: 'Seal documents with AES-256 encryption and custom permission flags.', icon: Lock, tag: 'Seal', cat: 'Security', complexity: 'Smart' },
-  { id: 'sign-pdf', name: 'Sign PDF', desc: 'Apply digital signatures with verified audit trails and integrity logs.', icon: PenTool, tag: 'Legal', cat: 'Security', complexity: 'Smart' },
-  { id: 'redact-pdf', name: 'Redact PDF', desc: 'Permanently purge sensitive data from both visual and binary layers.', icon: EyeOff, tag: 'Privacy', cat: 'Security', complexity: 'Ai' },
-  { id: 'digital-seal', name: 'Digital Seal', desc: 'Inject a cryptographic QR integrity seal into the document buffer.', icon: QrCode, tag: 'Integrity', cat: 'Security', complexity: 'Smart' },
-  { id: 'metadata-purge', name: 'Metadata Purge', desc: 'Systematically strip tracking and authorship metadata from file headers.', icon: ShieldX, tag: 'Cleanse', cat: 'Security', complexity: 'Smart' },
-  { id: 'translate-pdf', name: 'Translate PDF', desc: 'Map document content into 50+ languages while preserving layout.', icon: Globe, tag: 'Smart', cat: 'Intelligence', complexity: 'Ai' },
-  { id: 'summarize-pdf', name: 'Summarize PDF', desc: 'Generate structured executive briefs and key insights from documents.', icon: FileText, tag: 'Brief', cat: 'Intelligence', complexity: 'Ai' },
-  { id: 'ai-qa', name: 'AI Chat Q&A', desc: 'Engage in natural language dialogue with your document content.', icon: MessageSquare, tag: 'Dialogue', cat: 'Intelligence', complexity: 'Ai' },
-  { id: 'form-creator', name: 'Form Creator', desc: 'Develop interactive fillable forms with smart validation logic.', icon: CheckCircle2, tag: 'AcroForm', cat: 'Edit', complexity: 'Smart' },
-  { id: 'form-filler', name: 'Form Filler', desc: 'Auto-detect and populate existing form fields with session data.', icon: FileCode, tag: 'AutoFill', cat: 'Edit', complexity: 'Smart' },
+  // Organize
+  { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple files and images into a single master document buffer.', icon: Layout, tag: 'Sequence', cat: 'Organize', mode: 'WASM', color: '#3B82F6' },
+  { id: 'split-pdf', name: 'Split PDF', desc: 'Divide documents by ranges or auto-detected chapters into individual files.', icon: Scissors, tag: 'Divide', cat: 'Organize', mode: 'WASM', color: '#6366F1' },
+  { id: 'remove-pages', name: 'Remove Pages', desc: 'Prune unwanted pages and purge orphaned resources from the document tree.', icon: Trash2, tag: 'Prune', cat: 'Organize', mode: 'WASM', color: '#8B5CF6' },
+  { id: 'extract-pages', name: 'Extract Pages', desc: 'Isolate specific page ranges while maintaining full transparency groups.', icon: Copy, tag: 'Isolate', cat: 'Organize', mode: 'SMART', color: '#A78BFA' },
+  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Restructure the document tree with high-fidelity visual management.', icon: Layout, tag: 'Tree', cat: 'Organize', mode: 'SMART', color: '#7C3AED' },
+  { id: 'scan-to-pdf', name: 'Scan to PDF', desc: 'Capture prints via Camera API with adaptive shadow and skew removal.', icon: Scan, tag: 'Capture', cat: 'Organize', mode: 'WASM', color: '#5B21B6' },
+  
+  // Optimize
+  { id: 'compress-pdf', name: 'Compress PDF', desc: 'Re-encode bitstreams and subset fonts for maximum storage efficiency.', icon: Shrink, tag: 'Minify', cat: 'Optimize', mode: 'SMART', color: '#10B981' },
+  { id: 'repair-pdf', name: 'Repair PDF', desc: 'Execute deep byte-scans to recover objects from corrupted cross-reference tables.', icon: Wrench, tag: 'Recovery', cat: 'Optimize', mode: 'AI', color: '#059669' },
+  { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Synthesize searchable text layers over raster scans using smart recognition.', icon: Search, tag: 'Vision', cat: 'Optimize', mode: 'AI', color: '#047857' },
+  
+  // Convert TO
+  { id: 'word-pdf', name: 'Word to PDF', desc: 'Convert OOXML structures into pixel-perfect fixed-layout documents.', icon: FileText, tag: 'Office', cat: 'Convert', mode: 'WASM', color: '#F59E0B' },
+  { id: 'excel-pdf', name: 'Excel to PDF', desc: 'Map tabular grids into clean, coordinate-accurate document tables.', icon: Table, tag: 'Data', cat: 'Convert', mode: 'SMART', color: '#D97706' },
+  { id: 'html-pdf', name: 'HTML to PDF', desc: 'Execute DOM-to-Vector rendering for professional web archiving.', icon: Code2, tag: 'Web', cat: 'Convert', mode: 'WASM', color: '#B45309' },
+  { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Transform images into printable documents with precision margins.', icon: ImageIcon, tag: 'Imagery', cat: 'Convert', mode: 'WASM', color: '#92400E' },
+  
+  // Export FROM
+  { id: 'pdf-word', name: 'PDF to Word', desc: 'Reconstruct paragraph hierarchies and editable runs from raw vectors.', icon: FileText, tag: 'Reconstruct', cat: 'Export', mode: 'WASM', color: '#EF4444' },
+  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Extract grid data into structured spreadsheet workbooks with type inference.', icon: Table, tag: 'Grid', cat: 'Export', mode: 'SMART', color: '#DC2626' },
+  { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Export document pages as high-resolution imagery buffers.', icon: ImageIcon, tag: 'Export', cat: 'Export', mode: 'WASM', color: '#B91C1C' },
+  { id: 'pdf-a', name: 'PDF to PDF/A', desc: 'Standardize for ISO-compliant long-term archival storage.', icon: CheckCircle2, tag: 'Archive', cat: 'Export', mode: 'WASM', color: '#7F1D1D' },
+
+  // Edit
+  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Directly modify text, image, and vector objects within the live stream.', icon: Edit3, tag: 'Mastery', cat: 'Edit', mode: 'SMART', color: '#06B6D4' },
+  { id: 'watermark-pdf', name: 'Add Watermark', desc: 'Stamp identification text or image layers with precision opacity.', icon: Type, tag: 'Brand', cat: 'Edit', mode: 'WASM', color: '#0E7490' },
+  { id: 'page-numbers', name: 'Add Page Numbers', desc: 'Inject dynamic page indices into header or footer coordinate slots.', icon: Hash, tag: 'Indexing', cat: 'Edit', mode: 'SMART', color: '#0891B2' },
+  { id: 'crop-pdf', name: 'Crop PDF', desc: 'Adjust the visible canvas with a high-fidelity precision crop box.', icon: Maximize, tag: 'Canvas', cat: 'Edit', mode: 'SMART', color: '#155E75' },
+
+  // Security
+  { id: 'protect-pdf', name: 'Protect PDF', desc: 'Seal documents with AES-256 encryption and custom permission flags.', icon: Lock, tag: 'Seal', cat: 'Security', mode: 'SMART', color: '#F97316' },
+  { id: 'sign-pdf', name: 'Sign PDF', desc: 'Apply digital signatures with verified audit trails and integrity logs.', icon: PenTool, tag: 'Legal', cat: 'Security', mode: 'AI', color: '#EA580C' },
+  { id: 'redact-pdf', name: 'Redact PDF', desc: 'Permanently purge sensitive data from both visual and binary layers.', icon: EyeOff, tag: 'Privacy', cat: 'Security', mode: 'AI', color: '#C2410C' },
+  { id: 'compare-pdf', name: 'Compare PDF', desc: 'Detect semantic changes between different document versions.', icon: GitCompare, tag: 'Audit', cat: 'Security', mode: 'AI', color: '#9A3412' },
+
+  // Intelligence
+  { id: 'translate-pdf', name: 'Translate PDF', desc: 'Map document content into 50+ languages while preserving layout.', icon: Globe, tag: 'Smart', cat: 'Intelligence', mode: 'AI', color: '#EC4899' },
+  { id: 'summarize-pdf', name: 'Summarize PDF', desc: 'Generate structured executive briefs and key insights from documents.', icon: FileText, tag: 'Brief', cat: 'Intelligence', mode: 'AI', color: '#DB2777' },
+  { id: 'ai-qa', name: 'AI Chat Q&A', desc: 'Ask questions about document content in natural language.', icon: MessageSquare, tag: 'Dialogue', cat: 'Intelligence', mode: 'AI', color: '#BE185D' },
 ];
 
 const containerVariants = {
@@ -89,7 +105,7 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.08,
+      staggerChildren: 0.06,
       delayChildren: 0.1,
     }
   }
@@ -102,15 +118,14 @@ const cardVariants = {
     opacity: 1, 
     scale: 1,
     transition: {
-      type: "spring",
-      stiffness: 120,
-      damping: 16
+      duration: 0.55,
+      ease: [0.25, 1, 0.5, 1]
     }
   },
   exit: { 
     opacity: 0, 
     scale: 0.95, 
-    transition: { duration: 0.2 } 
+    transition: { duration: 0.25 } 
   }
 };
 
@@ -175,6 +190,14 @@ export function ServicesGrid({ query, category }: { query: string, category: str
                   </div>
                 </div>
                 
+                {/* Accent Glow */}
+                <motion.div
+                  className="absolute inset-0 pointer-events-none opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: `radial-gradient(circle at 50% 0%, ${unit.color}11 0%, transparent 70%)`
+                  }}
+                />
+
                 <CardContent className="p-8 flex flex-col h-full text-slate-950 relative z-10">
                   <div className="flex items-start justify-between mb-8">
                     <div className="w-16 h-16 bg-white/60 rounded-[1.5rem] flex items-center justify-center group-hover/card:scale-110 group-hover/card:bg-primary/10 transition-all duration-700 border-2 border-black/5 shadow-inner">
@@ -182,12 +205,12 @@ export function ServicesGrid({ query, category }: { query: string, category: str
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <Badge className={cn(
-                        "text-[9px] font-black h-5 px-2.5 border-none tracking-[0.2em] uppercase shadow-sm rounded-full",
-                        unit.complexity === 'System' ? "bg-emerald-500/10 text-emerald-600" :
-                        unit.complexity === 'Ai' ? "bg-primary/10 text-primary" :
-                        "bg-orange-500/10 text-orange-600"
+                        "text-[9px] font-black h-5 px-2.5 border tracking-[0.1em] uppercase shadow-sm rounded-full",
+                        unit.mode === 'WASM' ? "bg-blue-500/10 text-blue-600 border-blue-500/20" :
+                        unit.mode === 'AI' ? "bg-pink-500/10 text-pink-600 border-pink-500/20" :
+                        "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
                       )}>
-                        {unit.complexity}
+                        {unit.mode}
                       </Badge>
                       <span className="text-[10px] font-black text-slate-950/30 uppercase tracking-[0.3em]">{unit.tag}</span>
                     </div>
@@ -203,7 +226,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
                   <div className="pt-6 flex items-center justify-between border-t border-black/5 mt-8">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-[9px] font-black text-slate-950/60 uppercase tracking-widest">Instance Ready</span>
+                      <span className="text-[9px] font-black text-slate-950/60 uppercase tracking-widest">Engine Ready</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <Activity className="w-3 h-3 text-slate-950/20" />

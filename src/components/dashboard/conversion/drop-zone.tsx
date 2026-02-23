@@ -50,10 +50,19 @@ export function DropZone({ onFiles }: Props) {
         <input id="dropzone-input" type="file" multiple ref={inputRef} className="hidden" onChange={handleSelect} />
         
         {/* VENGEANCEUI CORNER BRACKETS */}
-        <div className="absolute top-10 left-10 w-12 h-12 border-t-4 border-l-4 border-black/10 group-hover:border-primary/40 transition-all duration-500" />
-        <div className="absolute top-10 right-10 w-12 h-12 border-t-4 border-r-4 border-black/10 group-hover:border-primary/40 transition-all duration-500" />
-        <div className="absolute bottom-10 left-10 w-12 h-12 border-b-4 border-l-4 border-black/10 group-hover:border-primary/40 transition-all duration-500" />
-        <div className="absolute bottom-10 right-10 w-12 h-12 border-b-4 border-r-4 border-black/10 group-hover:border-primary/40 transition-all duration-500" />
+        {[0, 1, 2, 3].map(i => (
+          <motion.div 
+            key={i}
+            animate={{ opacity: isDragging ? 1 : 0.3 }}
+            className="absolute w-12 h-12 border-primary border-solid border-0"
+            style={{
+              ...(i === 0 && { top: 32, left: 32, borderTopWidth: 4, borderLeftWidth: 4 }),
+              ...(i === 1 && { top: 32, right: 32, borderTopWidth: 4, borderRightWidth: 4 }),
+              ...(i === 2 && { bottom: 32, left: 32, borderBottomWidth: 4, borderLeftWidth: 4 }),
+              ...(i === 3 && { bottom: 32, right: 32, borderBottomWidth: 4, borderRightWidth: 4 }),
+            }}
+          />
+        ))}
 
         {/* DRAG-DETECT SCAN ANIMATION LAYER */}
         <AnimatePresence>
@@ -62,34 +71,37 @@ export function DropZone({ onFiles }: Props) {
               initial={{ y: "-100%", opacity: 0 }}
               animate={{ y: "100%", opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-              className="absolute inset-x-0 top-0 h-2 bg-primary/30 blur-md z-20"
+              transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+              className="absolute inset-x-0 top-0 h-1 bg-primary shadow-[0_0_20px_rgba(30,58,138,0.8)] z-20"
             />
           )}
         </AnimatePresence>
 
-        <div className={cn(
-          "w-24 h-24 bg-white text-black rounded-[2.5rem] flex items-center justify-center shadow-2xl transition-all duration-700 relative z-10 border-2 border-black/5",
-          isDragging ? "scale-125 rotate-12 bg-primary text-white border-primary/20" : "group-hover:scale-110 group-hover:-rotate-6"
-        )}>
+        <motion.div 
+          animate={{ scale: isDragging ? 1.2 : 1, rotate: isDragging ? 6 : 0 }}
+          className={cn(
+            "w-24 h-24 bg-white text-black rounded-[2.5rem] flex items-center justify-center shadow-2xl transition-all duration-700 relative z-10 border-2 border-black/5",
+            isDragging ? "bg-primary text-white border-primary/20" : "group-hover:scale-110 group-hover:-rotate-6"
+          )}
+        >
           <Upload className="w-10 h-10" />
-        </div>
+        </motion.div>
         
         <div className="mt-10 space-y-3 text-center relative z-10 px-12">
           <h3 className="text-3xl font-black tracking-tighter text-slate-950 uppercase leading-none">Drop Assets for Mastery</h3>
-          <p className="text-[11px] font-black text-slate-950/40 uppercase tracking-[0.4em]">Secure Hardware Sandbox</p>
+          <p className="text-[11px] font-black text-slate-950/40 uppercase tracking-[0.4em]">Secure Engineering Buffer</p>
         </div>
 
         {/* DECORATIVE BACKGROUND HUD */}
         <div className="absolute bottom-10 flex items-center gap-6 opacity-20 group-hover:opacity-40 transition-opacity">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span className="text-[9px] font-black uppercase tracking-widest">End-to-End Secure</span>
+            <span className="text-[9px] font-black uppercase tracking-widest">WASM Pipeline</span>
           </div>
           <div className="w-1 h-1 rounded-full bg-slate-950" />
           <div className="flex items-center gap-2">
             <Activity className="w-3.5 h-3.5" />
-            <span className="text-[9px] font-black uppercase tracking-widest">WASM Pipeline</span>
+            <span className="text-[9px] font-black uppercase tracking-widest">Real-Time Sync</span>
           </div>
         </div>
       </div>

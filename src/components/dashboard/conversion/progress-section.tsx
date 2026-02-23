@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 /**
  * AJN Progress Section — Master Architecture
  * High-fidelity HUD for real-time processing tracking.
+ * Implements Flip-Fade logs and sequential stage animation.
  */
 export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
   const [showLogs, setShowLogs] = useState<Record<string, boolean>>({});
@@ -54,10 +55,10 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           <p className="text-base font-black tracking-tighter truncate max-w-[320px] text-slate-950 uppercase">
-                            {job.inputs.length === 1 ? job.inputs[0].name : `Assembly Process`}
+                            {job.inputs.length === 1 ? job.inputs[0].name : `Asset Assembly Sequence`}
                           </p>
                           <Badge variant="outline" className="bg-black/5 text-slate-950/60 border-black/10 text-[9px] font-black h-5 px-2.5 tracking-widest uppercase rounded-full">
-                            Instance Ready
+                            {job.mode} ENGINE
                           </Badge>
                         </div>
                         <div className="flex items-center gap-3">
@@ -71,7 +72,7 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
                         <motion.div 
                           initial={{ width: 0 }}
                           animate={{ width: `${job.progress}%` }}
-                          transition={{ type: "spring", stiffness: 40, damping: 25 }}
+                          transition={{ duration: 0.5, ease: "easeOut" }}
                           className="absolute inset-y-0 left-0 bg-primary shadow-[0_0_20px_rgba(30,58,138,0.4)]"
                         />
                       </div>
@@ -79,10 +80,14 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
                       <div className="flex justify-between items-center pt-1">
                         <div className="flex items-center gap-4">
                           <div className="flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-full border border-primary/10">
-                            <span className="relative flex h-2 w-2">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                            <motion.span 
+                              animate={{ scale: [1, 1.2, 1], opacity: [1, 0.6, 1] }}
+                              transition={{ duration: 1.5, repeat: Infinity }}
+                              className="relative flex h-2 w-2"
+                            >
+                              <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                            </span>
+                            </motion.span>
                             <p className="text-[10px] font-black text-primary uppercase tracking-widest leading-none">
                               {job.stage}
                             </p>
@@ -124,12 +129,12 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
                         {job.logs.map((log, i) => (
                           <motion.div 
                             key={i}
-                            initial={{ opacity: 0, rotateX: -30, y: 10 }}
-                            animate={{ opacity: 1, rotateX: 0, y: 0 }}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.05 }}
                             className="flex gap-4 items-start"
                           >
-                            <span className="opacity-30 shrink-0 select-none">[{log.timestamp}]</span>
+                            <span className="opacity-30 shrink-0 select-none">[{String(log.ms).padStart(5, "0")}ms]</span>
                             <span className={cn(
                               "font-medium leading-relaxed",
                               log.level === 'error' ? 'text-red-400' : log.level === 'warn' ? 'text-yellow-400' : 'text-emerald-400'
@@ -139,7 +144,7 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
                           </motion.div>
                         ))}
                         <div className="flex gap-4 opacity-40">
-                          <span className="animate-pulse">_ system synchronizing binary buffer...</span>
+                          <span className="animate-pulse">_ engine synchronizing binary buffer...</span>
                         </div>
                       </motion.div>
                     )}

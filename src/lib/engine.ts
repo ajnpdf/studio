@@ -22,11 +22,12 @@ import { PDFManipulator } from './converters/pdf-manipulator';
  * Enforces high-fidelity processing with real-time logging and sequential mastery.
  */
 
-export type ExecutionMode = 'wasm' | 'smart' | 'ai';
+export type ExecutionMode = 'WASM' | 'SMART' | 'AI';
 export type JobStatus = 'queued' | 'running' | 'done' | 'failed' | 'cancelled';
 
 export interface LogEntry {
   timestamp: string;
+  ms: number;
   message: string;
   level: 'info' | 'warn' | 'error';
 }
@@ -55,6 +56,11 @@ export interface OutputBuffer {
   checksum: string;
   completedAt: number;
   toFmt: string;
+  stats: {
+    originalSize: string;
+    reduction: string;
+    time: string;
+  };
 }
 
 export interface ProcessingJob {
@@ -125,6 +131,7 @@ class SystemEngine {
   private addLog(job: ProcessingJob, message: string, level: LogEntry['level'] = 'info') {
     const entry: LogEntry = {
       timestamp: new Date().toLocaleTimeString(),
+      ms: Date.now() - job.startedAt,
       message,
       level
     };
@@ -140,7 +147,7 @@ class SystemEngine {
       const job: ProcessingJob = {
         id: Math.random().toString(36).substr(2, 9),
         toolId: toolId || 'merge-pdf',
-        mode: 'wasm',
+        mode: 'WASM',
         status: 'queued',
         progress: 0,
         stage: 'Calibrating Assembly System...',
@@ -216,8 +223,8 @@ class SystemEngine {
 
   private determineMode(toolId?: string): ExecutionMode {
     const aiTools = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'summarize-pdf', 'ai-qa'];
-    if (toolId && aiTools.includes(toolId)) return 'ai';
-    return 'wasm';
+    if (toolId && aiTools.includes(toolId)) return 'AI';
+    return 'WASM';
   }
 
   private async processNext() {
@@ -227,19 +234,25 @@ class SystemEngine {
 
     this.isProcessing = true;
     nextJob.status = 'running';
-    this.addLog(nextJob, "Executing multi-stage transformation...");
+    this.addLog(nextJob, `Loading ${nextJob.mode} engine module...`);
 
     try {
       let result;
+      const startTime = Date.now();
+
       if (nextJob.toolId === 'merge-pdf') {
         const manip = new PDFManipulator(nextJob.inputs.map(i => i.file), (p, m) => {
-          nextJob.progress = p;
+          nextJob.progress = Math.min(p, 99);
           this.addLog(nextJob, m);
         });
         result = await manip.merge();
       } else {
         result = await this.runTool(nextJob);
       }
+
+      const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+      const originalSize = nextJob.inputs.reduce((sum, f) => sum + f.size, 0);
+      const reduction = Math.max(0, Math.round(((originalSize - result.blob.size) / originalSize) * 100));
 
       const objectUrl = URL.createObjectURL(result.blob);
       const output: OutputBuffer = {
@@ -253,14 +266,19 @@ class SystemEngine {
         objectUrl,
         checksum: nextJob.id,
         completedAt: Date.now(),
-        toFmt: result.fileName.split('.').pop()?.toUpperCase() || 'PDF'
+        toFmt: result.fileName.split('.').pop()?.toUpperCase() || 'PDF',
+        stats: {
+          originalSize: (originalSize / (1024 * 1024)).toFixed(2) + ' MB',
+          reduction: `${reduction}%`,
+          time: `${duration}s`
+        }
       };
 
       nextJob.status = 'done';
       nextJob.progress = 100;
       nextJob.output = output;
       nextJob.completedAt = Date.now();
-      this.addLog(nextJob, "Process mastered successfully.");
+      this.addLog(nextJob, "Mastery cycle complete.");
 
       this.state.outputs.unshift(output);
       this.state.stats.totalMastered++;
@@ -278,7 +296,7 @@ class SystemEngine {
   private async runTool(job: ProcessingJob) {
     const file = job.inputs[0].file;
     const update = (p: number, m: string) => {
-      job.progress = p;
+      job.progress = Math.min(p, 99);
       this.addLog(job, m);
     };
 
@@ -310,7 +328,7 @@ class SystemEngine {
     
     const ConverterClass = this.converters[from] || this.converters['pdf'];
     const converter = new ConverterClass(file, (p: number, m: string) => {
-      job.progress = p;
+      job.progress = Math.min(p, 99);
       this.addLog(job, m);
     });
     return await converter.convertTo(to, job.settings);
