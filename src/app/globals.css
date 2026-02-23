@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --background: 275 75% 95%; /* Lavender base */
-    --foreground: 222 47% 5%; /* High-contrast black */
+    --foreground: 222 47% 5%; /* Deep slate black */
     --card: 0 0% 100% / 0.4;
     --card-foreground: 222 47% 5%;
     --popover: 0 0% 100%;
@@ -40,7 +40,14 @@
     background-size: 200% 200%;
     animation: gradientShift 12s ease infinite;
     position: relative;
-    @apply text-foreground font-body antialiased selection:bg-primary/10 selection:text-primary;
+    @apply text-slate-900 font-body antialiased selection:bg-primary/10 selection:text-primary;
+  }
+
+  /* Main gradient movement */
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
   /* Floating animated blobs */
@@ -73,12 +80,6 @@
     animation-duration: 22s;
     box-shadow: 0 0 200px rgba(255,255,255,0.2) inset;
   }
-}
-
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
 }
 
 @keyframes floatBlob {

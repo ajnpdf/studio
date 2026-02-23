@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 /**
  * AJN Tools Logo Animation
- * Updated to Navy Blue for a professional, high-fidelity brand presence.
+ * High-fidelity Navy Blue branding centerpiece.
  */
 export function LogoAnimation({ className, showGlow = true }: { className?: string, showGlow?: boolean }) {
   return (
@@ -77,7 +77,6 @@ export function LogoAnimation({ className, showGlow = true }: { className?: stri
           }
         }
 
-        /* Flowing gradient logic */
         #ajn-grad {
           animation: gradient-flow 5s linear infinite;
         }
@@ -87,7 +86,6 @@ export function LogoAnimation({ className, showGlow = true }: { className?: stri
           100% { transform: translateX(200px); }
         }
 
-        /* Ambient light movement */
         @keyframes bg-drift {
           0%, 100% { transform: translateY(-20px); }
           50% { transform: translateY(20px); }
@@ -96,7 +94,6 @@ export function LogoAnimation({ className, showGlow = true }: { className?: stri
           animation: bg-drift 10s ease-in-out infinite;
         }
 
-        /* Hover interactions */
         svg:hover .logo-path {
           stroke-width: 7;
           filter: drop-shadow(0 0 18px rgba(30, 58, 138, 0.9));
