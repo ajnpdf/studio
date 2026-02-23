@@ -19,7 +19,6 @@ import { PDFManipulator } from './converters/pdf-manipulator';
 /**
  * AJN MASTER ARCHITECTURE — CORE ENGINE
  * Stateful workflow orchestrator managing 45+ tools.
- * Enforces high-fidelity processing with real-time logging and sequential mastery.
  */
 
 export type ExecutionMode = 'WASM' | 'SMART' | 'AI';
@@ -100,17 +99,6 @@ class SystemEngine {
   private isProcessing: boolean = false;
   private listeners: Set<(state: GlobalAppState) => void> = new Set();
   private processedHashes: Set<string> = new Set();
-
-  private converters: Record<string, any> = {
-    pdf: PDFConverter, docx: WordConverter, doc: WordConverter,
-    xlsx: ExcelConverter, xls: ExcelConverter, csv: ExcelConverter,
-    pptx: PPTConverter, ppt: PPTConverter, odt: ODTConverter,
-    jpg: ImageConverter, jpeg: ImageConverter, png: ImageConverter, webp: ImageConverter,
-    mp4: VideoConverter, mp3: AudioConverter, zip: ArchiveConverter,
-    json: CodeConverter, html: CodeConverter, md: CodeConverter,
-    epub: EbookConverter, psd: DesignConverter, ai: DesignConverter,
-    stl: CADConverter, dxf: CADConverter
-  };
 
   subscribe(listener: (state: GlobalAppState) => void) {
     this.listeners.add(listener);
@@ -302,6 +290,8 @@ class SystemEngine {
 
     const manip = new PDFManipulator(file, update);
     const specialized = new SpecializedConverter(file, update);
+    const pdfConv = new PDFConverter(file, update);
+    const imgConv = new ImageConverter(file, update);
 
     switch (job.toolId) {
       case 'split-pdf':
@@ -318,12 +308,16 @@ class SystemEngine {
       case 'watermark': return manip.addWatermark(job.settings.text || 'AJN Master');
       case 'protect-pdf':
       case 'protect': return manip.protect(job.settings.password || '1234');
+      case 'unlock-pdf':
+      case 'unlock': return manip.unlock(job.settings.password || '');
+      case 'pdf-jpg':
+      case 'pdf2jpg': return pdfConv.convertTo('JPG', job.settings);
+      case 'jpg-pdf':
+      case 'jpg2pdf': return imgConv.convertTo('PDF', job.settings);
+      case 'ocr-pdf':
+      case 'ocr': return specialized.convertTo('OCR', job.settings);
       case 'redact-pdf':
       case 'redact': return specialized.convertTo('REDACTED_PDF', job.settings);
-      case 'summarize-pdf':
-      case 'summarize': return specialized.convertTo('TRANSCRIPT', job.settings);
-      case 'translate-pdf':
-      case 'translate': return specialized.convertTo('TRANSCRIPT', job.settings);
       default: return this.runConversion(job);
     }
   }
@@ -333,7 +327,15 @@ class SystemEngine {
     const from = job.inputs[0].format.toLowerCase();
     const to = job.settings.toFmt || 'PDF';
     
-    const ConverterClass = this.converters[from] || this.converters['pdf'];
+    // Dynamic routing to appropriate class
+    let ConverterClass;
+    if (['jpg', 'jpeg', 'png', 'webp'].includes(from)) ConverterClass = ImageConverter;
+    else if (from === 'pdf') ConverterClass = PDFConverter;
+    else if (['docx', 'doc'].includes(from)) ConverterClass = WordConverter;
+    else if (['xlsx', 'xls', 'csv'].includes(from)) ConverterClass = ExcelConverter;
+    else if (['pptx', 'ppt'].includes(from)) ConverterClass = PPTConverter;
+    else ConverterClass = PDFConverter;
+
     const converter = new ConverterClass(file, (p: number, m: string) => {
       job.progress = Math.min(p, 99);
       this.addLog(job, m);

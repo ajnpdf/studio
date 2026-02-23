@@ -1,6 +1,6 @@
 'use client';
 
-import { createWorker } from 'tesseract.js';
+import Tesseract from 'tesseract.js';
 import { PDFDocument, rgb } from 'pdf-lib';
 import { ProgressCallback, ConversionResult } from './pdf-converter';
 
@@ -27,9 +27,8 @@ export class SpecializedConverter {
 
     this.updateProgress(10, `Calibrating Specialized Tools Core...`);
 
-    if (target === 'SEARCHABLE_PDF') return this.toSearchablePdf(baseName);
+    if (target === 'SEARCHABLE_PDF' || target === 'OCR') return this.toSearchablePdf(baseName);
     if (target === 'REDACTED_PDF') return this.toRedactedPdf(baseName, settings.redactions || []);
-    if (target === 'TRANSCRIPT') return this.toTranscript(baseName);
     if (target === 'REPAIRED_PDF') return this.repairPdf(baseName);
 
     throw new Error(`Specialized tool ${target} not supported.`);
@@ -46,35 +45,39 @@ export class SpecializedConverter {
     };
   }
 
+  /**
+   * 12. OCR PDF (AI Tool Master Logic)
+   */
   private async toSearchablePdf(baseName: string): Promise<ConversionResult> {
-    this.updateProgress(20, "Initializing Smart OCR Engine...");
-    const worker = await createWorker('eng');
+    this.updateProgress(20, "Initializing Smart Vision Engine...");
     
-    const canvas = document.createElement('canvas');
-    const img = new Image();
-    img.src = URL.createObjectURL(this.file);
-    await new Promise(r => img.onload = r);
-    
-    canvas.width = img.width;
-    canvas.height = img.height;
-    const ctx = canvas.getContext('2d')!;
-    ctx.drawImage(img, 0, 0);
+    // Core Tesseract Logic
+    const { data } = await Tesseract.recognize(this.file, "eng", {
+      logger: m => {
+        if (m.status === 'recognizing text') {
+          this.updateProgress(20 + Math.round(m.progress * 70), "Neural character recognition in progress...");
+        }
+      }
+    });
 
-    const { data } = await worker.recognize(canvas);
-    this.updateProgress(80, "Synthesizing text layer...");
+    this.updateProgress(90, "Synthesizing searchable text layer...");
 
     const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([img.width, img.height]);
-    
-    const pdfImg = await pdfDoc.embedJpg(canvas.toDataURL('image/jpeg', 0.9));
-    page.drawImage(pdfImg, { x: 0, y: 0, width: img.width, height: img.height });
+    const page = pdfDoc.addPage();
+    const { width, height } = page.getSize();
 
-    await worker.terminate();
+    page.drawText(data.text, {
+      x: 50,
+      y: height - 100,
+      size: 10,
+      opacity: 0, // Searchable but invisible
+    });
+
     const pdfBytes = await pdfDoc.save();
 
     return {
       blob: new Blob([pdfBytes], { type: 'application/pdf' }),
-      fileName: `${baseName}_ocr.pdf`,
+      fileName: `${baseName}_Searchable.pdf`,
       mimeType: 'application/pdf'
     };
   }
@@ -100,16 +103,6 @@ export class SpecializedConverter {
       blob: new Blob([pdfBytes], { type: 'application/pdf' }),
       fileName: `${baseName}_redacted.pdf`,
       mimeType: 'application/pdf'
-    };
-  }
-
-  private async toTranscript(baseName: string): Promise<ConversionResult> {
-    this.updateProgress(50, "Executing Smart Translation Pass...");
-    await new Promise(r => setTimeout(r, 3000));
-    return {
-      blob: new Blob(['Translated content would be synthesized here.'], { type: 'text/plain' }),
-      fileName: `${baseName}_translated.txt`,
-      mimeType: 'text/plain'
     };
   }
 }

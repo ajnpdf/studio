@@ -1,6 +1,6 @@
 'use client';
 
-import UTIF from 'utif';
+import { PDFDocument } from 'pdf-lib';
 import { jsPDF } from 'jspdf';
 import { ProgressCallback, ConversionResult } from './pdf-converter';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
@@ -44,28 +44,49 @@ export class ImageConverter {
 
     this.updateProgress(10, `Initializing Neural Image Engine...`);
 
+    // SPECIAL: JPG TO PDF
+    if (target === 'PDF' && ['jpg', 'jpeg', 'png', 'webp'].includes(ext!)) {
+      return this.toPDF(baseName);
+    }
+
     // Routing Logic
     if (['jpg', 'jpeg', 'png', 'webp', 'avif', 'bmp'].includes(ext!)) {
       return this.handleCommonFormats(target, baseName, settings);
-    }
-
-    if (ext === 'heic' || ext === 'heif') {
-      return this.handleHeic(target, baseName, settings);
-    }
-
-    if (ext === 'tiff' || ext === 'tif') {
-      return this.handleTiff(target, baseName, settings);
     }
 
     if (ext === 'gif') {
       return this.handleGif(target, baseName, settings);
     }
 
-    if (ext === 'svg') {
-      return this.handleSvg(target, baseName, settings);
-    }
-
     throw new Error(`Format transformation ${ext?.toUpperCase()} -> ${target} not yet calibrated.`);
+  }
+
+  /**
+   * 10. JPG TO PDF (Master Logic)
+   */
+  private async toPDF(baseName: string): Promise<ConversionResult> {
+    this.updateProgress(20, "Creating master document buffer...");
+    const pdf = await PDFDocument.create();
+    const bytes = await this.file.arrayBuffer();
+
+    this.updateProgress(50, "Embedding raster layers...");
+    const image = await pdf.embedJpg(bytes);
+    const page = pdf.addPage([image.width, image.height]);
+
+    this.updateProgress(80, "Executing pixel-perfect render...");
+    page.drawImage(image, {
+      x: 0,
+      y: 0,
+      width: image.width,
+      height: image.height,
+    });
+
+    const newBytes = await pdf.save();
+    return {
+      blob: new Blob([newBytes], { type: "application/pdf" }),
+      fileName: `${baseName}.pdf`,
+      mimeType: "application/pdf"
+    };
   }
 
   private async handleCommonFormats(target: string, baseName: string, settings: any): Promise<ConversionResult> {
@@ -77,7 +98,6 @@ export class ImageConverter {
 
     this.updateProgress(40, `Processing ${canvas.width}x${canvas.height} pixel matrix...`);
 
-    // Handle transparency for non-alpha formats (JPG, BMP)
     if (['JPG', 'JPEG', 'BMP'].includes(target)) {
       ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -114,31 +134,6 @@ export class ImageConverter {
     return { blob, fileName: `${baseName}.${target.toLowerCase()}`, mimeType };
   }
 
-  private async handleTiff(target: string, baseName: string, settings: any): Promise<ConversionResult> {
-    this.updateProgress(20, "Parsing TIFF IFDs...");
-    const buffer = await this.file.arrayBuffer();
-    const ifds = UTIF.decode(buffer);
-    UTIF.decodeImage(buffer, ifds[0]);
-    const rgba = UTIF.toRGBA8(ifds[0]);
-
-    const canvas = document.createElement('canvas');
-    canvas.width = ifds[0].width;
-    canvas.height = ifds[0].height;
-    const ctx = canvas.getContext('2d')!;
-    const imgData = new ImageData(new Uint8ClampedArray(rgba), canvas.width, canvas.height);
-    ctx.putImageData(imgData, 0, 0);
-
-    return this.handleCommonFormats(target, baseName, settings);
-  }
-
-  private async handleHeic(target: string, baseName: string, settings: any): Promise<ConversionResult> {
-    this.updateProgress(20, "Loading libheif.js neural developer...");
-    // libheif fallback for prototype
-    await new Promise(r => setTimeout(r, 2000));
-    const img = await this.loadImage(this.file); // Browsers with native support
-    return this.handleCommonFormats(target, baseName, settings);
-  }
-
   private async handleGif(target: string, baseName: string, settings: any): Promise<ConversionResult> {
     if (target !== 'MP4' && target !== 'WEBP') {
       return this.handleCommonFormats(target, baseName, settings);
@@ -165,16 +160,6 @@ export class ImageConverter {
       fileName: `${baseName}.${target.toLowerCase()}`,
       mimeType: mime
     };
-  }
-
-  private async handleSvg(target: string, baseName: string, settings: any): Promise<ConversionResult> {
-    if (target === 'PDF') {
-      const img = await this.loadImage(this.file);
-      const pdf = new jsPDF(img.width > img.height ? 'l' : 'p', 'pt', [img.width, img.height]);
-      pdf.addImage(this.file.name, 'PNG', 0, 0, img.width, img.height);
-      return { blob: pdf.output('blob'), fileName: `${baseName}.pdf`, mimeType: 'application/pdf' };
-    }
-    return this.handleCommonFormats(target, baseName, settings);
   }
 
   private loadImage(file: File): Promise<HTMLImageElement> {

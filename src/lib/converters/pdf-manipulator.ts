@@ -232,4 +232,22 @@ export class PDFManipulator {
       mimeType: "application/pdf"
     };
   }
+
+  /**
+   * 9. UNLOCK PDF
+   */
+  async unlock(password: string): Promise<ConversionResult> {
+    this.updateProgress(20, "Breaking cryptographic seal...");
+    const bytes = await this.files[0].arrayBuffer();
+    const pdf = await PDFDocument.load(bytes, { password });
+
+    this.updateProgress(80, "Purging security restrictions...");
+    const newBytes = await pdf.save();
+    
+    return {
+      blob: new Blob([newBytes], { type: "application/pdf" }),
+      fileName: `Mastered_Unlocked.pdf`,
+      mimeType: "application/pdf"
+    };
+  }
 }
