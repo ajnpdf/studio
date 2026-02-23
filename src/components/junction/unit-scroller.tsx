@@ -15,13 +15,13 @@ export function UnitScroller() {
   const toolLogos = ALL_UNITS.map((unit) => (
     <div 
       key={unit.id} 
-      className="flex flex-col items-center gap-2.5 group cursor-pointer"
+      className="flex flex-col items-center gap-2 group cursor-pointer"
     >
       <div className="w-14 h-14 bg-white/40 backdrop-blur-2xl border border-black/5 rounded-xl flex items-center justify-center shadow-sm transition-all duration-500 group-hover:border-primary/40 group-hover:shadow-2xl group-hover:bg-white/60">
         <unit.icon className="w-6 h-6 text-slate-950 transition-transform duration-500 group-hover:scale-110" />
       </div>
       <div className="text-center">
-        <span className="text-[8px] font-black text-slate-950 uppercase tracking-[0.15em] group-hover:text-primary transition-colors block">
+        <span className="text-[8px] font-black text-slate-950 uppercase tracking-[0.1em] group-hover:text-primary transition-colors block leading-none">
           {unit.name}
         </span>
       </div>
@@ -30,12 +30,12 @@ export function UnitScroller() {
 
   // Ensure density for the marquee loop
   const extendedLogos = toolLogos.length < 40 
-    ? [...toolLogos, ...toolLogos, ...toolLogos].slice(0, 45) 
+    ? [...toolLogos, ...toolLogos, ...toolLogos]
     : toolLogos;
 
   return (
-    <div className="w-full py-2 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-8 mb-4">
+    <div className="w-full py-1 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-8 mb-2">
         <div className="h-px w-full bg-gradient-to-r from-transparent via-black/5 to-transparent" />
       </div>
       
@@ -46,7 +46,7 @@ export function UnitScroller() {
         pauseOnHover={true}
       />
 
-      <div className="max-w-7xl mx-auto px-8 mt-4">
+      <div className="max-w-7xl mx-auto px-8 mt-2">
         <div className="h-px w-full bg-gradient-to-r from-transparent via-black/5 to-transparent" />
       </div>
     </div>

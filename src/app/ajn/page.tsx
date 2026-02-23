@@ -46,9 +46,9 @@ export default function AJNPage() {
         </div>
       </header>
 
-      <main className="relative z-10 flex-1 p-6 pt-24 max-w-7xl mx-auto w-full space-y-12">
+      <main className="relative z-10 flex-1 p-6 pt-24 max-w-7xl mx-auto w-full space-y-8">
         {/* Top Search Sector */}
-        <section className="flex flex-col items-center gap-10">
+        <section className="flex flex-col items-center gap-8">
           <div className="w-full max-w-2xl relative group animate-in fade-in slide-in-from-top-8 duration-1000">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-[2rem] blur opacity-25 group-hover:opacity-100 transition duration-1000" />
             <div className="relative flex items-center bg-white/60 backdrop-blur-3xl border border-black/10 rounded-[2rem] overflow-hidden shadow-2xl transition-all hover:border-primary/40 focus-within:ring-4 focus-within:ring-primary/5">
@@ -67,7 +67,7 @@ export default function AJNPage() {
           </div>
 
           <div className="transition-all duration-1000 animate-in zoom-in-95">
-            <LogoAnimation className="w-64 h-28" />
+            <LogoAnimation className="w-48 h-20" />
           </div>
         </section>
 

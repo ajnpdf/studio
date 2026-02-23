@@ -28,12 +28,12 @@ export function LogoSlider({
 
   return (
     <div className={cn(
-      "relative w-full overflow-hidden py-4 select-none",
+      "relative w-full overflow-hidden py-2 select-none",
       className
     )}>
       {/* Professional Edge Fades - High Fidelity Masks */}
-      <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background via-background/80 to-transparent z-20 pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background via-background/80 to-transparent z-20 pointer-events-none" />
+      <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#e9cdfa] via-[#e9cdfa]/80 to-transparent z-20 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#c8e4f7] via-[#c8e4f7]/80 to-transparent z-20 pointer-events-none" />
 
       <div 
         className={cn(
