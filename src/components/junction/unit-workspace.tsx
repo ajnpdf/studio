@@ -6,7 +6,7 @@ import { FormatSelector } from '@/components/dashboard/conversion/format-selecto
 import { DropZone } from '@/components/dashboard/conversion/drop-zone';
 import { ProgressSection } from '@/components/dashboard/conversion/progress-section';
 import { OutputSection } from '@/components/dashboard/conversion/output-section';
-import { engine, ConversionJob } from '@/lib/engine';
+import { engine, GlobalAppState } from '@/lib/engine';
 import { 
   Menu,
   Lock,
@@ -25,13 +25,18 @@ import {
   Signature,
   EyeOff,
   GitCompare,
-  Trash2
+  Trash2,
+  GripVertical,
+  X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   defaultCategory: string;
@@ -39,17 +44,16 @@ interface Props {
 }
 
 /**
- * AJN Unit Workspace - End-to-End Real-Time Service Hub
- * Strictly Black Text, Proper Case, and Advanced Neural Parameters
+ * AJN UNIT WORKSPACE - CORE INTELLIGENCE LAYER
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
-  const [jobs, setJobs] = useState<ConversionJob[]>([]);
+  const [appState, setAppState] = useState<GlobalAppState | null>(null);
   const [activeCategory, setActiveCategory] = useState(defaultCategory);
   const [fromFmt, setFromFmt] = useState('');
   const [toFmt, setToFmt] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  // Advanced Contextual Parameters
+  // Advanced Parameters
   const [password, setPassword] = useState('');
   const [watermarkText, setWatermarkText] = useState('AJN Private');
   const [targetLang, setTargetLang] = useState('es');
@@ -58,8 +62,11 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [compressionLevel, setCompressionLevel] = useState(80);
 
   useEffect(() => {
-    if (!initialUnitId) return;
+    return engine.subscribe(setAppState);
+  }, []);
 
+  useEffect(() => {
+    if (!initialUnitId) return;
     if (initialUnitId.includes('-pdf')) {
       const from = initialUnitId.split('-')[0].toUpperCase();
       setFromFmt(from === 'MERGE' || from === 'SPLIT' || from === 'ORGANIZE' ? 'PDF' : from);
@@ -74,10 +81,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
     }
   }, [initialUnitId]);
 
-  useEffect(() => {
-    return engine.subscribe(setJobs);
-  }, []);
-
   const handleFilesAdded = (files: File[]) => {
     const settings = { 
       quality: compressionLevel,
@@ -90,8 +93,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
     engine.addJobs(files, fromFmt, toFmt, settings, initialUnitId);
   };
 
-  const activeJobs = jobs.filter(j => ['queued', 'processing'].includes(j.status));
-  const completedJobs = jobs.filter(j => j.status === 'complete');
+  if (!appState) return null;
 
   const hasControls = [
     'protect-pdf', 'split-pdf', 'extract-pages', 'remove-pages', 
@@ -101,13 +103,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
   return (
     <div className="flex h-full bg-transparent overflow-hidden relative font-body text-slate-950">
-      <button 
-        onClick={() => setMobileMenuOpen(true)}
-        className="lg:hidden fixed bottom-6 right-6 z-[70] w-12 h-12 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110"
-      >
-        <Menu className="w-6 h-6" />
-      </button>
-
       <div className={cn(
         "fixed inset-y-0 left-0 z-[80] lg:relative lg:z-0 lg:block transition-transform duration-500",
         mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
@@ -122,7 +117,39 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           <div className="p-4 md:p-10 space-y-8 max-w-4xl mx-auto pb-32">
             
-            {/* Contextual Advanced Parameters */}
+            {/* Merge UI — Drag-to-Reorder Interface */}
+            {initialUnitId === 'merge-pdf' && appState.activeFiles.length > 0 && (
+              <section className="space-y-4 animate-in slide-in-from-top-4 duration-500">
+                <div className="flex items-center justify-between px-1">
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black tracking-widest">WASM CONTEXT</Badge>
+                    <span className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Sequence Order</span>
+                  </div>
+                  <Button variant="ghost" size="sm" className="h-7 text-[9px] font-black text-slate-950/40 hover:text-slate-950 uppercase">Reverse Order</Button>
+                </div>
+                <div className="space-y-2">
+                  {appState.activeFiles.map((fb, idx) => (
+                    <Card key={fb.id} className="bg-white/40 border-white/60 shadow-sm group">
+                      <CardContent className="p-3 flex items-center gap-4">
+                        <GripVertical className="w-4 h-4 text-slate-950/20 cursor-grab active:cursor-grabbing" />
+                        <div className="w-10 h-10 bg-black/5 rounded-lg flex items-center justify-center font-black text-xs text-slate-950/40">
+                          {idx + 1}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-black truncate">{fb.metadata.name}</p>
+                          <p className="text-[9px] font-bold text-slate-950/40 uppercase">{fb.metadata.size} • {fb.metadata.format}</p>
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-950/20 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Neural Parameters */}
             {hasControls && (
               <section className="bg-white/40 border border-white/60 p-6 md:p-8 rounded-[2rem] animate-in fade-in slide-in-from-bottom-2 duration-700 shadow-xl backdrop-blur-xl">
                 <div className="flex items-center gap-3 mb-6 px-1">
@@ -142,7 +169,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           placeholder="Passphrase..." 
                           className="bg-white/60 border-black/5 h-11 pl-10 focus:ring-primary/20 rounded-xl font-bold text-slate-950"
                         />
-                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary transition-colors" />
+                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary" />
                       </div>
                     </div>
                   )}
@@ -157,7 +184,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           placeholder="e.g. 1, 3, 5-8" 
                           className="bg-white/60 border-black/5 h-11 pl-10 font-black rounded-xl focus:ring-primary/20 text-slate-950"
                         />
-                        <Scissors className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary transition-colors" />
+                        <Scissors className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary" />
                       </div>
                     </div>
                   )}
@@ -189,7 +216,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           placeholder="Enter text..." 
                           className="bg-white/60 border-black/5 h-11 pl-10 font-black rounded-xl focus:ring-primary/20 text-slate-950"
                         />
-                        <Type className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary transition-colors" />
+                        <Type className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary" />
                       </div>
                     </div>
                   )}
@@ -231,7 +258,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               </section>
             )}
 
-            {/* Protocol Control Hub */}
+            {/* Protocol Hub */}
             <FormatSelector 
               category={activeCategory} 
               from={fromFmt} 
@@ -241,17 +268,17 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               isSourceLocked={true}
             />
 
-            {/* Main Processing Buffer */}
+            {/* Ingestion Zone */}
             <DropZone onFiles={handleFilesAdded} />
 
-            {/* Real-time Processing Streams */}
-            {activeJobs.length > 0 && <ProgressSection jobs={activeJobs} />}
+            {/* Live Orchestration Streams */}
+            {appState.processingQueue.length > 0 && <ProgressSection jobs={appState.processingQueue} />}
 
-            {/* Final Mastering Layer */}
-            {completedJobs.length > 0 && (
+            {/* Final Distribution Layer */}
+            {appState.outputBuffer.length > 0 && (
               <OutputSection 
-                jobs={completedJobs} 
-                onPreview={(j) => console.log('Neural Inspect', j)} 
+                jobs={appState.outputBuffer} 
+                onPreview={(j) => console.log('Inspect Binary', j)} 
                 onClear={() => engine.clearQueue()} 
               />
             )}

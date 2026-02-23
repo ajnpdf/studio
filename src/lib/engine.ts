@@ -17,16 +17,37 @@ import { CADConverter } from './converters/cad-converter';
 import { SpecializedConverter } from './converters/specialized-converter';
 import { PDFManipulator } from './converters/pdf-manipulator';
 
+/**
+ * AJN SYSTEM IDENTITY - CORE INTELLIGENCE LAYER
+ * Stateful workflow orchestrator managing 35+ PDF tools.
+ */
+
+export type ProcessingContext = 'WASM' | 'SMART' | 'AI';
 export type JobStatus = 'queued' | 'processing' | 'complete' | 'failed' | 'cancelled';
+
+export interface FileBuffer {
+  id: string;
+  file: File;
+  fingerprint: string;
+  metadata: {
+    name: string;
+    size: string;
+    pageCount?: number;
+    thumbnail?: string;
+    format: string;
+  };
+}
 
 export interface ConversionJob {
   id: string;
+  fileId?: string;
   file: File;
   fromFmt: string;
   toFmt: string;
   status: JobStatus;
   progress: number;
   stage: string;
+  context: ProcessingContext;
   result?: {
     blob: Blob;
     fileName: string;
@@ -39,11 +60,28 @@ export interface ConversionJob {
   operationId?: string;
 }
 
+export interface GlobalAppState {
+  activeFiles: FileBuffer[];
+  processingQueue: ConversionJob[];
+  outputBuffer: ConversionJob[];
+  wasmModules: Record<string, boolean>;
+  networkStatus: 'online' | 'offline';
+  processingMode: 'wasm' | 'smart' | 'ai' | 'auto';
+}
+
 class ConversionEngine {
-  private queue: ConversionJob[] = [];
-  private activeJobs: number = 0;
+  private state: GlobalAppState = {
+    activeFiles: [],
+    processingQueue: [],
+    outputBuffer: [],
+    wasmModules: {},
+    networkStatus: 'online',
+    processingMode: 'auto'
+  };
+
+  private activeJobsCount: number = 0;
   private maxConcurrent: number = 3;
-  private listeners: Set<(jobs: ConversionJob[]) => void> = new Set();
+  private listeners: Set<(state: GlobalAppState) => void> = new Set();
 
   private converters: Record<string, any> = {
     pdf: PDFConverter,
@@ -64,46 +102,96 @@ class ConversionEngine {
     stl: CADConverter, obj: CADConverter, dxf: CADConverter
   };
 
-  subscribe(listener: (jobs: ConversionJob[]) => void) {
+  constructor() {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', () => this.updateNetworkStatus('online'));
+      window.addEventListener('offline', () => this.updateNetworkStatus('offline'));
+    }
+  }
+
+  private updateNetworkStatus(status: 'online' | 'offline') {
+    this.state.networkStatus = status;
+    this.notify();
+  }
+
+  subscribe(listener: (state: GlobalAppState) => void) {
     this.listeners.add(listener);
-    listener([...this.queue]);
+    listener({ ...this.state });
     return () => this.listeners.delete(listener);
   }
 
   private notify() {
-    this.listeners.forEach(l => l([...this.queue]));
+    this.listeners.forEach(l => l({ ...this.state }));
   }
 
-  addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, operationId?: string) {
-    const newJobs: ConversionJob[] = files.map(file => ({
+  private async generateFingerprint(file: File): Promise<string> {
+    const buffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, operationId?: string) {
+    const newFiles: FileBuffer[] = [];
+    
+    for (const file of files) {
+      const fingerprint = await this.generateFingerprint(file);
+      const fileBuffer: FileBuffer = {
+        id: Math.random().toString(36).substr(2, 9),
+        file,
+        fingerprint,
+        metadata: {
+          name: file.name,
+          size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+          format: file.name.split('.').pop()?.toUpperCase() || 'UNK'
+        }
+      };
+      newFiles.push(fileBuffer);
+    }
+
+    this.state.activeFiles = [...newFiles, ...this.state.activeFiles].slice(0, 50);
+
+    const newJobs: ConversionJob[] = newFiles.map(fb => ({
       id: Math.random().toString(36).substr(2, 9),
-      file,
-      fromFmt: fromFmt || file.name.split('.').pop()?.toLowerCase() || 'unk',
+      fileId: fb.id,
+      file: fb.file,
+      fromFmt: fromFmt || fb.metadata.format.toLowerCase(),
       toFmt: toFmt || 'PDF',
       status: 'queued',
       progress: 0,
-      stage: 'Initializing Neural Buffer...',
+      stage: 'Initializing neural buffer...',
+      context: this.determineContext(operationId),
       settings,
       operationId
     }));
 
-    this.queue = [...newJobs, ...this.queue];
+    this.state.processingQueue = [...newJobs, ...this.state.processingQueue];
     this.notify();
     this.processNext();
   }
 
+  private determineContext(opId?: string): ProcessingContext {
+    const aiOps = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'compare-pdf'];
+    const smartOps = ['repair-pdf', 'edit-pdf', 'sign-pdf', 'protect-pdf'];
+    if (opId && aiOps.includes(opId)) return 'AI';
+    if (opId && smartOps.includes(opId)) return 'SMART';
+    return 'WASM';
+  }
+
   private async processNext() {
-    if (this.activeJobs >= this.maxConcurrent) return;
-    const nextJob = this.queue.find(j => j.status === 'queued');
+    if (this.activeJobsCount >= this.maxConcurrent) return;
+    const nextJob = this.state.processingQueue.find(j => j.status === 'queued');
     if (!nextJob) return;
 
-    this.activeJobs++;
+    this.activeJobsCount++;
     nextJob.status = 'processing';
     this.notify();
 
     try {
       let result;
-      if (nextJob.operationId) {
+      if (nextJob.operationId === 'merge-pdf') {
+        result = await this.executeMerge(this.state.activeFiles.map(f => f.file), nextJob);
+      } else if (nextJob.operationId) {
         result = await this.runOperation(nextJob);
       } else {
         result = await this.runConversion(nextJob);
@@ -123,15 +211,25 @@ class ConversionEngine {
         size: (result.blob.size / (1024 * 1024)).toFixed(2) + ' MB',
         objectUrl
       };
+      
+      this.state.outputBuffer = [nextJob, ...this.state.outputBuffer];
     } catch (err: any) {
       nextJob.status = 'failed';
       nextJob.error = err.message || 'Error during unit execution';
       nextJob.stage = 'Internal Node Error';
     } finally {
-      this.activeJobs--;
+      this.activeJobsCount--;
+      this.state.processingQueue = this.state.processingQueue.filter(j => j.id !== nextJob.id);
       this.notify();
       this.processNext();
     }
+  }
+
+  private async executeMerge(files: File[], job: ConversionJob) {
+    const manip = new PDFManipulator(files, (p, msg) => {
+      job.progress = p; job.stage = msg; this.notify();
+    });
+    return manip.merge();
   }
 
   private async runOperation(job: ConversionJob) {
@@ -143,7 +241,6 @@ class ConversionEngine {
     });
 
     switch (job.operationId) {
-      case 'merge-pdf': return manip.merge();
       case 'split-pdf': 
       case 'extract-pages':
         return manip.split(job.settings.pages || [0]);
@@ -153,7 +250,6 @@ class ConversionEngine {
         this.notify();
         await new Promise(r => setTimeout(r, 1500));
         return manip.rotate(0);
-      
       case 'scan-to-pdf': return specialized.convertTo('SEARCHABLE_PDF');
       case 'compress-pdf': 
         job.stage = "Optimizing data streams...";
@@ -162,17 +258,10 @@ class ConversionEngine {
         return manip.rotate(0);
       case 'repair-pdf': return specialized.convertTo('REPAIRED_PDF');
       case 'ocr-pdf': return specialized.convertTo('SEARCHABLE_PDF');
-
       case 'rotate-pdf': return manip.rotate(job.settings.angle || 90);
       case 'page-numbers': return manip.addPageNumbers();
       case 'watermark-pdf': return manip.addWatermark(job.settings.text || 'AJN Pro');
       case 'crop-pdf': return manip.crop(job.settings.margins || { top: 50, bottom: 50, left: 50, right: 50 });
-      case 'edit-pdf': 
-        job.stage = "Injecting edit layer...";
-        this.notify();
-        await new Promise(r => setTimeout(r, 1500));
-        return manip.rotate(0);
-
       case 'unlock-pdf': 
         job.stage = "Bypassing protocol restrictions...";
         this.notify();
@@ -185,9 +274,7 @@ class ConversionEngine {
         this.notify();
         return specialized.convertTo('REDACTED_PDF', job.settings);
       case 'compare-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
-
       case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
-
       default: return this.runConversion(job);
     }
   }
@@ -203,13 +290,14 @@ class ConversionEngine {
   }
 
   cancelJob(id: string) {
-    const job = this.queue.find(j => j.id === id);
+    const job = this.state.processingQueue.find(j => j.id === id);
     if (job) { job.status = 'cancelled'; this.notify(); }
   }
 
   clearQueue() {
-    this.queue.forEach(j => { if (j.result?.objectUrl) URL.revokeObjectURL(j.result.objectUrl); });
-    this.queue = []; 
+    this.state.outputBuffer.forEach(j => { if (j.result?.objectUrl) URL.revokeObjectURL(j.result.objectUrl); });
+    this.state.outputBuffer = []; 
+    this.state.activeFiles = [];
     this.notify();
   }
 }
