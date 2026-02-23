@@ -15,7 +15,10 @@ import {
   RotateCw,
   Globe,
   Settings2,
-  ShieldCheck
+  ShieldCheck,
+  Zap,
+  Activity,
+  Workflow
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -29,8 +32,8 @@ interface Props {
 }
 
 /**
- * AJN Unit Workspace - Refined Light Professional Theme
- * Proper casing, reduced component sizes, and advanced modern layout.
+ * AJN Unit Workspace - Professional Overhaul
+ * Strictly Black Text, Proper Case, and High-Fidelity Logic
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [jobs, setJobs] = useState<ConversionJob[]>([]);
@@ -39,14 +42,13 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [toFmt, setToFmt] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  // Contextual Tool Settings
+  // Contextual Settings
   const [password, setPassword] = useState('');
-  const [watermarkText, setWatermarkText] = useState('AJN Tools');
+  const [watermarkText, setWatermarkText] = useState('AJN Pro');
   const [targetLang, setTargetLang] = useState('es');
   const [pageRange, setPageRange] = useState('1');
   const [rotateAngle, setRotateAngle] = useState('90');
   const [compressionLevel, setCompressionLevel] = useState(80);
-  const [margins, setMargins] = useState({ top: 50, bottom: 50, left: 50, right: 50 });
 
   useEffect(() => {
     if (!initialUnitId) return;
@@ -66,22 +68,18 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   }, [initialUnitId]);
 
   useEffect(() => {
-    return engine.subscribe((newJobs) => {
-      setJobs(newJobs);
-    });
+    return engine.subscribe(setJobs);
   }, []);
 
   const handleFilesAdded = (files: File[]) => {
-    const settings: any = { 
+    const settings = { 
       quality: compressionLevel,
       password,
       text: watermarkText,
       targetLang,
       angle: parseInt(rotateAngle),
-      pages: pageRange.split(',').map(p => parseInt(p.trim()) - 1).filter(p => !isNaN(p)),
-      margins
+      pages: pageRange.split(',').map(p => parseInt(p.trim()) - 1).filter(p => !isNaN(p))
     };
-
     engine.addJobs(files, fromFmt, toFmt, settings, initialUnitId);
   };
 
@@ -90,14 +88,14 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
   const hasControls = [
     'protect-pdf', 'split-pdf', 'extract-pages', 'remove-pages', 
-    'rotate-pdf', 'watermark-pdf', 'crop-pdf', 'translate-pdf', 'compress-pdf'
+    'rotate-pdf', 'watermark-pdf', 'translate-pdf', 'compress-pdf'
   ].includes(initialUnitId || '');
 
   return (
-    <div className="flex h-full bg-transparent overflow-hidden relative font-body">
+    <div className="flex h-full bg-transparent overflow-hidden relative font-body text-slate-950">
       <button 
         onClick={() => setMobileMenuOpen(true)}
-        className="lg:hidden fixed bottom-6 right-6 z-[70] w-12 h-12 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
+        className="lg:hidden fixed bottom-6 right-6 z-[70] w-12 h-12 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110"
       >
         <Menu className="w-6 h-6" />
       </button>
@@ -114,60 +112,60 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
       <main className="flex-1 flex flex-col min-w-0 border-r border-black/5 relative h-full">
         <div className="flex-1 overflow-y-auto scrollbar-hide">
-          <div className="p-4 md:p-10 space-y-6 md:space-y-8 max-w-4xl mx-auto pb-32">
+          <div className="p-4 md:p-10 space-y-8 max-w-4xl mx-auto pb-32">
             
             {/* Contextual Advanced Controls */}
             {hasControls && (
               <section className="bg-white/40 border border-white/60 p-6 md:p-8 rounded-[2rem] animate-in fade-in slide-in-from-bottom-2 duration-700 shadow-xl backdrop-blur-xl">
-                <div className="flex items-center gap-3 mb-6 opacity-60 px-1">
+                <div className="flex items-center gap-3 mb-6 px-1">
                   <Settings2 className="w-4 h-4 text-primary" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Protocol Adjustment</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">Unit Parameters</span>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {initialUnitId === 'protect-pdf' && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Master Password</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Seal Password</Label>
                       <div className="relative group">
                         <Input 
                           type="password" 
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Secret protocol key..." 
-                          className="bg-white/60 border-black/5 h-11 pl-10 focus:ring-primary/20 rounded-xl font-bold"
+                          placeholder="Cryptographic key..." 
+                          className="bg-white/60 border-black/5 h-11 pl-10 focus:ring-primary/20 rounded-xl font-bold text-slate-950"
                         />
-                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary transition-colors" />
                       </div>
                     </div>
                   )}
 
-                  {(initialUnitId === 'split-pdf' || initialUnitId === 'extract-pages' || initialUnitId === 'remove-pages') && (
+                  {(initialUnitId === 'split-pdf' || initialUnitId === 'extract-pages') && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Page Range</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Page Indices</Label>
                       <div className="relative group">
                         <Input 
                           value={pageRange}
                           onChange={(e) => setPageRange(e.target.value)}
                           placeholder="e.g. 1, 3, 5-8" 
-                          className="bg-white/60 border-black/5 h-11 pl-10 font-black rounded-xl focus:ring-primary/20"
+                          className="bg-white/60 border-black/5 h-11 pl-10 font-black rounded-xl focus:ring-primary/20 text-slate-950"
                         />
-                        <Scissors className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <Scissors className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary transition-colors" />
                       </div>
                     </div>
                   )}
 
                   {initialUnitId === 'rotate-pdf' && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Rotation Angle</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Rotation</Label>
                       <Select value={rotateAngle} onValueChange={setRotateAngle}>
-                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl focus:ring-primary/20">
+                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl focus:ring-primary/20 text-slate-950 font-bold">
                           <RotateCw className="w-3.5 h-3.5 mr-2 text-primary" />
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-white/95 backdrop-blur-xl border-black/5 rounded-xl">
-                          <SelectItem value="90" className="font-bold text-xs uppercase">90° Clockwise</SelectItem>
-                          <SelectItem value="180" className="font-bold text-xs uppercase">180° Inverse</SelectItem>
-                          <SelectItem value="270" className="font-bold text-xs uppercase">90° Counter</SelectItem>
+                          <SelectItem value="90" className="font-bold text-xs">90° Clockwise</SelectItem>
+                          <SelectItem value="180" className="font-bold text-xs">180° Invert</SelectItem>
+                          <SelectItem value="270" className="font-bold text-xs">90° Counter</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -175,32 +173,32 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
                   {initialUnitId === 'watermark-pdf' && (
                     <div className="space-y-2 md:col-span-2">
-                      <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Stamp Text</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Stamp Text</Label>
                       <div className="relative group">
                         <Input 
                           value={watermarkText}
                           onChange={(e) => setWatermarkText(e.target.value)}
-                          placeholder="Enter stamp content..." 
-                          className="bg-white/60 border-black/5 h-11 pl-10 font-black rounded-xl focus:ring-primary/20"
+                          placeholder="Enter neural stamp..." 
+                          className="bg-white/60 border-black/5 h-11 pl-10 font-black rounded-xl focus:ring-primary/20 text-slate-950"
                         />
-                        <Type className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <Type className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary transition-colors" />
                       </div>
                     </div>
                   )}
 
                   {initialUnitId === 'translate-pdf' && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Target Language</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest ml-1">Target Language</Label>
                       <Select value={targetLang} onValueChange={setTargetLang}>
-                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl focus:ring-primary/20">
+                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl focus:ring-primary/20 text-slate-950 font-bold">
                           <Globe className="w-3.5 h-3.5 mr-2 text-primary" />
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-white/95 backdrop-blur-xl border-black/5 rounded-xl">
-                          <SelectItem value="es" className="font-bold text-xs uppercase">Spanish (ES)</SelectItem>
-                          <SelectItem value="fr" className="font-bold text-xs uppercase">French (FR)</SelectItem>
-                          <SelectItem value="de" className="font-bold text-xs uppercase">German (DE)</SelectItem>
-                          <SelectItem value="jp" className="font-bold text-xs uppercase">Japanese (JP)</SelectItem>
+                          <SelectItem value="es" className="font-bold text-xs">Spanish</SelectItem>
+                          <SelectItem value="fr" className="font-bold text-xs">French</SelectItem>
+                          <SelectItem value="de" className="font-bold text-xs">German</SelectItem>
+                          <SelectItem value="jp" className="font-bold text-xs">Japanese</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -209,7 +207,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                   {initialUnitId === 'compress-pdf' && (
                     <div className="space-y-4 md:col-span-2">
                       <div className="flex justify-between items-center px-1">
-                        <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Efficiency Index</Label>
+                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Mastery Level</Label>
                         <span className="text-[10px] font-black text-primary">{compressionLevel}%</span>
                       </div>
                       <Slider 
@@ -225,7 +223,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               </section>
             )}
 
-            {/* Protocol HUB - Reduced size, locked source */}
+            {/* Protocol Control Hub */}
             <FormatSelector 
               category={activeCategory} 
               from={fromFmt} 
@@ -235,17 +233,17 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               isSourceLocked={true}
             />
 
-            {/* Processing Drop Zone */}
+            {/* Main Processing Entry */}
             <DropZone onFiles={handleFilesAdded} />
 
-            {/* Active Queue */}
+            {/* Real-time Task Streams */}
             {activeJobs.length > 0 && <ProgressSection jobs={activeJobs} />}
 
-            {/* Mastered Output */}
+            {/* Final Export Layer */}
             {completedJobs.length > 0 && (
               <OutputSection 
                 jobs={completedJobs} 
-                onPreview={(j) => console.log('Previewing Unit', j)} 
+                onPreview={(j) => console.log('Inspecting Unit', j)} 
                 onClear={() => engine.clearQueue()} 
               />
             )}

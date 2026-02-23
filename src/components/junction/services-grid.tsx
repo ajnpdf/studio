@@ -51,46 +51,46 @@ export type ServiceUnit = {
 
 export const ALL_UNITS: ServiceUnit[] = [
   // --- CORE PDF MANIPULATION ---
-  { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine PDFs in the order you want with the easiest PDF merger available.', icon: Merge, tag: 'CORE', cat: 'Document', complexity: 'WASM' },
-  { id: 'split-pdf', name: 'Split PDF', desc: 'Separate one page or a whole set for easy conversion into independent PDF files.', icon: Scissors, tag: 'CORE', cat: 'Document', complexity: 'WASM' },
-  { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce file size while optimizing for maximal PDF quality.', icon: Zap, tag: 'SMART', cat: 'Document', complexity: 'SMART' },
-  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Sort pages of your PDF file however you like. Delete or add PDF pages.', icon: Layout, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
-  { id: 'remove-pages', name: 'Remove Pages', desc: 'Delete unwanted pages from your document instantly.', icon: Trash2, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
-  { id: 'extract-pages', name: 'Extract Pages', desc: 'Pick specific pages and save them as a separate PDF.', icon: ExternalLink, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
+  { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple PDF documents into a single professional sequence.', icon: Merge, tag: 'CORE', cat: 'Document', complexity: 'WASM' },
+  { id: 'split-pdf', name: 'Split PDF', desc: 'Extract specific pages or segments into independent PDF files.', icon: Scissors, tag: 'CORE', cat: 'Document', complexity: 'WASM' },
+  { id: 'compress-pdf', name: 'Compress PDF', desc: 'Neural size optimization with maximum structural fidelity.', icon: Zap, tag: 'SMART', cat: 'Document', complexity: 'SMART' },
+  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Real-time page reordering, additions, and deletions.', icon: Layout, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
+  { id: 'remove-pages', name: 'Remove Pages', desc: 'Instantly purge unwanted pages from your document buffer.', icon: Trash2, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
+  { id: 'extract-pages', name: 'Extract Pages', desc: 'Isolate specific pages for targeted export and sharing.', icon: ExternalLink, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
   
   // --- CONVERT TO PDF ---
-  { id: 'word-pdf', name: 'Word to PDF', desc: 'Make DOC and DOCX files easy to read by converting them to PDF.', icon: FileText, tag: 'OOXML', cat: 'Document', complexity: 'WASM' },
-  { id: 'pptx-pdf', name: 'PowerPoint to PDF', desc: 'Make PPT and PPTX slideshows easy to view by converting them to PDF.', icon: Presentation, tag: 'OOXML', cat: 'Document', complexity: 'WASM' },
-  { id: 'excel-pdf', name: 'Excel to PDF', desc: 'Make EXCEL spreadsheets easy to read by converting them to PDF.', icon: Table, tag: 'OOXML', cat: 'Document', complexity: 'SMART' },
-  { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Convert JPG images to PDF in seconds. Easily adjust orientation and margins.', icon: ImageIcon, tag: 'IMAGE', cat: 'Document', complexity: 'WASM' },
-  { id: 'html-pdf', name: 'HTML to PDF', desc: 'Convert webpages in HTML to PDF with a single click.', icon: Code2, tag: 'WEB', cat: 'Document', complexity: 'SMART' },
+  { id: 'word-pdf', name: 'Word to PDF', desc: 'Convert DOC and DOCX files into professional A4 PDF documents.', icon: FileText, tag: 'OOXML', cat: 'Document', complexity: 'WASM' },
+  { id: 'pptx-pdf', name: 'PowerPoint to PDF', desc: 'Transform slide decks into highly-compatible read-only PDF format.', icon: Presentation, tag: 'OOXML', cat: 'Document', complexity: 'WASM' },
+  { id: 'excel-pdf', name: 'Excel to PDF', desc: 'Map spreadsheet grids into clean, printable PDF layouts.', icon: Table, tag: 'OOXML', cat: 'Document', complexity: 'SMART' },
+  { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Convert raster images to PDF with intelligent margin calibration.', icon: ImageIcon, tag: 'IMAGE', cat: 'Document', complexity: 'WASM' },
+  { id: 'html-pdf', name: 'HTML to PDF', desc: 'Render web pages and HTML files directly into vector PDF buffers.', icon: Code2, tag: 'WEB', cat: 'Document', complexity: 'SMART' },
 
   // --- CONVERT FROM PDF ---
-  { id: 'pdf-word', name: 'PDF to Word', desc: 'Easily convert your PDF files into easy to edit DOC and DOCX documents.', icon: FileText, tag: 'DOCX', cat: 'Document', complexity: 'WASM' },
-  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Pull data straight from PDFs into Excel spreadsheets.', icon: Table, tag: 'XLSX', cat: 'Document', complexity: 'SMART' },
-  { id: 'pdf-pptx', name: 'PDF to PowerPoint', desc: 'Turn your PDF files into easy to edit PPT and PPTX slideshows.', icon: Presentation, tag: 'PPTX', cat: 'Document', complexity: 'WASM' },
-  { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Convert each PDF page into a JPG or extract all images contained in a PDF.', icon: ImageIcon, tag: 'JPG', cat: 'Document', complexity: 'WASM' },
-  { id: 'pdf-pdfa', name: 'PDF to PDF/A', desc: 'ISO-standardized version for long-term archiving.', icon: ShieldCheck, tag: 'ISO', cat: 'Document', complexity: 'SMART' },
+  { id: 'pdf-word', name: 'PDF to Word', desc: 'Deconstruct PDF layers into editable DOCX document structures.', icon: FileText, tag: 'DOCX', cat: 'Document', complexity: 'WASM' },
+  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Detect and extract table data from PDF files into XLSX grids.', icon: Table, tag: 'XLSX', cat: 'Document', complexity: 'SMART' },
+  { id: 'pdf-pptx', name: 'PDF to PowerPoint', desc: 'Rebuild PDF pages as high-fidelity presentation slides.', icon: Presentation, tag: 'PPTX', cat: 'Document', complexity: 'WASM' },
+  { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Export PDF pages as high-resolution raster images.', icon: ImageIcon, tag: 'JPG', cat: 'Document', complexity: 'WASM' },
+  { id: 'pdf-pdfa', name: 'PDF to PDF/A', desc: 'Standardize documents for ISO-compliant long-term archiving.', icon: ShieldCheck, tag: 'ISO', cat: 'Document', complexity: 'SMART' },
 
   // --- EDIT & ANNOTATE ---
-  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Add text, images, shapes or freehand annotations to a PDF document.', icon: Wand2, tag: 'MASTER', cat: 'Document', complexity: 'WASM' },
-  { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Rotate your PDFs the way you need them. Even multiple PDFs at once.', icon: RotateCw, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
-  { id: 'page-numbers', name: 'Page Numbers', desc: 'Add page numbers into PDFs with ease.', icon: Hash, tag: 'TOOL', cat: 'Document', complexity: 'SMART' },
-  { id: 'watermark-pdf', name: 'Add Watermark', desc: 'Stamp an image or text over your PDF in seconds.', icon: Printer, tag: 'BRAND', cat: 'Document', complexity: 'SMART' },
-  { id: 'crop-pdf', name: 'Crop PDF', desc: 'Crop margins of PDF documents or select specific areas for one or all pages.', icon: Crop, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
+  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Real-time injection of text, shapes, and neural annotations.', icon: Wand2, tag: 'MASTER', cat: 'Document', complexity: 'WASM' },
+  { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Apply geometric rotation to pages across multiple documents.', icon: RotateCw, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
+  { id: 'page-numbers', name: 'Page Numbers', desc: 'Auto-sequence page indices with custom placement logic.', icon: Hash, tag: 'TOOL', cat: 'Document', complexity: 'SMART' },
+  { id: 'watermark-pdf', name: 'Add Watermark', desc: 'Stamp brand identity layers over PDF content buffers.', icon: Printer, tag: 'BRAND', cat: 'Document', complexity: 'SMART' },
+  { id: 'crop-pdf', name: 'Crop PDF', desc: 'Calibrate page margins and focal bounding boxes.', icon: Crop, tag: 'TOOL', cat: 'Document', complexity: 'WASM' },
 
   // --- SECURITY & TRUST ---
-  { id: 'unlock-pdf', name: 'Unlock PDF', desc: 'Remove PDF password security and permissions freedom.', icon: Unlock, tag: 'SECURE', cat: 'Document', complexity: 'WASM' },
-  { id: 'protect-pdf', name: 'Protect PDF', desc: 'Protect PDF files with a password and AES-256 encryption.', icon: Lock, tag: 'SECURE', cat: 'Document', complexity: 'WASM' },
-  { id: 'sign-pdf', name: 'Sign PDF', desc: 'Sign yourself or request electronic signatures from others.', icon: PenTool, tag: 'SECURE', cat: 'Document', complexity: 'WASM' },
+  { id: 'unlock-pdf', name: 'Unlock PDF', desc: 'Remove password protocols and permission restrictions.', icon: Unlock, tag: 'SECURE', cat: 'Document', complexity: 'WASM' },
+  { id: 'protect-pdf', name: 'Protect PDF', desc: 'Apply AES-256 cryptographic seals to sensitive files.', icon: Lock, tag: 'SECURE', cat: 'Document', complexity: 'WASM' },
+  { id: 'sign-pdf', name: 'Sign PDF', desc: 'Integrated E-Sign module for digital authorization workflows.', icon: PenTool, tag: 'SECURE', cat: 'Document', complexity: 'WASM' },
   
   // --- INTELLIGENCE & REPAIR ---
-  { id: 'repair-pdf', name: 'Repair PDF', desc: 'Repair a damaged PDF and recover data from corrupt PDF files.', icon: Hammer, tag: 'TOOL', cat: 'Document', complexity: 'SMART' },
-  { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Easily convert scanned PDF into searchable and selectable documents.', icon: Scan, tag: 'AI', cat: 'Document', complexity: 'AI' },
-  { id: 'compare-pdf', name: 'Compare PDF', desc: 'Side-by-side document comparison to spot changes.', icon: FileSearch, tag: 'PRO', cat: 'Document', complexity: 'AI' },
-  { id: 'redact-pdf', name: 'Redact PDF', desc: 'Permanently remove sensitive information from a PDF.', icon: ShieldAlert, tag: 'SECURE', cat: 'Document', complexity: 'AI' },
-  { id: 'translate-pdf', name: 'Translate PDF', desc: 'Easily translate PDF files powered by AI while keeping layout intact.', icon: Languages, tag: 'AI', cat: 'Document', complexity: 'AI' },
-  { id: 'scan-pdf', name: 'Scan to PDF', desc: 'Capture document scans from your mobile device directly to your browser.', icon: Camera, tag: 'MOBILE', cat: 'Document', complexity: 'SMART' },
+  { id: 'repair-pdf', name: 'Repair PDF', desc: 'Recover structural integrity from corrupted PDF stream data.', icon: Hammer, tag: 'TOOL', cat: 'Document', complexity: 'SMART' },
+  { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Convert raster scans into searchable neural text layers.', icon: Scan, tag: 'AI', cat: 'Document', complexity: 'AI' },
+  { id: 'compare-pdf', name: 'Compare PDF', desc: 'Identify semantic and visual differences between versions.', icon: FileSearch, tag: 'PRO', cat: 'Document', complexity: 'AI' },
+  { id: 'redact-pdf', name: 'Redact PDF', desc: 'Permanently purge sensitive data via cryptographic masking.', icon: ShieldAlert, tag: 'SECURE', cat: 'Document', complexity: 'AI' },
+  { id: 'translate-pdf', name: 'Translate PDF', desc: 'Neural language transformation while preserving document layout.', icon: Languages, tag: 'AI', cat: 'Document', complexity: 'AI' },
+  { id: 'scan-pdf', name: 'Scan to PDF', desc: 'Ingest mobile camera streams into digital PDF buffers.', icon: Camera, tag: 'MOBILE', cat: 'Document', complexity: 'SMART' },
 ];
 
 export function ServicesGrid({ query, category }: { query: string, category: string }) {
@@ -107,10 +107,10 @@ export function ServicesGrid({ query, category }: { query: string, category: str
   if (filteredUnits.length === 0) {
     return (
       <div className="py-24 text-center space-y-4 opacity-40 animate-in fade-in duration-500">
-        <Cpu className="w-16 h-16 mx-auto text-slate-900" />
+        <Cpu className="w-16 h-16 mx-auto text-slate-950" />
         <div className="space-y-1">
-          <p className="text-sm font-black tracking-widest text-slate-900">No Unit Found</p>
-          <p className="text-[10px] font-bold text-slate-900 tracking-widest">Re-calibrate search parameters</p>
+          <p className="text-sm font-black tracking-widest text-slate-950">Unit Not Found</p>
+          <p className="text-[10px] font-bold text-slate-950 tracking-widest">Adjust search parameters</p>
         </div>
       </div>
     );
@@ -127,8 +127,8 @@ export function ServicesGrid({ query, category }: { query: string, category: str
             
             <CardContent className="p-6 flex flex-col h-full">
               <div className="flex items-start justify-between mb-6">
-                <div className="w-12 h-12 bg-black/5 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500">
-                  <unit.icon className="w-6 h-6 text-slate-900 group-hover:text-primary transition-colors" />
+                <div className="w-12 h-12 bg-black/5 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500 border border-black/5">
+                  <unit.icon className="w-6 h-6 text-slate-950 group-hover:text-primary transition-colors" />
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
                   <Badge className={cn(
@@ -139,13 +139,13 @@ export function ServicesGrid({ query, category }: { query: string, category: str
                   )}>
                     {unit.complexity}
                   </Badge>
-                  <span className="text-[8px] font-black text-slate-900/40 tracking-widest">{unit.tag}</span>
+                  <span className="text-[8px] font-black text-slate-950/40 tracking-widest">{unit.tag}</span>
                 </div>
               </div>
 
               <div className="space-y-2 flex-1">
-                <h3 className="text-xs font-black tracking-tighter text-slate-900 group-hover:text-primary transition-colors">{unit.name}</h3>
-                <p className="text-[9px] text-slate-900 leading-relaxed font-bold tracking-wider line-clamp-3 opacity-60 group-hover:opacity-100 transition-opacity">
+                <h3 className="text-xs font-black tracking-tighter text-slate-950 group-hover:text-primary transition-colors leading-none">{unit.name}</h3>
+                <p className="text-[9px] text-slate-950 leading-relaxed font-bold tracking-wider line-clamp-3 opacity-60 group-hover:opacity-100 transition-opacity">
                   {unit.desc}
                 </p>
               </div>
@@ -153,9 +153,9 @@ export function ServicesGrid({ query, category }: { query: string, category: str
               <div className="pt-4 flex items-center justify-between border-t border-black/5 mt-4">
                 <div className="flex items-center gap-1.5">
                   <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[7px] font-black text-slate-900 tracking-widest">Ready</span>
+                  <span className="text-[7px] font-black text-slate-950 tracking-widest">Active Node</span>
                 </div>
-                <span className="text-[7px] font-bold text-slate-900/40 tracking-widest">{unit.cat}</span>
+                <span className="text-[7px] font-bold text-slate-950/40 tracking-widest">{unit.cat}</span>
               </div>
             </CardContent>
           </Card>

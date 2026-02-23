@@ -5,17 +5,17 @@
 @layer base {
   :root {
     --background: 275 75% 95%; /* Lavender base */
-    --foreground: 222 47% 5%; /* Deep slate black */
+    --foreground: 222 47% 2%; /* Deep Black/Slate */
     --card: 0 0% 100% / 0.4;
-    --card-foreground: 222 47% 5%;
+    --card-foreground: 222 47% 2%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 5%;
+    --popover-foreground: 222 47% 2%;
     --primary: 222 47% 25%; /* Navy Blue */
     --primary-foreground: 0 0% 100%;
     --secondary: 275 20% 92%;
-    --secondary-foreground: 222 47% 5%;
+    --secondary-foreground: 222 47% 2%;
     --muted: 275 20% 92%;
-    --muted-foreground: 275 10% 20%;
+    --muted-foreground: 222 47% 20%;
     --accent: 222 47% 25%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
@@ -40,7 +40,7 @@
     background-size: 200% 200%;
     animation: gradientShift 12s ease infinite;
     position: relative;
-    @apply text-slate-900 font-body antialiased selection:bg-primary/10 selection:text-primary;
+    @apply text-slate-950 font-body antialiased selection:bg-primary/10 selection:text-primary;
   }
 
   /* Main gradient movement */

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from 'react';
-import { ArrowRightLeft, Lock } from 'lucide-react';
+import { ArrowRightLeft, Lock, Workflow, Cpu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Select,
@@ -21,35 +21,36 @@ interface Props {
 }
 
 /**
- * AJN Format Selector - Advanced Input/Output Protocol Logic
+ * AJN Protocol Selector - Refined for High Contrast and Clarity
  */
 export function FormatSelector({ category, from, to, onFromChange, onToChange, isSourceLocked = false }: Props) {
   const targets = useMemo(() => {
-    if (from === 'PDF') return ['DOCX', 'DOC', 'XLSX', 'XLS', 'PPTX', 'PPT', 'JPG', 'PNG', 'WEBP', 'TIFF', 'TXT', 'RTF', 'HTML', 'EPUB', 'JSON', 'XML', 'CSV', 'MD'];
+    if (from === 'PDF') return ['DOCX', 'XLSX', 'PPTX', 'JPG', 'PNG', 'WEBP', 'TXT', 'HTML', 'EPUB', 'JSON', 'XML', 'MD'];
     if (['JPG', 'PNG', 'WEBP', 'HEIC', 'TIFF'].includes(from)) return ['PDF', 'JPG', 'PNG', 'WEBP'];
-    if (['DOCX', 'DOC', 'XLSX', 'XLS', 'PPTX', 'PPT'].includes(from)) return ['PDF'];
-    return ['PDF'];
+    if (['DOCX', 'XLSX', 'PPTX'].includes(from)) return ['PDF'];
+    return ['PDF', 'DOCX', 'XLSX', 'PPTX', 'JPG', 'PNG', 'WEBP'];
   }, [from]);
 
   const quickPills = useMemo(() => {
     if (isSourceLocked) return [];
-    if (category === 'Document') return ['PDF to DOCX', 'PDF to JPG', 'DOCX to PDF', 'XLSX to PDF'];
-    if (category === 'Image') return ['JPG to PNG', 'PNG to WebP', 'HEIC to JPG', 'SVG to PNG'];
-    if (category === 'Video') return ['MP4 to GIF', 'MP4 to MP3', 'MOV to MP4'];
+    if (category === 'Document') return ['PDF to DOCX', 'PDF to JPG', 'DOCX to PDF'];
+    if (category === 'Image') return ['JPG to PNG', 'PNG to WebP', 'HEIC to JPG'];
     return [];
   }, [category, isSourceLocked]);
 
   return (
-    <section className="space-y-4 animate-in slide-in-from-top-4 duration-500 w-full">
-      <div className="flex flex-col md:flex-row items-center gap-3 bg-white/40 p-5 rounded-[2rem] border border-white/60 shadow-xl relative overflow-hidden backdrop-blur-xl">
+    <section className="space-y-4 animate-in slide-in-from-top-4 duration-500 w-full text-slate-950">
+      <div className="flex flex-col md:flex-row items-center gap-3 bg-white/40 p-5 rounded-[2.5rem] border border-white/60 shadow-xl relative overflow-hidden backdrop-blur-xl">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent pointer-events-none" />
         
         {/* INPUT PROTOCOL */}
         <div className="flex-1 w-full space-y-1.5 relative z-10">
-          <label className="text-[10px] font-black uppercase tracking-widest text-slate-900 ml-3">Input Protocol</label>
-          <div className="h-12 bg-black/5 border border-black/5 rounded-xl flex items-center px-5 font-black text-xs uppercase text-slate-900 group transition-all">
-            {from || 'Analyzing Input...'}
-            <Lock className="w-3 h-3 ml-auto text-primary/40 group-hover:text-primary transition-colors" />
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-950 ml-4 flex items-center gap-2">
+            <Cpu className="w-3 h-3" /> Input Protocol
+          </label>
+          <div className="h-12 bg-black/5 border border-black/10 rounded-2xl flex items-center px-5 font-black text-xs uppercase text-slate-950 group transition-all">
+            {from || 'Identifying...'}
+            <Lock className="w-3.5 h-3.5 ml-auto text-primary/40 group-hover:text-primary transition-colors" />
           </div>
         </div>
 
@@ -59,15 +60,17 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange, i
 
         {/* OUTPUT PROTOCOL */}
         <div className="flex-1 w-full space-y-1.5 relative z-10">
-          <label className="text-[10px] font-black uppercase tracking-widest text-slate-900 ml-3">Output Protocol</label>
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-950 ml-4 flex items-center gap-2">
+            <Workflow className="w-3 h-3" /> Output Protocol
+          </label>
           <Select value={to} onValueChange={onToChange}>
-            <SelectTrigger className="h-12 bg-white/60 border-black/5 rounded-xl flex items-center px-5 font-black text-xs uppercase text-slate-900 focus:ring-primary/20 shadow-sm transition-all hover:border-primary/20">
-              <SelectValue placeholder="SELECT TARGET" />
+            <SelectTrigger className="h-12 bg-white/60 border-black/10 rounded-2xl flex items-center px-5 font-black text-xs uppercase text-slate-950 focus:ring-primary/20 shadow-sm transition-all hover:border-primary/40">
+              <SelectValue placeholder="Target Protocol" />
             </SelectTrigger>
-            <SelectContent className="bg-white/95 backdrop-blur-xl border-black/5 max-h-[300px] rounded-xl shadow-2xl">
+            <SelectContent className="bg-white/95 backdrop-blur-xl border-black/5 max-h-[300px] rounded-2xl shadow-2xl">
               {targets.map(t => (
-                <SelectItem key={t} value={t} className="text-[10px] font-black uppercase tracking-widest py-2.5 text-slate-900">
-                  {t} Target
+                <SelectItem key={t} value={t} className="text-[10px] font-black uppercase tracking-widest py-2.5 text-slate-950">
+                  {t} Protocol
                 </SelectItem>
               ))}
             </SelectContent>
@@ -76,8 +79,8 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange, i
       </div>
 
       {!isSourceLocked && quickPills.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 px-2">
-          <span className="text-[9px] font-black text-slate-900 uppercase tracking-widest mr-1">Presets:</span>
+        <div className="flex flex-wrap items-center gap-2 px-4">
+          <span className="text-[9px] font-black text-slate-950/40 uppercase tracking-widest mr-1">Presets:</span>
           {quickPills.map(pill => (
             <button 
               key={pill}
@@ -86,7 +89,7 @@ export function FormatSelector({ category, from, to, onFromChange, onToChange, i
                 onFromChange(f);
                 onToChange(t);
               }}
-              className="px-3 py-1 bg-white/40 border border-white/60 rounded-full text-[9px] font-bold text-slate-900 hover:bg-primary hover:text-white transition-all uppercase tracking-widest shadow-sm"
+              className="px-4 py-1.5 bg-white/40 border border-white/60 rounded-full text-[9px] font-bold text-slate-950 hover:bg-primary hover:text-white transition-all uppercase tracking-widest shadow-sm"
             >
               {pill}
             </button>
