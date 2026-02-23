@@ -2,13 +2,13 @@
 "use client";
 
 import { useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FileText, 
   ImageIcon, 
   Table, 
   Code2, 
   ArrowRight,
-  Presentation,
   Layout,
   Scissors,
   Trash2,
@@ -17,10 +17,8 @@ import {
   Shrink,
   Wrench,
   Search,
-  RotateCw,
   Hash,
   Type,
-  Crop,
   Edit3,
   Unlock,
   Lock,
@@ -30,14 +28,14 @@ import {
   Globe,
   QrCode,
   ShieldX,
-  Languages,
   MessageSquare,
   FileCode,
   Layers,
   History,
   CheckCircle2,
   Accessibility,
-  FolderOpen
+  FolderOpen,
+  Workflow
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -92,7 +90,7 @@ export const ALL_UNITS: ServiceUnit[] = [
   { id: 'summarize-pdf', name: 'Summarize PDF', desc: 'Generate structured executive briefs and key insights from documents.', icon: FileText, tag: 'Brief', cat: 'Intelligence', complexity: 'Ai' },
   { id: 'ai-qa', name: 'AI Chat Q&A', desc: 'Engage in natural language dialogue with your document content.', icon: MessageSquare, tag: 'Dialogue', cat: 'Intelligence', complexity: 'Ai' },
 
-  // --- Advanced Tools (31-45) ---
+  // --- Advanced Tools ---
   { id: 'form-creator', name: 'Form Creator', desc: 'Develop interactive fillable forms with smart validation logic.', icon: CheckCircle2, tag: 'AcroForm', cat: 'Edit', complexity: 'Smart' },
   { id: 'form-filler', name: 'Form Filler', desc: 'Auto-detect and populate existing form fields with session data.', icon: FileCode, tag: 'AutoFill', cat: 'Edit', complexity: 'Smart' },
   { id: 'pdf-to-text', name: 'PDF to Text', desc: 'Extract all textual content as structured Markdown or plain text.', icon: FileText, tag: 'Extract', cat: 'Convert', complexity: 'System' },
@@ -110,6 +108,32 @@ export const ALL_UNITS: ServiceUnit[] = [
   { id: 'version-manager', name: 'Version Manager', desc: 'Maintain and restore snapshots of your document history.', icon: History, tag: 'Snap', cat: 'Organize', complexity: 'Smart' },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.1,
+    }
+  }
+};
+
+const cardVariants = {
+  hidden: { y: 40, opacity: 0, scale: 0.95 },
+  visible: { 
+    y: 0, 
+    opacity: 1, 
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 12
+    }
+  },
+  exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } }
+};
+
 export function ServicesGrid({ query, category }: { query: string, category: string }) {
   const filteredUnits = useMemo(() => {
     return ALL_UNITS.filter(unit => {
@@ -120,6 +144,14 @@ export function ServicesGrid({ query, category }: { query: string, category: str
       return matchesSearch && matchesCategory;
     });
   }, [query, category]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+  };
 
   if (filteredUnits.length === 0) {
     return (
@@ -136,50 +168,69 @@ export function ServicesGrid({ query, category }: { query: string, category: str
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 pb-32">
-      {filteredUnits.map((unit) => (
-        <Link key={unit.id} href={`/tools/${unit.id}`}>
-          <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 hover:bg-white/60 transition-all duration-500 group cursor-pointer overflow-hidden border-2 relative backdrop-blur-xl shadow-sm">
-            <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-              <ArrowRight className="w-3 h-3 text-primary" />
-            </div>
-            
-            <CardContent className="p-6 flex flex-col h-full text-slate-950">
-              <div className="flex items-start justify-between mb-6">
-                <div className="w-12 h-12 bg-black/5 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500 border border-black/5">
-                  <unit.icon className="w-6 h-6 text-slate-950 group-hover:text-primary transition-colors" />
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-32"
+    >
+      <AnimatePresence mode="popLayout">
+        {filteredUnits.map((unit) => (
+          <motion.div
+            key={unit.id}
+            layout
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            onMouseMove={handleMouseMove}
+            className="group h-full"
+          >
+            <Link href={`/tools/${unit.id}`}>
+              <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 hover:bg-white/60 transition-all duration-500 cursor-pointer overflow-hidden border-2 relative backdrop-blur-xl shadow-sm glow-border">
+                <div className="scan-line opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0">
+                  <ArrowRight className="w-3 h-3 text-primary" />
                 </div>
-                <div className="flex flex-col items-end gap-1.5">
-                  <Badge className={cn(
-                    "text-[8px] font-black h-4 px-1.5 border-none tracking-widest uppercase",
-                    unit.complexity === 'System' ? "bg-emerald-500/10 text-emerald-600" :
-                    unit.complexity === 'Ai' ? "bg-primary/10 text-primary" :
-                    "bg-orange-500/10 text-orange-600"
-                  )}>
-                    {unit.complexity}
-                  </Badge>
-                  <span className="text-[9px] font-bold text-slate-900/40 uppercase">{unit.tag}</span>
-                </div>
-              </div>
+                
+                <CardContent className="p-6 flex flex-col h-full text-slate-950">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="w-12 h-12 bg-black/5 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500 border border-black/5">
+                      <unit.icon className="w-6 h-6 text-slate-950 group-hover:text-primary transition-colors" />
+                    </div>
+                    <div className="flex flex-col items-end gap-1.5">
+                      <Badge className={cn(
+                        "text-[8px] font-black h-4 px-1.5 border-none tracking-widest uppercase shadow-sm",
+                        unit.complexity === 'System' ? "bg-emerald-500/10 text-emerald-600" :
+                        unit.complexity === 'Ai' ? "bg-primary/10 text-primary" :
+                        "bg-orange-500/10 text-orange-600"
+                      )}>
+                        {unit.complexity}
+                      </Badge>
+                      <span className="text-[9px] font-bold text-slate-900/40 uppercase tracking-tighter">{unit.tag}</span>
+                    </div>
+                  </div>
 
-              <div className="space-y-2 flex-1">
-                <h3 className="text-sm font-black tracking-tighter group-hover:text-primary transition-colors leading-none uppercase">{unit.name}</h3>
-                <p className="text-[10px] leading-relaxed font-medium tracking-wide line-clamp-3 opacity-60 group-hover:opacity-100 transition-opacity uppercase">
-                  {unit.desc}
-                </p>
-              </div>
+                  <div className="space-y-2 flex-1">
+                    <h3 className="text-sm font-black tracking-tighter group-hover:text-primary transition-colors leading-none uppercase">{unit.name}</h3>
+                    <p className="text-[10px] leading-relaxed font-medium tracking-wide line-clamp-3 opacity-60 group-hover:opacity-100 transition-opacity uppercase">
+                      {unit.desc}
+                    </p>
+                  </div>
 
-              <div className="pt-4 flex items-center justify-between border-t border-black/5 mt-4">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[8px] font-bold text-slate-900/60 uppercase">System Active</span>
-                </div>
-                <span className="text-[8px] font-bold text-slate-900/40 uppercase">{unit.cat}</span>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-      ))}
-    </div>
+                  <div className="pt-4 flex items-center justify-between border-t border-black/5 mt-4">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[8px] font-bold text-slate-900/60 uppercase">System Active</span>
+                    </div>
+                    <span className="text-[8px] font-bold text-slate-900/40 uppercase tracking-widest">{unit.cat}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </motion.div>
   );
 }
