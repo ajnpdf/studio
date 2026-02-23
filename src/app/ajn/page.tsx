@@ -14,14 +14,8 @@ import {
   X,
   Layers,
   BrainCircuit,
-  Cpu,
-  Lock,
-  Globe,
-  Gauge,
   ArrowRight,
-  Activity,
-  Zap,
-  Network
+  Zap
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -39,17 +33,12 @@ const PDF_SERVICES = [
 ];
 
 const ALL_SERVICES = [
-  { id: 'pdf-docx', name: 'PDF to Word Master', desc: 'Reconstruct layouts via Smart OCR', cat: 'Document', icon: ShieldCheck, tag: 'WASM' },
+  { id: 'pdf-docx', name: 'PDF to Word Master', desc: 'Reconstruct layouts via Smart OCR', cat: 'Document', icon: FileText, tag: 'WASM' },
   { id: 'pdf-xlsx', name: 'PDF to Excel Grid', desc: 'Smart table detection & extraction', cat: 'Document', icon: Layers, tag: 'AI' },
   { id: 'img-webp', name: 'Universal WebP Transcode', desc: 'Lossless compression for web nodes', cat: 'Image', icon: ShieldCheck, tag: 'WASM' },
 ];
 
-const ADVANCED_FEATURES = [
-  { icon: BrainCircuit, title: "Neural Ingestion Core", desc: "High-fidelity data acquisition via distributed processing nodes." },
-  { icon: Zap, title: "Velocity Pipeline", desc: "High-throughput architecture optimized for mission-critical workloads." },
-  { icon: Lock, title: "Buffer Isolation", desc: "Ephemeral session-based security with 256-bit cryptographic anchoring." },
-  { icon: Network, title: "Protocol Mesh", desc: "Seamless semantic mapping across 300+ professional service units." }
-];
+import { FileText } from 'lucide-react';
 
 export default function AJNPage() {
   const [isDragging, setIsDragging] = useState(false);
@@ -112,14 +101,14 @@ export default function AJNPage() {
         
         <div className="flex items-center gap-2 md:gap-6">
           <Link href="/junction">
-            <Button variant="outline" className="h-8 md:h-9 border-black/10 bg-white/50 hover:bg-primary hover:text-white font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-xl transition-all gap-2 px-3 md:px-4 shadow-sm">
+            <Button variant="outline" className="h-8 md:h-9 border-black/10 bg-white/50 hover:bg-primary hover:text-white font-bold text-[10px] md:text-[11px] uppercase tracking-widest rounded-xl transition-all gap-2 px-3 md:px-4 shadow-sm">
               <Workflow className="w-3 md:w-3.5 h-3 md:h-3.5" /> <span className="hidden sm:inline">Services</span> Hub
             </Button>
           </Link>
           <div className="h-6 md:h-8 w-px bg-black/5 hidden sm:block" />
-          <div className="flex items-center gap-2 px-2 md:px-3 py-1 md:py-1.5 bg-white/5 rounded-xl border border-black/5">
-            <ShieldCheck className="w-3 md:w-3.5 h-3 md:h-3.5 text-emerald-600" />
-            <span className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest hidden xs:inline">STABLE PROTOCOL</span>
+          <div className="flex items-center gap-2 px-3 md:px-4 py-1.5 bg-white/5 rounded-xl border border-black/5">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="text-[9px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-widest hidden xs:inline">Stable Protocol</span>
           </div>
         </div>
       </header>
@@ -147,17 +136,17 @@ export default function AJNPage() {
                 {filteredServices.length > 0 ? (
                   <div className="grid grid-cols-1 gap-1 md:gap-2">
                     {filteredServices.map((s) => (
-                      <Link key={s.id} href={`/junction/units?cat=${s.cat}`} onClick={() => setShowSearch(false)}>
+                      <Link key={s.id} href={`/tools/${s.id}`} onClick={() => setShowSearch(false)}>
                         <div className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl hover:bg-primary/5 transition-all group cursor-pointer border border-transparent hover:border-primary/10">
                           <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                             <s.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                           </div>
                           <div className="flex-1 overflow-hidden">
                             <div className="flex items-center gap-2 md:gap-3">
-                              <h4 className="text-xs md:sm font-black uppercase tracking-tighter text-slate-800">{s.name}</h4>
+                              <h4 className="text-xs md:sm font-bold text-slate-800">{s.name}</h4>
                               <Badge className="bg-primary/10 text-primary border-none text-[7px] md:text-[8px] font-black">{s.tag}</Badge>
                             </div>
-                            <p className="text-[8px] md:text-[10px] text-muted-foreground font-bold uppercase tracking-widest truncate">{s.desc}</p>
+                            <p className="text-[10px] md:text-xs text-muted-foreground font-medium truncate">{s.desc}</p>
                           </div>
                           <ArrowRight className="w-3 h-3 md:w-4 h-4 text-black/10 group-hover:text-primary transition-colors" />
                         </div>
@@ -167,7 +156,7 @@ export default function AJNPage() {
                 ) : (
                   <div className="py-20 text-center space-y-4 opacity-40">
                     <Search className="w-12 h-12 mx-auto text-muted-foreground" />
-                    <p className="text-[10px] font-black uppercase tracking-widest">No matching service units</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest">No matching service units</p>
                   </div>
                 )}
               </div>
@@ -177,26 +166,27 @@ export default function AJNPage() {
       )}
 
       <main className="relative z-10 flex-1 flex flex-col items-center p-4 md:p-6 mt-24 md:mt-32">
-        {/* ADVANCED PDF SERVICE TICKER */}
-        <div className="w-full overflow-hidden mb-12 relative group">
-          <div className="flex animate-marquee-fast whitespace-nowrap gap-12 items-center mb-4">
-            {[...PDF_SERVICES, ...PDF_SERVICES].map((s, i) => (
-              <div key={i} className="flex items-center gap-4 bg-white/20 backdrop-blur-md px-6 py-2.5 rounded-full border border-black/5 shadow-sm">
-                <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(30,58,138,0.5)]" />
-                <span className="text-[10px] md:text-[12px] font-black text-slate-900 tracking-[0.2em] uppercase">{s}</span>
-              </div>
-            ))}
+        {/* GLOBAL SEARCH BOX */}
+        <div className="w-full max-w-2xl relative group animate-in fade-in slide-in-from-top-4 duration-1000 mb-12">
+          <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-[2.5rem] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
+          <div className="relative flex items-center bg-white/60 backdrop-blur-3xl border border-black/5 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all hover:border-primary/40">
+            <Search className="absolute left-6 md:left-8 w-6 h-6 text-primary" />
+            <input 
+              readOnly
+              onClick={() => setShowSearch(true)}
+              placeholder="Search 300+ service units..." 
+              className="w-full h-16 md:h-20 bg-transparent pl-16 md:pl-20 pr-24 text-base md:text-xl font-bold text-slate-900 placeholder:text-slate-900/30 cursor-pointer outline-none"
+            />
+            <div className="absolute right-6 md:right-8 flex items-center gap-2 px-3 py-1.5 bg-black/5 rounded-xl border border-black/5">
+              <Command className="w-3 h-3 text-muted-foreground" />
+              <span className="text-[10px] font-bold text-muted-foreground">K</span>
+            </div>
           </div>
-          <div className="flex animate-marquee-slow-reverse whitespace-nowrap gap-12 items-center opacity-40">
-            {[...PDF_SERVICES, ...PDF_SERVICES].reverse().map((s, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <span className="text-[9px] font-bold text-slate-600 tracking-[0.4em] uppercase">{s}</span>
-                <span className="w-1 h-1 rounded-full bg-slate-400" />
-              </div>
-            ))}
-          </div>
-          <div className="absolute inset-y-0 left-0 w-48 bg-gradient-to-r from-[#e9cdfa] via-[#e9cdfa]/80 to-transparent z-10" />
-          <div className="absolute inset-y-0 right-0 w-48 bg-gradient-to-l from-[#c8e4f7] via-[#c8e4f7]/80 to-transparent z-10" />
+        </div>
+
+        {/* AJN ANIMATION */}
+        <div className={cn("transition-all duration-700 mb-12", isDragging ? "scale-110" : "scale-100")}>
+          <LogoAnimation />
         </div>
 
         <div className={cn(
@@ -204,30 +194,7 @@ export default function AJNPage() {
           isProcessing || showSearch ? "scale-95 opacity-40 blur-sm" : "scale-100"
         )}>
           
-          {/* 1. LARGE GLOBAL SEARCH BOX - FIRST */}
-          <div className="w-full max-w-2xl relative group animate-in fade-in slide-in-from-top-4 duration-1000">
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-[2.5rem] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
-            <div className="relative flex items-center bg-white/60 backdrop-blur-3xl border border-black/5 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all hover:border-primary/40">
-              <Search className="absolute left-6 md:left-8 w-6 h-6 text-primary" />
-              <input 
-                readOnly
-                onClick={() => setShowSearch(true)}
-                placeholder="Search 300+ Service Units..." 
-                className="w-full h-16 md:h-20 bg-transparent pl-16 md:pl-20 pr-24 text-base md:text-xl font-black uppercase tracking-widest text-slate-900 placeholder:text-slate-900/30 cursor-pointer outline-none"
-              />
-              <div className="absolute right-6 md:right-8 flex items-center gap-2 px-3 py-1.5 bg-black/5 rounded-xl border border-black/5">
-                <Command className="w-3 h-3 text-muted-foreground" />
-                <span className="text-[10px] font-black text-muted-foreground">K</span>
-              </div>
-            </div>
-          </div>
-
-          {/* 2. AJN ANIMATION - MIDDLE */}
-          <div className={cn("transition-all duration-700", isDragging ? "scale-110" : "scale-100")}>
-            <LogoAnimation />
-          </div>
-
-          {/* 3. DROP ZONE Area */}
+          {/* DROP ZONE Area */}
           <div className="w-full max-w-2xl space-y-4">
             <div 
               onClick={() => fileInputRef.current?.click()}
@@ -246,17 +213,17 @@ export default function AJNPage() {
               </div>
 
               <div className="text-center space-y-2 md:space-y-3 px-6 md:px-8">
-                <h2 className="text-2xl md:text-4xl font-black tracking-tight text-slate-900 uppercase leading-none">Drop to Optimize</h2>
-                <p className="text-[8px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-60">Professional Smart Processing System</p>
+                <h2 className="text-2xl md:text-4xl font-bold tracking-tight text-slate-900 leading-none">Drop to Optimize</h2>
+                <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-[0.2em] md:tracking-[0.3em] opacity-60">Professional Smart Processing System</p>
               </div>
 
-              <div className="mt-8 md:mt-12 flex flex-wrap justify-center gap-4 md:gap-8 text-[8px] md:text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em]">
-                <span className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 md:w-3.5 md:h-3.5" /> Encrypted</span>
-                <span className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 md:w-3.5 md:h-3.5" /> Local</span>
+              <div className="mt-8 md:mt-12 flex flex-wrap justify-center gap-4 md:gap-8 text-[9px] md:text-[10px] font-bold uppercase text-muted-foreground/40 tracking-widest">
+                <span className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5" /> Encrypted</span>
+                <span className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5" /> Local</span>
               </div>
             </div>
             {/* Small Letters Hint */}
-            <div className="flex justify-center gap-6 text-[7px] font-black uppercase tracking-[0.4em] text-slate-900/30 animate-pulse">
+            <div className="flex justify-center gap-6 text-[8px] font-bold uppercase tracking-[0.3em] text-slate-900/30 animate-pulse">
               <span>Drag files here</span>
               <span>•</span>
               <span>Auto-detect format</span>
@@ -265,18 +232,27 @@ export default function AJNPage() {
             </div>
           </div>
 
-          {/* 4. PROFESSIONAL ADVANCED CAPABILITIES GRID */}
-          <section className="w-full max-w-5xl py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
-            {ADVANCED_FEATURES.map((f, i) => (
-              <div key={i} className="p-6 md:p-8 rounded-[2rem] bg-white/40 backdrop-blur-md border border-black/5 hover:border-primary/20 transition-all group shadow-sm">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <f.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+          {/* PDF SERVICE TICKER */}
+          <div className="w-full overflow-hidden mt-12 mb-20 relative group">
+            <div className="flex animate-marquee-fast whitespace-nowrap gap-12 items-center mb-4">
+              {[...PDF_SERVICES, ...PDF_SERVICES].map((s, i) => (
+                <div key={i} className="flex items-center gap-4 bg-white/30 backdrop-blur-md px-6 py-3 rounded-full border border-black/5 shadow-sm">
+                  <span className="w-2 h-2 rounded-full bg-primary/60" />
+                  <span className="text-[11px] md:text-[13px] font-bold text-slate-800 tracking-wider">{s}</span>
                 </div>
-                <h3 className="text-xs md:text-sm font-black uppercase tracking-widest text-slate-900 mb-3">{f.title}</h3>
-                <p className="text-[10px] md:text-xs text-muted-foreground font-bold leading-relaxed uppercase tracking-wider opacity-60">{f.desc}</p>
-              </div>
-            ))}
-          </section>
+              ))}
+            </div>
+            <div className="flex animate-marquee-slow-reverse whitespace-nowrap gap-12 items-center opacity-30">
+              {[...PDF_SERVICES, ...PDF_SERVICES].reverse().map((s, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <span className="text-[10px] font-medium text-slate-600 tracking-wide">{s}</span>
+                  <span className="w-1 h-1 rounded-full bg-slate-400" />
+                </div>
+              ))}
+            </div>
+            <div className="absolute inset-y-0 left-0 w-48 bg-gradient-to-r from-[#e9cdfa] via-[#e9cdfa]/80 to-transparent z-10" />
+            <div className="absolute inset-y-0 right-0 w-48 bg-gradient-to-l from-[#c8e4f7] via-[#c8e4f7]/80 to-transparent z-10" />
+          </div>
         </div>
 
         {/* PROCESSING OVERLAY */}
@@ -291,13 +267,13 @@ export default function AJNPage() {
 
               <div className="space-y-4 md:space-y-6">
                 <div className="space-y-1">
-                  <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-slate-900 italic">Processing Engine</h2>
-                  <p className="text-[8px] md:text-[10px] font-black text-primary uppercase tracking-widest truncate max-w-[200px] mx-auto">{fileMeta?.name}</p>
+                  <h2 className="text-xl md:text-2xl font-bold text-slate-900">Processing Engine</h2>
+                  <p className="text-[10px] md:text-xs font-bold text-primary uppercase tracking-widest truncate max-w-[200px] mx-auto">{fileMeta?.name}</p>
                 </div>
                 
                 <div className="space-y-3">
-                  <div className="flex justify-between text-[8px] md:text-[10px] font-black uppercase text-muted-foreground px-1 tracking-widest">
-                    <span>{progress}% SYNCHRONIZED</span>
+                  <div className="flex justify-between text-[10px] font-bold uppercase text-muted-foreground px-1 tracking-widest">
+                    <span>{progress}% Synchronized</span>
                     <span>{fileMeta?.size}</span>
                   </div>
                   <div className="h-1.5 w-full bg-black/5 rounded-full overflow-hidden border border-black/5">
@@ -312,8 +288,8 @@ export default function AJNPage() {
           </div>
         )}
 
-        <footer className="py-8 text-[8px] md:text-[9px] font-black text-slate-900/20 uppercase tracking-[0.3em] md:tracking-[0.5em] mt-auto">
-          AJN JUNCTION • GLOBAL NODE • 2025
+        <footer className="py-8 text-[9px] md:text-[10px] font-bold text-slate-900/20 uppercase tracking-[0.4em] mt-auto">
+          AJN Junction • Global Node • 2025
         </footer>
       </main>
 
