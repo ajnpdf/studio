@@ -18,7 +18,10 @@ import {
   Lock,
   Globe,
   Gauge,
-  ArrowRight
+  ArrowRight,
+  Activity,
+  Zap,
+  Network
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -41,11 +44,11 @@ const ALL_SERVICES = [
   { id: 'img-webp', name: 'Universal WebP Transcode', desc: 'Lossless compression for web nodes', cat: 'Image', icon: ShieldCheck, tag: 'WASM' },
 ];
 
-const FEATURES = [
-  { icon: Cpu, title: "Local WASM Core", desc: "Process sensitive data 100% locally in your browser sandbox." },
-  { icon: Gauge, title: "Smart Concurrency", desc: "Parallel processing slots for high-volume batch workloads." },
-  { icon: Lock, title: "Vault Security", desc: "End-to-end 256-bit encryption for every session file." },
-  { icon: Globe, title: "Universal Interop", desc: "Seamless transformation across 300+ professional formats." }
+const ADVANCED_FEATURES = [
+  { icon: BrainCircuit, title: "Neural Ingestion Core", desc: "High-fidelity data acquisition via distributed processing nodes." },
+  { icon: Zap, title: "Velocity Pipeline", desc: "High-throughput architecture optimized for mission-critical workloads." },
+  { icon: Lock, title: "Buffer Isolation", desc: "Ephemeral session-based security with 256-bit cryptographic anchoring." },
+  { icon: Network, title: "Protocol Mesh", desc: "Seamless semantic mapping across 300+ professional service units." }
 ];
 
 export default function AJNPage() {
@@ -114,7 +117,7 @@ export default function AJNPage() {
             </Button>
           </Link>
           <div className="h-6 md:h-8 w-px bg-black/5 hidden sm:block" />
-          <div className="flex items-center gap-2 px-2 md:px-3 py-1 md:py-1.5 bg-white/50 rounded-xl border border-black/5">
+          <div className="flex items-center gap-2 px-2 md:px-3 py-1 md:py-1.5 bg-white/5 rounded-xl border border-black/5">
             <ShieldCheck className="w-3 md:w-3.5 h-3 md:h-3.5 text-emerald-600" />
             <span className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest hidden xs:inline">STABLE PROTOCOL</span>
           </div>
@@ -262,9 +265,9 @@ export default function AJNPage() {
             </div>
           </div>
 
-          {/* 4. PROFESSIONAL CAPABILITIES GRID */}
+          {/* 4. PROFESSIONAL ADVANCED CAPABILITIES GRID */}
           <section className="w-full max-w-5xl py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
-            {FEATURES.map((f, i) => (
+            {ADVANCED_FEATURES.map((f, i) => (
               <div key={i} className="p-6 md:p-8 rounded-[2rem] bg-white/40 backdrop-blur-md border border-black/5 hover:border-primary/20 transition-all group shadow-sm">
                 <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <f.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
