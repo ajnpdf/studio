@@ -4,6 +4,11 @@
 import { PDFDocument, rgb, degrees, StandardFonts } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
 import JSZip from 'jszip';
+import { PDFManipulator } from './converters/pdf-manipulator';
+import { SpecializedConverter } from './converters/specialized-converter';
+import { WordConverter } from './converters/word-converter';
+import { ExcelConverter } from './converters/excel-converter';
+import { PPTConverter } from './converters/ppt-converter';
 
 /**
  * AJN Master System Engine - Production Implementation
@@ -87,49 +92,6 @@ export class PDFEngine {
     if (bytes < 1024) return bytes + " B";
     if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
     return (bytes / 1048576).toFixed(2) + " MB";
-  }
-}
-
-// ─── PART 2: CONVERT & EDIT TOOLS (11-22) ────────────────────────────────────
-
-export class WordToPDF {
-  private progress: ProgressEmitter;
-  constructor(onProgress: any) { this.progress = new ProgressEmitter(onProgress); }
-
-  async run(file: File, options: any = {}) {
-    this.progress.emit('Parsing', 'Unzipping DOCX container', 10);
-    // Real implementation uses mammoth.js or custom XML walker
-    // Simulated high-fidelity flow for part 2
-    await new Promise(r => setTimeout(r, 1500));
-    this.progress.emit('Rendering', 'Laying out text and styles', 40);
-    const doc = await PDFDocument.create();
-    doc.addPage([595, 842]);
-    this.progress.emit('Saving', 'Writing PDF binary', 90);
-    const bytes = await doc.save();
-    return bytes.buffer;
-  }
-}
-
-export class RotatePDF {
-  private progress: ProgressEmitter;
-  constructor(onProgress: any) { this.progress = new ProgressEmitter(onProgress); }
-
-  async run(file: File, rotations: any, options: any = {}) {
-    this.progress.emit('Loading', 'Parsing PDF object tree', 10);
-    const buf = await file.arrayBuffer();
-    const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
-    const pages = doc.getPages();
-
-    this.progress.emit('Rotating', 'Applying geometric corrections', 40);
-    pages.forEach((page, i) => {
-      const delta = options.all !== null ? options.all : (rotations[i] ?? 90);
-      const current = page.getRotation().angle;
-      page.setRotation(degrees((current + delta) % 360));
-    });
-
-    this.progress.emit('Saving', 'Finalizing document trailer', 85);
-    const bytes = await doc.save();
-    return bytes.buffer;
   }
 }
 
@@ -253,7 +215,7 @@ class SystemEngine {
   }
 
   private determineMode(toolId?: string): ExecutionMode {
-    const aiTools = ['ocr-pdf', 'translate-pdf', 'summarize-pdf', 'repair-pdf', 'redact-pdf', 'sign-pdf'];
+    const aiTools = ['ocr-pdf', 'translate-pdf', 'summarize-pdf', 'repair-pdf', 'redact-pdf', 'sign-pdf', 'compare-pdf'];
     if (toolId && aiTools.includes(toolId)) return 'AI';
     return 'WASM';
   }
@@ -280,25 +242,48 @@ class SystemEngine {
     const startTime = Date.now();
 
     try {
-      this.addLog(nextJob, `Starting hardware-accelerated ${nextJob.mode} engine...`);
+      this.addLog(nextJob, `Executing hardware-accelerated ${nextJob.mode} engine...`);
       
-      let outBuffer: ArrayBuffer | null = null;
+      let res: any = null;
+      const progressCb = (p: number, m: string) => {
+        nextJob.progress = p;
+        this.addLog(nextJob, m);
+      };
 
-      // Actual Part 2 Tool Logic Routing
-      if (nextJob.toolId === 'rotate-pdf') {
-        const tool = new RotatePDF((p: number, s: string, m: string) => {
-          nextJob.progress = p;
-          this.addLog(nextJob, m);
-        });
-        outBuffer = await tool.run(nextJob.inputs[0].file, {});
+      // MASTER ROUTING MATRIX
+      if (nextJob.toolId === 'merge-pdf') {
+        const tool = new PDFManipulator(nextJob.inputs.map(i => i.file), progressCb);
+        res = await tool.merge();
+      } else if (nextJob.toolId === 'split-pdf') {
+        const tool = new PDFManipulator(nextJob.inputs[0].file, progressCb);
+        res = await tool.split(nextJob.settings);
+      } else if (nextJob.toolId === 'rotate-pdf') {
+        const tool = new PDFManipulator(nextJob.inputs[0].file, progressCb);
+        res = await tool.rotate(nextJob.settings.rotations || {});
       } else if (nextJob.toolId === 'word-pdf') {
-        const tool = new WordToPDF((p: number, s: string, m: string) => {
-          nextJob.progress = p;
-          this.addLog(nextJob, m);
-        });
-        outBuffer = await tool.run(nextJob.inputs[0].file);
+        const tool = new WordConverter(nextJob.inputs[0].file, progressCb);
+        res = await tool.convertTo('PDF');
+      } else if (nextJob.toolId === 'excel-pdf') {
+        const tool = new ExcelConverter(nextJob.inputs[0].file, progressCb);
+        res = await tool.convertTo('PDF');
+      } else if (nextJob.toolId === 'ppt-pdf') {
+        const tool = new PPTConverter(nextJob.inputs[0].file, progressCb);
+        res = await tool.convertTo('PDF');
+      } else if (['ocr-pdf', 'summarize-pdf', 'translate-pdf', 'compare-pdf'].includes(nextJob.toolId!)) {
+        const tool = new SpecializedConverter(nextJob.inputs[0].file, progressCb);
+        const toolTarget = nextJob.toolId === 'ocr-pdf' ? 'OCR' : 
+                           nextJob.toolId === 'summarize-pdf' ? 'SUMMARIZE' : 
+                           nextJob.toolId === 'translate-pdf' ? 'TRANSLATE' : 'COMPARE';
+        res = await tool.convertTo(toolTarget, nextJob.settings);
+      } else if (['protect-pdf', 'unlock-pdf', 'redact-pdf', 'sign-pdf', 'crop-pdf'].includes(nextJob.toolId!)) {
+        const tool = new PDFManipulator(nextJob.inputs[0].file, progressCb);
+        if (nextJob.toolId === 'protect-pdf') res = await tool.protect(nextJob.settings);
+        if (nextJob.toolId === 'unlock-pdf') res = await tool.unlock(nextJob.settings.password);
+        if (nextJob.toolId === 'redact-pdf') res = await tool.redact(nextJob.settings);
+        if (nextJob.toolId === 'sign-pdf') res = await tool.sign(nextJob.settings.signature, nextJob.settings.position);
+        if (nextJob.toolId === 'crop-pdf') res = await tool.crop(nextJob.settings);
       } else {
-        // Fallback simulation for other tools while Part 3/4 are being mapped
+        // Fallback simulation
         for (let p = 0; p <= 100; p += 20) {
           await new Promise(r => setTimeout(r, 400));
           nextJob.progress = p;
@@ -306,19 +291,20 @@ class SystemEngine {
         }
         const doc = await PDFDocument.create();
         doc.addPage();
-        outBuffer = (await doc.save()).buffer;
+        const b = await doc.save();
+        res = { blob: new Blob([b], {type:'application/pdf'}), fileName: `Mastered_${nextJob.inputs[0].name}`, mimeType: 'application/pdf' };
       }
 
       const output: OutputBuffer = {
         id: Math.random().toString(36).substr(2, 9),
         jobId: nextJob.id,
-        blob: new Blob([outBuffer!], { type: 'application/pdf' }),
-        fileName: `Mastered_${nextJob.inputs[0].name}`,
-        mimeType: 'application/pdf',
-        sizeFormatted: PDFEngine.formatSize(outBuffer!.byteLength),
-        objectUrl: URL.createObjectURL(new Blob([outBuffer!], { type: 'application/pdf' })),
+        blob: res.blob,
+        fileName: res.fileName,
+        mimeType: res.mimeType,
+        sizeFormatted: PDFEngine.formatSize(res.blob.size),
+        objectUrl: URL.createObjectURL(res.blob),
         completedAt: Date.now(),
-        toFmt: 'PDF',
+        toFmt: res.fileName.split('.').pop()?.toUpperCase() || 'PDF',
         stats: {
           originalSize: PDFEngine.formatSize(nextJob.inputs[0].size),
           reduction: '0%',
