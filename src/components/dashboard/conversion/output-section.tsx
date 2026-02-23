@@ -41,6 +41,10 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
           title: 'AJN Output',
           text: `Converted ${job.file.name} to ${job.toFmt.toUpperCase()}`
         });
+      } else {
+        // Fallback for browsers that don't support sharing files
+        navigator.clipboard.writeText(job.result.objectUrl);
+        alert('Sharing not supported on this browser. Link copied to clipboard.');
       }
     } catch (err) {
       console.warn('Sharing failed', err);
@@ -58,29 +62,27 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
             Mastered Output ({jobs.length})
           </h3>
         </div>
-        <Button variant="ghost" onClick={onClear} className="h-8 text-[10px] font-black uppercase text-red-400 hover:text-red-500 hover:bg-red-500/10 gap-2">
-          <Trash2 className="w-3.5 h-3.5" /> CLEAR SESSION
-        </Button>
+        <button onClick={onClear} className="text-[10px] font-black uppercase text-red-400 hover:text-red-500 transition-colors flex items-center gap-2">
+          <Trash2 className="w-3.5 h-3.5" /> Clear Session
+        </button>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
         {jobs.map((job) => (
-          <Card key={job.id} className="bg-[#0d1225]/60 backdrop-blur-3xl border-emerald-500/20 border-2 overflow-hidden hover:border-emerald-500/40 transition-all group relative">
-            <div className="absolute inset-0 bg-emerald-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-            
+          <Card key={job.id} className="bg-white/40 backdrop-blur-3xl border-emerald-500/20 border-2 overflow-hidden hover:border-emerald-500/40 transition-all group relative">
             <CardContent className="p-6 flex items-center gap-6 relative z-10">
-              <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500">
+              <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500">
                 {getIcon(job.toFmt)}
               </div>
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-1.5">
-                  <h4 className="text-sm font-black uppercase tracking-tighter truncate max-w-[280px]">{job.result?.fileName}</h4>
-                  <Badge className="bg-emerald-500 text-white border-none text-[8px] font-black px-2 h-5 shadow-lg shadow-emerald-500/20">READY</Badge>
+                  <h4 className="text-sm font-black tracking-tighter truncate max-w-[280px] text-slate-900">{job.result?.fileName}</h4>
+                  <Badge className="bg-emerald-500 text-white border-none text-[8px] font-black px-2 h-5">READY</Badge>
                 </div>
-                <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
+                <div className="flex items-center gap-4 text-[10px] font-bold text-slate-900/40 uppercase tracking-widest">
                   <span className="flex items-center gap-1.5"><FileCode className="w-3 h-3" /> {job.result?.size}</span>
-                  <span className="text-emerald-500 font-black">Verified Checksum</span>
+                  <span className="text-emerald-600 font-black">Verified Checksum</span>
                 </div>
               </div>
 
@@ -89,23 +91,23 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
                   size="sm" 
                   variant="outline" 
                   onClick={() => onPreview(job)}
-                  className="h-10 border-white/10 bg-white/5 text-[10px] font-black uppercase gap-2 hover:bg-primary hover:text-white px-5 rounded-xl shadow-lg transition-all"
+                  className="h-10 border-black/10 bg-white/50 text-[10px] font-black uppercase gap-2 hover:bg-primary hover:text-white px-5 rounded-xl shadow-sm transition-all"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" /> PREVIEW
+                  <ExternalLink className="w-3.5 h-3.5" /> Preview
                 </Button>
                 <Button 
                   size="sm" 
                   onClick={() => handleDownload(job)}
-                  className="h-10 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] px-6 shadow-xl shadow-emerald-500/30 gap-2 rounded-xl transition-all hover:scale-105 active:scale-95"
+                  className="h-10 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] px-6 shadow-md gap-2 rounded-xl transition-all"
                 >
-                  <Download className="w-4 h-4" /> DOWNLOAD
+                  <Download className="w-4 h-4" /> Download
                 </Button>
-                <div className="h-8 w-px bg-white/10 mx-1" />
+                <div className="h-8 w-px bg-black/5 mx-1" />
                 <Button 
                   size="icon" 
                   variant="ghost" 
                   onClick={() => handleShare(job)}
-                  className="h-10 w-10 text-muted-foreground hover:text-white hover:bg-white/5 rounded-xl"
+                  className="h-10 w-10 text-slate-900/40 hover:text-slate-900 hover:bg-black/5 rounded-xl"
                 >
                   <Share2 className="w-4 h-4" />
                 </Button>
@@ -116,8 +118,8 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
       </div>
 
       {jobs.length > 1 && (
-        <Button className="w-full h-16 bg-white text-black hover:bg-white/90 font-black text-sm uppercase tracking-widest shadow-2xl rounded-2xl gap-3 transition-all hover:scale-[1.01]">
-          <Download className="w-5 h-5" /> EXPORT BATCH (ZIP)
+        <Button className="w-full h-16 bg-white text-slate-900 hover:bg-white/90 font-black text-sm uppercase tracking-widest shadow-xl rounded-2xl gap-3 transition-all">
+          <Download className="w-5 h-5" /> Export Batch (ZIP)
         </Button>
       )}
     </section>
