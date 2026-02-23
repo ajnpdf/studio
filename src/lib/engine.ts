@@ -3,6 +3,11 @@
 import { PDFConverter } from './converters/pdf-converter';
 import { SpecializedConverter } from './converters/specialized-converter';
 import { PDFManipulator } from './converters/pdf-manipulator';
+import { ScannerConverter } from './converters/scanner-converter';
+import { WordConverter } from './converters/word-converter';
+import { ExcelConverter } from './converters/excel-converter';
+import { PPTConverter } from './converters/ppt-converter';
+import { ImageConverter } from './converters/image-converter';
 
 export type ExecutionMode = 'WASM' | 'SMART' | 'AI';
 export type JobStatus = 'queued' | 'running' | 'done' | 'failed' | 'cancelled';
@@ -137,7 +142,11 @@ class SystemEngine {
   }
 
   private determineMode(toolId?: string): ExecutionMode {
-    const aiTools = ['ocr-pdf', 'translate-pdf', 'summarize-pdf', 'pdf-excel', 'pdf-pptx', 'compare-pdf'];
+    const aiTools = [
+      'ocr-pdf', 'translate-pdf', 'summarize-pdf', 
+      'pdf-excel', 'pdf-pptx', 'compare-pdf', 
+      'repair-pdf', 'categorize-file'
+    ];
     if (toolId && aiTools.includes(toolId)) return 'AI';
     return 'WASM';
   }
@@ -149,7 +158,7 @@ class SystemEngine {
 
     this.isProcessing = true;
     nextJob.status = 'running';
-    this.addLog(nextJob, `Loading ${nextJob.mode} engine module...`);
+    this.addLog(nextJob, `Loading ${nextJob.mode} engine architecture...`);
 
     try {
       const startTime = Date.now();
@@ -164,7 +173,7 @@ class SystemEngine {
         id: Math.random().toString(36).substr(2, 9),
         jobId: nextJob.id,
         blob: result.blob,
-        fileName: `Mastered_${result.fileName}`,
+        fileName: `${result.fileName}`,
         mimeType: result.mimeType,
         sizeFormatted: (result.blob.size / (1024 * 1024)).toFixed(2) + ' MB',
         objectUrl,
@@ -183,7 +192,7 @@ class SystemEngine {
       this.state.stats.totalMastered++;
     } catch (err: any) {
       nextJob.status = 'failed';
-      this.addLog(nextJob, err.message || 'System Fault', 'error');
+      this.addLog(nextJob, err.message || 'System Pipeline Fault', 'error');
     } finally {
       this.isProcessing = false;
       this.state.queue = this.state.queue.filter(j => j.id !== nextJob.id);
@@ -199,24 +208,58 @@ class SystemEngine {
       this.addLog(job, m);
     };
 
+    // Instantiate respective Master Service Units
     const manip = new PDFManipulator(files, update);
     const specialized = new SpecializedConverter(files[0], update);
+    const scanner = new ScannerConverter(files, update);
     const pdfConv = new PDFConverter(files[0], update);
+    const wordConv = new WordConverter(files[0], update);
+    const excelConv = new ExcelConverter(files[0], update);
+    const pptConv = new PPTConverter(files[0], update);
+    const imgConv = new ImageConverter(files[0], update);
 
     switch (job.toolId) {
+      // Domain 1: Organize
+      case 'merge-pdf': return manip.merge();
+      case 'split-pdf': return manip.split(job.settings);
+      case 'organize-pdf': return manip.organize(job.settings.permutation || []);
+      case 'scan-pdf': return scanner.process(job.settings);
+
+      // Domain 2: Optimize
+      case 'compress-pdf': return manip.compress(job.settings);
+      case 'repair-pdf': return manip.repair(job.settings);
+      case 'ocr-pdf': return specialized.convertTo('OCR', job.settings);
+
+      // Domain 3: Convert TO PDF
+      case 'word-pdf': return wordConv.convertTo('PDF', job.settings);
+      case 'excel-pdf': return excelConv.convertTo('PDF', job.settings);
+      case 'ppt-pdf': return pptConv.convertTo('PDF', job.settings);
+      case 'jpg-pdf': return imgConv.toMasterPDF(files, job.settings);
+      case 'html-pdf': return specialized.convertTo('HTML_PDF', job.settings);
+
+      // Domain 4: Convert FROM PDF
+      case 'pdf-jpg': return pdfConv.convertTo('JPG', job.settings);
+      case 'pdf-word': return pdfConv.convertTo('WORD', job.settings);
+      case 'pdf-pptx': return pdfConv.convertTo('PPTX', job.settings);
+      case 'pdf-excel': return pdfConv.convertTo('EXCEL', job.settings);
+      case 'pdf-pdfa': return manip.toPDFA(job.settings.conformance || '2b');
+
+      // Domain 5: Edit
+      case 'rotate-pdf': return manip.rotate(job.settings.rotationMap || {});
+      case 'add-page-numbers': return manip.addPageNumbers(job.settings);
+      
+      // Domain 6: Security
       case 'unlock-pdf': return manip.unlock(job.settings.password);
       case 'protect-pdf': return manip.protect(job.settings);
       case 'sign-pdf': return manip.sign(job.settings.signatureData, job.settings.position);
       case 'redact-pdf': return manip.redact(job.settings.redactions || []);
+
+      // Domain 7: Intelligence
       case 'translate-pdf': return specialized.convertTo('TRANSLATE', job.settings);
       case 'compare-pdf': return specialized.convertTo('COMPARE', job.settings);
-      case 'ocr-pdf': return specialized.convertTo('OCR', job.settings);
-      case 'rotate-pdf': return manip.rotate(job.settings.rotationMap || {});
-      case 'add-page-numbers': return manip.addPageNumbers(job.settings);
-      case 'pdf-pdfa': return manip.toPDFA(job.settings.conformance);
-      case 'merge-pdf': return manip.merge();
-      case 'split-pdf': return manip.split(job.settings);
-      default: return pdfConv.convertTo(job.settings.toFmt || 'PDF', job.settings);
+
+      default: 
+        return pdfConv.convertTo(job.settings.toFmt || 'PDF', job.settings);
     }
   }
 
