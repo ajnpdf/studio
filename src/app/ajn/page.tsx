@@ -13,11 +13,9 @@ import {
   Command,
   X,
   Layers,
-  BrainCircuit,
   ArrowRight,
   Zap,
   FileText,
-  Activity,
   Cpu,
   Lock,
   Network
@@ -29,18 +27,14 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 const PDF_SERVICES = [
-  "Merge PDF", "Split PDF", "Compress PDF", "PDF to Word", "PDF to PowerPoint", 
-  "PDF to Excel", "Word to PDF", "PowerPoint to PDF", "Excel to PDF", "Edit PDF", 
-  "PDF to JPG", "JPG to PDF", "Sign PDF", "Watermark", "Rotate PDF", 
-  "HTML to PDF", "Unlock PDF", "Protect PDF", "Organize PDF", "PDF to PDF/A", 
-  "Repair PDF", "Page Numbers", "Scan to PDF", "OCR PDF", "Compare PDF", 
-  "Redact PDF", "Crop PDF", "Translate PDF"
+  "JPG to PDF", "Word to PDF", "PowerPoint to PDF", "Excel to PDF", "HTML to PDF",
+  "PDF to JPG", "PDF to Word", "PDF to PowerPoint", "PDF to Excel", "PDF to PDF/A"
 ];
 
 const QUICK_UNITS = [
   { id: 'pdf-word', name: 'PDF to Word Master', desc: 'Reconstruct layouts via Smart OCR', cat: 'Document', icon: FileText, tag: 'WASM' },
   { id: 'pdf-excel', name: 'PDF to Excel Grid', desc: 'Smart table detection & extraction', cat: 'Document', icon: Layers, tag: 'AI' },
-  { id: 'merge-pdf', name: 'Universal Merger', desc: 'High-fidelity stream sequencing', cat: 'Document', icon: ShieldCheck, tag: 'WASM' },
+  { id: 'word-pdf', name: 'Universal Word to PDF', desc: 'High-fidelity OOXML reconstruction', cat: 'Document', icon: ShieldCheck, tag: 'WASM' },
 ];
 
 export default function AJNPage() {
