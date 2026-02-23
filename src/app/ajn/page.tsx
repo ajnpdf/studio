@@ -16,7 +16,11 @@ import {
   BrainCircuit,
   ArrowRight,
   Zap,
-  FileText
+  FileText,
+  Activity,
+  Cpu,
+  Lock,
+  Network
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -92,7 +96,7 @@ export default function AJNPage() {
     >
       <NightSky />
       
-      {/* HEADER */}
+      {/* Header */}
       <header className="fixed top-0 left-0 right-0 h-16 md:h-20 border-b border-black/5 bg-white/40 backdrop-blur-xl z-[60] px-4 md:px-8 flex items-center justify-between shadow-sm animate-in fade-in duration-700">
         <Link href="/" className="flex items-center group">
           <LogoAnimation className="w-16 h-8 md:w-24 md:h-12" showGlow={false} />
@@ -113,7 +117,7 @@ export default function AJNPage() {
       </header>
 
       <main className="relative z-10 flex-1 flex flex-col items-center p-4 md:p-6 mt-24 md:mt-32">
-        {/* GLOBAL SEARCH BOX - REDUCED SIZE */}
+        {/* Global Search Box - Reduced Size */}
         <div className="w-full max-w-xl relative group animate-in fade-in slide-in-from-top-8 duration-1000 mb-10">
           <div className="absolute -inset-1 bg-gradient-to-r from-[#000080]/20 to-blue-500/20 rounded-[2rem] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
           <div className="relative flex items-center bg-white/60 backdrop-blur-3xl border border-black/5 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-2xl transition-all hover:border-[#000080]/40">
@@ -131,7 +135,7 @@ export default function AJNPage() {
           </div>
         </div>
 
-        {/* AJN ANIMATION - CENTERED */}
+        {/* AJN Animation - Centered */}
         <div className={cn("transition-all duration-1000 mb-10 animate-in zoom-in-95 duration-1000", isDragging ? "scale-110" : "scale-100")}>
           <LogoAnimation className="w-48 h-20 md:w-64 md:h-28" />
         </div>
@@ -141,7 +145,7 @@ export default function AJNPage() {
           isProcessing || showSearch ? "scale-95 opacity-40 blur-sm" : "scale-100 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300"
         )}>
           
-          {/* DROP ZONE Area - REDUCED SIZE */}
+          {/* Drop Zone Area - Reduced Size */}
           <div className="w-full max-w-xl space-y-4">
             <div 
               onClick={() => fileInputRef.current?.click()}
@@ -170,7 +174,7 @@ export default function AJNPage() {
               </div>
             </div>
             
-            {/* Small Letters Hint - PROPER CASING */}
+            {/* Small Letters Hint - Proper Casing */}
             <div className="flex justify-center gap-6 text-[8px] font-bold uppercase tracking-[0.3em] text-slate-900/30 animate-pulse">
               <span>Drag files here</span>
               <span>•</span>
@@ -180,8 +184,29 @@ export default function AJNPage() {
             </div>
           </div>
 
-          {/* PDF SERVICE TICKER */}
-          <div className="w-full overflow-hidden mt-8 mb-16 relative group animate-in fade-in duration-1000 delay-500">
+          {/* Infrastructure Monitor - Professional Advance Content Setup */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full px-4 animate-in fade-in duration-1000 delay-500">
+            {[
+              { label: 'Neural ingestion core', sub: 'Node 01 active', icon: Cpu, color: 'text-blue-600' },
+              { label: 'Velocity pipeline', sub: '14 ops/sec optimal', icon: Zap, color: 'text-amber-600' },
+              { label: 'Buffer isolation', sub: '256-bit AES secure', icon: Lock, color: 'text-emerald-600' },
+              { label: 'Protocol mesh', sub: '300+ units sync', icon: Network, color: 'text-indigo-600' },
+            ].map((stat, i) => (
+              <div key={i} className="p-4 bg-white/40 backdrop-blur-xl border border-black/5 rounded-2xl space-y-2 group hover:border-primary/20 transition-all cursor-default">
+                <div className="flex items-center justify-between">
+                  <stat.icon className={cn("w-4 h-4", stat.color)} />
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-[10px] font-black text-slate-900 tracking-tight leading-tight">{stat.label}</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">{stat.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* PDF Service Ticker */}
+          <div className="w-full overflow-hidden mt-8 mb-16 relative group animate-in fade-in duration-1000 delay-700">
             <div className="flex animate-marquee-fast whitespace-nowrap gap-10 items-center mb-4">
               {[...PDF_SERVICES, ...PDF_SERVICES].map((s, i) => (
                 <div key={i} className="flex items-center gap-3 bg-white/30 backdrop-blur-md px-5 py-2.5 rounded-full border border-black/5 shadow-sm">
@@ -203,7 +228,7 @@ export default function AJNPage() {
           </div>
         </div>
 
-        {/* SEARCH OVERLAY */}
+        {/* Search Overlay */}
         {showSearch && (
           <div className="fixed inset-0 z-[100] flex items-start justify-center pt-0 md:pt-[15vh] px-0 md:px-6 bg-white/60 backdrop-blur-md animate-in fade-in duration-300">
             <div className="w-full h-full md:h-auto md:max-w-xl bg-white border-none md:border md:border-black/5 md:rounded-[2rem] shadow-2xl overflow-hidden animate-in slide-in-from-top-4 duration-500">
@@ -255,7 +280,7 @@ export default function AJNPage() {
           </div>
         )}
 
-        {/* PROCESSING OVERLAY */}
+        {/* Processing Overlay */}
         {isProcessing && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 backdrop-blur-3xl animate-in fade-in duration-500">
             <div className="w-full max-w-sm space-y-8 md:space-y-10 text-center p-8">
@@ -288,7 +313,7 @@ export default function AJNPage() {
           </div>
         )}
 
-        <footer className="py-8 text-[9px] font-bold text-slate-900/20 uppercase tracking-[0.4em] mt-auto animate-in fade-in duration-1000 delay-700">
+        <footer className="py-8 text-[9px] font-bold text-slate-900/20 uppercase tracking-[0.4em] mt-auto animate-in fade-in duration-1000 delay-1000">
           AJN Junction • Global Node • 2025
         </footer>
       </main>
