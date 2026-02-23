@@ -1,3 +1,4 @@
+
 'use client';
 
 import { PDFConverter } from './converters/pdf-converter';
@@ -131,13 +132,13 @@ class SystemEngine {
   }
 
   async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, toolId?: string) {
-    const isMultiInput = ['merge-pdf', 'merge', 'scan-to-pdf', 'scan'].includes(toolId || '');
+    const isMultiInput = ['merge-pdf', 'merge', 'scan-to-pdf', 'scan', 'jpg-pdf', 'jpg2pdf'].includes(toolId || '');
     
     if (isMultiInput) {
       const job: ProcessingJob = {
         id: Math.random().toString(36).substr(2, 9),
         toolId: toolId || 'merge-pdf',
-        mode: toolId?.includes('scan') ? 'AI' : 'WASM',
+        mode: (toolId?.includes('scan') || toolId?.includes('jpg')) ? 'AI' : 'WASM',
         status: 'queued',
         progress: 0,
         stage: 'Calibrating Multi-Asset Sequence...',
@@ -318,7 +319,7 @@ class SystemEngine {
       case 'pdf-jpg':
       case 'pdf2jpg': return pdfConv.convertTo('JPG', job.settings);
       case 'jpg-pdf':
-      case 'jpg2pdf': return imgConv.convertTo('PDF', job.settings);
+      case 'jpg2pdf': return imgConv.toMasterPDF(files, job.settings);
       case 'ocr-pdf':
       case 'ocr': return specialized.convertTo('OCR', job.settings);
       case 'redact-pdf':

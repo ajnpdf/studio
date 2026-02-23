@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
@@ -33,7 +34,8 @@ import {
   Camera, 
   Maximize, 
   RefreshCw, 
-  Zap 
+  Zap,
+  Image as ImageIcon
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -54,7 +56,7 @@ interface Props {
 
 /**
  * AJN Unit Workspace - High-Fidelity Bento Grid
- * Implements the Master Organize, Merge, Split, Page Removal, and Scan workflows.
+ * Implements the Master Organize, Merge, Split, Page Removal, Scan, and Image-to-PDF workflows.
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [appState, setAppState] = useState<GlobalAppState | null>(null);
@@ -89,13 +91,18 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [bwMode, setBwMode] = useState(false);
   const [quality, setQuality] = useState(85);
   const [aiAssist, setAiAssist] = useState(true);
+  
+  // Image Conversion Parameters
+  const [fitMode, setFitMode] = useState<'FIT' | 'FILL' | 'STRETCH' | 'ORIGINAL'>('FIT');
+  const [orientation, setOrientation] = useState<'portrait' | 'landscape' | 'auto'>('portrait');
+  const [margins, setMargins] = useState(40);
 
   useEffect(() => {
     return engine.subscribe(setAppState);
   }, []);
 
   const handleFilesAdded = (files: File[]) => {
-    if (initialUnitId === 'merge-pdf' || initialUnitId === 'scan-to-pdf') {
+    if (initialUnitId === 'merge-pdf' || initialUnitId === 'scan-to-pdf' || initialUnitId === 'jpg-pdf' || initialUnitId === 'jpg2pdf') {
       setPrepQueue(prev => [...prev, ...files]);
       return;
     }
@@ -210,7 +217,10 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       actions: organizeStack,
       bwMode,
       quality,
-      aiAssist
+      aiAssist,
+      fitMode,
+      orientation,
+      margins
     };
 
     engine.addJobs(files, from, to, settings, initialUnitId);
@@ -383,6 +393,39 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           </div>
                           <Button onClick={handleBatchExecute} className="w-full h-16 bg-primary hover:bg-primary/90 text-white font-black text-sm uppercase tracking-widest rounded-3xl shadow-2xl shadow-primary/30 gap-3">
                             <CheckCircle2 className="w-5 h-5" /> Assemble Master Scan
+                          </Button>
+                        </div>
+                      )}
+                    </section>
+                  )}
+
+                  {/* JPG TO PDF UI */}
+                  {(initialUnitId === 'jpg-pdf' || initialUnitId === 'jpg2pdf') && (
+                    <section className="space-y-8">
+                      {prepQueue.length > 0 && (
+                        <div className="space-y-6">
+                          <div className="flex items-center justify-between px-4">
+                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-950/60">Asset Sequence ({prepQueue.length})</h3>
+                            <Button variant="ghost" onClick={() => setPrepQueue([])} className="text-[10px] font-black uppercase text-red-500 hover:bg-red-50">Purge Buffer</Button>
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {prepQueue.map((file, i) => (
+                              <Card key={i} className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-black/5 group relative">
+                                <img src={URL.createObjectURL(file)} className="aspect-[1/1.4] object-cover" />
+                                <div className="absolute top-2 left-2 bg-black/60 px-2 py-0.5 rounded text-[9px] font-black text-white">{i + 1}</div>
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                  <Button size="icon" variant="destructive" onClick={() => setPrepQueue(prev => prev.filter((_, idx) => idx !== i))} className="h-8 w-8 rounded-lg"><Trash2 className="w-4 h-4" /></Button>
+                                </div>
+                              </Card>
+                            ))}
+                            <button onClick={() => document.getElementById('jpg-upload')?.click()} className="aspect-[1/1.4] rounded-2xl border-2 border-dashed border-black/10 flex flex-col items-center justify-center gap-2 hover:bg-black/5 transition-all text-slate-950/40">
+                              <Plus className="w-6 h-6" />
+                              <span className="text-[9px] font-black uppercase">Add Assets</span>
+                            </button>
+                            <input id="jpg-upload" type="file" multiple accept="image/*" className="hidden" onChange={(e) => e.target.files && handleFilesAdded(Array.from(e.target.files))} />
+                          </div>
+                          <Button onClick={handleBatchExecute} className="w-full h-16 bg-primary hover:bg-primary/90 text-white font-black text-sm uppercase tracking-widest rounded-3xl shadow-2xl shadow-primary/30 gap-3">
+                            <Play className="w-4 h-4 fill-current" /> Execute Sequential Master
                           </Button>
                         </div>
                       )}
@@ -571,7 +614,9 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     </section>
                   )}
 
-                  {!selectionFile && !isCameraActive && <DropZone onFiles={handleFilesAdded} />}
+                  {!selectionFile && !isCameraActive && (prepQueue.length === 0 || (initialUnitId !== 'merge-pdf' && initialUnitId !== 'scan-to-pdf' && initialUnitId !== 'jpg-pdf' && initialUnitId !== 'jpg2pdf')) && (
+                    <DropZone onFiles={handleFilesAdded} />
+                  )}
                 </div>
 
                 {/* Parameters Sidebar */}
@@ -582,6 +627,38 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     </div>
                     
                     <div className="space-y-6 relative z-10">
+                      {(initialUnitId === 'jpg-pdf' || initialUnitId === 'jpg2pdf') && (
+                        <div className="space-y-6">
+                          <div className="space-y-3">
+                            <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Master Fit Mode</Label>
+                            <div className="grid grid-cols-2 gap-2">
+                              {['FIT', 'FILL', 'STRETCH', 'ORIGINAL'].map(m => (
+                                <button key={m} onClick={() => setFitMode(m as any)} className={cn("px-4 py-2 rounded-xl border-2 transition-all text-[9px] font-black uppercase", fitMode === m ? "bg-primary text-white border-primary shadow-lg" : "bg-white/40 border-black/5 text-slate-950/40")}>
+                                  {m}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="space-y-3">
+                            <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Page Orientation</Label>
+                            <Select value={orientation} onValueChange={(v: any) => setOrientation(v)}>
+                              <SelectTrigger className="h-12 bg-white/60 border-black/5 rounded-2xl font-black text-xs shadow-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="portrait">Portrait</SelectItem>
+                                <SelectItem value="landscape">Landscape</SelectItem>
+                                <SelectItem value="auto">Auto-Detect (EXIF)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-3">
+                            <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Master Quality ({quality}%)</Label>
+                            <Slider value={[quality]} max={100} onValueChange={([v]) => setQuality(v)} />
+                          </div>
+                        </div>
+                      )}
+
                       {initialUnitId === 'compress-pdf' && (
                         <div className="space-y-6">
                           <div className="space-y-3">
