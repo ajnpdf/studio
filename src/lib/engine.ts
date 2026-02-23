@@ -212,7 +212,7 @@ class SystemEngine {
   }
 
   private determineMode(toolId?: string): ExecutionMode {
-    const aiTools = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'summarize-pdf', 'ai-qa', 'sign-pdf', 'sign', 'scan-to-pdf'];
+    const aiTools = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'summarize-pdf', 'ai-qa', 'sign-pdf', 'sign', 'scan-to-pdf', 'repair-pdf'];
     if (toolId && aiTools.includes(toolId)) return 'AI';
     return 'WASM';
   }
@@ -301,6 +301,10 @@ class SystemEngine {
       case 'extract': return manip.extractPages(job.settings.pages || [0], job.settings.extractionMode);
       case 'remove-pages':
       case 'remove': return manip.removePages(job.settings.pages || []);
+      case 'compress-pdf':
+      case 'compress': return manip.compress(job.settings);
+      case 'repair-pdf':
+      case 'repair': return manip.repair(job.settings);
       case 'rotate-pdf':
       case 'rotate': return manip.rotate(job.settings.angle || 90);
       case 'page-numbers':

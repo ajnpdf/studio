@@ -12,36 +12,28 @@ import {
   Settings2, 
   ShieldCheck, 
   Cpu, 
-  GripVertical,
-  X,
-  Plus,
-  Play,
-  RotateCw,
-  Lock,
-  ChevronRight,
-  Download,
-  Share2,
-  ExternalLink,
-  Wand2,
-  Database,
-  Layers,
-  Activity,
-  History,
-  Scissors,
-  Layout,
-  Type,
-  FileText,
-  Trash2,
-  CheckCircle2,
-  ArrowUpDown,
-  Files,
-  Copy,
-  BookOpen,
-  Camera,
-  Maximize,
-  Scan,
-  RefreshCw,
-  Zap
+  X, 
+  Plus, 
+  Play, 
+  RotateCw, 
+  Lock, 
+  ChevronRight, 
+  Wand2, 
+  Database, 
+  Layers, 
+  Activity, 
+  Scissors, 
+  Layout, 
+  Type, 
+  FileText, 
+  Trash2, 
+  CheckCircle2, 
+  Copy, 
+  BookOpen, 
+  Camera, 
+  Maximize, 
+  RefreshCw, 
+  Zap 
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -51,6 +43,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Slider } from '@/components/ui/slider';
 import * as pdfjsLib from 'pdfjs-dist';
 import { cn } from '@/lib/utils';
 
@@ -94,6 +87,8 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [summaryLength, setSummaryLength] = useState('medium');
   const [extractionMode, setExtractionMode] = useState<'single' | 'batch'>('single');
   const [bwMode, setBwMode] = useState(false);
+  const [quality, setQuality] = useState(85);
+  const [aiAssist, setAiAssist] = useState(true);
 
   useEffect(() => {
     return engine.subscribe(setAppState);
@@ -213,7 +208,9 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       toFmt: to,
       extractionMode,
       actions: organizeStack,
-      bwMode
+      bwMode,
+      quality,
+      aiAssist
     };
 
     engine.addJobs(files, from, to, settings, initialUnitId);
@@ -337,7 +334,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                             <video ref={videoRef} autoPlay muted playsInline className="w-full aspect-[4/3] object-cover" />
                             <canvas ref={canvasRef} className="hidden" />
                             
-                            {/* Scanning Overlay HUD */}
                             <div className="absolute inset-0 pointer-events-none border-[40px] border-black/20">
                               <div className="w-full h-full border-2 border-white/20 border-dashed relative">
                                 <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-primary" />
@@ -373,7 +369,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           </div>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             {prepQueue.map((file, i) => (
-                              <Card key={i} className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-black/5 group">
+                              <Card key={i} className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-black/5 group relative">
                                 <img src={URL.createObjectURL(file)} className="aspect-square object-cover" />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                   <Button size="icon" variant="destructive" onClick={() => setPrepQueue(prev => prev.filter((_, idx) => idx !== i))} className="h-8 w-8 rounded-lg"><Trash2 className="w-4 h-4" /></Button>
@@ -397,7 +393,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                   {initialUnitId === 'organize-pdf' && selectionFile && (
                     <section className="space-y-8">
                       <div className="flex h-[600px] border-2 border-black/5 rounded-[3rem] overflow-hidden bg-white/40 backdrop-blur-2xl shadow-2xl">
-                        {/* Bookmark Panel */}
                         <aside className="w-64 border-r border-black/5 flex flex-col shrink-0 bg-white/20">
                           <header className="p-6 border-b border-black/5 flex items-center gap-3">
                             <BookOpen className="w-4 h-4 text-primary" />
@@ -409,7 +404,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           </div>
                         </aside>
 
-                        {/* Page Draggable Grid */}
                         <main className="flex-1 overflow-y-auto p-8 scrollbar-hide">
                           {isLoadingThumbs ? (
                             <div className="h-full flex flex-col items-center justify-center gap-4 opacity-40">
@@ -439,7 +433,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                                   
                                   <div className="absolute top-3 left-3 bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[9px] font-black text-white">{i + 1}</div>
                                   
-                                  {/* Quick Control HUD */}
                                   <div className="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center gap-3">
                                     <div className="flex gap-2">
                                       <Button size="icon" variant="secondary" onClick={() => movePage(i, 'left')} disabled={i === 0} className="h-8 w-8 bg-white/10 hover:bg-white/20 text-white rounded-lg"><ChevronRight className="w-4 h-4 rotate-180" /></Button>
@@ -589,6 +582,47 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     </div>
                     
                     <div className="space-y-6 relative z-10">
+                      {initialUnitId === 'compress-pdf' && (
+                        <div className="space-y-6">
+                          <div className="space-y-3">
+                            <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Mastery Index</Label>
+                            <Slider value={[quality]} max={100} onValueChange={([v]) => setQuality(v)} />
+                            <div className="flex justify-between text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest pt-1">
+                              <span>Speed</span>
+                              <span>Fidelity</span>
+                            </div>
+                          </div>
+                          <div className="space-y-3">
+                            <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Target Profile</Label>
+                            <Select defaultValue="150">
+                              <SelectTrigger className="h-12 bg-white/60 border-black/5 rounded-2xl font-black text-xs shadow-sm">
+                                <SelectValue placeholder="Standard (150 DPI)" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="72">Screen (72 DPI)</SelectItem>
+                                <SelectItem value="150">Standard (150 DPI)</SelectItem>
+                                <SelectItem value="300">Print (300 DPI)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      )}
+
+                      {initialUnitId === 'repair-pdf' && (
+                        <div className="space-y-6">
+                          <div className="flex items-center justify-between p-5 bg-white/60 rounded-2xl border border-black/5 shadow-sm">
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-black uppercase text-slate-900 tracking-widest">AI Assist Recovery</p>
+                              <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest opacity-60">Neural Relation Sync</p>
+                            </div>
+                            <Switch checked={aiAssist} onCheckedChange={setAiAssist} className="data-[state=checked]:bg-primary" />
+                          </div>
+                          <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl text-[9px] font-bold text-muted-foreground leading-relaxed uppercase">
+                            Linear byte-scan will be executed if the trailer is unreachable.
+                          </div>
+                        </div>
+                      )}
+
                       {initialUnitId === 'scan-to-pdf' && (
                         <div className="space-y-6">
                           <div className="flex items-center justify-between p-5 bg-white/60 rounded-2xl border border-black/5 shadow-sm">
