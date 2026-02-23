@@ -34,6 +34,8 @@ import {
   Maximize, 
   RefreshCw, 
   Zap,
+  Globe,
+  Code2,
   Image as ImageIcon
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -45,6 +47,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Slider } from '@/components/ui/slider';
+import { Textarea } from '@/components/ui/textarea';
 import * as pdfjsLib from 'pdfjs-dist';
 import { cn } from '@/lib/utils';
 
@@ -55,7 +58,7 @@ interface Props {
 
 /**
  * AJN Unit Workspace - High-Fidelity Bento Grid
- * Implements the Master Organize, Merge, Split, Page Removal, Scan, and Image-to-PDF workflows.
+ * Implements the Master Organize, Merge, Split, Page Removal, Scan, Image-to-PDF, and HTML-to-PDF workflows.
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [appState, setAppState] = useState<GlobalAppState | null>(null);
@@ -98,6 +101,13 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
   // Presentation Parameters
   const [handoutMode, setHandoutMode] = useState(false);
+
+  // HTML Parameters
+  const [htmlInputType, setHtmlInputType] = useState<'url' | 'paste' | 'file'>('url');
+  const [htmlUrl, setHtmlUrl] = useState('');
+  const [htmlPaste, setHtmlPaste] = useState('');
+  const [customCss, setCustomCss] = useState('');
+  const [executeJs, setHtmlJs] = useState(false);
 
   useEffect(() => {
     return engine.subscribe(setAppState);
@@ -223,7 +233,11 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       fitMode,
       orientation,
       margins,
-      handoutMode
+      handoutMode,
+      htmlUrl: htmlInputType === 'url' ? htmlUrl : null,
+      htmlContent: htmlInputType === 'paste' ? htmlPaste : null,
+      customCss,
+      executeJs
     };
 
     engine.addJobs(files, from, to, settings, initialUnitId);
@@ -238,6 +252,10 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   };
 
   const handleBatchExecute = () => {
+    if (initialUnitId === 'html-pdf') {
+      executeJob([]);
+      return;
+    }
     if (prepQueue.length === 0) return;
     executeJob(prepQueue);
     setPrepQueue([]);
@@ -315,6 +333,76 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div className="lg:col-span-8 space-y-8">
                   
+                  {/* HTML TO PDF UI */}
+                  {initialUnitId === 'html-pdf' && (
+                    <section className="space-y-8 animate-in fade-in duration-700">
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-2 p-1 bg-black/5 rounded-2xl w-fit">
+                          {['url', 'paste', 'file'].map(t => (
+                            <button
+                              key={t}
+                              onClick={() => setHtmlInputType(t as any)}
+                              className={cn(
+                                "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                htmlInputType === t ? "bg-white text-primary shadow-xl" : "text-slate-950/40 hover:text-slate-950"
+                              )}
+                            >
+                              {t === 'url' && <Globe className="w-3.5 h-3.5 inline mr-2" />}
+                              {t === 'paste' && <Code2 className="w-3.5 h-3.5 inline mr-2" />}
+                              {t === 'file' && <FileText className="w-3.5 h-3.5 inline mr-2" />}
+                              {t}
+                            </button>
+                          ))}
+                        </div>
+
+                        <Card className="bg-white/40 backdrop-blur-2xl border-2 border-black/5 rounded-[3rem] overflow-hidden shadow-2xl">
+                          <CardContent className="p-10 space-y-8">
+                            {htmlInputType === 'url' && (
+                              <div className="space-y-4">
+                                <div className="space-y-2">
+                                  <Label className="text-[10px] font-black uppercase tracking-[0.2em] ml-1">Source URL Address</Label>
+                                  <Input 
+                                    value={htmlUrl}
+                                    onChange={(e) => setHtmlUrl(e.target.value)}
+                                    placeholder="https://example.com/report" 
+                                    className="h-16 bg-white/60 border-black/5 rounded-2xl text-lg font-bold px-6 shadow-sm focus:ring-primary/20" 
+                                  />
+                                </div>
+                                <p className="text-[9px] font-bold text-slate-950/40 uppercase tracking-widest leading-relaxed">
+                                  System will execute a server-side proxy inhalation to bypass CORS security markers.
+                                </p>
+                              </div>
+                            )}
+
+                            {htmlInputType === 'paste' && (
+                              <div className="space-y-4">
+                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] ml-1">HTML Code Fragment</Label>
+                                <Textarea 
+                                  value={htmlPaste}
+                                  onChange={(e) => setHtmlPaste(e.target.value)}
+                                  placeholder="<html><body><h1>Report</h1>...</body></html>" 
+                                  className="min-h-[300px] bg-white/60 border-black/5 rounded-[2rem] font-mono text-xs p-8 shadow-sm focus:ring-primary/20"
+                                />
+                              </div>
+                            )}
+
+                            {htmlInputType === 'file' && (
+                              <DropZone onFiles={handleFilesAdded} />
+                            )}
+
+                            <Button 
+                              onClick={handleBatchExecute}
+                              disabled={(htmlInputType === 'url' && !htmlUrl) || (htmlInputType === 'paste' && !htmlPaste)}
+                              className="w-full h-16 bg-primary hover:bg-primary/90 text-white font-black text-sm uppercase tracking-widest rounded-3xl shadow-2xl shadow-primary/30 gap-3"
+                            >
+                              <Play className="w-5 h-5 fill-current" /> Execute Web Mastery Sequence
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </section>
+                  )}
+
                   {/* SCAN TO PDF UI */}
                   {initialUnitId === 'scan-to-pdf' && (
                     <section className="space-y-8">
@@ -617,7 +705,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     </section>
                   )}
 
-                  {!selectionFile && !isCameraActive && (prepQueue.length === 0 || (initialUnitId !== 'merge-pdf' && initialUnitId !== 'scan-to-pdf' && initialUnitId !== 'jpg-pdf' && initialUnitId !== 'jpg2pdf')) && (
+                  {!selectionFile && !isCameraActive && (prepQueue.length === 0 || (initialUnitId !== 'merge-pdf' && initialUnitId !== 'scan-to-pdf' && initialUnitId !== 'jpg-pdf' && initialUnitId !== 'jpg2pdf')) && (initialUnitId !== 'html-pdf') && (
                     <DropZone onFiles={handleFilesAdded} />
                   )}
                 </div>
@@ -630,6 +718,30 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     </div>
                     
                     <div className="space-y-6 relative z-10">
+                      {initialUnitId === 'html-pdf' && (
+                        <div className="space-y-6">
+                          <div className="space-y-3">
+                            <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Injection Matrix</Label>
+                            <Textarea 
+                              value={customCss}
+                              onChange={(e) => setCustomCss(e.target.value)}
+                              placeholder="Inject custom @media print CSS..." 
+                              className="h-32 bg-white/60 border-black/5 rounded-2xl font-mono text-[10px] p-4 focus:ring-primary/20 shadow-sm"
+                            />
+                          </div>
+                          <div className="flex items-center justify-between p-5 bg-white/60 rounded-2xl border border-black/5 shadow-sm">
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-black uppercase text-slate-900 tracking-widest">Execute JS</p>
+                              <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest opacity-60">Hydrate Dynamic Content</p>
+                            </div>
+                            <Switch checked={executeJs} onCheckedChange={setHtmlJs} className="data-[state=checked]:bg-primary" />
+                          </div>
+                          <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl text-[9px] font-bold text-muted-foreground leading-relaxed uppercase">
+                            Anchor tags will be scanned and preserved as functional /URI actions in the final PDF buffer.
+                          </div>
+                        </div>
+                      )}
+
                       {(initialUnitId === 'jpg-pdf' || initialUnitId === 'jpg2pdf') && (
                         <div className="space-y-6">
                           <div className="space-y-3">

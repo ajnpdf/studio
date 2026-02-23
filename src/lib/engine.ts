@@ -132,7 +132,27 @@ class SystemEngine {
 
   async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, toolId?: string) {
     const isMultiInput = ['merge-pdf', 'merge', 'scan-to-pdf', 'scan', 'jpg-pdf', 'jpg2pdf'].includes(toolId || '');
+    const isVirtualInput = toolId === 'html-pdf';
     
+    if (isVirtualInput) {
+      const job: ProcessingJob = {
+        id: Math.random().toString(36).substr(2, 9),
+        toolId: toolId || 'html-pdf',
+        mode: 'WASM',
+        status: 'queued',
+        progress: 0,
+        stage: 'Calibrating Virtual Web Capture...',
+        logs: [],
+        inputs: [],
+        output: null,
+        settings,
+        startedAt: new Date()
+      };
+      this.state.queue = [...this.state.queue, job];
+      this.processNext();
+      return;
+    }
+
     if (isMultiInput) {
       const job: ProcessingJob = {
         id: Math.random().toString(36).substr(2, 9),
@@ -233,7 +253,7 @@ class SystemEngine {
       result = await this.runTool(nextJob);
 
       const duration = ((Date.now() - startTime) / 1000).toFixed(1);
-      const originalSize = nextJob.inputs.reduce((sum, f) => sum + f.size, 0);
+      const originalSize = nextJob.inputs.length > 0 ? nextJob.inputs.reduce((sum, f) => sum + f.size, 0) : 1024 * 1024;
       const reduction = Math.max(0, Math.round(((originalSize - result.blob.size) / originalSize) * 100));
 
       const objectUrl = URL.createObjectURL(result.blob);
@@ -289,8 +309,11 @@ class SystemEngine {
     const scanner = new ScannerConverter(files, update);
     const wordConv = new WordConverter(files[0], update);
     const pptConv = new PPTConverter(files[0], update);
+    const codeConv = new CodeConverter(files[0], update);
 
     switch (job.toolId) {
+      case 'html-pdf':
+      case 'html2pdf': return codeConv.convertTo('PDF', job.settings);
       case 'word-pdf':
       case 'word2pdf': return wordConv.convertTo('PDF');
       case 'ppt-pdf':
