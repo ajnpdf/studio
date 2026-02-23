@@ -15,6 +15,7 @@ import { DesignConverter } from './converters/design-converter';
 import { CADConverter } from './converters/cad-converter';
 import { SpecializedConverter } from './converters/specialized-converter';
 import { PDFManipulator } from './converters/pdf-manipulator';
+import { ScannerConverter } from './converters/scanner-converter';
 
 /**
  * AJN MASTER ARCHITECTURE — CORE ENGINE
@@ -74,8 +75,8 @@ export interface ProcessingJob {
   inputs: FileNode[];
   output: OutputBuffer | null;
   settings: any;
-  startedAt: number;
-  completedAt?: number;
+  startedAt: Date;
+  completedAt?: Date;
 }
 
 export interface GlobalAppState {
@@ -120,7 +121,7 @@ class SystemEngine {
   private addLog(job: ProcessingJob, message: string, level: LogEntry['level'] = 'info') {
     const entry: LogEntry = {
       timestamp: new Date().toLocaleTimeString(),
-      ms: Date.now() - job.startedAt,
+      ms: Date.now() - job.startedAt.getTime(),
       message,
       level
     };
@@ -130,21 +131,21 @@ class SystemEngine {
   }
 
   async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, toolId?: string) {
-    const isMerge = toolId === 'merge-pdf' || toolId === 'merge';
+    const isMultiInput = ['merge-pdf', 'merge', 'scan-to-pdf', 'scan'].includes(toolId || '');
     
-    if (isMerge) {
+    if (isMultiInput) {
       const job: ProcessingJob = {
         id: Math.random().toString(36).substr(2, 9),
         toolId: toolId || 'merge-pdf',
-        mode: 'WASM',
+        mode: toolId?.includes('scan') ? 'AI' : 'WASM',
         status: 'queued',
         progress: 0,
-        stage: 'Calibrating Assembly System...',
+        stage: 'Calibrating Multi-Asset Sequence...',
         logs: [],
         inputs: [],
         output: null,
         settings,
-        startedAt: Date.now()
+        startedAt: new Date()
       };
 
       for (const file of files) {
@@ -163,7 +164,7 @@ class SystemEngine {
       }
 
       this.state.queue = [...this.state.queue, job];
-      this.addLog(job, "Assembly sequence verified.");
+      this.addLog(job, "Asset sequence verified. Processing lock initiated.");
       this.processNext();
       return;
     }
@@ -197,7 +198,7 @@ class SystemEngine {
         inputs: [fileNode],
         output: null,
         settings,
-        startedAt: Date.now()
+        startedAt: new Date()
       };
 
       this.processedHashes.add(jobKey);
@@ -211,7 +212,7 @@ class SystemEngine {
   }
 
   private determineMode(toolId?: string): ExecutionMode {
-    const aiTools = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'summarize-pdf', 'ai-qa', 'sign-pdf', 'sign'];
+    const aiTools = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'summarize-pdf', 'ai-qa', 'sign-pdf', 'sign', 'scan-to-pdf'];
     if (toolId && aiTools.includes(toolId)) return 'AI';
     return 'WASM';
   }
@@ -258,7 +259,7 @@ class SystemEngine {
       nextJob.status = 'done';
       nextJob.progress = 100;
       nextJob.output = output;
-      nextJob.completedAt = Date.now();
+      nextJob.completedAt = new Date();
       this.addLog(nextJob, "Mastery Cycle Complete.");
 
       this.state.outputs.unshift(output);
@@ -285,8 +286,11 @@ class SystemEngine {
     const specialized = new SpecializedConverter(files[0], update);
     const pdfConv = new PDFConverter(files[0], update);
     const imgConv = new ImageConverter(files[0], update);
+    const scanner = new ScannerConverter(files, update);
 
     switch (job.toolId) {
+      case 'scan-to-pdf':
+      case 'scan': return scanner.process(job.settings);
       case 'organize-pdf':
       case 'organize': return manip.organize(job.settings.actions || []);
       case 'merge-pdf':
