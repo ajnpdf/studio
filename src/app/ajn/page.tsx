@@ -144,7 +144,7 @@ export default function AJNPage() {
                   isDragging && "border-primary bg-primary/5 scale-[0.98]"
                 )}
               >
-                <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => e.target.files && simulateProcessing(e.target.files[0])} />
+                <input type="file" multiple ref={fileInputRef} className="hidden" onChange={(e) => e.target.files && simulateProcessing(e.target.files[0])} />
                 
                 <div className={cn(
                   "w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center mb-4 shadow-sm transition-all duration-500",

@@ -29,7 +29,6 @@ export function PlatformLoader() {
           return 100;
         }
         
-        // Update text every ~14%
         const nextPercent = prev + 1;
         if (nextPercent % 14 === 0 && textIndex < loadingSteps.length - 1) {
           setTextIndex(Math.floor(nextPercent / 14));
@@ -37,7 +36,7 @@ export function PlatformLoader() {
         
         return nextPercent;
       });
-    }, 30);
+    }, 20);
 
     return () => clearInterval(interval);
   }, [textIndex]);
@@ -49,9 +48,6 @@ export function PlatformLoader() {
       "fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-500",
       isDone ? "opacity-0 pointer-events-none" : "opacity-100"
     )}>
-      {/* Background sync with global body style during load */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#e9cdfa] to-[#c8e4f7]" />
-      
       <div className="relative z-10 flex flex-col items-center">
         {/* AJN LOGO - Navy Blue */}
         <svg 
@@ -69,21 +65,18 @@ export function PlatformLoader() {
           </defs>
 
           <g className="logo-paths">
-            {/* A */}
             <path d="M20 100 L55 20 L90 100" className="logo-path" />
-            {/* J */}
             <path d="M140 20 L140 80 Q140 105 115 100" className="logo-path delay-1" />
-            {/* N */}
             <path d="M190 100 L190 20 L250 100 L250 20" className="logo-path delay-2" />
           </g>
         </svg>
 
         <div className="space-y-4 text-center">
-          <p className="text-[14px] font-black text-slate-950/80 uppercase tracking-[0.3em] animate-pulse">
+          <p className="text-sm font-black text-slate-950/80 tracking-widest animate-pulse">
             {isDone ? "Welcome to AJN Platform" : loadingSteps[textIndex]}
           </p>
           
-          <div className="text-[28px] font-black text-primary">
+          <div className="text-3xl font-black text-primary">
             {percent}%
           </div>
 
