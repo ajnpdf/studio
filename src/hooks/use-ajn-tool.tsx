@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from "react";
@@ -26,6 +25,7 @@ export function useAJNTool(toolId: string) {
   const abortRef = useRef(false);
 
   const onProgress = useCallback((p: ProgressState) => {
+    if (abortRef.current) return;
     setProgress(p);
     setLogs(prev => [...prev.slice(-49), { ...p, ts: Date.now() }]);
   }, []);

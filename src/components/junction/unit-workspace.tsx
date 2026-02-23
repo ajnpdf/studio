@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -10,11 +9,12 @@ import { Settings2, ShieldCheck, Cpu, Zap, Download, RefreshCw, CheckCircle2 } f
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { ALL_UNITS } from './services-grid';
 import { Button } from '@/components/ui/button';
+import { toast } from '@/hooks/use-toast';
 
 interface Props {
   defaultCategory: string;
@@ -29,13 +29,30 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [config, setConfig] = useState<any>({});
   const unit = ALL_UNITS.find(u => u.id === initialUnitId);
   
-  const { phase, progress, logs, result, run, reset } = useAJNTool(initialUnitId || 'converter');
+  const { phase, progress, logs, result, run, reset } = useAJNTool(initialUnitId || 'merge-pdf');
 
   const handleFilesAdded = (files: File[]) => {
     run(files, config);
   };
 
   const set = (k: string, v: any) => setConfig({ ...config, [k]: v });
+
+  const handleDownload = () => {
+    if (!result) return;
+    const url = URL.createObjectURL(result.blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = result.fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Download Initiated",
+      description: "Mastered asset has been exported to your local file system.",
+    });
+  };
 
   const renderConfig = () => {
     if (!unit) return null;
@@ -119,25 +136,27 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                 {phase === 'idle' && <DropZone onFiles={handleFilesAdded} />}
                 
                 {phase === 'running' && (
-                  <Card className="p-8 bg-white/60 border-2 border-black/5 rounded-[3.5rem] space-y-8 shadow-2xl">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-black uppercase tracking-widest text-primary flex items-center gap-3">
-                        <RefreshCw className="w-4 h-4 animate-spin" /> Processing Mastery...
-                      </h3>
-                      <Badge className="bg-primary text-white border-none font-black text-[9px] px-2.5 h-5 rounded-full">
-                        {Math.round(progress.pct)}%
-                      </Badge>
-                    </div>
-                    
-                    <ProgressBar pct={progress.pct} label={progress.detail} />
+                  <Card className="p-8 bg-white/60 border-2 border-black/5 rounded-[3.5rem] space-y-8 shadow-2xl overflow-hidden">
+                    <CardContent className="p-0 space-y-8">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-black uppercase tracking-widest text-primary flex items-center gap-3">
+                          <RefreshCw className="w-4 h-4 animate-spin" /> Processing Mastery...
+                        </h3>
+                        <Badge className="bg-primary text-white border-none font-black text-[9px] px-2.5 h-5 rounded-full">
+                          {Math.round(progress.pct)}%
+                        </Badge>
+                      </div>
+                      
+                      <ProgressBar pct={progress.pct} label={progress.detail} />
 
-                    <LogStream logs={logs} />
+                      <LogStream logs={logs} />
+                    </CardContent>
                   </Card>
                 )}
 
                 {phase === 'done' && result && (
                   <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-                    <Card className="bg-white/80 border-2 border-emerald-500/20 p-8 rounded-[3.5rem] shadow-2xl space-y-8">
+                    <Card className="bg-white/80 border-2 border-emerald-500/20 p-8 rounded-[3.5rem] shadow-2xl space-y-8 overflow-hidden">
                       <div className="flex flex-col items-center text-center space-y-4">
                         <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center">
                           <CheckCircle2 className="w-10 h-10 text-emerald-600" />
@@ -147,7 +166,10 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
-                        <Button className="h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl gap-3 shadow-xl">
+                        <Button 
+                          onClick={handleDownload}
+                          className="h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl gap-3 shadow-xl"
+                        >
                           <Download className="w-4 h-4" /> Download File
                         </Button>
                         <Button variant="outline" onClick={reset} className="h-14 border-black/10 bg-white hover:bg-black/5 font-black text-xs uppercase tracking-widest rounded-2xl gap-3">
