@@ -17,11 +17,6 @@ import { SpecializedConverter } from './converters/specialized-converter';
 import { PDFManipulator } from './converters/pdf-manipulator';
 import { ScannerConverter } from './converters/scanner-converter';
 
-/**
- * AJN MASTER ARCHITECTURE — CORE ENGINE
- * Stateful workflow orchestrator managing 45+ tools.
- */
-
 export type ExecutionMode = 'WASM' | 'SMART' | 'AI';
 export type JobStatus = 'queued' | 'running' | 'done' | 'failed' | 'cancelled';
 
@@ -130,67 +125,9 @@ class SystemEngine {
   }
 
   async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, toolId?: string) {
-    const isMultiInput = ['merge-pdf', 'merge', 'scan-to-pdf', 'scan', 'jpg-pdf', 'jpg2pdf'].includes(toolId || '');
-    
-    if (toolId === 'html-pdf') {
-      const job: ProcessingJob = {
-        id: Math.random().toString(36).substr(2, 9),
-        toolId: 'html-pdf',
-        mode: 'WASM',
-        status: 'queued',
-        progress: 0,
-        stage: 'Initial Calibration...',
-        logs: [],
-        inputs: [],
-        output: null,
-        settings,
-        startedAt: new Date()
-      };
-      this.state.queue = [...this.state.queue, job];
-      this.processNext();
-      return;
-    }
-
-    if (isMultiInput) {
-      const job: ProcessingJob = {
-        id: Math.random().toString(36).substr(2, 9),
-        toolId: toolId || 'merge-pdf',
-        mode: 'WASM',
-        status: 'queued',
-        progress: 0,
-        stage: 'Initial Calibration...',
-        logs: [],
-        inputs: [],
-        output: null,
-        settings,
-        startedAt: new Date()
-      };
-
-      for (const file of files) {
-        const hash = await this.generateHash(file);
-        job.inputs.push({
-          id: Math.random().toString(36).substr(2, 9),
-          name: file.name,
-          originalName: file.name,
-          size: file.size,
-          format: file.name.split('.').pop()?.toUpperCase() || 'UNK',
-          sha256: hash,
-          status: 'idle',
-          uploadedAt: Date.now(),
-          file
-        });
-      }
-
-      this.state.queue = [...this.state.queue, job];
-      this.processNext();
-      return;
-    }
-
     for (const file of files) {
       const hash = await this.generateHash(file);
-      const jobKey = `${hash}_${toolId || 'convert'}_${toFmt}`;
-
-      if (this.processedHashes.has(jobKey)) continue;
+      const jobKey = `${hash}_${toolId || 'convert'}_${toFmt}_${Date.now()}`;
 
       const fileNode: FileNode = {
         id: Math.random().toString(36).substring(7),
@@ -218,7 +155,6 @@ class SystemEngine {
         startedAt: new Date()
       };
 
-      this.processedHashes.add(jobKey);
       this.state.files.unshift(fileNode);
       this.state.queue = [...this.state.queue, job];
     }
@@ -228,7 +164,7 @@ class SystemEngine {
   }
 
   private determineMode(toolId?: string): ExecutionMode {
-    const aiTools = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'summarize-pdf', 'ai-qa', 'sign-pdf', 'pdf-excel', 'pdf-pptx'];
+    const aiTools = ['ocr-pdf', 'translate-pdf', 'summarize-pdf', 'pdf-excel', 'pdf-pptx'];
     if (toolId && aiTools.includes(toolId)) return 'AI';
     return 'WASM';
   }
@@ -247,7 +183,7 @@ class SystemEngine {
       const result = await this.runTool(nextJob);
 
       const duration = ((Date.now() - startTime) / 1000).toFixed(1);
-      const originalSize = nextJob.inputs.length > 0 ? nextJob.inputs.reduce((sum, f) => sum + f.size, 0) : 1024 * 1024;
+      const originalSize = nextJob.inputs.reduce((sum, f) => sum + f.size, 0);
       const reduction = Math.max(0, Math.round(((originalSize - result.blob.size) / originalSize) * 100));
 
       const objectUrl = URL.createObjectURL(result.blob);
@@ -273,8 +209,6 @@ class SystemEngine {
       nextJob.status = 'done';
       nextJob.progress = 100;
       nextJob.output = output;
-      this.addLog(nextJob, "Mastery Cycle Complete.");
-
       this.state.outputs.unshift(output);
       this.state.stats.totalMastered++;
     } catch (err: any) {
@@ -295,25 +229,19 @@ class SystemEngine {
       this.addLog(job, m);
     };
 
-    const pdfConv = new PDFConverter(files[0], update);
-    const wordConv = new WordConverter(files[0], update);
-    const pptConv = new PPTConverter(files[0], update);
-    const excelConv = new ExcelConverter(files[0], update);
     const manip = new PDFManipulator(files, update);
     const specialized = new SpecializedConverter(files[0], update);
+    const pdfConv = new PDFConverter(files[0], update);
 
     switch (job.toolId) {
-      case 'pdf-pptx': return pdfConv.convertTo('PPTX', job.settings);
-      case 'pdf-excel': return pdfConv.convertTo('XLSX', job.settings);
-      case 'pdf-word': return pdfConv.convertTo('DOCX', job.settings);
-      case 'pdf-jpg': return pdfConv.convertTo('JPG', job.settings);
-      case 'word-pdf': return wordConv.convertTo('PDF');
-      case 'ppt-pdf': return pptConv.convertTo('PDF');
-      case 'excel-pdf': return excelConv.convertTo('PDF');
+      case 'rotate-pdf': return manip.rotate(job.settings.rotationMap || {});
+      case 'add-page-numbers': return manip.addPageNumbers(job.settings);
+      case 'pdf-pdfa': return manip.toPDFA(job.settings.conformance);
       case 'merge-pdf': return manip.merge();
       case 'split-pdf': return manip.split(job.settings);
       case 'ocr-pdf': return specialized.convertTo('OCR', job.settings);
-      case 'redact-pdf': return specialized.convertTo('REDACTED_PDF', job.settings);
+      case 'compress-pdf': return manip.compress(job.settings);
+      case 'repair-pdf': return manip.repair(job.settings);
       default: return pdfConv.convertTo(job.settings.toFmt || 'PDF', job.settings);
     }
   }
@@ -327,7 +255,6 @@ class SystemEngine {
     this.state.outputs.forEach(o => URL.revokeObjectURL(o.objectUrl));
     this.state.outputs = [];
     this.state.files = [];
-    this.processedHashes.clear();
     this.notify();
   }
 }
