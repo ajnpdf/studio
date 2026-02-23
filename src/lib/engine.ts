@@ -19,10 +19,10 @@ import { PDFManipulator } from './converters/pdf-manipulator';
 
 /**
  * AJN SYSTEM IDENTITY - CORE INTELLIGENCE LAYER
- * Stateful workflow orchestrator managing 35+ PDF tools.
+ * Stateful workflow orchestrator managing 35+ PDF tools across 6 domains.
  */
 
-export type ProcessingContext = 'WASM' | 'SMART' | 'AI';
+export type ExecutionContext = 'WASM' | 'SMART' | 'AI';
 export type JobStatus = 'queued' | 'processing' | 'complete' | 'failed' | 'cancelled';
 
 export interface FileBuffer {
@@ -47,13 +47,14 @@ export interface ConversionJob {
   status: JobStatus;
   progress: number;
   stage: string;
-  context: ProcessingContext;
+  context: ExecutionContext;
   result?: {
     blob: Blob;
     fileName: string;
     mimeType: string;
     size: string;
     objectUrl: string;
+    isZip?: boolean;
   };
   error?: string;
   settings: any;
@@ -149,6 +150,7 @@ class ConversionEngine {
       newFiles.push(fileBuffer);
     }
 
+    // Persist to Global State
     this.state.activeFiles = [...newFiles, ...this.state.activeFiles].slice(0, 50);
 
     const newJobs: ConversionJob[] = newFiles.map(fb => ({
@@ -170,9 +172,9 @@ class ConversionEngine {
     this.processNext();
   }
 
-  private determineContext(opId?: string): ProcessingContext {
-    const aiOps = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'compare-pdf'];
-    const smartOps = ['repair-pdf', 'edit-pdf', 'sign-pdf', 'protect-pdf'];
+  private determineContext(opId?: string): ExecutionContext {
+    const aiOps = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'compare-pdf', 'repair-pdf'];
+    const smartOps = ['compress-pdf', 'extract-pages', 'organize-pdf', 'sign-pdf', 'protect-pdf'];
     if (opId && aiOps.includes(opId)) return 'AI';
     if (opId && smartOps.includes(opId)) return 'SMART';
     return 'WASM';
@@ -200,14 +202,14 @@ class ConversionEngine {
       const objectUrl = URL.createObjectURL(result.blob);
       nextJob.status = 'complete';
       nextJob.progress = 100;
-      nextJob.stage = 'Process Successful';
+      nextJob.stage = 'Operation Successful';
       
       const originalBase = nextJob.file.name.replace(/\.[^/.]+$/, "");
-      const finalFileName = `Mastered_${originalBase}.${nextJob.toFmt.toLowerCase()}`;
+      const finalFileName = `Mastered_${originalBase}.${result.fileName.split('.').pop()}`;
 
       nextJob.result = {
         ...result,
-        fileName: finalFileName,
+        fileName: result.fileName || finalFileName,
         size: (result.blob.size / (1024 * 1024)).toFixed(2) + ' MB',
         objectUrl
       };
@@ -215,8 +217,8 @@ class ConversionEngine {
       this.state.outputBuffer = [nextJob, ...this.state.outputBuffer];
     } catch (err: any) {
       nextJob.status = 'failed';
-      nextJob.error = err.message || 'Error during unit execution';
-      nextJob.stage = 'Internal Node Error';
+      nextJob.error = err.message || 'Node execution error';
+      nextJob.stage = 'Internal Logic Failure';
     } finally {
       this.activeJobsCount--;
       this.state.processingQueue = this.state.processingQueue.filter(j => j.id !== nextJob.id);
@@ -242,40 +244,43 @@ class ConversionEngine {
 
     switch (job.operationId) {
       case 'split-pdf': 
+        return manip.split(job.settings.splitMode || 'range', job.settings.splitValue || '1');
       case 'extract-pages':
-        return manip.split(job.settings.pages || [0]);
-      case 'remove-pages': return manip.removePages(job.settings.pages || []);
+        return manip.extractPages(job.settings.pages || [0]);
+      case 'remove-pages': 
+        return manip.removePages(job.settings.pages || []);
       case 'organize-pdf': 
-        job.stage = "Rearranging page tree...";
-        this.notify();
-        await new Promise(r => setTimeout(r, 1500));
-        return manip.rotate(0);
-      case 'scan-to-pdf': return specialized.convertTo('SEARCHABLE_PDF');
+        return manip.reorderPages(job.settings.newOrder || []);
+      case 'scan-to-pdf': 
+        return specialized.convertTo('SEARCHABLE_PDF');
       case 'compress-pdf': 
-        job.stage = "Optimizing data streams...";
-        this.notify();
-        await new Promise(r => setTimeout(r, 2000));
-        return manip.rotate(0);
-      case 'repair-pdf': return specialized.convertTo('REPAIRED_PDF');
-      case 'ocr-pdf': return specialized.convertTo('SEARCHABLE_PDF');
-      case 'rotate-pdf': return manip.rotate(job.settings.angle || 90);
-      case 'page-numbers': return manip.addPageNumbers();
-      case 'watermark-pdf': return manip.addWatermark(job.settings.text || 'AJN Pro');
-      case 'crop-pdf': return manip.crop(job.settings.margins || { top: 50, bottom: 50, left: 50, right: 50 });
+        return manip.compress(job.settings.profile || 'balanced');
+      case 'repair-pdf': 
+        return specialized.convertTo('REPAIRED_PDF');
+      case 'ocr-pdf': 
+        return specialized.convertTo('SEARCHABLE_PDF');
+      case 'rotate-pdf': 
+        return manip.rotate(job.settings.angle || 90);
+      case 'page-numbers': 
+        return manip.addPageNumbers();
+      case 'watermark-pdf': 
+        return manip.addWatermark(job.settings.text || 'AJN Pro');
+      case 'crop-pdf': 
+        return manip.crop(job.settings.margins || { top: 50, bottom: 50, left: 50, right: 50 });
       case 'unlock-pdf': 
-        job.stage = "Bypassing protocol restrictions...";
-        this.notify();
-        await new Promise(r => setTimeout(r, 1500));
-        return manip.rotate(0);
-      case 'protect-pdf': return manip.protect(job.settings.password || '1234');
-      case 'sign-pdf': return manip.addWatermark('Digitally Signed', 0.1);
+        return manip.rotate(0); // Stub for prototype decryption
+      case 'protect-pdf': 
+        return manip.protect(job.settings.password || '1234');
+      case 'sign-pdf': 
+        return manip.addWatermark('Digitally Signed', 0.1);
       case 'redact-pdf': 
-        job.stage = "Purging sensitive vectors...";
-        this.notify();
         return specialized.convertTo('REDACTED_PDF', job.settings);
-      case 'compare-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
-      case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
-      default: return this.runConversion(job);
+      case 'compare-pdf': 
+        return specialized.convertTo('TRANSCRIPT', job.settings);
+      case 'translate-pdf': 
+        return specialized.convertTo('TRANSCRIPT', job.settings);
+      default: 
+        return this.runConversion(job);
     }
   }
 
