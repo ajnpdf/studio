@@ -22,7 +22,10 @@ import {
   GripVertical, 
   X,
   Layers,
-  ChevronDown
+  ChevronDown,
+  Monitor,
+  Layout,
+  Maximize
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -52,6 +55,8 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [splitMode, setSplitMode] = useState<'range' | 'every'>('range');
   const [rotateAngle, setRotateAngle] = useState('90');
   const [compressionProfile, setCompressionProfile] = useState('balanced');
+  const [pageSize, setPageSize] = useState('A4');
+  const [orientation, setOrientation] = useState('auto');
 
   useEffect(() => {
     return engine.subscribe(setAppState);
@@ -82,7 +87,9 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       angle: parseInt(rotateAngle),
       splitMode,
       splitValue: pageRange,
-      pages: pageRange.split(',').map(p => parseInt(p.trim()) - 1).filter(p => !isNaN(p))
+      pages: pageRange.split(',').map(p => parseInt(p.trim()) - 1).filter(p => !isNaN(p)),
+      pageSize,
+      orientation
     };
     engine.addJobs(files, fromFmt, toFmt, settings, initialUnitId);
   };
@@ -92,7 +99,8 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const hasControls = [
     'protect-pdf', 'split-pdf', 'extract-pages', 'remove-pages', 
     'rotate-pdf', 'watermark-pdf', 'translate-pdf', 'compress-pdf',
-    'unlock-pdf', 'redact-pdf', 'page-numbers', 'crop-pdf'
+    'unlock-pdf', 'redact-pdf', 'page-numbers', 'crop-pdf', 'jpg-pdf',
+    'word-pdf', 'pptx-pdf', 'excel-pdf', 'html-pdf'
   ].includes(initialUnitId || '');
 
   return (
@@ -111,7 +119,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               <section className="bg-white/40 border border-white/60 p-6 md:p-8 rounded-[2rem] animate-in fade-in slide-in-from-bottom-2 duration-700 shadow-xl backdrop-blur-xl">
                 <div className="flex items-center gap-3 mb-6 px-1">
                   <Settings2 className="w-4 h-4 text-primary" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Neural Parameters</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">Neural Parameters</span>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -119,7 +127,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     <div className="space-y-2">
                       <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Split Strategy</Label>
                       <Select value={splitMode} onValueChange={(v: any) => setSplitMode(v)}>
-                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold">
+                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -130,6 +138,37 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     </div>
                   )}
 
+                  {(initialUnitId === 'jpg-pdf' || initialUnitId === 'word-pdf') && (
+                    <>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Page Layout</Label>
+                        <Select value={pageSize} onValueChange={setPageSize}>
+                          <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="A4" className="font-bold text-xs">A4 Protocol</SelectItem>
+                            <SelectItem value="LETTER" className="font-bold text-xs">Letter Protocol</SelectItem>
+                            <SelectItem value="LEGAL" className="font-bold text-xs">Legal Protocol</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Orientation</Label>
+                        <Select value={orientation} onValueChange={setOrientation}>
+                          <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="auto" className="font-bold text-xs">Auto Detect</SelectItem>
+                            <SelectItem value="portrait" className="font-bold text-xs">Portrait</SelectItem>
+                            <SelectItem value="landscape" className="font-bold text-xs">Landscape</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </>
+                  )}
+
                   {(initialUnitId === 'split-pdf' || initialUnitId === 'extract-pages' || initialUnitId === 'remove-pages') && (
                     <div className="space-y-2">
                       <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">{splitMode === 'every' ? 'N-Page Interval' : 'Page Range'}</Label>
@@ -138,7 +177,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           value={pageRange}
                           onChange={(e) => setPageRange(e.target.value)}
                           placeholder={splitMode === 'every' ? "e.g. 2" : "e.g. 1-5, 8-10"} 
-                          className="bg-white/60 border-black/5 h-11 pl-10 font-black rounded-xl focus:ring-primary/20"
+                          className="bg-white/60 border-black/5 h-11 pl-10 font-black rounded-xl focus:ring-primary/20 text-slate-950"
                         />
                         <Scissors className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary" />
                       </div>
@@ -149,7 +188,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     <div className="space-y-2">
                       <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Efficiency Profile</Label>
                       <Select value={compressionProfile} onValueChange={setCompressionProfile}>
-                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold">
+                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -170,7 +209,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="Passphrase..." 
-                          className="bg-white/60 border-black/5 h-11 pl-10 rounded-xl font-bold"
+                          className="bg-white/60 border-black/5 h-11 pl-10 rounded-xl font-bold text-slate-950"
                         />
                         <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary" />
                       </div>
@@ -181,7 +220,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     <div className="space-y-2">
                       <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Rotation Angle</Label>
                       <Select value={rotateAngle} onValueChange={setRotateAngle}>
-                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold">
+                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
                           <RotateCw className="w-3.5 h-3.5 mr-2 text-primary" />
                           <SelectValue />
                         </SelectTrigger>

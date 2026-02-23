@@ -65,7 +65,6 @@ export interface GlobalAppState {
   activeFiles: FileBuffer[];
   processingQueue: ConversionJob[];
   outputBuffer: ConversionJob[];
-  wasmModules: Record<string, boolean>;
   networkStatus: 'online' | 'offline';
   processingMode: 'wasm' | 'smart' | 'ai' | 'auto';
 }
@@ -75,7 +74,6 @@ class ConversionEngine {
     activeFiles: [],
     processingQueue: [],
     outputBuffer: [],
-    wasmModules: {},
     networkStatus: 'online',
     processingMode: 'auto'
   };
@@ -150,7 +148,6 @@ class ConversionEngine {
       newFiles.push(fileBuffer);
     }
 
-    // Persist to Global State
     this.state.activeFiles = [...newFiles, ...this.state.activeFiles].slice(0, 50);
 
     const newJobs: ConversionJob[] = newFiles.map(fb => ({
@@ -161,20 +158,20 @@ class ConversionEngine {
       toFmt: toFmt || 'PDF',
       status: 'queued',
       progress: 0,
-      stage: 'Initializing neural buffer...',
+      stage: 'Initializing Neural Buffer...',
       context: this.determineContext(operationId),
       settings,
       operationId
     }));
 
-    this.state.processingQueue = [...newJobs, ...this.state.processingQueue];
+    this.state.processingQueue = [...this.state.processingQueue, ...newJobs];
     this.notify();
     this.processNext();
   }
 
   private determineContext(opId?: string): ExecutionContext {
     const aiOps = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'compare-pdf', 'repair-pdf'];
-    const smartOps = ['compress-pdf', 'extract-pages', 'organize-pdf', 'sign-pdf', 'protect-pdf'];
+    const smartOps = ['compress-pdf', 'extract-pages', 'organize-pdf', 'sign-pdf', 'protect-pdf', 'word-pdf', 'excel-pdf', 'pptx-pdf'];
     if (opId && aiOps.includes(opId)) return 'AI';
     if (opId && smartOps.includes(opId)) return 'SMART';
     return 'WASM';
@@ -202,7 +199,7 @@ class ConversionEngine {
       const objectUrl = URL.createObjectURL(result.blob);
       nextJob.status = 'complete';
       nextJob.progress = 100;
-      nextJob.stage = 'Operation Successful';
+      nextJob.stage = 'Process Successful';
       
       const originalBase = nextJob.file.name.replace(/\.[^/.]+$/, "");
       const finalFileName = `Mastered_${originalBase}.${result.fileName.split('.').pop()}`;
@@ -217,8 +214,8 @@ class ConversionEngine {
       this.state.outputBuffer = [nextJob, ...this.state.outputBuffer];
     } catch (err: any) {
       nextJob.status = 'failed';
-      nextJob.error = err.message || 'Node execution error';
-      nextJob.stage = 'Internal Logic Failure';
+      nextJob.error = err.message || 'Processing Error';
+      nextJob.stage = 'Internal Logic Error';
     } finally {
       this.activeJobsCount--;
       this.state.processingQueue = this.state.processingQueue.filter(j => j.id !== nextJob.id);
@@ -264,11 +261,11 @@ class ConversionEngine {
       case 'page-numbers': 
         return manip.addPageNumbers();
       case 'watermark-pdf': 
-        return manip.addWatermark(job.settings.text || 'AJN Pro');
+        return manip.addWatermark(job.settings.text || 'AJN Master');
       case 'crop-pdf': 
         return manip.crop(job.settings.margins || { top: 50, bottom: 50, left: 50, right: 50 });
       case 'unlock-pdf': 
-        return manip.rotate(0); // Stub for prototype decryption
+        return manip.rotate(0);
       case 'protect-pdf': 
         return manip.protect(job.settings.password || '1234');
       case 'sign-pdf': 
@@ -287,7 +284,7 @@ class ConversionEngine {
   private async runConversion(job: ConversionJob) {
     const key = job.fromFmt.toLowerCase();
     const ConverterClass = this.converters[key];
-    if (!ConverterClass) throw new Error(`Protocol ${key.toUpperCase()} not calibrated.`);
+    if (!ConverterClass) throw new Error(`Protocol ${key.toUpperCase()} not found.`);
     const converter = new ConverterClass(job.file, (p: number, msg: string) => {
       job.progress = p; job.stage = msg; this.notify();
     });
