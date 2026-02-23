@@ -13,7 +13,9 @@ export default function LandingPage() {
       <main className="w-full max-w-5xl flex flex-col items-center gap-10 md:gap-14 relative z-10 -mt-12 animate-in fade-in zoom-in-95 duration-1000">
         
         {/* Centerpiece Navy Blue Logo */}
-        <LogoAnimation className="w-64 h-32 md:w-80 md:h-40" />
+        <div className="relative">
+          <LogoAnimation className="w-64 h-32 md:w-80 md:h-40" />
+        </div>
         
         <div className="text-center space-y-8 md:space-y-10">
           <div className="space-y-4">

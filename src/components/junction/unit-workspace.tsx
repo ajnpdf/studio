@@ -13,7 +13,10 @@ import {
   RotateCw, 
   ShieldCheck, 
   Cpu, 
-  Layers
+  Layers,
+  Globe,
+  GitCompare,
+  EyeOff
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -30,7 +33,7 @@ interface Props {
 
 /**
  * AJN Unit Workspace - Professional Autonomous Hub
- * Automatically configures protocol based on Tool Identity.
+ * Automatically configures protocol based on Tool Identity and Execution Context.
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [appState, setAppState] = useState<GlobalAppState | null>(null);
@@ -44,24 +47,18 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [splitMode, setSplitMode] = useState<'range' | 'every'>('range');
   const [rotateAngle, setRotateAngle] = useState('90');
   const [compressionProfile, setCompressionProfile] = useState('balanced');
-  const [pageSize, setPageSize] = useState('A4');
-  const [orientation, setOrientation] = useState('auto');
   const [dpi, setDpi] = useState('150');
   const [quality, setQuality] = useState(90);
   
-  // Page Numbering Settings
-  const [numPosition, setNumPosition] = useState('footer-center');
-  const [numFormat, setNumFormat] = useState('Page {n} of {N}');
-  const [numStart, setNumStart] = useState(1);
-  const [numColor, setNumColor] = useState('#000000');
-  const [skipFirst, setSkipFirst] = useState(false);
+  // Comparison & Redaction
+  const [compareMode, setCompareMode] = useState('visual');
+  const [redactSensitive, setRedactSensitive] = useState(true);
 
   useEffect(() => {
     return engine.subscribe(setAppState);
   }, []);
 
   const handleFilesAdded = (files: File[]) => {
-    // Determine From/To based on Unit ID
     let from = '';
     let to = 'PDF';
 
@@ -70,7 +67,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
     } else if (initialUnitId?.startsWith('pdf-')) {
       from = 'pdf';
       to = initialUnitId.split('-')[1].toUpperCase();
-      if (to === 'PDFA') to = 'PDF'; // Remediated PDF
+      if (to === 'PDFA') to = 'PDF'; 
     } else {
       from = 'pdf';
       to = 'PDF';
@@ -85,15 +82,10 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       splitMode,
       splitValue: pageRange,
       pages: pageRange.split(',').map(p => parseInt(p.trim()) - 1).filter(p => !isNaN(p)),
-      pageSize,
-      orientation,
       dpi: parseInt(dpi),
       quality,
-      position: numPosition,
-      format: numFormat,
-      startNumber: numStart,
-      color: numColor,
-      skipFirst
+      compareMode,
+      redactSensitive
     };
 
     engine.addJobs(files, from, to, settings, initialUnitId);
@@ -104,11 +96,12 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const hasControls = [
     'protect-pdf', 'split-pdf', 'extract-pages', 'remove-pages', 
     'rotate-pdf', 'watermark-pdf', 'translate-pdf', 'compress-pdf',
-    'unlock-pdf', 'redact-pdf', 'page-numbers', 'crop-pdf', 'pdf-jpg'
+    'unlock-pdf', 'redact-pdf', 'page-numbers', 'crop-pdf', 'pdf-jpg',
+    'compare-pdf'
   ].includes(initialUnitId || '');
 
   return (
-    <div className="flex h-full bg-transparent overflow-hidden relative text-slate-950">
+    <div className="flex h-full bg-transparent overflow-hidden relative text-slate-950 font-body">
       <CategorySidebar 
         active={activeCategory} 
         onSelect={(id) => setActiveCategory(id)} 
@@ -120,15 +113,15 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
             
             <div className="flex items-center justify-between px-2 animate-in fade-in duration-700">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 shadow-sm">
                   <Cpu className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <h2 className="text-xl font-black tracking-tight text-slate-950 uppercase">{initialUnitId?.replace('-', ' ')}</h2>
-                  <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Autonomous Unit Calibration</p>
+                  <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Neural Unit Calibration</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20 shadow-sm">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
                 <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">WASM Layer Active</span>
               </div>
@@ -138,10 +131,58 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               <section className="bg-white/40 border border-white/60 p-6 md:p-8 rounded-[2rem] animate-in fade-in slide-in-from-bottom-2 duration-700 shadow-xl backdrop-blur-xl">
                 <div className="flex items-center gap-3 mb-6 px-1">
                   <Settings2 className="w-4 h-4 text-primary" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">Neural Parameters</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-950">Unit Parameters</span>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {initialUnitId === 'translate-pdf' && (
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest flex items-center gap-2">
+                        <Globe className="w-3 h-3" /> Target Language
+                      </Label>
+                      <Select value={targetLang} onValueChange={setTargetLang}>
+                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {['Spanish', 'French', 'German', 'Chinese', 'Japanese', 'Arabic'].map(l => (
+                            <SelectItem key={l} value={l.toLowerCase().substring(0,2)} className="font-bold text-xs">{l}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {initialUnitId === 'compare-pdf' && (
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest flex items-center gap-2">
+                        <GitCompare className="w-3 h-3" /> Diff Mode
+                      </Label>
+                      <Select value={compareMode} onValueChange={setCompareMode}>
+                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="visual" className="font-bold text-xs">Pixel-Level Diff</SelectItem>
+                          <SelectItem value="semantic" className="font-bold text-xs">Textual Diff</SelectItem>
+                          <SelectItem value="structural" className="font-bold text-xs">Structural Diff</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {initialUnitId === 'redact-pdf' && (
+                    <div className="space-y-4 col-span-full">
+                      <div className="flex items-center justify-between p-4 bg-white/60 rounded-xl border border-black/5">
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-black uppercase text-slate-950 tracking-widest">Neural Auto-Redact</p>
+                          <p className="text-[8px] font-bold text-slate-950/40 uppercase">Identifies PII, Emails, and Phone Numbers</p>
+                        </div>
+                        <Switch checked={redactSensitive} onCheckedChange={setRedactSensitive} />
+                      </div>
+                    </div>
+                  )}
+
                   {initialUnitId === 'split-pdf' && (
                     <div className="space-y-2">
                       <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Split Strategy</Label>
@@ -157,61 +198,29 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     </div>
                   )}
 
-                  {initialUnitId === 'pdf-jpg' && (
-                    <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Export Resolution</Label>
-                      <Select value={dpi} onValueChange={setDpi}>
-                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="72" className="font-bold text-xs">72 DPI (Web)</SelectItem>
-                          <SelectItem value="150" className="font-bold text-xs">150 DPI (Print)</SelectItem>
-                          <SelectItem value="300" className="font-bold text-xs">300 DPI (High Res)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {initialUnitId === 'page-numbers' && (
-                    <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Label Position</Label>
-                      <Select value={numPosition} onValueChange={setNumPosition}>
-                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="header-center" className="font-bold text-xs">Header Center</SelectItem>
-                          <SelectItem value="footer-center" className="font-bold text-xs">Footer Center</SelectItem>
-                          <SelectItem value="footer-right" className="font-bold text-xs">Footer Right</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
                   {(initialUnitId === 'split-pdf' || initialUnitId === 'extract-pages' || initialUnitId === 'remove-pages') && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">{splitMode === 'every' ? 'N-Page Interval' : 'Page Range'}</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">{splitMode === 'every' ? 'Interval' : 'Range'}</Label>
                       <Input 
                         value={pageRange}
                         onChange={(e) => setPageRange(e.target.value)}
                         placeholder={splitMode === 'every' ? "e.g. 2" : "e.g. 1-5, 8-10"} 
-                        className="bg-white/60 border-black/5 h-11 font-black rounded-xl focus:ring-primary/20 text-slate-950"
+                        className="bg-white/60 border-black/5 h-11 font-black rounded-xl text-slate-950"
                       />
                     </div>
                   )}
 
                   {initialUnitId === 'compress-pdf' && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Efficiency Profile</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Efficiency Level</Label>
                       <Select value={compressionProfile} onValueChange={setCompressionProfile}>
                         <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="quality" className="font-bold text-xs">High Fidelity (150 DPI)</SelectItem>
-                          <SelectItem value="balanced" className="font-bold text-xs">Balanced (96 DPI)</SelectItem>
-                          <SelectItem value="extreme" className="font-bold text-xs">Extreme (72 DPI)</SelectItem>
+                          <SelectItem value="quality" className="font-bold text-xs">High Fidelity</SelectItem>
+                          <SelectItem value="balanced" className="font-bold text-xs">Balanced</SelectItem>
+                          <SelectItem value="extreme" className="font-bold text-xs">Maximum</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -219,12 +228,12 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
                   {(initialUnitId === 'protect-pdf' || initialUnitId === 'unlock-pdf') && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Security Passphrase</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Security Pin</Label>
                       <Input 
                         type="password" 
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Required for encryption..." 
+                        placeholder="Cipher key..." 
                         className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950"
                       />
                     </div>
@@ -232,15 +241,15 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
                   {initialUnitId === 'rotate-pdf' && (
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Rotation Angle</Label>
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Rotation</Label>
                       <Select value={rotateAngle} onValueChange={setRotateAngle}>
                         <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold text-slate-950">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="90" className="font-bold text-xs">90° Clockwise</SelectItem>
-                          <SelectItem value="180" className="font-bold text-xs">180° Invert</SelectItem>
-                          <SelectItem value="270" className="font-bold text-xs">90° Counter-Clockwise</SelectItem>
+                          <SelectItem value="90" className="font-bold text-xs">90° CW</SelectItem>
+                          <SelectItem value="180" className="font-bold text-xs">180° INV</SelectItem>
+                          <SelectItem value="270" className="font-bold text-xs">90° CCW</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

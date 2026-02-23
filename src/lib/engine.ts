@@ -20,7 +20,7 @@ import { PDFManipulator } from './converters/pdf-manipulator';
 /**
  * AJN SYSTEM IDENTITY - CORE INTELLIGENCE LAYER
  * Stateful workflow orchestrator managing 35+ PDF tools across 6 domains.
- * Enforces unique job locks and professional mastered naming.
+ * Enforces a strict one-to-one processing ratio via Job Locks and SHA-256 Fingerprinting.
  */
 
 export type ExecutionContext = 'WASM' | 'SMART' | 'AI';
@@ -68,6 +68,10 @@ export interface GlobalAppState {
   outputBuffer: ConversionJob[];
   networkStatus: 'online' | 'offline';
   processingMode: 'wasm' | 'smart' | 'ai' | 'auto';
+  userSession: {
+    lastProcessAt: string | null;
+    totalMastered: number;
+  };
 }
 
 class ConversionEngine {
@@ -76,11 +80,15 @@ class ConversionEngine {
     processingQueue: [],
     outputBuffer: [],
     networkStatus: 'online',
-    processingMode: 'auto'
+    processingMode: 'auto',
+    userSession: {
+      lastProcessAt: null,
+      totalMastered: 0
+    }
   };
 
-  private activeJobsCount: number = 0;
-  private maxConcurrent: number = 2;
+  private isProcessing: boolean = false;
+  private processedHashes: Set<string> = new Set();
   private listeners: Set<(state: GlobalAppState) => void> = new Set();
 
   private converters: Record<string, any> = {
@@ -132,13 +140,17 @@ class ConversionEngine {
   }
 
   async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, operationId?: string) {
-    const newFiles: FileBuffer[] = [];
+    const newJobs: ConversionJob[] = [];
     
     for (const file of files) {
       const fingerprint = await this.generateFingerprint(file);
-      
-      // Prevent duplicates in active files
-      if (this.state.activeFiles.some(f => f.fingerprint === fingerprint)) continue;
+      const jobKey = `${fingerprint}_${operationId || 'convert'}_${toFmt}`;
+
+      // CRITICAL: Prevent duplicate job generation for the same file/operation pair
+      if (this.processedHashes.has(jobKey)) {
+        console.warn(`Job ${jobKey} is already in buffer or active.`);
+        continue;
+      }
 
       const fileBuffer: FileBuffer = {
         id: Math.random().toString(36).substr(2, 9),
@@ -150,26 +162,27 @@ class ConversionEngine {
           format: file.name.split('.').pop()?.toUpperCase() || 'UNK'
         }
       };
-      newFiles.push(fileBuffer);
+
+      const job: ConversionJob = {
+        id: Math.random().toString(36).substr(2, 9),
+        fileId: fileBuffer.id,
+        file: file,
+        fromFmt: fromFmt || fileBuffer.metadata.format.toLowerCase(),
+        toFmt: toFmt || 'PDF',
+        status: 'queued',
+        progress: 0,
+        stage: 'Calibrating Intelligence...',
+        context: this.determineContext(operationId),
+        settings,
+        operationId
+      };
+
+      this.processedHashes.add(jobKey);
+      this.state.activeFiles.unshift(fileBuffer);
+      newJobs.push(job);
     }
 
-    if (newFiles.length === 0) return;
-
-    this.state.activeFiles = [...newFiles, ...this.state.activeFiles].slice(0, 50);
-
-    const newJobs: ConversionJob[] = newFiles.map(fb => ({
-      id: Math.random().toString(36).substr(2, 9),
-      fileId: fb.id,
-      file: fb.file,
-      fromFmt: fromFmt || fb.metadata.format.toLowerCase(),
-      toFmt: toFmt || 'PDF',
-      status: 'queued',
-      progress: 0,
-      stage: 'Calibrating Unit...',
-      context: this.determineContext(operationId),
-      settings,
-      operationId
-    }));
+    if (newJobs.length === 0) return;
 
     this.state.processingQueue = [...this.state.processingQueue, ...newJobs];
     this.notify();
@@ -189,11 +202,11 @@ class ConversionEngine {
   }
 
   private async processNext() {
-    if (this.activeJobsCount >= this.maxConcurrent) return;
+    if (this.isProcessing) return;
     const nextJob = this.state.processingQueue.find(j => j.status === 'queued');
     if (!nextJob) return;
 
-    this.activeJobsCount++;
+    this.isProcessing = true;
     nextJob.status = 'processing';
     this.notify();
 
@@ -223,13 +236,15 @@ class ConversionEngine {
         objectUrl
       };
       
-      this.state.outputBuffer = [nextJob, ...this.state.outputBuffer];
+      this.state.outputBuffer.unshift(nextJob);
+      this.state.userSession.totalMastered++;
+      this.state.userSession.lastProcessAt = new Date().toISOString();
     } catch (err: any) {
       nextJob.status = 'failed';
       nextJob.error = err.message || 'Processing Error';
       nextJob.stage = 'Logic Fault';
     } finally {
-      this.activeJobsCount--;
+      this.isProcessing = false;
       this.state.processingQueue = this.state.processingQueue.filter(j => j.id !== nextJob.id);
       this.notify();
       this.processNext();
@@ -277,7 +292,7 @@ class ConversionEngine {
       case 'crop-pdf': 
         return manip.crop(job.settings.margins || { top: 50, bottom: 50, left: 50, right: 50 });
       case 'unlock-pdf': 
-        return manip.rotate(0);
+        return manip.rotate(0); // Mock bypass
       case 'protect-pdf': 
         return manip.protect(job.settings.password || '1234');
       case 'sign-pdf': 
@@ -285,9 +300,9 @@ class ConversionEngine {
       case 'redact-pdf': 
         return specialized.convertTo('REDACTED_PDF', job.settings);
       case 'compare-pdf': 
-        return specialized.convertTo('TRANSCRIPT', job.settings);
+        return specialized.convertTo('TRANSCRIPT', job.settings); // AI Mock
       case 'translate-pdf': 
-        return specialized.convertTo('TRANSCRIPT', job.settings);
+        return specialized.convertTo('TRANSCRIPT', job.settings); // AI Mock
       case 'pdf-pdfa':
         return this.runConversion({ ...job, toFmt: 'PDFA' });
       default: 
@@ -314,6 +329,7 @@ class ConversionEngine {
     this.state.outputBuffer.forEach(j => { if (j.result?.objectUrl) URL.revokeObjectURL(j.result.objectUrl); });
     this.state.outputBuffer = []; 
     this.state.activeFiles = [];
+    this.processedHashes.clear();
     this.notify();
   }
 }
