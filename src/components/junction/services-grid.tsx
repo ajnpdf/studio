@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from 'react';
@@ -10,7 +9,6 @@ import {
   ArrowRight,
   ShieldCheck,
   Presentation,
-  Cpu,
   Layout,
   Scissors,
   Trash2,
@@ -29,8 +27,7 @@ import {
   PenTool,
   EyeOff,
   GitCompare,
-  Globe,
-  Layers
+  Globe
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -49,11 +46,11 @@ export type ServiceUnit = {
 
 export const ALL_UNITS: ServiceUnit[] = [
   // --- ORGANIZE ---
-  { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple documents and images into a single, linearized PDF buffer.', icon: Layout, tag: 'Sequence', cat: 'Organize', complexity: 'Wasm' },
+  { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple documents and images into a single, linearized document buffer.', icon: Layout, tag: 'Sequence', cat: 'Organize', complexity: 'Wasm' },
   { id: 'split-pdf', name: 'Split PDF', desc: 'Divide documents by ranges, intervals, or bookmark indices into individual files.', icon: Scissors, tag: 'Divide', cat: 'Organize', complexity: 'Wasm' },
   { id: 'remove-pages', name: 'Remove Pages', desc: 'Prune unwanted pages and purge orphaned font/image resources.', icon: Trash2, tag: 'Prune', cat: 'Organize', complexity: 'Wasm' },
   { id: 'extract-pages', name: 'Extract Pages', desc: 'Isolate specific page ranges while maintaining transparency groups and vector graphics.', icon: Copy, tag: 'Isolate', cat: 'Organize', complexity: 'Smart' },
-  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Restructure /Pages and /Outlines trees with a visual drag-and-drop manager.', icon: Layout, tag: 'Tree', cat: 'Organize', complexity: 'Smart' },
+  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Restructure the document tree with a visual drag-and-drop manager.', icon: Layout, tag: 'Tree', cat: 'Organize', complexity: 'Smart' },
 
   // --- OPTIMIZE ---
   { id: 'scan-to-pdf', name: 'Scan to PDF', desc: 'Capture prints via Camera API and apply deskew, thresholding, and shadow removal.', icon: Scan, tag: 'Capture', cat: 'Optimize', complexity: 'Wasm' },
@@ -72,7 +69,7 @@ export const ALL_UNITS: ServiceUnit[] = [
   { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Export high-resolution raster frames from document page streams.', icon: ImageIcon, tag: 'Export', cat: 'Convert', complexity: 'Wasm' },
   { id: 'pdf-word', name: 'PDF to Word', desc: 'Reconstruct paragraph hierarchies from raw text and positioning vectors.', icon: FileText, tag: 'Edit', cat: 'Convert', complexity: 'Wasm' },
   { id: 'pdf-pptx', name: 'PDF to PowerPoint', desc: 'Synthesize editable slide objects from document layer metadata.', icon: Presentation, tag: 'Slides', cat: 'Convert', complexity: 'Wasm' },
-  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Extract semantic grid data into structured spreadsheet workbooks.', icon: Table, tag: 'Grid', cat: 'Convert', complexity: 'Smart' },
+  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Extract grid data into structured spreadsheet workbooks.', icon: Table, tag: 'Grid', cat: 'Convert', complexity: 'Smart' },
   { id: 'pdf-pdfa', name: 'PDF to PDF/A', desc: 'Enforce ISO long-term archiving standards by embedding mandatory metadata.', icon: ShieldCheck, tag: 'ISO', cat: 'Convert', complexity: 'Smart' },
 
   // --- EDIT ---
@@ -80,14 +77,14 @@ export const ALL_UNITS: ServiceUnit[] = [
   { id: 'page-numbers', name: 'Add Page Numbers', desc: 'Inject dynamic page indices into header or footer coordinate slots.', icon: Hash, tag: 'Indexing', cat: 'Edit', complexity: 'Smart' },
   { id: 'watermark-pdf', name: 'Add Watermark', desc: 'Stamp identification text or image layers with adjustable opacity.', icon: Type, tag: 'Brand', cat: 'Edit', complexity: 'Smart' },
   { id: 'crop-pdf', name: 'Crop PDF', desc: 'Modify the visual canvas by adjusting the document crop-box boundaries.', icon: Crop, tag: 'Canvas', cat: 'Edit', complexity: 'Wasm' },
-  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Directly modify text and image objects within the existing PDF stream.', icon: Edit3, tag: 'Mastery', cat: 'Edit', complexity: 'Smart' },
+  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Directly modify text and image objects within the document stream.', icon: Edit3, tag: 'Mastery', cat: 'Edit', complexity: 'Smart' },
 
   // --- SECURITY ---
   { id: 'unlock-pdf', name: 'Unlock PDF', desc: 'Bypass system restrictions and purge owner passwords from document streams.', icon: Unlock, tag: 'Access', cat: 'Security', complexity: 'Smart' },
   { id: 'protect-pdf', name: 'Protect PDF', desc: 'Seal documents with AES-256 encryption and custom user permissions.', icon: Lock, tag: 'Seal', cat: 'Security', complexity: 'Smart' },
   { id: 'sign-pdf', name: 'Sign PDF', desc: 'Apply digital signatures with verified audit trails and legal integrity.', icon: PenTool, tag: 'Legal', cat: 'Security', complexity: 'Smart' },
   { id: 'redact-pdf', name: 'Redact PDF', desc: 'Permanently purge sensitive data from both the visual and binary layers.', icon: EyeOff, tag: 'Privacy', cat: 'Security', complexity: 'Ai' },
-  { id: 'compare-pdf', name: 'Compare PDF', desc: 'Detect semantic differences between two versions of a document.', icon: GitCompare, tag: 'Audit', cat: 'Security', complexity: 'Ai' },
+  { id: 'compare-pdf', name: 'Compare PDF', desc: 'Detect differences between two versions of a document.', icon: GitCompare, tag: 'Audit', cat: 'Security', complexity: 'Ai' },
 
   // --- INTELLIGENCE ---
   { id: 'translate-pdf', name: 'Translate PDF', desc: 'Map document content into 50+ languages via smart translation models.', icon: Globe, tag: 'Smart', cat: 'Intelligence', complexity: 'Ai' },
@@ -107,7 +104,9 @@ export function ServicesGrid({ query, category }: { query: string, category: str
   if (filteredUnits.length === 0) {
     return (
       <div className="py-24 text-center space-y-4 opacity-40 animate-in fade-in duration-500">
-        <Cpu className="w-16 h-16 mx-auto text-slate-950" />
+        <div className="w-16 h-16 mx-auto text-slate-950 flex items-center justify-center">
+          <Search className="w-12 h-12" />
+        </div>
         <div className="space-y-1">
           <p className="text-sm font-bold tracking-tight text-slate-950">Unit Not Found</p>
           <p className="text-[10px] font-medium text-slate-950 uppercase tracking-widest">Adjust Search Parameters</p>

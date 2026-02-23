@@ -17,7 +17,8 @@ import {
   Grid2X2,
   LogOut,
   LayoutDashboard,
-  Users
+  Users,
+  Wand2
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -45,13 +46,11 @@ const toolItems = [
 ];
 
 const workspaceItems = [
-  { icon: Users, label: 'Node Team', href: '/dashboard/team', description: 'Multi-user sync' },
+  { icon: Users, label: 'Team Hub', href: '/dashboard/team', description: 'Multi-user sync' },
   { icon: Wand2, label: 'API Gateway', href: '/dashboard/api', description: 'Developer control' },
   { icon: ShieldCheck, label: 'Root Ops', href: '/admin', description: 'System core', badge: 'ROOT' },
-  { icon: Settings, label: 'Node Config', href: '/dashboard/settings', description: 'Session prefs' },
+  { icon: Settings, label: 'Session Config', href: '/dashboard/settings', description: 'Session prefs' },
 ];
-
-import { Wand2 } from 'lucide-react';
 
 export function DashboardSidebar() {
   const pathname = usePathname();
@@ -121,7 +120,7 @@ export function DashboardSidebar() {
                 <p className="font-black text-[11px] uppercase tracking-tighter truncate text-slate-900">{user?.displayName || 'OPERATOR'}</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">ACTIVE NODE</span>
+                  <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">ACTIVE SESSION</span>
                 </div>
               </div>
             )}
@@ -179,7 +178,7 @@ export function DashboardSidebar() {
             className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 transition-all"
           >
             <LogOut className="w-4 h-4 shrink-0" />
-            {!collapsed && <span>Disconnect Node</span>}
+            {!collapsed && <span>End Session</span>}
           </button>
         ) : (
           <Link href="/login">

@@ -12,8 +12,7 @@ import {
   Wand2, 
   Layers,
   ChevronLeft,
-  ChevronRight,
-  ShieldCheck
+  ChevronRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -39,7 +38,6 @@ interface Props {
 
 /**
  * AJN Category Sidebar - Refined Light Professional Theme
- * Compact, proper case, and modern glassmorphism.
  */
 export function CategorySidebar({ active, onSelect }: Props) {
   const [collapsed, setCollapsed] = useState(false);
@@ -106,7 +104,7 @@ export function CategorySidebar({ active, onSelect }: Props) {
           {!collapsed && (
             <div className="relative z-10">
               <p className="text-[10px] font-black uppercase text-slate-900 leading-none">System Stable</p>
-              <p className="text-[8px] font-bold text-muted-foreground/60 uppercase tracking-widest mt-1">Global Node Node</p>
+              <p className="text-[8px] font-bold text-muted-foreground/60 uppercase tracking-widest mt-1">Global Engine Hub</p>
             </div>
           )}
         </div>

@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { Button } from '@/components/ui/button';
@@ -9,21 +8,15 @@ import {
   ShieldCheck, 
   Search,
   Command,
-  Workflow,
-  Cpu,
-  Zap,
-  Lock,
-  Layers,
-  ArrowRight
+  Workflow
 } from 'lucide-react';
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { ServicesGrid } from '@/components/junction/services-grid';
 
 /**
- * AJN Smart Gateway - Professional Engineering Entrance
- * Features functional search and real-time unit discovery.
+ * AJN Gateway - Professional Engineering Entrance
+ * Features functional search and real-time service discovery.
  */
 export default function AJNPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,7 +25,7 @@ export default function AJNPage() {
     <div className="min-h-screen text-slate-950 selection:bg-primary/10 relative font-body flex flex-col bg-transparent overflow-x-hidden">
       <NightSky />
       
-      {/* PROFESSIONAL HEADER */}
+      {/* Professional Header */}
       <header className="fixed top-0 left-0 right-0 h-16 border-b border-black/5 bg-white/40 backdrop-blur-xl z-[60] px-8 flex items-center justify-between shadow-sm">
         <Link href="/" className="flex items-center group">
           <LogoAnimation className="w-20 h-10" showGlow={false} />
@@ -53,7 +46,7 @@ export default function AJNPage() {
       </header>
 
       <main className="relative z-10 flex-1 p-6 pt-24 max-w-7xl mx-auto w-full space-y-12">
-        {/* TOP SEARCH & BRANDING SECTOR */}
+        {/* Top Search Sector */}
         <section className="flex flex-col items-center gap-10">
           <div className="w-full max-w-2xl relative group animate-in fade-in slide-in-from-top-8 duration-1000">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-[2rem] blur opacity-25 group-hover:opacity-100 transition duration-1000" />
@@ -75,30 +68,9 @@ export default function AJNPage() {
           <div className="transition-all duration-1000 animate-in zoom-in-95">
             <LogoAnimation className="w-64 h-28" />
           </div>
-
-          {/* INFRASTRUCTURE MONITOR */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full px-4 animate-in fade-in duration-1000 delay-300">
-            {[
-              { label: 'Smart Analysis', sub: 'System Ready', icon: Cpu, color: 'text-blue-600' },
-              { label: 'Processing Speed', sub: 'High Performance', icon: Zap, color: 'text-amber-600' },
-              { label: 'Secure Sandbox', sub: 'Encrypted Layers', icon: Lock, color: 'text-emerald-600' },
-              { label: 'Service Network', sub: 'Complete Library', icon: Layers, color: 'text-indigo-600' },
-            ].map((stat, i) => (
-              <div key={i} className="p-4 bg-white/40 backdrop-blur-xl border border-black/5 rounded-2xl space-y-2 group hover:border-primary/20 transition-all cursor-default shadow-sm text-slate-950">
-                <div className="flex items-center justify-between">
-                  <stat.icon className={cn("w-4 h-4", stat.color)} />
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                </div>
-                <div className="space-y-0.5">
-                  <p className="text-[10px] font-black tracking-tight leading-tight uppercase">{stat.label}</p>
-                  <p className="text-[8px] font-bold text-slate-950/40 tracking-widest uppercase">{stat.sub}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </section>
 
-        {/* INTEGRATED SERVICES GRID */}
+        {/* Integrated Services Grid */}
         <section className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500 pb-20">
           <div className="flex items-center justify-between px-4 border-b border-black/5 pb-4">
             <div className="space-y-1">

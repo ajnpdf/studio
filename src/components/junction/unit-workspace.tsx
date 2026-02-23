@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -131,7 +130,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
               </div>
               <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Wasm Layer Active</span>
+                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">WASM System Active</span>
               </div>
             </div>
 
