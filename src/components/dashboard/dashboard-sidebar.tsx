@@ -1,30 +1,23 @@
 "use client";
 
 import { 
-  Network, 
-  Files, 
-  Wand2, 
-  Users, 
   Settings, 
-  LayoutDashboard,
-  LogOut,
-  Repeat,
-  FileText,
-  ImageIcon,
-  Video,
-  Music,
-  Box,
-  BrainCircuit,
-  HelpCircle,
-  Megaphone,
-  ChevronLeft,
-  ChevronRight,
-  ShieldCheck,
-  LogIn,
-  Activity,
-  Cpu,
+  Repeat, 
+  FileText, 
+  ImageIcon, 
+  Video, 
+  Music, 
+  Box, 
+  BrainCircuit, 
+  ChevronLeft, 
+  ChevronRight, 
+  ShieldCheck, 
+  LogIn, 
+  Activity, 
   Grid2X2,
-  Workflow
+  LogOut,
+  LayoutDashboard,
+  Users
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -57,6 +50,8 @@ const workspaceItems = [
   { icon: ShieldCheck, label: 'Root Ops', href: '/admin', description: 'System core', badge: 'ROOT' },
   { icon: Settings, label: 'Node Config', href: '/dashboard/settings', description: 'Session prefs' },
 ];
+
+import { Wand2 } from 'lucide-react';
 
 export function DashboardSidebar() {
   const pathname = usePathname();
@@ -111,9 +106,8 @@ export function DashboardSidebar() {
     )}>
       {/* Brand Header */}
       <div className="p-6 border-b border-black/5">
-        <Link href="/" className="flex items-center gap-2 group mb-8">
+        <Link href="/" className="flex items-center group mb-8">
           <LogoAnimation className="w-16 h-8 md:w-20 md:h-10" showGlow={false} />
-          {!collapsed && <span className="font-black text-xl tracking-tighter text-slate-900 uppercase ml-[-8px]">AJN</span>}
         </Link>
 
         {user ? (

@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { ServicesGrid } from '@/components/junction/services-grid';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Search, SlidersHorizontal, Cpu, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Search, SlidersHorizontal, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 
 /**
  * AJN Junction Page - Redesigned for the Light Theme
@@ -23,9 +22,8 @@ export default function JunctionPage() {
       
       {/* HUD HEADER */}
       <header className="fixed top-0 left-0 right-0 h-16 md:h-20 border-b border-black/5 bg-white/40 backdrop-blur-xl z-50 px-4 md:px-8 flex items-center justify-between shadow-sm">
-        <Link href="/ajn" className="flex items-center gap-2 md:gap-3 group">
-          <LogoAnimation className="w-16 h-8 md:w-20 md:h-10" showGlow={false} />
-          <span className="font-black text-lg md:text-xl tracking-tighter text-slate-900 uppercase ml-[-8px]">AJN JUNCTION</span>
+        <Link href="/ajn" className="flex items-center group">
+          <LogoAnimation className="w-16 h-8 md:w-24 md:h-12" showGlow={false} />
         </Link>
         
         <div className="flex items-center gap-4">

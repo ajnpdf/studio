@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Bell, Plus, Menu, User, Settings, LogOut, LogIn, Moon, Sun, Monitor, Activity } from 'lucide-react';
+import { Search, Bell, LogOut, Sun, Activity } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +19,8 @@ import { LanguageSelector } from './language-selector';
 import { useAuth, useUser } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
+import { LogoAnimation } from '../landing/logo-animation';
+import { User } from 'lucide-react';
 
 export function DashboardTopBar() {
   const [showBilling, setShowBilling] = useState(false);
@@ -35,8 +37,7 @@ export function DashboardTopBar() {
       <header className="h-16 border-b border-white/5 bg-background/40 backdrop-blur-xl flex items-center justify-between px-6">
         <div className="flex items-center gap-4 flex-1">
           <div className="lg:hidden flex items-center gap-2 pr-4 border-r border-white/10">
-             <Activity className="w-5 h-5 text-white" />
-             <span className="font-black text-lg tracking-tighter">AJN</span>
+             <LogoAnimation className="w-14 h-7" showGlow={false} />
           </div>
           <div className="relative max-w-md w-full hidden md:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

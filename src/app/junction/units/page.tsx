@@ -3,7 +3,7 @@
 import { UnitWorkspace } from '@/components/junction/unit-workspace';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Network, ShieldCheck, Activity } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
@@ -24,9 +24,8 @@ function UnitsContent() {
       {/* PROFESSIONAL WORKSPACE HEADER */}
       <header className="h-16 border-b border-white/5 bg-background/40 backdrop-blur-xl flex items-center justify-between px-6 shrink-0 z-50">
         <div className="flex items-center gap-6">
-          <Link href="/junction" className="flex items-center gap-2 group">
-            <LogoAnimation className="w-14 h-7" showGlow={false} />
-            <span className="font-black text-sm tracking-tighter uppercase ml-[-4px]">Service Unit Workspace</span>
+          <Link href="/junction" className="flex items-center group">
+            <LogoAnimation className="w-16 h-8 md:w-20 md:h-10" showGlow={false} />
           </Link>
           <div className="h-6 w-px bg-white/10" />
           <div className="flex items-center gap-4">

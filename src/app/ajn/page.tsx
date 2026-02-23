@@ -5,7 +5,6 @@ import { LogoAnimation } from '@/components/landing/logo-animation';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { Button } from '@/components/ui/button';
 import { 
-  Network, 
   ShieldCheck, 
   Upload,
   CheckCircle2,
@@ -20,10 +19,8 @@ import {
   Music,
   X,
   Layers,
-  FileCode,
   BrainCircuit,
   Wand2,
-  Activity,
   Cpu,
   Lock,
   Globe,
@@ -112,9 +109,8 @@ export default function AJNPage() {
       
       {/* HUD HEADER */}
       <header className="fixed top-0 left-0 right-0 h-16 md:h-20 border-b border-black/5 bg-white/40 backdrop-blur-xl z-[60] px-4 md:px-8 flex items-center justify-between shadow-sm">
-        <Link href="/" className="flex items-center gap-2 md:gap-3 group">
-          <LogoAnimation className="w-16 h-8 md:w-20 md:h-10" showGlow={false} />
-          <span className="font-black text-lg md:text-xl tracking-tighter text-slate-900 uppercase ml-[-8px]">AJN</span>
+        <Link href="/" className="flex items-center group">
+          <LogoAnimation className="w-16 h-8 md:w-24 md:h-12" showGlow={false} />
         </Link>
         
         <div className="flex items-center gap-2 md:gap-6">

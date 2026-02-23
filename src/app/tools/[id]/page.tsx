@@ -1,11 +1,10 @@
-
 "use client";
 
 import { use } from 'react';
 import { UnitWorkspace } from '@/components/junction/unit-workspace';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ShieldCheck, Activity, Cpu } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { ALL_UNITS } from '@/components/junction/services-grid';
@@ -30,11 +29,8 @@ export default function ToolPage({ params }: Props) {
       {/* PROFESSIONAL TOOLBAR */}
       <header className="h-16 border-b border-white/5 bg-background/40 backdrop-blur-xl flex items-center justify-between px-6 shrink-0 z-50">
         <div className="flex items-center gap-6">
-          <Link href="/junction" className="flex items-center gap-2 group">
-            <LogoAnimation className="w-14 h-7" showGlow={false} />
-            <span className="font-black text-sm tracking-tighter uppercase ml-[-4px]">
-              {tool.name} <span className="text-primary/60 ml-2 hidden sm:inline">UNIT: {id.toUpperCase()}</span>
-            </span>
+          <Link href="/junction" className="flex items-center group">
+            <LogoAnimation className="w-16 h-8 md:w-20 md:h-10" showGlow={false} />
           </Link>
           <div className="h-6 w-px bg-white/10 hidden lg:block" />
           <div className="hidden lg:flex items-center gap-4">
@@ -58,7 +54,7 @@ export default function ToolPage({ params }: Props) {
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-y-auto scrollbar-hide">
         <div className="h-full flex flex-col">
           {/* Tool Hero Info */}
           <div className="p-8 pb-0 text-center space-y-2 animate-in fade-in slide-in-from-top-4 duration-700">
