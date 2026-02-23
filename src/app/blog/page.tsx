@@ -108,7 +108,7 @@ export default function BlogPage() {
           <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.5em]">
             MADE BY INDIAN ❤️
           </p>
-        </footer>
+        </section>
       </main>
     </div>
   );

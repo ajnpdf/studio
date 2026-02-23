@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowRight, Layers, ShieldCheck, Heart, User, CheckCircle2 } from 'lucide-react';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { motion } from 'framer-motion';
+import { Card } from '@/components/ui/card';
 
 /**
  * AJN Landing Page - High-Fidelity Professional Entrance
@@ -120,5 +121,3 @@ export default function LandingPage() {
     </div>
   );
 }
-
-import { Card } from '@/components/ui/card';
