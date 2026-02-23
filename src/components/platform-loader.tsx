@@ -45,7 +45,7 @@ export function PlatformLoader() {
 
   return (
     <div className={cn(
-      "fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-500",
+      "fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-500 bg-transparent",
       isDone ? "opacity-0 pointer-events-none" : "opacity-100"
     )}>
       <div className="relative z-10 flex flex-col items-center">

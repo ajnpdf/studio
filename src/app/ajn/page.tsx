@@ -182,13 +182,13 @@ export default function AJNPage() {
                 { label: 'Buffer Isolation', sub: '256-bit Secure', icon: Lock, color: 'text-emerald-600' },
                 { label: 'Protocol Mesh', sub: '300+ Units Sync', icon: Network, color: 'text-indigo-600' },
               ].map((stat, i) => (
-                <div key={i} className="p-4 bg-white/40 backdrop-blur-xl border border-black/5 rounded-2xl space-y-2 group hover:border-primary/20 transition-all cursor-default shadow-sm">
+                <div key={i} className="p-4 bg-white/40 backdrop-blur-xl border border-black/5 rounded-2xl space-y-2 group hover:border-primary/20 transition-all cursor-default shadow-sm text-slate-950">
                   <div className="flex items-center justify-between">
                     <stat.icon className={cn("w-4 h-4", stat.color)} />
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   </div>
                   <div className="space-y-0.5">
-                    <p className="text-[10px] font-black text-slate-950 tracking-tight leading-tight uppercase">{stat.label}</p>
+                    <p className="text-[10px] font-black tracking-tight leading-tight uppercase">{stat.label}</p>
                     <p className="text-[8px] font-bold text-slate-950/40 tracking-widest uppercase">{stat.sub}</p>
                   </div>
                 </div>

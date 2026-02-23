@@ -28,6 +28,7 @@ export type ServiceUnit = {
 
 /**
  * AJN Service Units - Professional PDF Focus
+ * Curated list of high-fidelity PDF transformation units.
  */
 export const ALL_UNITS: ServiceUnit[] = [
   // --- CONVERT TO PDF ---
@@ -77,7 +78,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
               <ArrowRight className="w-3 h-3 text-primary" />
             </div>
             
-            <CardContent className="p-6 flex flex-col h-full">
+            <CardContent className="p-6 flex flex-col h-full text-slate-950">
               <div className="flex items-start justify-between mb-6">
                 <div className="w-12 h-12 bg-black/5 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500 border border-black/5">
                   <unit.icon className="w-6 h-6 text-slate-950 group-hover:text-primary transition-colors" />
@@ -96,8 +97,8 @@ export function ServicesGrid({ query, category }: { query: string, category: str
               </div>
 
               <div className="space-y-2 flex-1">
-                <h3 className="text-sm font-black tracking-tighter text-slate-950 group-hover:text-primary transition-colors leading-none">{unit.name}</h3>
-                <p className="text-[10px] text-slate-900 leading-relaxed font-medium tracking-wide line-clamp-3 opacity-60 group-hover:opacity-100 transition-opacity">
+                <h3 className="text-sm font-black tracking-tighter group-hover:text-primary transition-colors leading-none">{unit.name}</h3>
+                <p className="text-[10px] leading-relaxed font-medium tracking-wide line-clamp-3 opacity-60 group-hover:opacity-100 transition-opacity">
                   {unit.desc}
                 </p>
               </div>

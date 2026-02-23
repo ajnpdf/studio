@@ -5,7 +5,7 @@ import { ArrowRight, Network, ShieldCheck } from 'lucide-react';
 
 /**
  * AJN Minimal Standalone Landing - Professional Overhaul
- * Fixed layout to prevent scrolling, removed Node Protocol label.
+ * Strictly non-scrollable, Black text, Proper Case.
  */
 export default function LandingPage() {
   return (
@@ -14,7 +14,7 @@ export default function LandingPage() {
         {/* Centerpiece Neural Animation - Navy Blue */}
         <LogoAnimation className="w-64 h-32 md:w-80 md:h-40" />
         
-        {/* Minimal Brand Identifier - Proper Case & Black Text */}
+        {/* Minimal Brand Identifier - Black Text */}
         <div className="text-center space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
           <div className="space-y-3">
             <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-slate-950 leading-none">
@@ -31,18 +31,18 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link href="/ajn">
-              <Button className="h-12 md:h-14 px-8 md:px-10 bg-primary text-white hover:bg-primary/90 font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl transition-all gap-3 shadow-2xl shadow-primary/20 hover:scale-105">
+              <Button className="h-12 md:h-14 px-8 md:px-10 bg-primary text-white hover:bg-primary/90 font-black text-xs rounded-2xl transition-all gap-3 shadow-2xl shadow-primary/20 hover:scale-105">
                 Discover the Core <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
             <Link href="/junction">
-              <Button variant="outline" className="h-12 md:h-14 px-8 md:px-10 border-black/10 bg-white/40 backdrop-blur-xl text-slate-950 font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl transition-all gap-3 shadow-xl hover:bg-white/60 hover:border-primary/40">
+              <Button variant="outline" className="h-12 md:h-14 px-8 md:px-10 border-black/10 bg-white/40 backdrop-blur-xl text-slate-950 font-black text-xs rounded-2xl transition-all gap-3 shadow-xl hover:bg-white/60 hover:border-primary/40">
                 <Network className="w-4 h-4 text-primary" /> Access Junction
               </Button>
             </Link>
           </div>
 
-          {/* Infrastructure Verification - Proper Case & Black Text */}
+          {/* Infrastructure Verification - Black Text */}
           <div className="pt-6 flex items-center justify-center gap-8 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-slate-950" />
