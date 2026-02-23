@@ -1,4 +1,3 @@
-
 'use client';
 
 import { PDFConverter } from './converters/pdf-converter';
@@ -9,6 +8,7 @@ import { WordConverter } from './converters/word-converter';
 import { ExcelConverter } from './converters/excel-converter';
 import { PPTConverter } from './converters/ppt-converter';
 import { ImageConverter } from './converters/image-converter';
+import { CodeConverter } from './converters/code-converter';
 
 export type ExecutionMode = 'WASM' | 'SMART' | 'AI';
 export type JobStatus = 'queued' | 'running' | 'done' | 'failed' | 'cancelled';
@@ -150,7 +150,7 @@ class SystemEngine {
     const aiTools = [
       'ocr-pdf', 'translate-pdf', 'summarize-pdf', 
       'pdf-excel', 'pdf-pptx', 'compare-pdf', 
-      'repair-pdf', 'categorize-file'
+      'repair-pdf', 'categorize-file', 'redact-pdf'
     ];
     if (toolId && aiTools.includes(toolId)) return 'AI';
     return 'WASM';
@@ -163,7 +163,7 @@ class SystemEngine {
 
     this.isProcessing = true;
     nextJob.status = 'running';
-    this.addLog(nextJob, `Inhaling ${nextJob.mode} architecture...`);
+    this.addLog(nextJob, `Bootstrapping ${nextJob.mode} architecture...`);
 
     try {
       const startTime = Date.now();
@@ -221,32 +221,51 @@ class SystemEngine {
     const excelConv = new ExcelConverter(files[0], update);
     const pptConv = new PPTConverter(files[0], update);
     const imgConv = new ImageConverter(files[0], update);
+    const codeConv = new CodeConverter(files[0], update);
 
     switch (job.toolId) {
+      // Organize
       case 'merge-pdf': return manip.merge();
       case 'split-pdf': return manip.split(job.settings);
+      case 'delete-pages': return manip.organize(job.settings.permutation || []);
+      case 'extract-pages': return manip.organize(job.settings.permutation || []);
       case 'organize-pdf': return manip.organize(job.settings.permutation || []);
-      case 'scan-pdf': return scanner.process(job.settings);
+      
+      // Optimize
       case 'compress-pdf': return manip.compress(job.settings);
       case 'repair-pdf': return manip.repair(job.settings);
       case 'ocr-pdf': return specialized.convertTo('OCR', job.settings);
-      case 'word-pdf': return wordConv.convertTo('PDF', job.settings);
-      case 'excel-pdf': return excelConv.convertTo('PDF', job.settings);
-      case 'ppt-pdf': return pptConv.convertTo('PDF', job.settings);
+      case 'pdf-pdfa': return manip.toPDFA(job.settings.conformance || '2b');
+      
+      // Convert TO PDF
       case 'jpg-pdf': return imgConv.toMasterPDF(files, job.settings);
+      case 'word-pdf': return wordConv.convertTo('PDF', job.settings);
+      case 'ppt-pdf': return pptConv.convertTo('PDF', job.settings);
+      case 'excel-pdf': return excelConv.convertTo('PDF', job.settings);
+      case 'html-pdf': return codeConv.convertTo('PDF', job.settings);
+      
+      // Export FROM PDF
       case 'pdf-jpg': return pdfConv.convertTo('JPG', job.settings);
       case 'pdf-word': return pdfConv.convertTo('WORD', job.settings);
       case 'pdf-pptx': return pdfConv.convertTo('PPTX', job.settings);
       case 'pdf-excel': return pdfConv.convertTo('EXCEL', job.settings);
+      
+      // Edit
+      case 'rotate-pdf': return manip.rotate(job.settings.rotationMap || {});
+      case 'add-page-numbers': return manip.addPageNumbers(job.settings);
+      case 'edit-pdf': return new Promise((resolve) => setTimeout(() => resolve({ blob: new Blob([]), fileName: 'edit_session.pdf', mimeType: 'application/pdf' }), 2000));
+      
+      // Security
       case 'unlock-pdf': return manip.unlock(job.settings.password);
       case 'protect-pdf': return manip.protect(job.settings);
       case 'sign-pdf': return manip.sign(job.settings.signatureData, job.settings.position);
       case 'redact-pdf': return manip.redact(job.settings.redactions || []);
+      
+      // Intelligence
       case 'translate-pdf': return specialized.convertTo('TRANSLATE', job.settings);
       case 'compare-pdf': return specialized.convertTo('COMPARE', job.settings);
-      case 'pdf-pdfa': return manip.toPDFA(job.settings.conformance || '2b');
-      case 'add-page-numbers': return manip.addPageNumbers(job.settings);
-      case 'rotate-pdf': return manip.rotate(job.settings.rotationMap || {});
+      case 'summarize-pdf': return specialized.convertTo('SUMMARIZE', job.settings);
+      
       default: return pdfConv.convertTo(job.settings.toFmt || 'PDF', job.settings);
     }
   }

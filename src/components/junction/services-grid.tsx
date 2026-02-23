@@ -39,7 +39,10 @@ import {
   Zap,
   Activity,
   Maximize,
-  Presentation
+  Presentation,
+  ShieldCheck,
+  Cpu,
+  MousePointer2
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -58,48 +61,64 @@ export type ServiceUnit = {
 };
 
 export const ALL_UNITS: ServiceUnit[] = [
-  // Organize
-  { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple files and images into a single master document buffer.', icon: Layout, tag: 'Sequence', cat: 'Organize', mode: 'WASM', color: '#3B82F6' },
-  { id: 'split-pdf', name: 'Split PDF', desc: 'Divide documents by ranges or auto-detected chapters into individual files.', icon: Scissors, tag: 'Divide', cat: 'Organize', mode: 'WASM', color: '#6366F1' },
-  { id: 'remove-pages', name: 'Remove Pages', desc: 'Prune unwanted pages and purge orphaned resources from the document tree.', icon: Trash2, tag: 'Prune', cat: 'Organize', mode: 'WASM', color: '#8B5CF6' },
-  { id: 'extract-pages', name: 'Extract Pages', desc: 'Isolate specific page ranges while maintaining full transparency groups.', icon: Copy, tag: 'Isolate', cat: 'Organize', mode: 'SMART', color: '#A78BFA' },
-  
-  // Optimize
-  { id: 'compress-pdf', name: 'Compress PDF', desc: 'Re-encode bitstreams and subset fonts for maximum storage efficiency.', icon: Shrink, tag: 'Minify', cat: 'Optimize', mode: 'SMART', color: '#10B981' },
-  { id: 'repair-pdf', name: 'Repair PDF', desc: 'Execute deep byte-scans to recover objects from corrupted cross-reference tables.', icon: Wrench, tag: 'Recovery', cat: 'Optimize', mode: 'AI', color: '#059669' },
-  { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Synthesize searchable text layers over raster scans using smart recognition.', icon: Search, tag: 'Vision', cat: 'Optimize', mode: 'AI', color: '#047857' },
-  
-  // Convert TO
-  { id: 'word-pdf', name: 'Word to PDF', desc: 'Convert OOXML structures into pixel-perfect fixed-layout documents.', icon: FileText, tag: 'Office', cat: 'Convert', mode: 'WASM', color: '#F59E0B' },
-  { id: 'ppt-pdf', name: 'PowerPoint to PDF', desc: 'Transform slide decks into high-fidelity presentation PDF documents.', icon: Presentation, tag: 'Slides', cat: 'Convert', mode: 'SMART', color: '#D97706' },
-  { id: 'excel-pdf', name: 'Excel to PDF', desc: 'Map tabular grids into clean, coordinate-accurate document tables.', icon: Table, tag: 'Data', cat: 'Convert', mode: 'SMART', color: '#D97706' },
-  
-  // Export FROM
-  { id: 'pdf-word', name: 'PDF to Word', desc: 'Reconstruct paragraph hierarchies and editable runs from raw vectors.', icon: FileText, tag: 'Reconstruct', cat: 'Export', mode: 'WASM', color: '#EF4444' },
-  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Extract grid data into structured spreadsheet workbooks with type inference.', icon: Table, tag: 'Grid', cat: 'Export', mode: 'AI', color: '#DC2626' },
-  { id: 'pdf-pptx', name: 'PDF to PPTX', desc: 'Convert document pages into editable presentation slides with AI layout mapping.', icon: Presentation, tag: 'Slides', cat: 'Export', mode: 'AI', color: '#F97316' },
-  { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Export document pages as high-resolution imagery buffers.', icon: ImageIcon, tag: 'Export', cat: 'Export', mode: 'WASM', color: '#B91C1C' },
+  // --- ORGANIZE ---
+  { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple assets into a single master document buffer.', icon: Layout, tag: 'Sequence', cat: 'Organize', mode: 'WASM', color: '#3B82F6' },
+  { id: 'split-pdf', name: 'Split PDF', desc: 'Divide documents by ranges or auto-detected sections.', icon: Scissors, tag: 'Divide', cat: 'Organize', mode: 'WASM', color: '#6366F1' },
+  { id: 'delete-pages', name: 'Remove Pages', desc: 'Prune unwanted indices and purge orphaned resources.', icon: Trash2, tag: 'Prune', cat: 'Organize', mode: 'WASM', color: '#8B5CF6' },
+  { id: 'extract-pages', name: 'Extract Pages', desc: 'Isolate specific page ranges into new documents.', icon: Copy, tag: 'Isolate', cat: 'Organize', mode: 'SMART', color: '#A78BFA' },
+  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Reorder, rotate, and manage document structures.', icon: FolderOpen, tag: 'Structure', cat: 'Organize', mode: 'SMART', color: '#C084FC' },
 
-  // Intelligence
-  { id: 'translate-pdf', name: 'Translate PDF', desc: 'Map document content into 50+ languages while preserving layout.', icon: Globe, tag: 'Smart', cat: 'Intelligence', mode: 'AI', color: '#EC4899' },
-  { id: 'summarize-pdf', name: 'Summarize PDF', desc: 'Generate structured executive briefs and key insights from documents.', icon: FileText, tag: 'Brief', cat: 'Intelligence', mode: 'AI', color: '#DB2777' },
+  // --- OPTIMIZE ---
+  { id: 'compress-pdf', name: 'Compress PDF', desc: 'Re-encode bitstreams for maximum storage efficiency.', icon: Shrink, tag: 'Minify', cat: 'Optimize', mode: 'SMART', color: '#10B981' },
+  { id: 'repair-pdf', name: 'Repair PDF', desc: 'Execute deep byte-scans to recover corrupted objects.', icon: Wrench, tag: 'Recovery', cat: 'Optimize', mode: 'AI', color: '#059669' },
+  { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Synthesize searchable text layers over raster scans.', icon: Search, tag: 'Vision', cat: 'Optimize', mode: 'AI', color: '#047857' },
+  { id: 'pdf-pdfa', name: 'PDF to PDF/A', desc: 'Hardened archival conversion for ISO compliance.', icon: ShieldCheck, tag: 'Archive', cat: 'Optimize', mode: 'WASM', color: '#065F46' },
+
+  // --- CONVERT ---
+  { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Transform imagery sequences into pixel-perfect documents.', icon: ImageIcon, tag: 'Imagery', cat: 'Convert', mode: 'WASM', color: '#F59E0B' },
+  { id: 'word-pdf', name: 'Word to PDF', desc: 'Convert OOXML structures into fixed-layout PDFs.', icon: FileText, tag: 'Office', cat: 'Convert', mode: 'WASM', color: '#D97706' },
+  { id: 'ppt-pdf', name: 'PowerPoint to PDF', desc: 'Transform slide decks into high-fidelity presentations.', icon: Presentation, tag: 'Slides', cat: 'Convert', mode: 'SMART', color: '#B45309' },
+  { id: 'excel-pdf', name: 'Excel to PDF', desc: 'Map tabular grids into clean, coordinate-accurate tables.', icon: Table, tag: 'Data', cat: 'Convert', mode: 'SMART', color: '#92400E' },
+  { id: 'html-pdf', name: 'HTML to PDF', desc: 'Render web content into segmented document containers.', icon: Globe, tag: 'Web', cat: 'Convert', mode: 'SMART', color: '#78350F' },
+
+  // --- EXPORT ---
+  { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Export document pages as high-resolution imagery buffers.', icon: ImageIcon, tag: 'Raster', cat: 'Export', mode: 'WASM', color: '#EF4444' },
+  { id: 'pdf-word', name: 'PDF to Word', desc: 'Reconstruct paragraph hierarchies from raw vectors.', icon: FileText, tag: 'Doc', cat: 'Export', mode: 'WASM', color: '#DC2626' },
+  { id: 'pdf-pptx', name: 'PDF to PPTX', desc: 'Convert pages into editable presentation slides.', icon: Presentation, tag: 'Slides', cat: 'Export', mode: 'AI', color: '#B91C1C' },
+  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Extract grid data into structured spreadsheet workbooks.', icon: Table, tag: 'Grid', cat: 'Export', mode: 'AI', color: '#991B1B' },
+
+  // --- EDIT ---
+  { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Correct orientations via metadata transformation.', icon: History, tag: 'Geometry', cat: 'Edit', mode: 'WASM', color: '#EC4899' },
+  { id: 'add-page-numbers', name: 'Add Numbers', desc: 'Precision coordinate-mapped document numbering.', icon: Hash, tag: 'Indexing', cat: 'Edit', mode: 'WASM', color: '#DB2777' },
+  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Full interactive object-model document manipulation.', icon: MousePointer2, tag: 'Mastery', cat: 'Edit', mode: 'SMART', color: '#BE185D' },
+
+  // --- SECURITY ---
+  { id: 'unlock-pdf', name: 'Unlock PDF', desc: 'Purge encryption handlers and permission flags.', icon: Unlock, tag: 'Decrypt', cat: 'Security', mode: 'WASM', color: '#000000' },
+  { id: 'protect-pdf', name: 'Protect PDF', desc: 'Hardened AES-256 encryption and permissions.', icon: Lock, tag: 'Encrypt', cat: 'Security', mode: 'WASM', color: '#111827' },
+  { id: 'sign-pdf', name: 'Sign PDF', desc: 'Cryptographic digital signatures and e-signing.', icon: PenTool, tag: 'E-Sign', cat: 'Security', mode: 'SMART', color: '#1F2937' },
+  { id: 'redact-pdf', name: 'Redact PDF', desc: 'Permanent surgical binary data removal.', icon: EyeOff, tag: 'Purge', cat: 'Security', mode: 'AI', color: '#374151' },
+
+  // --- INTELLIGENCE ---
+  { id: 'translate-pdf', name: 'Translate PDF', desc: 'Map document content into 50+ languages.', icon: Globe, tag: 'Smart', cat: 'Intelligence', mode: 'AI', color: '#3B82F6' },
+  { id: 'compare-pdf', name: 'Compare PDF', desc: 'Differential analysis of text and visual layers.', icon: GitCompare, tag: 'Diff', cat: 'Intelligence', mode: 'AI', color: '#2563EB' },
+  { id: 'summarize-pdf', name: 'Summarize PDF', desc: 'Generate structured briefs from complex data.', icon: FileText, tag: 'Extract', cat: 'Intelligence', mode: 'AI', color: '#1D4ED8' },
 ];
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.06 }
+    transition: { staggerChildren: 0.04 }
   }
 };
 
 const cardVariants = {
-  hidden: { y: 60, opacity: 0, scale: 0.92 },
+  hidden: { y: 40, opacity: 0, scale: 0.95 },
   visible: { 
     y: 0, 
     opacity: 1, 
     scale: 1,
-    transition: { duration: 0.55, ease: [0.25, 1, 0.5, 1] }
+    transition: { duration: 0.5, ease: [0.25, 1, 0.5, 1] }
   }
 };
 
@@ -116,10 +135,10 @@ export function ServicesGrid({ query, category }: { query: string, category: str
   if (filteredUnits.length === 0) {
     return (
       <div className="py-32 text-center space-y-6 opacity-30">
-        <div className="w-24 h-24 mx-auto text-slate-950 flex items-center justify-center bg-black/5 rounded-[3rem]">
-          <Search className="w-12 h-12" />
+        <div className="w-20 h-20 mx-auto text-slate-950 flex items-center justify-center bg-black/5 rounded-[2.5rem]">
+          <Search className="w-10 h-10" />
         </div>
-        <p className="text-xl font-black uppercase">Instance Not Found</p>
+        <p className="text-lg font-black uppercase tracking-widest text-slate-950">Instance Not Found</p>
       </div>
     );
   }
@@ -135,21 +154,24 @@ export function ServicesGrid({ query, category }: { query: string, category: str
         {filteredUnits.map((unit) => (
           <motion.div key={unit.id} layout variants={cardVariants} className="group h-full">
             <Link href={`/tools/${unit.id}`}>
-              <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 transition-all duration-700 cursor-pointer overflow-hidden border-2 relative backdrop-blur-2xl shadow-xl group/card">
+              <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 transition-all duration-700 cursor-pointer overflow-hidden border-2 relative backdrop-blur-2xl shadow-xl group/card rounded-[2.5rem]">
                 <CardContent className="p-8 flex flex-col h-full text-slate-950 relative z-10">
                   <div className="flex items-start justify-between mb-8">
-                    <div className="w-16 h-16 bg-white/60 rounded-[1.5rem] flex items-center justify-center border-2 border-black/5">
-                      <unit.icon className="w-8 h-8 text-slate-950 group-hover/card:text-primary transition-colors" />
+                    <div className="w-14 h-14 bg-white/60 rounded-2xl flex items-center justify-center border-2 border-black/5 group-hover/card:scale-110 transition-transform duration-500 shadow-inner">
+                      <unit.icon className="w-7 h-7 text-slate-950 group-hover/card:text-primary transition-colors" />
                     </div>
-                    <Badge className="bg-primary/10 text-primary border-none text-[9px] font-black uppercase">{unit.mode}</Badge>
+                    <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase tracking-widest px-2.5 h-5 rounded-full">{unit.mode}</Badge>
                   </div>
                   <div className="space-y-3 flex-1">
-                    <h3 className="text-lg font-black uppercase leading-none">{unit.name}</h3>
-                    <p className="text-[11px] font-bold text-slate-950/50 uppercase leading-relaxed">{unit.desc}</p>
+                    <h3 className="text-lg font-black uppercase leading-none tracking-tight">{unit.name}</h3>
+                    <p className="text-[10px] font-bold text-slate-950/40 uppercase leading-relaxed tracking-wide">{unit.desc}</p>
                   </div>
                   <div className="pt-6 border-t border-black/5 mt-8 flex items-center justify-between">
-                    <span className="text-[9px] font-black text-slate-950/60 uppercase">{unit.cat}</span>
-                    <ArrowRight className="w-4 h-4 text-primary opacity-0 group-hover/card:opacity-100 transition-all translate-x-4 group-hover/card:translate-x-0" />
+                    <span className="text-[9px] font-black text-slate-950/30 uppercase tracking-[0.2em]">{unit.cat}</span>
+                    <div className="flex items-center gap-2 group-hover/card:text-primary transition-all">
+                      <span className="text-[8px] font-black uppercase tracking-widest opacity-0 group-hover/card:opacity-100 translate-x-2 group-hover/card:translate-x-0 transition-all">Execute</span>
+                      <ArrowRight className="w-4 h-4 text-primary translate-x-4 group-hover/card:translate-x-0 transition-all" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>

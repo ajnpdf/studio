@@ -18,7 +18,12 @@ import {
   Maximize, 
   Database,
   Layers,
-  Wand2
+  Wand2,
+  LockKeyhole,
+  FileCode,
+  Languages,
+  EyeOff,
+  History
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -89,17 +94,17 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     <h2 className="text-2xl md:text-3xl font-black tracking-tighter uppercase leading-none text-slate-950">{unitDisplayName}</h2>
                     <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-[0.4em] mt-1.5 flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Unit Operational Node
+                      Operational Unit Node
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="hidden sm:flex items-center gap-2 px-4 py-1.5 bg-white/60 border border-black/5 rounded-xl shadow-sm">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">System Secured</span>
+                    <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Buffer Secured</span>
                   </div>
                   <Badge className="bg-primary/10 text-primary border-none px-4 h-9 rounded-xl font-black text-[10px] uppercase tracking-widest">
-                    v1.0 Production
+                    v1.0 WASM Active
                   </Badge>
                 </div>
               </header>
@@ -110,7 +115,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                 </div>
 
                 <aside className="lg:col-span-4 space-y-8">
-                  <Card className="bg-white/60 border-2 border-black/5 p-8 rounded-[3rem] shadow-2xl backdrop-blur-3xl space-y-8 relative overflow-hidden transition-all hover:border-primary/20">
+                  <Card className="bg-white/60 border-2 border-black/5 p-8 rounded-[3.5rem] shadow-2xl backdrop-blur-3xl space-y-8 relative overflow-hidden transition-all hover:border-primary/20 group">
                     <div className="space-y-6 relative z-10">
                       <div className="flex items-center justify-between">
                         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2">
@@ -123,54 +128,83 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                       {initialUnitId?.includes('compress') ? (
                         <div className="space-y-6">
                           <div className="space-y-3">
-                            <Label className="text-[9px] font-black uppercase text-slate-950/60 ml-1">Mastery Index (Quality)</Label>
+                            <Label className="text-[9px] font-black uppercase text-slate-950/60 ml-1">Compression Index</Label>
                             <Slider 
                               value={[optimizeConfig.quality]} 
                               onValueChange={([v]) => setOptimizeConfig({...optimizeConfig, quality: v})}
                               max={100}
                             />
+                            <div className="flex justify-between text-[8px] font-black text-slate-950/20 uppercase">
+                              <span>Smallest</span>
+                              <span>Balanced</span>
+                              <span>Best</span>
+                            </div>
                           </div>
-                          <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10">
-                            <p className="text-[10px] font-black uppercase">Strip EXIF</p>
+                          <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10 group-hover:border-primary/30 transition-all">
+                            <p className="text-[10px] font-black uppercase tracking-widest">Strip Metadata</p>
                             <Switch checked={optimizeConfig.stripMetadata} onCheckedChange={(v) => setOptimizeConfig({...optimizeConfig, stripMetadata: v})} />
                           </div>
                         </div>
                       ) : initialUnitId?.includes('protect') ? (
                         <div className="space-y-6">
                           <div className="space-y-2">
-                            <Label className="text-[9px] font-black uppercase text-slate-950/60 ml-1">Open Password</Label>
-                            <Input 
-                              type="password"
-                              placeholder="Required to view..."
-                              value={securityConfig.userPassword}
-                              onChange={(e) => setSecurityConfig({...securityConfig, userPassword: e.target.value})}
-                              className="h-12 bg-white/60 border-black/5 rounded-2xl font-bold"
-                            />
+                            <Label className="text-[9px] font-black uppercase text-slate-950/60 ml-1">Master Password</Label>
+                            <div className="relative">
+                              <Input 
+                                type="password"
+                                placeholder="Required to view..."
+                                value={securityConfig.userPassword}
+                                onChange={(e) => setSecurityConfig({...securityConfig, userPassword: e.target.value})}
+                                className="h-12 bg-white/60 border-black/5 rounded-2xl font-bold pl-10"
+                              />
+                              <LockKeyhole className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-950/40" />
+                            </div>
+                          </div>
+                          <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black uppercase">Allow Print</span>
+                              <Switch defaultChecked />
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black uppercase">Allow Copy</span>
+                              <Switch defaultChecked />
+                            </div>
                           </div>
                         </div>
                       ) : initialUnitId?.includes('translate') ? (
                         <div className="space-y-6">
-                          <Label className="text-[9px] font-black uppercase text-slate-950/60 ml-1">Target Language</Label>
-                          <Select value={translateConfig.targetLanguage} onValueChange={(v) => setTranslateConfig({...translateConfig, targetLanguage: v})}>
-                            <SelectTrigger className="h-12 bg-white/60 border-black/5 rounded-2xl font-black text-[10px] uppercase">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {['Spanish', 'French', 'German', 'Chinese', 'Japanese'].map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
+                          <div className="space-y-3">
+                            <Label className="text-[9px] font-black uppercase text-slate-950/60 ml-1">Target Identity</Label>
+                            <Select value={translateConfig.targetLanguage} onValueChange={(v) => setTranslateConfig({...translateConfig, targetLanguage: v})}>
+                              <SelectTrigger className="h-12 bg-white/60 border-black/5 rounded-2xl font-black text-[10px] uppercase shadow-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {['Spanish', 'French', 'German', 'Chinese', 'Japanese', 'Arabic'].map(l => <SelectItem key={l} value={l} className="font-bold text-[10px] uppercase">{l}</SelectItem>)}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                            <p className="text-[10px] font-black uppercase">Bilingual Layout</p>
+                            <Switch checked={translateConfig.bilingual} onCheckedChange={(v) => setTranslateConfig({...translateConfig, bilingual: v})} />
+                          </div>
                         </div>
                       ) : (
                         <div className="space-y-6">
-                          <Label className="text-[9px] font-black uppercase text-slate-950/60 ml-1">Output Format</Label>
-                          <Select value={conversionConfig.toFmt} onValueChange={(v) => setConversionConfig({...conversionConfig, toFmt: v})}>
-                            <SelectTrigger className="h-12 bg-white/60 border-black/5 rounded-2xl font-black text-[10px] uppercase">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {['PDF', 'JPG', 'PNG', 'DOCX', 'PPTX', 'XLSX'].map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
+                          <div className="space-y-3">
+                            <Label className="text-[9px] font-black uppercase text-slate-950/60 ml-1">Binary Target</Label>
+                            <Select value={conversionConfig.toFmt} onValueChange={(v) => setConversionConfig({...conversionConfig, toFmt: v})}>
+                              <SelectTrigger className="h-12 bg-white/60 border-black/5 rounded-2xl font-black text-[10px] uppercase shadow-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {['PDF', 'JPG', 'PNG', 'DOCX', 'PPTX', 'XLSX', 'HTML'].map(f => <SelectItem key={f} value={f} className="font-bold text-[10px] uppercase">{f}</SelectItem>)}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                            <p className="text-[10px] font-black uppercase text-primary text-center">Standard Optimization Active</p>
+                          </div>
                         </div>
                       )}
                     </div>
