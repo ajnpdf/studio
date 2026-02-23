@@ -11,7 +11,6 @@ import {
   Settings2, 
   ShieldCheck, 
   Cpu, 
-  Layers,
   GripVertical,
   X,
   Plus,
@@ -22,7 +21,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -47,7 +45,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [splitMode, setSplitMode] = useState<'range' | 'every' | 'range'>('range');
   const [rotateAngle, setRotateAngle] = useState('90');
   const [compressionProfile, setCompressionProfile] = useState('balanced');
-  const [redactSensitive, setRedactSensitive] = useState(true);
 
   useEffect(() => {
     return engine.subscribe(setAppState);
@@ -82,8 +79,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       targetLang,
       angle: parseInt(rotateAngle),
       splitMode,
-      splitValue: pageRange,
-      redactSensitive
+      splitValue: pageRange
     };
 
     engine.addJobs(files, from, to, settings, initialUnitId);
@@ -188,7 +184,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                   </div>
                 ) : (
                   <div className="py-16 text-center border-2 border-dashed border-black/5 rounded-[2.5rem] space-y-4 opacity-40">
-                    <Layers className="w-12 h-12 mx-auto" />
+                    <Plus className="w-12 h-12 mx-auto" />
                     <p className="text-[10px] font-black uppercase tracking-widest">Add at least 2 files to enable merge logic</p>
                   </div>
                 )}

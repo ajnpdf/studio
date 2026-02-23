@@ -114,7 +114,6 @@ class ConversionEngine {
   }
 
   async addJobs(files: File[], fromFmt: string, toFmt: string, settings: any, operationId?: string) {
-    // SPECIAL CASE: Merge PDF - All files become ONE job
     if (operationId === 'merge-pdf') {
       const job: ConversionJob = {
         id: Math.random().toString(36).substr(2, 9),
@@ -129,7 +128,6 @@ class ConversionEngine {
         settings,
         operationId
       };
-      // Prevent duplicate merge queue
       if (!this.state.processingQueue.some(j => j.operationId === 'merge-pdf')) {
         this.state.processingQueue = [...this.state.processingQueue, job];
         this.notify();
@@ -143,7 +141,6 @@ class ConversionEngine {
       const fingerprint = await this.generateFingerprint(file);
       const jobKey = `${fingerprint}_${operationId || 'convert'}_${toFmt}`;
 
-      // ONE-TO-ONE RATIO CHECK
       if (this.processedHashes.has(jobKey) || this.state.processingQueue.some(j => j.id === jobKey)) continue;
 
       const fileBuffer: FileBuffer = {

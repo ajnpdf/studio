@@ -30,7 +30,6 @@ import {
   EyeOff,
   GitCompare,
   Globe,
-  Signature,
   Layers
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -111,14 +110,14 @@ export function ServicesGrid({ query, category }: { query: string, category: str
         <Cpu className="w-16 h-16 mx-auto text-slate-950" />
         <div className="space-y-1">
           <p className="text-sm font-bold tracking-tight text-slate-950">Unit Not Found</p>
-          <p className="text-[10px] font-medium text-slate-950 uppercase tracking-widest">Adjust Search Sector</p>
+          <p className="text-[10px] font-medium text-slate-950 uppercase tracking-widest">Adjust Search Parameters</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 pb-32">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 pb-32">
       {filteredUnits.map((unit) => (
         <Link key={unit.id} href={`/tools/${unit.id}`}>
           <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 hover:bg-white/60 transition-all duration-500 group cursor-pointer overflow-hidden border-2 relative backdrop-blur-xl">
@@ -154,7 +153,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
               <div className="pt-4 flex items-center justify-between border-t border-black/5 mt-4">
                 <div className="flex items-center gap-1.5">
                   <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[8px] font-bold text-slate-900/60 uppercase">System Ready</span>
+                  <span className="text-[8px] font-bold text-slate-900/60 uppercase">System Active</span>
                 </div>
                 <span className="text-[8px] font-bold text-slate-900/40 uppercase">{unit.cat}</span>
               </div>
