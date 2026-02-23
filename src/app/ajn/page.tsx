@@ -84,7 +84,7 @@ export default function AJNPage() {
     >
       <NightSky />
       
-      {/* HUD Header */}
+      {/* HUD Header - Header Animation only, extra AJN removed */}
       <header className="fixed top-0 left-0 right-0 h-16 border-b border-black/5 bg-white/40 backdrop-blur-xl z-[60] px-8 flex items-center justify-between shadow-sm">
         <Link href="/" className="flex items-center group">
           <LogoAnimation className="w-20 h-10" showGlow={false} />
@@ -105,7 +105,7 @@ export default function AJNPage() {
       </header>
 
       <main className="relative z-10 flex-1 flex flex-col items-center p-6 mt-24">
-        {/* Top Focal Search */}
+        {/* Top Focal Search - Reduced size */}
         <div className="w-full max-w-xl relative group animate-in fade-in slide-in-from-top-8 duration-1000 mb-10">
           <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-[2rem] blur opacity-25 group-hover:opacity-100 transition duration-1000" />
           <div className="relative flex items-center bg-white/60 backdrop-blur-3xl border border-black/10 rounded-[2rem] overflow-hidden shadow-2xl transition-all hover:border-primary/40">
@@ -133,37 +133,37 @@ export default function AJNPage() {
           isProcessing || showSearch ? "scale-95 opacity-40 blur-sm" : "scale-100 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300"
         )}>
           
-          {/* Enhanced Drop Zone */}
+          {/* Enhanced Drop Zone - Reduced size, professional micro-hints */}
           <div className="w-full max-w-xl space-y-4">
             <div 
               onClick={() => fileInputRef.current?.click()}
               className={cn(
-                "group relative w-full min-h-[220px] bg-white/40 backdrop-blur-md border-2 border-dashed border-black/10 rounded-[2.5rem] flex flex-col items-center justify-center cursor-pointer transition-all duration-500 hover:border-primary/40 hover:bg-white/60 overflow-hidden shadow-xl",
+                "group relative w-full min-h-[200px] bg-white/40 backdrop-blur-md border-2 border-dashed border-black/10 rounded-[2.5rem] flex flex-col items-center justify-center cursor-pointer transition-all duration-500 hover:border-primary/40 hover:bg-white/60 overflow-hidden shadow-xl",
                 isDragging && "border-primary bg-primary/5 scale-[0.98]"
               )}
             >
               <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => e.target.files && simulateProcessing(e.target.files[0])} />
               
               <div className={cn(
-                "w-16 h-16 bg-primary/5 rounded-2xl flex items-center justify-center mb-6 shadow-sm transition-all duration-500",
+                "w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center mb-4 shadow-sm transition-all duration-500",
                 isDragging ? "scale-125 rotate-6 bg-primary" : "group-hover:scale-110"
               )}>
-                <Upload className={cn("w-8 h-8 transition-colors", isDragging ? "text-white" : "text-primary")} />
+                <Upload className={cn("w-7 h-7 transition-colors", isDragging ? "text-white" : "text-primary")} />
               </div>
 
-              <div className="text-center space-y-2 px-8">
-                <h2 className="text-2xl font-black tracking-tight text-slate-950 leading-none">Drop to Optimize</h2>
-                <p className="text-[10px] font-black text-slate-950/40 tracking-[0.3em] uppercase">In-Session Processing Buffer</p>
+              <div className="text-center space-y-1.5 px-8">
+                <h2 className="text-xl font-black tracking-tight text-slate-950 leading-none">Drop to Optimize</h2>
+                <p className="text-[10px] font-bold text-slate-950/40 tracking-[0.3em] uppercase">In-Session Processing Buffer</p>
               </div>
 
-              <div className="mt-8 flex flex-wrap justify-center gap-6 text-[9px] font-black text-slate-950/30 tracking-widest uppercase">
+              <div className="mt-6 flex flex-wrap justify-center gap-6 text-[9px] font-black text-slate-950/30 tracking-widest uppercase">
                 <span className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3" /> Encrypted</span>
                 <span className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3" /> 100% Local</span>
               </div>
             </div>
             
-            {/* Micro-Hints */}
-            <div className="flex justify-center gap-6 text-[9px] font-black tracking-[0.3em] text-slate-950/20 animate-pulse uppercase">
+            {/* Micro-Hints - Proper Case */}
+            <div className="flex justify-center gap-6 text-[9px] font-bold tracking-[0.3em] text-slate-950/20 animate-pulse uppercase">
               <span>Drag files here</span>
               <span>•</span>
               <span>Auto-detect format</span>
@@ -172,7 +172,7 @@ export default function AJNPage() {
             </div>
           </div>
 
-          {/* Infrastructure Monitor */}
+          {/* Infrastructure Monitor - Status checks, Proper Case, Black Text */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full px-4 animate-in fade-in duration-1000 delay-500">
             {[
               { label: 'Neural Ingestion', sub: 'Node 01 Active', icon: Cpu, color: 'text-blue-600' },
@@ -187,13 +187,13 @@ export default function AJNPage() {
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-[10px] font-black text-slate-950 tracking-tight leading-tight uppercase">{stat.label}</p>
-                  <p className="text-[8px] font-black text-slate-950/40 tracking-widest uppercase">{stat.sub}</p>
+                  <p className="text-[8px] font-bold text-slate-950/40 tracking-widest uppercase">{stat.sub}</p>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Scroll Marquee */}
+          {/* Scroll Marquee - PDF Services, Proper Case, Black Text */}
           <div className="w-full overflow-hidden mt-8 mb-16 relative group animate-in fade-in duration-1000 delay-700">
             <div className="flex animate-marquee-fast whitespace-nowrap gap-10 items-center mb-4">
               {[...PDF_SERVICES, ...PDF_SERVICES].map((s, i) => (
