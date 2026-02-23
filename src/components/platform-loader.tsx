@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -55,13 +54,13 @@ export function PlatformLoader() {
         viewBox="0 0 300 120" 
         className={cn(
           "w-[220px] mb-8 transition-all duration-700",
-          isDone && "filter drop-shadow-[0_0_25px_#22d3ee]"
+          isDone && "filter drop-shadow-[0_0_25px_#1e3a8a]"
         )}
       >
         <defs>
           <linearGradient id="loader-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#22d3ee" />
-            <stop offset="100%" stopColor="#6366f1" />
+            <stop offset="0%" stopColor="#1e3a8a" />
+            <stop offset="100%" stopColor="#000080" />
           </linearGradient>
         </defs>
 
@@ -80,13 +79,13 @@ export function PlatformLoader() {
           {isDone ? "Welcome to AJN Platform" : loadingSteps[textIndex]}
         </p>
         
-        <div className="text-[28px] font-black bg-gradient-to-r from-[#22d3ee] to-[#6366f1] bg-clip-text text-transparent">
+        <div className="text-[28px] font-black bg-gradient-to-r from-[#1e3a8a] to-[#000080] bg-clip-text text-transparent">
           {percent}%
         </div>
 
         <div className="w-[260px] h-1.5 bg-[#0f172a] rounded-full overflow-hidden mx-auto border border-white/5">
           <div 
-            className="h-full bg-gradient-to-r from-[#22d3ee] to-[#6366f1] transition-all duration-300 ease-out"
+            className="h-full bg-gradient-to-r from-[#1e3a8a] to-[#000080] transition-all duration-300 ease-out"
             style={{ width: `${percent}%` }}
           />
         </div>

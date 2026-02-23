@@ -5,8 +5,7 @@ import { cn } from '@/lib/utils';
 
 /**
  * AJN Tools Logo Animation
- * The high-fidelity, monochromatic global brand centerpiece.
- * Features: Staggered path-draw, flowing gradients, and ambient radial glow.
+ * Updated to Navy Blue for a professional, high-fidelity brand presence.
  */
 export function LogoAnimation({ className, showGlow = true }: { className?: string, showGlow?: boolean }) {
   return (
@@ -14,7 +13,7 @@ export function LogoAnimation({ className, showGlow = true }: { className?: stri
       {/* Ambient background light */}
       {showGlow && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-[500px] h-[500px] bg-[radial-gradient(circle,#38bdf8_0%,transparent_70%)] opacity-[0.08] animate-bg-drift blur-3xl" />
+          <div className="w-[500px] h-[500px] bg-[radial-gradient(circle,#1e3a8a_0%,transparent_70%)] opacity-[0.08] animate-bg-drift blur-3xl" />
         </div>
       )}
       
@@ -24,9 +23,9 @@ export function LogoAnimation({ className, showGlow = true }: { className?: stri
       >
         <defs>
           <linearGradient id="ajn-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#22d3ee" />
-            <stop offset="50%" stopColor="#6366f1" />
-            <stop offset="100%" stopColor="#22d3ee" />
+            <stop offset="0%" stopColor="#1e3a8a" />
+            <stop offset="50%" stopColor="#000080" />
+            <stop offset="100%" stopColor="#1e3a8a" />
           </linearGradient>
         </defs>
 
@@ -55,8 +54,8 @@ export function LogoAnimation({ className, showGlow = true }: { className?: stri
           stroke-dasharray: 400;
           stroke-dashoffset: 400;
           
-          /* Smart glow & animation pipeline */
-          filter: drop-shadow(0 0 6px rgba(56,189,248,0.35));
+          /* Smart glow & animation pipeline - Navy Blue variant */
+          filter: drop-shadow(0 0 6px rgba(30, 58, 138, 0.35));
           animation: 
             draw 1.6s ease forwards,
             pulse 3s ease-in-out infinite;
@@ -71,10 +70,10 @@ export function LogoAnimation({ className, showGlow = true }: { className?: stri
 
         @keyframes pulse {
           0%, 100% {
-            filter: drop-shadow(0 0 6px rgba(56,189,248,0.35));
+            filter: drop-shadow(0 0 6px rgba(30, 58, 138, 0.35));
           }
           50% {
-            filter: drop-shadow(0 0 14px rgba(99,102,241,0.55));
+            filter: drop-shadow(0 0 14px rgba(0, 0, 128, 0.55));
           }
         }
 
@@ -100,7 +99,7 @@ export function LogoAnimation({ className, showGlow = true }: { className?: stri
         /* Hover interactions */
         svg:hover .logo-path {
           stroke-width: 7;
-          filter: drop-shadow(0 0 18px rgba(56,189,248,0.9));
+          filter: drop-shadow(0 0 18px rgba(30, 58, 138, 0.9));
           transition: 0.4s;
         }
       `}</style>
