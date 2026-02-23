@@ -50,7 +50,7 @@ export default function AJNPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <div className="h-screen w-full text-slate-950 relative font-body flex flex-col bg-transparent overflow-y-auto scrollbar-hide invisible-scroll">
+    <div className="min-h-screen w-full text-slate-950 relative font-body flex flex-col bg-transparent overflow-y-auto scrollbar-hide">
       <NightSky />
       
       {/* PROFESSIONAL GLASSMORPISM HEADER */}
@@ -125,9 +125,9 @@ export default function AJNPage() {
               <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Access all functional Engineering Instances</p>
             </div>
             {searchQuery && (
-              <Button variant="ghost" onClick={() => setSearchQuery('')} className="text-[10px] font-black uppercase text-primary hover:bg-primary/5 rounded-xl">
+              <button onClick={() => setSearchQuery('')} className="text-[10px] font-black uppercase text-primary hover:underline underline-offset-4">
                 Reset Sector View
-              </Button>
+              </button>
             )}
           </div>
           

@@ -40,8 +40,7 @@ interface Props {
 }
 
 /**
- * AJN Unit Workspace - High-Fidelity Bento Grid
- * Expert-focused interface with zero redundant labels.
+ * AJN Unit Workspace - High-Fidelity Bento Grid with Invisible Scroll
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [appState, setAppState] = useState<GlobalAppState | null>(null);
@@ -123,7 +122,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
       <CategorySidebar active={activeCategory} onSelect={setActiveCategory} />
 
       <main className="flex-1 flex flex-col min-w-0 border-r border-black/5 relative h-full">
-        <div className="flex-1 overflow-y-auto scrollbar-hide invisible-scroll">
+        <div className="flex-1 overflow-y-auto scrollbar-hide">
           <AnimatePresence mode="wait">
             <motion.div 
               key={initialUnitId}

@@ -37,12 +37,11 @@ interface Props {
 }
 
 /**
- * AJN Category Sidebar - Minimalist Expert Mode
- * Icon-driven navigation with zero redundant text labels.
+ * AJN Category Sidebar - Icon-only control strip with Scrollbar Hide
  */
 export function CategorySidebar({ active, onSelect }: Props) {
   return (
-    <aside className="h-full border-r border-black/5 bg-white/40 backdrop-blur-3xl flex flex-col shrink-0 w-20 transition-all duration-500 z-30 shadow-sm">
+    <aside className="h-full border-r border-black/5 bg-white/40 backdrop-blur-3xl flex flex-col shrink-0 w-20 z-30 shadow-sm overflow-hidden">
       <div className="p-5 border-b border-black/5 flex items-center justify-center">
         <div className="w-8 h-8 bg-black/5 rounded-xl flex items-center justify-center">
           <Layers className="w-4 h-4 text-slate-950/40" />

@@ -42,14 +42,6 @@
     @apply text-slate-950 font-body antialiased selection:bg-primary/10 selection:text-primary overflow-x-hidden;
   }
 
-  .invisible-scroll {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .invisible-scroll::-webkit-scrollbar {
-    display: none;
-  }
-
   @keyframes gradientShift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -96,12 +88,12 @@
 }
 
 @layer utilities {
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 
   .glass-header {
