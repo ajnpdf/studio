@@ -14,7 +14,9 @@ import {
   X,
   Plus,
   Play,
-  RotateCw
+  RotateCw,
+  Sparkles,
+  Lock
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,6 +33,7 @@ interface Props {
 /**
  * AJN Unit Workspace - Professional Autonomous Hub
  * Implements Sequential Preparation for Merge and Tool-aware Execution.
+ * Strictly adheres to Black Text and Proper Case standards.
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [appState, setAppState] = useState<GlobalAppState | null>(null);
@@ -43,7 +46,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [pageRange, setPageRange] = useState('1-5');
   const [splitMode, setSplitMode] = useState<'range' | 'every' | 'range'>('range');
   const [rotateAngle, setRotateAngle] = useState('90');
-  const [compressionProfile, setCompressionProfile] = useState('balanced');
+  const [summaryLength, setSummaryLength] = useState('medium');
 
   useEffect(() => {
     return engine.subscribe(setAppState);
@@ -72,13 +75,13 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
     }
 
     const settings = { 
-      profile: compressionProfile,
       password,
       text: watermarkText,
       targetLang,
       angle: parseInt(rotateAngle),
       splitMode,
-      splitValue: pageRange
+      splitValue: pageRange,
+      length: summaryLength
     };
 
     engine.addJobs(files, from, to, settings, initialUnitId);
@@ -107,7 +110,8 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const hasControls = [
     'protect-pdf', 'split-pdf', 'extract-pages', 'remove-pages', 
     'rotate-pdf', 'watermark-pdf', 'translate-pdf', 'compress-pdf',
-    'unlock-pdf', 'redact-pdf', 'page-numbers', 'crop-pdf'
+    'unlock-pdf', 'redact-pdf', 'page-numbers', 'crop-pdf', 
+    'summarize-pdf', 'digital-seal'
   ].includes(initialUnitId || '');
 
   return (
@@ -211,6 +215,34 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           ))}
                         </SelectContent>
                       </Select>
+                    </div>
+                  )}
+
+                  {initialUnitId === 'summarize-pdf' && (
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Summary Length</Label>
+                      <Select value={summaryLength} onValueChange={setSummaryLength}>
+                        <SelectTrigger className="bg-white/60 border-black/5 h-11 rounded-xl font-bold">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="short" className="font-bold text-xs">Short (Bullets)</SelectItem>
+                          <SelectItem value="medium" className="font-bold text-xs">Medium (Standard)</SelectItem>
+                          <SelectItem value="long" className="font-bold text-xs">Long (Deep Analysis)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {initialUnitId === 'digital-seal' && (
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-bold text-slate-950/60 uppercase tracking-widest">Seal Message</Label>
+                      <Input 
+                        value={watermarkText}
+                        onChange={(e) => setWatermarkText(e.target.value)}
+                        placeholder="Verified by AJN" 
+                        className="bg-white/60 border-black/5 h-11 rounded-xl font-bold"
+                      />
                     </div>
                   )}
 

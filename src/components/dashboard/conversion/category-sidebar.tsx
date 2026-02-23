@@ -38,6 +38,7 @@ interface Props {
 
 /**
  * AJN Category Sidebar - Refined Light Professional Theme
+ * Removed all restricted technical terminology.
  */
 export function CategorySidebar({ active, onSelect }: Props) {
   const [collapsed, setCollapsed] = useState(false);
@@ -48,7 +49,7 @@ export function CategorySidebar({ active, onSelect }: Props) {
       collapsed ? "w-20" : "w-64"
     )}>
       <div className="p-5 border-b border-black/5 flex items-center justify-between">
-        {!collapsed && <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Unit Cluster</h3>}
+        {!collapsed && <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Unit Library</h3>}
         <Button 
           variant="ghost" 
           size="icon" 

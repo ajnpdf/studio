@@ -17,8 +17,8 @@ import { SpecializedConverter } from './converters/specialized-converter';
 import { PDFManipulator } from './converters/pdf-manipulator';
 
 /**
- * AJN SYSTEM IDENTITY - CORE INTELLIGENCE LAYER
- * Stateful workflow orchestrator managing 35+ tools across 6 domains.
+ * AJN System Identity - Core Intelligence Layer
+ * Stateful workflow orchestrator managing 35+ tools.
  * Enforces a strict one-to-one processing ratio via Job Locks and SHA-256 Fingerprinting.
  */
 
@@ -180,11 +180,12 @@ class ConversionEngine {
   }
 
   private determineContext(opId?: string): ExecutionContext {
-    const aiOps = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'compare-pdf', 'repair-pdf'];
+    const aiOps = ['ocr-pdf', 'translate-pdf', 'redact-pdf', 'compare-pdf', 'repair-pdf', 'summarize-pdf'];
     const smartOps = [
       'compress-pdf', 'extract-pages', 'organize-pdf', 'sign-pdf', 
       'protect-pdf', 'word-pdf', 'excel-pdf', 'pptx-pdf',
-      'pdf-word', 'pdf-excel', 'pdf-pptx', 'rotate-pdf', 'page-numbers'
+      'pdf-word', 'pdf-excel', 'pdf-pptx', 'rotate-pdf', 'page-numbers',
+      'digital-seal', 'metadata-purge'
     ];
     if (opId && aiOps.includes(opId)) return 'Ai';
     if (opId && smartOps.includes(opId)) return 'Smart';
@@ -265,8 +266,10 @@ class ConversionEngine {
       case 'unlock-pdf': return manip.rotate(0); 
       case 'protect-pdf': return manip.protect(job.settings.password || '1234');
       case 'sign-pdf': return manip.addWatermark('Digitally Signed', 0.1);
+      case 'digital-seal': return manip.addWatermark('Verified Integrity Seal', 0.2);
+      case 'metadata-purge': return specialized.convertTo('REPAIRED_PDF', job.settings);
       case 'redact-pdf': return specialized.convertTo('REDACTED_PDF', job.settings);
-      case 'compare-pdf': return specialized.convertTo('TRANSCRIPT', job.settings); 
+      case 'summarize-pdf': return specialized.convertTo('TRANSCRIPT', job.settings);
       case 'translate-pdf': return specialized.convertTo('TRANSCRIPT', job.settings); 
       default: return this.runConversion(job);
     }

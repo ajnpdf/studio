@@ -27,7 +27,9 @@ import {
   PenTool,
   EyeOff,
   GitCompare,
-  Globe
+  Globe,
+  QrCode,
+  ShieldX
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -45,49 +47,47 @@ export type ServiceUnit = {
 };
 
 export const ALL_UNITS: ServiceUnit[] = [
-  // --- ORGANIZE ---
+  // --- Organize ---
   { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple documents and images into a single, linearized document buffer.', icon: Layout, tag: 'Sequence', cat: 'Organize', complexity: 'Wasm' },
   { id: 'split-pdf', name: 'Split PDF', desc: 'Divide documents by ranges, intervals, or bookmark indices into individual files.', icon: Scissors, tag: 'Divide', cat: 'Organize', complexity: 'Wasm' },
   { id: 'remove-pages', name: 'Remove Pages', desc: 'Prune unwanted pages and purge orphaned resources.', icon: Trash2, tag: 'Prune', cat: 'Organize', complexity: 'Wasm' },
   { id: 'extract-pages', name: 'Extract Pages', desc: 'Isolate specific page ranges while maintaining transparency groups.', icon: Copy, tag: 'Isolate', cat: 'Organize', complexity: 'Smart' },
   { id: 'organize-pdf', name: 'Organize PDF', desc: 'Restructure the document tree with a visual drag-and-drop manager.', icon: Layout, tag: 'Tree', cat: 'Organize', complexity: 'Smart' },
 
-  // --- OPTIMIZE ---
+  // --- Optimize ---
   { id: 'scan-to-pdf', name: 'Scan to PDF', desc: 'Capture prints via Camera API and apply deskew and shadow removal.', icon: Scan, tag: 'Capture', cat: 'Optimize', complexity: 'Wasm' },
   { id: 'compress-pdf', name: 'Compress PDF', desc: 'Re-encode bitstreams and subset fonts to achieve maximum efficiency.', icon: Shrink, tag: 'Minify', cat: 'Optimize', complexity: 'Smart' },
   { id: 'repair-pdf', name: 'Repair PDF', desc: 'Execute byte-scans to recover objects from corrupted tables.', icon: Wrench, tag: 'Recovery', cat: 'Optimize', complexity: 'Ai' },
   { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Synthesize an invisible text layer over raster scans using smart recognition.', icon: Search, tag: 'Vision', cat: 'Optimize', complexity: 'Ai' },
 
-  // --- CONVERT TO ---
+  // --- Convert ---
   { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Wrap raster images into standardized, printable document containers.', icon: ImageIcon, tag: 'Raster', cat: 'Convert', complexity: 'Wasm' },
   { id: 'word-pdf', name: 'Word to PDF', desc: 'Convert OOXML structures into high-fidelity, fixed-layout document buffers.', icon: FileText, tag: 'Office', cat: 'Convert', complexity: 'Wasm' },
   { id: 'pptx-pdf', name: 'PowerPoint to PDF', desc: 'Render slide decks into universal presentation-grade PDF files.', icon: Presentation, tag: 'Office', cat: 'Convert', complexity: 'Wasm' },
   { id: 'excel-pdf', name: 'Excel to PDF', desc: 'Map tabular grids into clean, coordinate-accurate document tables.', icon: Table, tag: 'Data', cat: 'Convert', complexity: 'Smart' },
   { id: 'html-pdf', name: 'HTML to PDF', desc: 'Execute DOM-to-Vector rendering for professional web archiving.', icon: Code2, tag: 'Web', cat: 'Convert', complexity: 'Smart' },
-
-  // --- CONVERT FROM ---
   { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Export high-resolution raster frames from document page streams.', icon: ImageIcon, tag: 'Export', cat: 'Convert', complexity: 'Wasm' },
   { id: 'pdf-word', name: 'PDF to Word', desc: 'Reconstruct paragraph hierarchies from raw text and positioning vectors.', icon: FileText, tag: 'Edit', cat: 'Convert', complexity: 'Wasm' },
-  { id: 'pdf-pptx', name: 'PDF to PowerPoint', desc: 'Synthesize editable slide objects from document layer metadata.', icon: Presentation, tag: 'Slides', cat: 'Convert', complexity: 'Wasm' },
   { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Extract grid data into structured spreadsheet workbooks.', icon: Table, tag: 'Grid', cat: 'Convert', complexity: 'Smart' },
-  { id: 'pdf-pdfa', name: 'PDF to PDF/A', desc: 'Enforce ISO long-term archiving standards by embedding metadata.', icon: ShieldCheck, tag: 'ISO', cat: 'Convert', complexity: 'Smart' },
 
-  // --- EDIT ---
+  // --- Edit ---
   { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Apply geometric rotation to document pages in 90-degree intervals.', icon: RotateCw, tag: 'Geometry', cat: 'Edit', complexity: 'Wasm' },
   { id: 'page-numbers', name: 'Add Page Numbers', desc: 'Inject dynamic page indices into header or footer coordinate slots.', icon: Hash, tag: 'Indexing', cat: 'Edit', complexity: 'Smart' },
   { id: 'watermark-pdf', name: 'Add Watermark', desc: 'Stamp identification text or image layers with adjustable opacity.', icon: Type, tag: 'Brand', cat: 'Edit', complexity: 'Smart' },
   { id: 'crop-pdf', name: 'Crop PDF', desc: 'Modify the visual canvas by adjusting document boundaries.', icon: Crop, tag: 'Canvas', cat: 'Edit', complexity: 'Wasm' },
   { id: 'edit-pdf', name: 'Edit PDF', desc: 'Directly modify text and image objects within the document stream.', icon: Edit3, tag: 'Mastery', cat: 'Edit', complexity: 'Smart' },
 
-  // --- SECURITY ---
+  // --- Security ---
   { id: 'unlock-pdf', name: 'Unlock PDF', desc: 'Bypass system restrictions and purge owner passwords.', icon: Unlock, tag: 'Access', cat: 'Security', complexity: 'Smart' },
   { id: 'protect-pdf', name: 'Protect PDF', desc: 'Seal documents with AES-256 encryption and custom permissions.', icon: Lock, tag: 'Seal', cat: 'Security', complexity: 'Smart' },
   { id: 'sign-pdf', name: 'Sign PDF', desc: 'Apply digital signatures with verified audit trails and integrity.', icon: PenTool, tag: 'Legal', cat: 'Security', complexity: 'Smart' },
   { id: 'redact-pdf', name: 'Redact PDF', desc: 'Permanently purge sensitive data from both visual and binary layers.', icon: EyeOff, tag: 'Privacy', cat: 'Security', complexity: 'Ai' },
-  { id: 'compare-pdf', name: 'Compare PDF', desc: 'Detect differences between two versions of a document.', icon: GitCompare, tag: 'Audit', cat: 'Security', complexity: 'Ai' },
+  { id: 'digital-seal', name: 'Digital Seal', desc: 'Inject a cryptographic QR integrity seal into the document.', icon: QrCode, tag: 'Integrity', cat: 'Security', complexity: 'Smart' },
+  { id: 'metadata-purge', name: 'Metadata Purge', desc: 'Systematically strip tracking and authorship metadata from binary layers.', icon: ShieldX, tag: 'Cleanse', cat: 'Security', complexity: 'Smart' },
 
-  // --- INTELLIGENCE ---
+  // --- Intelligence ---
   { id: 'translate-pdf', name: 'Translate PDF', desc: 'Map document content into 50+ languages via smart models.', icon: Globe, tag: 'Smart', cat: 'Intelligence', complexity: 'Ai' },
+  { id: 'summarize-pdf', name: 'Summarize PDF', desc: 'Generate a structured executive brief from document content.', icon: FileText, tag: 'Brief', cat: 'Intelligence', complexity: 'Ai' },
 ];
 
 export function ServicesGrid({ query, category }: { query: string, category: string }) {
