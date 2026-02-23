@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { Button } from '@/components/ui/button';
@@ -20,24 +20,23 @@ import { UnitScroller } from '@/components/junction/unit-scroller';
 
 /**
  * Animated Title Component
- * Features character-by-character 3D flip animation
+ * Features character-by-character 3D flip animation mirroring VengeanceUI standards.
  */
 function CharacterTitle({ text }: { text: string }) {
   return (
-    <div className="flex flex-wrap justify-center gap-[0.1em]">
+    <div className="flex flex-wrap justify-center gap-[0.05em] perspective-1000">
       {text.split("").map((char, i) => (
         <motion.span
           key={i}
-          initial={{ rotateX: -90, opacity: 0 }}
-          whileInView={{ rotateX: 0, opacity: 1 }}
-          viewport={{ once: true }}
+          initial={{ rotateX: -110, opacity: 0, y: 20 }}
+          animate={{ rotateX: 0, opacity: 1, y: 0 }}
           transition={{
             type: "spring",
-            stiffness: 100,
-            damping: 10,
-            delay: i * 0.03
+            stiffness: 120,
+            damping: 12,
+            delay: i * 0.04
           }}
-          className="inline-block origin-bottom"
+          className="inline-block origin-bottom preserve-3d"
         >
           {char === " " ? "\u00A0" : char}
         </motion.span>
@@ -53,7 +52,6 @@ export default function AJNPage() {
     <div className="h-screen w-full text-slate-950 selection:bg-primary/10 relative font-body flex flex-col bg-transparent overflow-y-auto scrollbar-hide">
       <NightSky />
       
-      {/* Professional Header */}
       <header className="fixed top-0 left-0 right-0 h-16 border-b border-black/5 bg-white/40 backdrop-blur-xl z-[60] px-8 flex items-center justify-between shadow-sm">
         <Link href="/" className="flex items-center group">
           <LogoAnimation className="w-20 h-10" showGlow={false} />
@@ -74,7 +72,6 @@ export default function AJNPage() {
       </header>
 
       <main className="relative z-10 flex-1 p-6 pt-24 max-w-7xl mx-auto w-full space-y-12">
-        {/* Top Search Sector */}
         <section className="flex flex-col items-center gap-10">
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
@@ -88,7 +85,7 @@ export default function AJNPage() {
               <Input 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search 40+ Intelligent Units (e.g. 'Merge', 'OCR', 'Translate')..." 
+                placeholder="Search 45+ Smart Units (e.g. 'Merge', 'OCR', 'Translate')..." 
                 className="w-full h-16 bg-transparent pl-16 pr-20 text-base font-bold text-slate-950 border-none focus-visible:ring-0 placeholder:text-slate-950/30"
               />
               <div className="absolute right-6 flex items-center gap-2 px-2.5 py-1 bg-black/5 rounded-lg border border-black/5">
@@ -106,21 +103,19 @@ export default function AJNPage() {
           </div>
         </section>
 
-        {/* Dynamic Infinite Scroller */}
         <section className="animate-in fade-in duration-1000 delay-300">
           <div className="flex items-center gap-2 px-8 mb-4">
             <Sparkles className="w-3.5 h-3.5 text-primary" />
-            <span className="text-[10px] font-black text-slate-950/40 uppercase tracking-widest">Real-Time Activity Stream</span>
+            <span className="text-[10px] font-black text-slate-950/40 uppercase tracking-widest">Real-Time System Stream</span>
           </div>
           <UnitScroller />
         </section>
 
-        {/* Integrated Services Grid */}
         <section className="space-y-8 pb-20">
           <div className="flex items-center justify-between px-4 border-b border-black/5 pb-4">
             <div className="space-y-1">
-              <h2 className="text-2xl font-black tracking-tight text-slate-950 uppercase">Library Registry</h2>
-              <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Explore all functional system units</p>
+              <h2 className="text-2xl font-black tracking-tight text-slate-950 uppercase">Service Registry</h2>
+              <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Explore all functional system instances</p>
             </div>
             {searchQuery && (
               <Button variant="ghost" onClick={() => setSearchQuery('')} className="text-[10px] font-black uppercase text-primary hover:bg-primary/5">

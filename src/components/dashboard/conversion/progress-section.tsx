@@ -5,7 +5,7 @@ import { ProcessingJob, engine } from '@/lib/engine';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { X, Loader2, Clock, Cpu, Terminal, ChevronDown } from 'lucide-react';
+import { X, Loader2, Clock, Cpu, Terminal, ChevronDown, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -26,10 +26,10 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
       <div className="flex items-center justify-between px-4">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
-            <Cpu className="w-4 h-4 text-primary animate-pulse" />
+            <Activity className="w-4 h-4 text-primary animate-pulse" />
           </div>
           <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-primary">
-            Active Master Queue ({jobs.length})
+            Active System Queue ({jobs.length})
           </h3>
         </div>
       </div>
@@ -62,20 +62,19 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <p className="text-sm font-black tracking-tight truncate max-w-[280px] text-slate-950 uppercase">
-                            {job.inputs.length === 1 ? job.inputs[0].name : `${job.inputs.length} Assets for Merge`}
+                            {job.inputs.length === 1 ? job.inputs[0].name : `${job.inputs.length} Assets for Assembly`}
                           </p>
                           <Badge variant="outline" className="bg-black/5 text-slate-950/60 border-black/10 text-[8px] font-black h-4 px-2 tracking-widest uppercase">
-                            {job.mode} MODE
+                            {job.mode} Mode
                           </Badge>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] font-black text-slate-950/60 uppercase tracking-widest">
-                            {job.progress}% COMPLETE
+                            {job.progress}% Complete
                           </span>
                         </div>
                       </div>
                       
-                      {/* Multi-Stage Progress Bar */}
                       <div className="relative h-1.5 bg-black/5 rounded-full overflow-hidden">
                         <motion.div 
                           initial={{ width: 0 }}
@@ -100,7 +99,7 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
                           className="text-[8px] font-black text-primary uppercase flex items-center gap-1.5 hover:underline"
                         >
                           <Terminal className="w-3 h-3" /> 
-                          {showLogs[job.id] ? 'Hide' : 'View'} Technical Log
+                          {showLogs[job.id] ? 'Hide' : 'View'} System Log
                           <ChevronDown className={cn("w-2.5 h-2.5 transition-transform", showLogs[job.id] && "rotate-180")} />
                         </button>
                       </div>
@@ -116,7 +115,6 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
                     </Button>
                   </div>
 
-                  {/* FLIP-FADE LOG STREAM */}
                   {showLogs[job.id] && (
                     <div className="bg-black/90 p-4 font-mono text-[9px] text-emerald-400 space-y-1.5 max-h-40 overflow-y-auto border-t border-white/10">
                       <AnimatePresence initial={false}>

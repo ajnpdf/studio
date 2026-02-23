@@ -144,7 +144,7 @@ class SystemEngine {
         mode: 'wasm',
         status: 'queued',
         progress: 0,
-        stage: 'Calibrating Merge System...',
+        stage: 'Calibrating Assembly System...',
         logs: [],
         inputs: [],
         output: null,
@@ -168,7 +168,7 @@ class SystemEngine {
       }
 
       this.state.queue = [...this.state.queue, job];
-      this.addLog(job, "Merge sequence verified.");
+      this.addLog(job, "Assembly sequence verified.");
       this.processNext();
       return;
     }

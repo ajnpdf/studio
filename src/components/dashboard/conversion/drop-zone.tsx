@@ -74,8 +74,8 @@ export function DropZone({ onFiles }: Props) {
         </div>
         
         <div className="mt-8 space-y-2 text-center relative z-10 px-8">
-          <h3 className="text-2xl font-black tracking-tighter text-slate-950 uppercase leading-none">Drop assets for mastery</h3>
-          <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">WASM System Local Buffer</p>
+          <h3 className="text-2xl font-black tracking-tighter text-slate-950 uppercase leading-none">Drop Assets for Mastery</h3>
+          <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Secure Local Buffer</p>
         </div>
       </div>
 
