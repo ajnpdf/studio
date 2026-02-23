@@ -7,42 +7,48 @@ interface LogoSliderProps {
   logos: React.ReactNode[];
   speed?: number;
   direction?: 'left' | 'right';
+  pauseOnHover?: boolean;
   className?: string;
 }
 
 /**
- * AJN Logo Slider - Professional Infinite Marquee
- * Hardware-accelerated horizontal flow for service units.
+ * AJN Logo Slider - Professional Modern Marquee
+ * Hardware-accelerated infinite flow with interactive pause state.
  */
 export function LogoSlider({ 
   logos, 
-  speed = 40, 
+  speed = 100, 
   direction = 'left',
+  pauseOnHover = true,
   className 
 }: LogoSliderProps) {
-  // Duplicate logos to ensure seamless infinite loop
-  const duplicatedLogos = [...logos, ...logos, ...logos, ...logos];
+  // Triple logos to ensure a truly seamless infinite loop at high speeds
+  const duplicatedLogos = [...logos, ...logos, ...logos];
 
   return (
     <div className={cn(
-      "relative w-full overflow-hidden py-12 select-none",
+      "relative w-full overflow-hidden py-10 select-none",
       className
     )}>
-      {/* Professional Edge Fades */}
-      <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background to-transparent z-10" />
-      <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background to-transparent z-10" />
+      {/* Professional Edge Fades - High Fidelity Masks */}
+      <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-background via-background/80 to-transparent z-20 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-background via-background/80 to-transparent z-20 pointer-events-none" />
 
       <div 
         className={cn(
-          "flex items-center gap-12 w-max animate-marquee whitespace-nowrap",
-          direction === 'right' && "animate-marquee-reverse"
+          "flex items-center gap-16 w-max animate-marquee whitespace-nowrap",
+          direction === 'right' && "animate-marquee-reverse",
+          pauseOnHover && "hover:[animation-play-state:paused]"
         )}
         style={{ 
           animationDuration: `${speed}s`,
         }}
       >
         {duplicatedLogos.map((logo, index) => (
-          <div key={index} className="flex-shrink-0 flex items-center justify-center grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 hover:scale-110">
+          <div 
+            key={index} 
+            className="flex-shrink-0 flex items-center justify-center transition-all duration-700 hover:scale-110"
+          >
             {logo}
           </div>
         ))}
@@ -51,10 +57,10 @@ export function LogoSlider({
       <style jsx global>{`
         @keyframes marquee {
           0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+          100% { transform: translateX(-33.33%); }
         }
         @keyframes marquee-reverse {
-          0% { transform: translateX(-50%); }
+          0% { transform: translateX(-33.33%); }
           100% { transform: translateX(0); }
         }
         .animate-marquee {

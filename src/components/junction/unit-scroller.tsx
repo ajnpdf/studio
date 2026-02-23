@@ -6,43 +6,50 @@ import { ALL_UNITS } from './services-grid';
 import { cn } from '@/lib/utils';
 
 /**
- * AJN Unit Scroller - Showcase of 40+ System Services
+ * AJN Unit Scroller - Modern Showcase
+ * Features 40+ high-fidelity system units with interactive flow.
  */
 export function UnitScroller() {
-  // Extract icons from ALL_UNITS and map to stylized Logo elements
+  // Map tools to modern glassmorphism tiles
   const toolLogos = ALL_UNITS.map((unit) => (
     <div 
       key={unit.id} 
-      className="flex flex-col items-center gap-3 group"
+      className="flex flex-col items-center gap-4 group cursor-pointer"
     >
-      <div className="w-16 h-16 bg-white/60 backdrop-blur-xl border border-black/10 rounded-2xl flex items-center justify-center shadow-sm transition-all group-hover:border-primary/40 group-hover:shadow-xl">
-        <unit.icon className="w-8 h-8 text-slate-950" />
+      <div className="w-20 h-20 bg-white/40 backdrop-blur-2xl border border-black/5 rounded-[2rem] flex items-center justify-center shadow-sm transition-all duration-500 group-hover:border-primary/40 group-hover:shadow-2xl group-hover:bg-white/60">
+        <unit.icon className="w-9 h-9 text-slate-950 transition-transform duration-500 group-hover:scale-110" />
       </div>
-      <span className="text-[9px] font-black text-slate-950/40 uppercase tracking-widest group-hover:text-primary transition-colors">
-        {unit.name}
-      </span>
+      <div className="space-y-1 text-center">
+        <span className="text-[10px] font-black text-slate-950 uppercase tracking-[0.2em] group-hover:text-primary transition-colors block">
+          {unit.name}
+        </span>
+        <span className="text-[8px] font-bold text-slate-950/30 uppercase tracking-widest block opacity-0 group-hover:opacity-100 transition-opacity">
+          Ready
+        </span>
+      </div>
     </div>
   ));
 
-  // If we have fewer than 40, duplicate to fulfill the visual requirement
+  // Extend the list to ensure density for the marquee
   const extendedLogos = toolLogos.length < 40 
-    ? [...toolLogos, ...toolLogos].slice(0, 45) 
+    ? [...toolLogos, ...toolLogos, ...toolLogos].slice(0, 45) 
     : toolLogos;
 
   return (
-    <div className="w-full space-y-4 py-8">
-      <div className="px-8 mb-4">
-        <div className="h-px w-full bg-black/5" />
+    <div className="w-full py-4 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-8 mb-6">
+        <div className="h-px w-full bg-gradient-to-r from-transparent via-black/5 to-transparent" />
       </div>
       
       <LogoSlider 
         logos={extendedLogos} 
-        speed={80} 
+        speed={100} 
         direction="left" 
+        pauseOnHover={true}
       />
 
-      <div className="px-8 mt-4">
-        <div className="h-px w-full bg-black/5" />
+      <div className="max-w-7xl mx-auto px-8 mt-6">
+        <div className="h-px w-full bg-gradient-to-r from-transparent via-black/5 to-transparent" />
       </div>
     </div>
   );
