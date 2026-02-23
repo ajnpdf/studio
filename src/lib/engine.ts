@@ -109,10 +109,6 @@ class AJNPDFEngine {
       onProgressCallback({ stage, detail: `Executing Stage ${stageIdx + 1}: ${stage}`, pct });
     };
 
-    const internalOnLog = (log: string) => {
-      // Logic for internal logging handled by WASMWorkerSim
-    };
-
     await WASMWorkerSim.execute(toolId, options, internalOnProgress, (log: string) => {
       onProgressCallback({ stage: "Processing", detail: log, pct: 0 }); // Passing logs through progress callback for simplified UI stream
     });
