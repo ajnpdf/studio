@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 
 /**
  * AJN Progress Section — Master Architecture
- * Features Flip-Fade Text logs and Multi-Stage indicators.
+ * High-fidelity HUD for real-time processing tracking.
  */
 export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
   const [showLogs, setShowLogs] = useState<Record<string, boolean>>({});
@@ -20,22 +20,10 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
     setShowLogs(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
+  if (jobs.length === 0) return null;
+
   return (
     <section className="space-y-6 text-slate-950">
-      <div className="flex items-center justify-between px-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 shadow-lg">
-            <Activity className="w-5 h-5 text-primary animate-pulse" />
-          </div>
-          <div className="space-y-0.5">
-            <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-primary leading-none">
-              System Execution Queue
-            </h3>
-            <p className="text-[9px] font-bold text-slate-950/40 uppercase tracking-widest">{jobs.length} Active Modules</p>
-          </div>
-        </div>
-      </div>
-
       <div className="space-y-4">
         <AnimatePresence mode="popLayout">
           {jobs.map((job) => (
@@ -47,7 +35,6 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
               transition={{ type: "spring", stiffness: 120, damping: 18 }}
             >
               <Card className="bg-white/50 backdrop-blur-3xl border-black/5 overflow-hidden group border-2 shadow-2xl rounded-[2rem] relative">
-                {/* AMBIENT BACKGROUND GLOW */}
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-50" />
                 
                 <CardContent className="p-0 relative z-10">
@@ -67,10 +54,10 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           <p className="text-base font-black tracking-tighter truncate max-w-[320px] text-slate-950 uppercase">
-                            {job.inputs.length === 1 ? job.inputs[0].name : `Assembly of ${job.inputs.length} Assets`}
+                            {job.inputs.length === 1 ? job.inputs[0].name : `Assembly Process`}
                           </p>
                           <Badge variant="outline" className="bg-black/5 text-slate-950/60 border-black/10 text-[9px] font-black h-5 px-2.5 tracking-widest uppercase rounded-full">
-                            {job.mode} Instance
+                            Instance Ready
                           </Badge>
                         </div>
                         <div className="flex items-center gap-3">
@@ -109,7 +96,7 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
                           className="text-[10px] font-black text-primary uppercase flex items-center gap-2 hover:underline group/log"
                         >
                           <Terminal className="w-3.5 h-3.5 group-hover/log:scale-110 transition-transform" /> 
-                          {showLogs[job.id] ? 'Minimize' : 'Inspect'} Log
+                          {showLogs[job.id] ? 'Minimize' : 'Inspect'} Master Log
                           <ChevronDown className={cn("w-3 h-3 transition-transform duration-500", showLogs[job.id] && "rotate-180")} />
                         </button>
                       </div>
@@ -125,7 +112,6 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
                     </Button>
                   </div>
 
-                  {/* FLIP-FADE SEQUENTIAL LOGS */}
                   <AnimatePresence>
                     {showLogs[job.id] && (
                       <motion.div 
@@ -153,7 +139,7 @@ export function ProgressSection({ jobs }: { jobs: ProcessingJob[] }) {
                           </motion.div>
                         ))}
                         <div className="flex gap-4 opacity-40">
-                          <span className="animate-pulse">_ system awaiting further buffer data...</span>
+                          <span className="animate-pulse">_ system synchronizing binary buffer...</span>
                         </div>
                       </motion.div>
                     )}

@@ -40,8 +40,8 @@ interface Props {
 }
 
 /**
- * AJN Unit Workspace - Professional Bento Infrastructure
- * Features hardware-accelerated transitions and real-time state synchronization.
+ * AJN Unit Workspace - High-Fidelity Bento Grid
+ * Expert-focused interface with zero redundant labels.
  */
 export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [appState, setAppState] = useState<GlobalAppState | null>(null);
@@ -140,23 +140,25 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                   </div>
                   <div className="space-y-1">
                     <h2 className="text-2xl font-black tracking-tighter text-slate-950 uppercase leading-none">{unitDisplayName}</h2>
-                    <p className="text-[11px] font-black text-slate-950/40 uppercase tracking-[0.4em]">Operational System Instance</p>
+                    <p className="text-[11px] font-black text-slate-950/40 uppercase tracking-[0.4em]">Master System Active</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 px-5 py-2.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 shadow-inner">
+                <div className="flex items-center gap-3 px-5 py-2.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">Master System Active</span>
+                  <span className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">Environment Ready</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div className="lg:col-span-8 space-y-8">
-                  {/* SEQUENTIAL MERGE HUD */}
                   {initialUnitId === 'merge-pdf' && (
                     <section className="space-y-6">
                       <div className="flex items-center justify-between px-4">
-                        <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-950/60">Sequence Assembly Logic</h3>
-                        <Badge className="bg-primary text-white border-none text-[10px] font-black px-3 h-6 rounded-full">{prepQueue.length} Active Assets</Badge>
+                        <div className="flex items-center gap-2">
+                          <Layers className="w-4 h-4 text-slate-950/40" />
+                          <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-950/60">Sequence Assembly</h3>
+                        </div>
+                        <Badge className="bg-primary text-white border-none text-[10px] font-black px-3 h-6 rounded-full">{prepQueue.length} Assets</Badge>
                       </div>
 
                       <AnimatePresence mode="popLayout">
@@ -181,7 +183,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-sm font-black truncate text-slate-950 uppercase tracking-tighter">{file.name}</p>
-                                      <p className="text-[9px] font-black text-slate-950/40 uppercase tracking-widest">{(file.size / (1024 * 1024)).toFixed(2)} MB • Verification Stable</p>
+                                      <p className="text-[9px] font-black text-slate-950/40 uppercase tracking-widest">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
                                     </div>
                                     <div className="flex items-center gap-2">
                                       <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-primary/10 rounded-xl" onClick={() => reorderPrep(i, 'up')} disabled={i === 0}><RotateCw className="w-4 h-4 rotate-[-90deg]" /></Button>
@@ -210,8 +212,8 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           <div className="py-20 text-center border-4 border-dashed border-black/5 rounded-[3rem] space-y-4 opacity-30 group hover:opacity-100 transition-opacity">
                             <Layers className="w-12 h-12 mx-auto" />
                             <div className="space-y-1">
-                              <p className="text-[11px] font-black uppercase tracking-[0.4em]">Queue Assembly Logic</p>
-                              <p className="text-[9px] font-bold uppercase">Load assets below to initialize merge sequence</p>
+                              <p className="text-[11px] font-black uppercase tracking-[0.4em]">Asset Buffer</p>
+                              <p className="text-[9px] font-bold uppercase">Load assets below to initialize sequence</p>
                             </div>
                           </div>
                         )}
@@ -223,7 +225,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                 </div>
 
                 <div className="lg:col-span-4 space-y-8">
-                  {/* PARAMETER CONFIGURATION BENTO */}
                   <section className="bg-white/50 border border-white/80 p-8 rounded-[3rem] shadow-2xl backdrop-blur-3xl space-y-8 relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-8 opacity-5 rotate-12">
                       <Settings2 className="w-32 h-32 text-primary" />
@@ -233,7 +234,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                       <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
                         <Settings2 className="w-5 h-5 text-primary" />
                       </div>
-                      <span className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-950">System Parameters</span>
+                      <span className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-950">Master Parameters</span>
                     </div>
                     
                     <div className="space-y-6 relative z-10">
@@ -255,7 +256,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
                       {initialUnitId === 'summarize-pdf' && (
                         <div className="space-y-3">
-                          <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Mastery Fidelity Level</Label>
+                          <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Fidelity Level</Label>
                           <Select value={summaryLength} onValueChange={setSummaryLength}>
                             <SelectTrigger className="bg-white/60 border-black/5 h-12 rounded-2xl font-black text-xs uppercase shadow-sm">
                               <SelectValue />
@@ -271,7 +272,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
 
                       {initialUnitId === 'protect-pdf' && (
                         <div className="space-y-3">
-                          <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">System Security Pin</Label>
+                          <Label className="text-[10px] font-black text-slate-950/60 uppercase tracking-[0.3em] ml-1">Security Seal Pin</Label>
                           <div className="relative">
                             <Input 
                               type="password" 
@@ -285,24 +286,22 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                         </div>
                       )}
 
-                      <div className="p-6 bg-primary/5 rounded-[2rem] border border-primary/10 shadow-inner space-y-3">
-                        <div className="flex items-center gap-3 mb-1">
+                      <div className="p-6 bg-primary/5 rounded-[2rem] border border-primary/10 shadow-inner">
+                        <div className="flex items-center gap-3 mb-2">
                           <ShieldCheck className="w-4 h-4 text-primary" />
-                          <span className="text-[10px] font-black uppercase text-primary tracking-widest">Environment Status</span>
+                          <span className="text-[10px] font-black uppercase text-primary tracking-widest">Environment Secured</span>
                         </div>
                         <p className="text-[9px] leading-relaxed font-bold text-slate-950/50 uppercase tracking-wide">
-                          All operations execute in hardware-accelerated local sandboxes. No binary data is cached on AJN infrastructure.
+                          System executing in high-fidelity local memory buffer.
                         </p>
                       </div>
                     </div>
                   </section>
 
-                  {/* REAL-TIME PROGRESS BENTO */}
                   <ProgressSection jobs={appState.queue} />
                 </div>
               </div>
 
-              {/* OUTPUT SECTOR */}
               {appState.outputs.length > 0 && (
                 <OutputSection 
                   jobs={appState.outputs} 

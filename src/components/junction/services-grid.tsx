@@ -141,7 +141,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
         </div>
         <div className="space-y-2">
           <p className="text-xl font-black tracking-tight text-slate-950 uppercase">Instance Not Found</p>
-          <p className="text-[11px] font-bold text-slate-950/60 uppercase tracking-[0.4em]">Calibrate search parameters for sector match</p>
+          <p className="text-[11px] font-bold text-slate-950/60 uppercase tracking-[0.4em]">Calibrate search parameters for match</p>
         </div>
       </div>
     );
