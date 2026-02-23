@@ -35,6 +35,7 @@ export function NightSky() {
     setMounted(true);
   }, []);
 
+  // Prevent hydration error by rendering nothing until client-side is ready
   if (!mounted) {
     return null;
   }

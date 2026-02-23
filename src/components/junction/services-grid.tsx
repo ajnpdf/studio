@@ -126,7 +126,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
         <div className="w-20 h-20 mx-auto text-slate-950 flex items-center justify-center bg-black/5 rounded-[2.5rem]">
           <Search className="w-10 h-10" />
         </div>
-        <p className="text-lg font-black uppercase tracking-widest text-slate-950">Instance Not Found</p>
+        <p className="text-lg font-black tracking-widest text-slate-950">Instance Not Found</p>
       </div>
     );
   }
@@ -148,16 +148,16 @@ export function ServicesGrid({ query, category }: { query: string, category: str
                     <div className="w-14 h-14 bg-white/60 rounded-2xl flex items-center justify-center border-2 border-black/5 group-hover/card:scale-110 transition-transform duration-500 shadow-inner">
                       <unit.icon className="w-7 h-7 text-slate-950 group-hover/card:text-primary transition-colors" />
                     </div>
-                    <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase tracking-widest px-2.5 h-5 rounded-full">{unit.mode}</Badge>
+                    <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black px-2.5 h-5 rounded-full">{unit.mode}</Badge>
                   </div>
-                  <div className="space-y-3 flex-1">
-                    <h3 className="text-lg font-black uppercase leading-none tracking-tight">{unit.name}</h3>
+                  <div className="space-y-3 flex-1 text-left">
+                    <h3 className="text-lg font-black leading-none tracking-tight">{unit.name}</h3>
                     <p className="text-[10px] font-bold text-slate-950/40 uppercase leading-relaxed tracking-wide">{unit.desc}</p>
                   </div>
                   <div className="pt-6 border-t border-black/5 mt-8 flex items-center justify-between">
                     <span className="text-[9px] font-black text-slate-950/30 uppercase tracking-[0.2em]">{unit.cat}</span>
                     <div className="flex items-center gap-2 group-hover/card:text-primary transition-all">
-                      <span className="text-[8px] font-black uppercase tracking-widest opacity-0 group-hover/card:opacity-100 translate-x-2 group-hover/card:translate-x-0 transition-all">Execute</span>
+                      <span className="text-[8px] font-black tracking-widest opacity-0 group-hover/card:opacity-100 translate-x-2 group-hover/card:translate-x-0 transition-all">Execute</span>
                       <ArrowRight className="w-4 h-4 text-primary translate-x-4 group-hover/card:translate-x-0 transition-all" />
                     </div>
                   </div>

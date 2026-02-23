@@ -68,7 +68,6 @@ export function PlatformLoader() {
           </defs>
 
           <g className="logo-paths">
-            {/* Using inline styles or Tailwind classes for animations to avoid styled-jsx hydration mismatches */}
             <path d="M20 100 L55 20 L90 100" fill="none" stroke="url(#loader-grad)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" style={{ strokeDasharray: 400, strokeDashoffset: 400, animation: 'draw 1.2s ease forwards' }} />
             <path d="M140 20 L140 80 Q140 105 115 100" fill="none" stroke="url(#loader-grad)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" style={{ strokeDasharray: 400, strokeDashoffset: 400, animation: 'draw 1.2s ease forwards 0.2s' }} />
             <path d="M190 100 L190 20 L250 100 L250 20" fill="none" stroke="url(#loader-grad)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" style={{ strokeDasharray: 400, strokeDashoffset: 400, animation: 'draw 1.2s ease forwards 0.4s' }} />

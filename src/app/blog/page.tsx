@@ -82,16 +82,16 @@ export default function BlogPage() {
                   </div>
                   
                   <div className="space-y-3 flex-1">
-                    <h2 className="text-xl font-black uppercase leading-tight tracking-tight group-hover:text-primary transition-colors">
+                    <h2 className="text-xl font-black leading-tight tracking-tight group-hover:text-primary transition-colors">
                       {post.title}
                     </h2>
-                    <p className="text-[11px] font-medium text-slate-950/60 leading-relaxed uppercase tracking-wide">
+                    <p className="text-[11px] font-medium text-slate-950/60 leading-relaxed tracking-wide">
                       {post.excerpt}
                     </p>
                   </div>
 
                   <div className="pt-6 border-t border-black/5 flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest">
+                    <div className="flex items-center gap-2 text-[9px] font-black tracking-widest">
                       <User className="w-3.5 h-3.5" /> {post.author}
                     </div>
                     <Button variant="ghost" size="icon" className="group-hover:bg-primary group-hover:text-white rounded-full transition-all">
@@ -106,7 +106,7 @@ export default function BlogPage() {
 
         <section className="py-20 text-center space-y-4">
           <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.5em]">
-            MADE BY INDIAN ❤️
+            Made by Indian ❤️
           </p>
         </section>
       </main>

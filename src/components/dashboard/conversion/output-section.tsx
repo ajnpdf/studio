@@ -83,8 +83,8 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1.5">
-                        <h4 className="text-base font-black tracking-tight truncate text-slate-950 uppercase">{job.fileName}</h4>
-                        <Badge className="bg-emerald-500 text-white border-none text-[8px] font-black px-2.5 h-5 rounded-full tracking-widest">MASTERED</Badge>
+                        <h4 className="text-base font-black tracking-tight truncate text-slate-950">{job.fileName}</h4>
+                        <Badge className="bg-emerald-500 text-white border-none text-[8px] font-black px-2.5 h-5 rounded-full tracking-widest">Mastered</Badge>
                       </div>
                       <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">
                         {job.sizeFormatted} • Environment Secured
@@ -95,7 +95,7 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
                       <Button size="icon" variant="ghost" onClick={() => onPreview(job)} className="h-10 w-10 text-slate-950/40 hover:text-primary transition-all">
                         <ExternalLink className="w-4.5 h-4.5" />
                       </Button>
-                      <Button onClick={() => handleDownload(job)} className="h-11 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] px-8 shadow-xl shadow-emerald-500/20 gap-3 rounded-2xl transition-all tracking-widest uppercase">
+                      <Button onClick={() => handleDownload(job)} className="h-11 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] px-8 shadow-xl shadow-emerald-500/20 gap-3 rounded-2xl transition-all tracking-widest">
                         <Download className="w-4 h-4" /> Download
                       </Button>
                     </div>
@@ -111,7 +111,7 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
                       ].map((s, i) => (
                         <div key={i} className="space-y-1">
                           <p className="text-[8px] font-black text-slate-950/30 uppercase tracking-[0.2em]">{s.label}</p>
-                          <p className={cn("text-xs font-black uppercase", s.accent ? "text-emerald-600" : "text-slate-950")}>{s.value}</p>
+                          <p className={cn("text-xs font-black", s.accent ? "text-emerald-600" : "text-slate-950")}>{s.value}</p>
                         </div>
                       ))}
                     </div>

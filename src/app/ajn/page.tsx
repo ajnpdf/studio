@@ -37,14 +37,14 @@ export default function AJNPage() {
             </Button>
           </Link>
           <div className="h-6 w-px bg-black/5" />
-          <div className="flex items-center gap-2 px-4 py-1.5 bg-emerald-500/5 rounded-xl border border-emerald-500/10 shadow-inner">
+          <div className="flex items-center gap-2 px-4 py-1.5 bg-emerald-500/5 rounded-xl border border-emerald-500/10 shadow-sm">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span className="text-[10px] font-black text-emerald-600 tracking-widest uppercase">System Secured</span>
+            <span className="text-[10px] font-black text-emerald-600 tracking-widest">System Secured</span>
           </div>
         </div>
       </header>
 
-      <main className="relative z-10 flex-1 p-6 pt-32 max-w-7xl mx-auto w-full space-y-16">
+      <main className="relative z-10 flex-1 p-6 pt-32 max-w-7xl mx-auto w-full space-y-16 pb-32">
         {/* CENTERED SEARCH & BRANDING SECTOR */}
         <section className="flex flex-col items-center gap-12 text-center">
           <div className="space-y-2">
@@ -86,8 +86,8 @@ export default function AJNPage() {
         {/* SERVICE GRID SECTOR */}
         <section className="space-y-10 pb-32">
           <div className="flex items-end justify-between px-4 border-b border-black/5 pb-6">
-            <div className="space-y-2">
-              <h2 className="text-3xl font-black tracking-tight text-slate-950 uppercase leading-none">System Registry</h2>
+            <div className="space-y-2 text-left">
+              <h2 className="text-3xl font-black tracking-tight text-slate-950 leading-none">System Registry</h2>
               <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Access all functional Engineering Instances</p>
             </div>
             {searchQuery && (
@@ -113,7 +113,7 @@ export default function AJNPage() {
               AJN Engineering Core • 2025
             </p>
             <div className="flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-full border border-primary/10">
-              <span className="text-[8px] font-black text-primary uppercase tracking-widest">MADE BY INDIAN ❤️</span>
+              <span className="text-[8px] font-black text-primary uppercase tracking-widest">Made by Indian ❤️</span>
             </div>
           </div>
         </footer>

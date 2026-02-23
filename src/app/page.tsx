@@ -83,22 +83,22 @@ export default function LandingPage() {
 
         {/* SOLUTIONS SECTION */}
         <section className="w-full pt-32 grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-10 rounded-[3rem] space-y-6 hover:border-primary/20 transition-all">
+          <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-10 rounded-[3rem] space-y-6 hover:border-primary/20 transition-all text-left">
             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center"><User className="w-6 h-6 text-primary" /></div>
-            <h3 className="text-2xl font-black uppercase tracking-tight">For Students</h3>
-            <p className="text-sm font-medium text-slate-950/60 leading-relaxed uppercase tracking-widest">Master your assignments with lightning-fast PDF merging, OCR notes extraction, and smart formatting tools. Free forever for individual nodes.</p>
+            <h3 className="text-2xl font-black tracking-tight">For Students</h3>
+            <p className="text-sm font-medium text-slate-950/60 leading-relaxed tracking-wide">Master your assignments with lightning-fast PDF merging, OCR notes extraction, and smart formatting tools. Free forever for individual nodes.</p>
           </Card>
-          <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-10 rounded-[3rem] space-y-6 hover:border-primary/20 transition-all">
+          <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-10 rounded-[3rem] space-y-6 hover:border-primary/20 transition-all text-left">
             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center"><CheckCircle2 className="w-6 h-6 text-primary" /></div>
-            <h3 className="text-2xl font-black uppercase tracking-tight">For Business</h3>
-            <p className="text-sm font-medium text-slate-950/60 leading-relaxed uppercase tracking-widest">Industrial-grade batch processing, team workspaces, and AES-256 secure encryption layers for sensitive corporate assets.</p>
+            <h3 className="text-2xl font-black tracking-tight">For Business</h3>
+            <p className="text-sm font-medium text-slate-950/60 leading-relaxed tracking-wide">Industrial-grade batch processing, team workspaces, and AES-256 secure encryption layers for sensitive corporate assets.</p>
           </Card>
         </section>
       </main>
 
       <div className="absolute top-10 right-10 flex flex-col items-end gap-1 text-right">
         <span className="text-[9px] font-black uppercase tracking-[0.3em] opacity-40">Founder & CEO</span>
-        <span className="text-sm font-black uppercase tracking-tighter text-primary">Anjan Patel</span>
+        <span className="text-sm font-black tracking-tighter text-primary">Anjan Patel</span>
       </div>
 
       <footer className="w-full py-16 mt-auto border-t border-black/5 flex flex-col items-center gap-8 relative z-10">
@@ -114,7 +114,7 @@ export default function LandingPage() {
             AJN Engineering Core • 2025
           </p>
           <div className="flex items-center gap-2 px-4 py-1.5 bg-primary/5 rounded-full border border-primary/10">
-            <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">MADE BY INDIAN ❤️</span>
+            <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Made by Indian ❤️</span>
           </div>
         </div>
       </footer>
