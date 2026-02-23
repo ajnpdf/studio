@@ -23,7 +23,10 @@ import {
   FileCode,
   Languages,
   EyeOff,
-  History
+  History,
+  Scan,
+  ShieldX,
+  Target
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -53,6 +56,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
   const [optimizeConfig, setOptimizeConfig] = useState({ quality: 85, stripMetadata: true });
   const [translateConfig, setTranslateConfig] = useState({ targetLanguage: 'Spanish', bilingual: false });
   const [conversionConfig, setConversionConfig] = useState({ toFmt: 'PDF' });
+  const [ocrConfig, setOcrConfig] = useState({ language: 'eng', autoRotate: true });
 
   useEffect(() => {
     return engine.subscribe(setAppState);
@@ -64,6 +68,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
     if (initialUnitId?.includes('protect')) settings = securityConfig;
     if (initialUnitId?.includes('compress')) settings = optimizeConfig;
     if (initialUnitId?.includes('translate')) settings = translateConfig;
+    if (initialUnitId?.includes('ocr')) settings = ocrConfig;
 
     engine.addJobs(files, '', conversionConfig.toFmt, settings, initialUnitId);
   };
@@ -124,7 +129,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                         <Zap className="w-3.5 h-3.5 text-primary/40 animate-pulse" />
                       </div>
 
-                      {/* Domain Mapping logic */}
+                      {/* Dynamic Parameter Mapping */}
                       {initialUnitId?.includes('compress') ? (
                         <div className="space-y-6">
                           <div className="space-y-3">
@@ -140,7 +145,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                               <span>Best</span>
                             </div>
                           </div>
-                          <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10 group-hover:border-primary/30 transition-all">
+                          <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10 transition-all">
                             <p className="text-[10px] font-black uppercase tracking-widest">Strip Metadata</p>
                             <Switch checked={optimizeConfig.stripMetadata} onCheckedChange={(v) => setOptimizeConfig({...optimizeConfig, stripMetadata: v})} />
                           </div>
@@ -169,6 +174,24 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                               <span className="text-[10px] font-black uppercase">Allow Copy</span>
                               <Switch defaultChecked />
                             </div>
+                          </div>
+                        </div>
+                      ) : initialUnitId?.includes('ocr') ? (
+                        <div className="space-y-6">
+                          <div className="space-y-3">
+                            <Label className="text-[9px] font-black uppercase text-slate-950/60 ml-1">Script Recognition</Label>
+                            <Select value={ocrConfig.language} onValueChange={(v) => setOcrConfig({...ocrConfig, language: v})}>
+                              <SelectTrigger className="h-12 bg-white/60 border-black/5 rounded-2xl font-black text-[10px] uppercase">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {['English', 'Spanish', 'French', 'German', 'Chinese', 'Japanese'].map(l => <SelectItem key={l} value={l.toLowerCase().substring(0,3)} className="font-bold text-[10px] uppercase">{l}</SelectItem>)}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                            <p className="text-[10px] font-black uppercase">Auto-Deskew</p>
+                            <Switch checked={ocrConfig.autoRotate} onCheckedChange={(v) => setOcrConfig({...ocrConfig, autoRotate: v})} />
                           </div>
                         </div>
                       ) : initialUnitId?.includes('translate') ? (

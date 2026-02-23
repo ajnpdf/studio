@@ -1,4 +1,3 @@
-
 "use client";
 
 import { 
@@ -34,21 +33,21 @@ import { LogoAnimation } from '@/components/landing/logo-animation';
 import { SponsoredUnit } from '@/components/ui/sponsored-unit';
 
 const navItems = [
-  { icon: Repeat, label: 'Junction Core', href: '/dashboard/convert', description: 'Universal format engine' },
-  { icon: Grid2X2, label: 'All Units', href: '/dashboard/tools', description: 'Network directory hub' },
+  { icon: Repeat, label: 'Junction Core', href: '/junction', description: 'Universal format engine' },
+  { icon: Grid2X2, label: 'All Units', href: '/junction', description: 'Network directory hub' },
 ];
 
 const toolItems = [
   { icon: FileText, label: 'PDF Mastery', href: '/dashboard/pdf-editor', description: 'Smart PDF Studio' },
   { icon: ImageIcon, label: 'Image Mastery', href: '/dashboard/image-editor', description: 'Image Optimizer' },
-  { icon: Video, label: 'Video Lab', href: '/dashboard/tools/video', description: 'FFmpeg transcode' },
-  { icon: Music, label: 'Audio Studio', href: '/dashboard/tools/audio', description: 'Track surgery' },
-  { icon: Box, label: 'Batch Center', href: '/dashboard/tools/batch', description: 'Multi-file tasks' },
-  { icon: BrainCircuit, label: 'Smart Intelligence', href: '/dashboard/tools/ai', description: 'Semantic analysis' },
+  { icon: Video, label: 'Video Lab', href: '/tools/video-lab', description: 'FFmpeg transcode' },
+  { icon: Music, label: 'Audio Studio', href: '/tools/audio-studio', description: 'Track surgery' },
+  { icon: Box, label: 'Batch Center', href: '/tools/batch-center', description: 'Multi-file tasks' },
+  { icon: BrainCircuit, label: 'Smart Intelligence', href: '/tools/summarize-pdf', description: 'Semantic analysis' },
 ];
 
 const workspaceItems = [
-  { icon: Users, label: 'Team Hub', href: '/dashboard/team', description: 'Multi-user sync' },
+  { icon: Users, label: 'Team Hub', href: '/dashboard/settings?tab=billing', description: 'Multi-user sync' },
   { icon: Wand2, label: 'API Gateway', href: '/dashboard/api', description: 'Developer control' },
   { icon: ShieldCheck, label: 'Root Ops', href: '/admin', description: 'System core', badge: 'ROOT' },
   { icon: Settings, label: 'Session Config', href: '/dashboard/settings', description: 'Session prefs' },
@@ -62,7 +61,7 @@ export function DashboardSidebar() {
   const auth = useAuth();
 
   const handleSignOut = () => {
-    signOut(auth).then(() => router.push('/login'));
+    signOut(auth).then(() => router.push('/'));
   };
 
   const NavLink = ({ item }: { item: any }) => (
@@ -146,11 +145,11 @@ export function DashboardSidebar() {
         <div>
           {!collapsed && <p className="px-3 mb-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Operation Core</p>}
           <div className="space-y-1">
-            <NavLink item={{ icon: LayoutDashboard, label: 'Services Hub', href: '/dashboard', description: 'Network Center' }} />
-            {navItems.map((item) => <NavLink key={item.href} item={item} />)}
+            <NavLink item={{ icon: LayoutDashboard, label: 'Services Hub', href: '/ajn', description: 'Network Center' }} />
+            {navItems.map((item) => <NavLink key={item.label} item={item} />)}
             <div className="pt-4 mt-4 border-t border-black/5">
               {!collapsed && <p className="px-3 mb-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Service Units</p>}
-              {toolItems.map((item) => <NavLink key={item.href} item={item} />)}
+              {toolItems.map((item) => <NavLink key={item.label} item={item} />)}
             </div>
           </div>
         </div>
@@ -159,7 +158,7 @@ export function DashboardSidebar() {
           {!collapsed && <p className="px-3 mb-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Infrastructure</p>}
           <div className="space-y-1">
             {workspaceItems.map((item) => (
-              <div key={item.href} className={!user ? "opacity-20 pointer-events-none grayscale" : ""}>
+              <div key={item.label}>
                 <NavLink item={item} />
               </div>
             ))}
