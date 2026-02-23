@@ -3,10 +3,6 @@
 import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  FileText, 
-  ImageIcon, 
-  Table, 
-  ArrowRight,
   Layout,
   Scissors,
   Trash2,
@@ -24,15 +20,17 @@ import {
   FolderOpen,
   Presentation,
   ShieldCheck,
-  Cpu,
   MousePointer2,
   History,
   Paintbrush,
-  Layers
+  Layers,
+  ImageIcon,
+  FileText,
+  Table,
+  ArrowRight
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
 export type ServiceUnit = {
@@ -83,17 +81,17 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.03 }
+    transition: { staggerChildren: 0.02 }
   }
 };
 
 const cardVariants = {
-  hidden: { y: 20, opacity: 0, scale: 0.98 },
+  hidden: { y: 15, opacity: 0, scale: 0.98 },
   visible: { 
     y: 0, 
     opacity: 1, 
     scale: 1,
-    transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] }
+    transition: { duration: 0.4, ease: "easeOut" }
   }
 };
 
@@ -109,11 +107,11 @@ export function ServicesGrid({ query, category }: { query: string, category: str
 
   if (filteredUnits.length === 0) {
     return (
-      <div className="py-20 text-center space-y-4 opacity-30">
-        <div className="w-16 h-16 mx-auto flex items-center justify-center bg-black/5 rounded-2xl">
+      <div className="py-32 text-center space-y-4 opacity-30">
+        <div className="w-16 h-16 mx-auto flex items-center justify-center bg-black/5 rounded-3xl">
           <Search className="w-8 h-8" />
         </div>
-        <p className="text-sm font-bold tracking-widest">Instance not found</p>
+        <p className="text-sm font-black tracking-widest uppercase">Instance Not Found</p>
       </div>
     );
   }
@@ -123,27 +121,27 @@ export function ServicesGrid({ query, category }: { query: string, category: str
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pb-20"
+      className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 pb-32"
     >
       <AnimatePresence mode="popLayout">
         {filteredUnits.map((unit) => (
           <motion.div key={unit.id} layout variants={cardVariants} className="group">
             <Link href={`/tools/${unit.id}`}>
-              <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 transition-all duration-500 cursor-pointer overflow-hidden border relative backdrop-blur-xl shadow-md group/card rounded-2xl">
-                <CardContent className="p-5 flex flex-col h-full text-slate-950 relative z-10">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-10 h-10 bg-white/60 rounded-xl flex items-center justify-center border border-black/5 group-hover/card:scale-110 transition-transform duration-500">
-                      <unit.icon className="w-5 h-5 text-slate-950 group-hover/card:text-primary transition-colors" />
+              <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 transition-all duration-700 cursor-pointer overflow-hidden border backdrop-blur-xl shadow-md group/card rounded-3xl">
+                <CardContent className="p-6 flex flex-col h-full text-slate-950 relative z-10">
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="w-11 h-11 bg-white/60 rounded-2xl flex items-center justify-center border border-black/5 group-hover/card:scale-110 group-hover/card:shadow-lg transition-all duration-700">
+                      <unit.icon className="w-5.5 h-5.5 text-slate-950 group-hover/card:text-primary transition-colors" />
                     </div>
-                    <Badge className="bg-primary/5 text-primary border-none text-[7px] font-black px-2 h-4 rounded-full">{unit.mode}</Badge>
+                    <Badge className="bg-primary/5 text-primary border-none text-[8px] font-black px-2.5 h-5 rounded-full">{unit.mode}</Badge>
                   </div>
-                  <div className="space-y-1 flex-1 text-left">
-                    <h3 className="text-sm font-black leading-tight tracking-tight">{unit.name}</h3>
-                    <p className="text-[9px] font-medium text-slate-950/40 uppercase tracking-wide truncate">{unit.desc}</p>
+                  <div className="space-y-1.5 flex-1 text-left">
+                    <h3 className="text-sm font-black leading-none tracking-tight">{unit.name}</h3>
+                    <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest truncate">{unit.desc}</p>
                   </div>
-                  <div className="pt-3 border-t border-black/5 mt-4 flex items-center justify-between">
-                    <span className="text-[8px] font-bold text-slate-950/30 uppercase">{unit.cat}</span>
-                    <ArrowRight className="w-3 h-3 text-primary translate-x-2 group-hover/card:translate-x-0 transition-all opacity-0 group-hover/card:opacity-100" />
+                  <div className="pt-4 border-t border-black/5 mt-5 flex items-center justify-between">
+                    <span className="text-[9px] font-black text-slate-950/30 uppercase tracking-widest">{unit.cat}</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-primary translate-x-2 group-hover/card:translate-x-0 transition-all opacity-0 group-hover/card:opacity-100" />
                   </div>
                 </CardContent>
               </Card>

@@ -13,15 +13,15 @@ interface Star {
 }
 
 /**
- * AJN Night Sky - Optimized for Light Background
- * Robust hydration fix: Returns null on initial server/client pass to sync attributes.
+ * AJN Night Sky - Optimized for Lavender Gradient
+ * Hydration-hardened: Ensures dynamic star values only generate on client.
  */
 export function NightSky() {
   const [stars, setStars] = useState<Star[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const generatedStars = [...Array(25)].map((_, i) => ({
+    const generatedStars = [...Array(30)].map((_, i) => ({
       id: i,
       width: `${Math.random() * 1.5 + 1}px`,
       height: `${Math.random() * 1.5 + 1}px`,
@@ -38,12 +38,14 @@ export function NightSky() {
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-transparent">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(139,92,246,0.05)_0%,transparent_60%)] opacity-50" />
+      {/* Dynamic Mesh Layer */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(139,92,246,0.08)_0%,transparent_60%)] opacity-50" />
+      
       <div className="absolute inset-0">
         {stars.map((star) => (
           <div
             key={star.id}
-            className="absolute bg-white rounded-full opacity-30 animate-twinkle shadow-[0_0_6px_rgba(139,92,246,0.3)]"
+            className="absolute bg-white rounded-full opacity-40 animate-twinkle shadow-[0_0_8px_rgba(255,255,255,0.5)]"
             style={{
               width: star.width,
               height: star.height,
