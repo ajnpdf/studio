@@ -77,7 +77,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     optimizationLevel: 'balanced'
   });
 
+  // Tools that require surgical page selection
   const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf', 'organize-pdf', 'redact-pdf'].includes(tool?.id || '');
+  // Tools that can run directly but benefit from a preview phase
+  const isHybridTool = ['add-page-numbers', 'rotate-pdf', 'sign-pdf', 'grayscale-pdf'].includes(tool?.id || '');
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
@@ -119,6 +122,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             rotation: 0
           });
 
+          // Default selection behavior
           if (!isSurgicalTool) initialSelected.add(pageId);
         }
       }
@@ -217,7 +221,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
                           <div className="flex items-center gap-3">
                             <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest">
-                              {isSurgicalTool ? selectedPages.size : pages.length} Segments
+                              {(isSurgicalTool) ? selectedPages.size : pages.length} Segments
                             </Badge>
                             <Button onClick={handleConfirmedExecution} className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl hover:scale-105 transition-all">
                               Process Document <ChevronRight className="ml-2 w-4 h-4" />
