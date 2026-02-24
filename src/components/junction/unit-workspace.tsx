@@ -18,8 +18,13 @@ import {
   ListChecks,
   Eraser,
   Layers,
-  FileText,
+  RotateCw,
+  ArrowLeft,
+  ArrowRight,
   Loader2,
+  Settings2,
+  Scissors,
+  Zap,
   Maximize
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -34,31 +39,38 @@ if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 }
 
+interface PageNode {
+  id: string;
+  url: string;
+  fileIdx: number;
+  pageIdx: number;
+  rotation: number;
+}
+
 interface Props {
   defaultCategory: string;
   initialUnitId?: string;
 }
 
-/**
- * AJN Universal Unit Workspace
- * High-fidelity responsive visionary hub for real-time file engineering.
- * Optimized for Mobile & Desktop view.
- */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const unit = ALL_UNITS.find(u => u.id === initialUnitId);
   const { phase, progress, logs, result, error, run, reset, setPhase } = useAJNTool(initialUnitId || 'merge-pdf');
   
   const [sourceFiles, setSourceFiles] = useState<File[]>([]);
-  const [pages, setPages] = useState<{ id: string, url: string, fileIdx: number, pageIdx: number }[]>([]);
+  const [pages, setPages] = useState<PageNode[]>([]);
   const [selectedPages, setSelectedPages] = useState<Set<string>>(new Set());
   const [isInitializing, setIsInitializing] = useState(false);
+  const [splitInterval, setSplitInterval] = useState(1);
+  const [splitMode, setSplitMode] = useState<'range' | 'interval'>('range');
+  const [compressionLevel, setCompressionLevel] = useState<'basic' | 'strong'>('basic');
 
-  // Surgical tools require manual selection (pruning model)
   const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf', 'organize-pdf', 'redact-pdf'].includes(unit?.id || '');
+  const isOrganizeTool = unit?.id === 'organize-pdf';
+  const isSplitTool = unit?.id === 'split-pdf';
+  const isCompressTool = unit?.id === 'compress-pdf';
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
-    // Automatically transition to visionary if PDF, else direct execution
     if (files.some(f => f.type === 'application/pdf')) {
       await loadAllPdfPages(files);
     } else {
@@ -69,7 +81,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const loadAllPdfPages = async (files: File[]) => {
     setIsInitializing(true);
     setPhase('selecting');
-    const allLoadedPages: any[] = [];
+    const allLoadedPages: PageNode[] = [];
     const initialSelected = new Set<string>();
 
     try {
@@ -88,15 +100,15 @@ export function UnitWorkspace({ initialUnitId }: Props) {
           canvas.width = viewport.width; canvas.height = viewport.height;
           await page.render({ canvasContext: ctx, viewport }).promise;
           
-          const pageId = `${fIdx}-${pIdx}`;
+          const pageId = `${fIdx}-${pIdx}-${Math.random().toString(36).substr(2, 4)}`;
           allLoadedPages.push({ 
             id: pageId, 
             url: canvas.toDataURL('image/jpeg', 0.75),
             fileIdx: fIdx,
-            pageIdx: pIdx - 1
+            pageIdx: pIdx - 1,
+            rotation: 0
           });
 
-          // Transformation tools select all by default for review
           if (!isSurgicalTool) initialSelected.add(pageId);
         }
       }
@@ -104,15 +116,25 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       setSelectedPages(initialSelected);
     } catch (err) {
       console.error(err);
-      toast({ title: "Binary Load Error", description: "Document integrity check failed.", variant: "destructive" });
+      toast({ title: "Binary Integrity Error", description: "Could not rasterize document.", variant: "destructive" });
       reset();
     } finally {
       setIsInitializing(false);
     }
   };
 
-  const selectAllPages = () => setSelectedPages(new Set(pages.map(p => p.id)));
-  const deselectAllPages = () => setSelectedPages(new Set());
+  const movePage = (idx: number, dir: 'up' | 'down') => {
+    const nextIdx = dir === 'up' ? idx - 1 : idx + 1;
+    if (nextIdx < 0 || nextIdx >= pages.length) return;
+    const newPages = [...pages];
+    [newPages[idx], newPages[nextIdx]] = [newPages[nextIdx], newPages[idx]];
+    setPages(newPages);
+  };
+
+  const rotatePage = (id: string) => {
+    setPages(prev => prev.map(p => p.id === id ? { ...p, rotation: (p.rotation + 90) % 360 } : p));
+  };
+
   const togglePageSelection = (pageId: string) => {
     const next = new Set(selectedPages);
     if (next.has(pageId)) next.delete(pageId);
@@ -121,17 +143,25 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleConfirmedExecution = () => {
-    const indices = Array.from(selectedPages).map(id => {
-      const parts = id.split('-');
-      return parseInt(parts[1]) - 1; 
-    });
-    
-    if (indices.length === 0 && isSurgicalTool) {
-      toast({ title: "Selection Required", description: "Select document segments for mastery execution." });
+    const pageData = pages
+      .filter(p => !isSurgicalTool || selectedPages.has(p.id))
+      .map(p => ({
+        fileIdx: p.fileIdx,
+        pageIdx: p.pageIdx,
+        rotation: p.rotation
+      }));
+
+    if (pageData.length === 0 && isSurgicalTool) {
+      toast({ title: "No Pages Selected", description: "Identify document nodes for extraction." });
       return;
     }
-    
-    run(sourceFiles, { pageIndices: indices });
+
+    run(sourceFiles, { 
+      pageData,
+      splitMode,
+      splitInterval,
+      compressionLevel
+    });
   };
 
   const handleDownload = () => {
@@ -139,7 +169,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     const url = URL.createObjectURL(result.blob);
     const a = document.createElement('a');
     a.href = url; a.download = result.fileName; a.click();
-    toast({ title: "Asset Exported", description: "Binary buffer saved to local storage." });
+    toast({ title: "Asset Exported", description: "Download successful." });
   };
 
   return (
@@ -148,7 +178,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-4 md:p-10 space-y-10 max-w-7xl mx-auto pb-32">
             
-            {/* WORKSPACE HEADER */}
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-sm">
@@ -156,17 +185,13 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <h2 className="text-xl md:text-3xl font-black tracking-tighter uppercase leading-none truncate max-w-[240px] md:max-w-none">{unit?.name || "Registry Node"}</h2>
+                    <h2 className="text-xl md:text-3xl font-black tracking-tighter uppercase leading-none">{unit?.name || "Registry Node"}</h2>
                     <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[8px] font-black h-5 uppercase tracking-widest">{unit?.mode || 'WASM'}</Badge>
                   </div>
                   <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em] flex items-center gap-2">
-                    <Activity className="w-2.5 h-2.5 text-emerald-600" /> Neural Pipeline Synchronized
+                    <Activity className="w-2.5 h-2.5 text-emerald-600" /> Professional Mastery Sequence
                   </p>
                 </div>
-              </div>
-              <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-white/40 border border-black/5 rounded-2xl shadow-sm">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span className="text-[10px] font-black text-slate-950/60 uppercase tracking-widest">In-Session Buffer Secured</span>
               </div>
             </header>
 
@@ -183,54 +208,98 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     {isInitializing ? (
                       <div className="py-32 text-center space-y-6 opacity-40">
                         <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
-                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950">Rasterizing High-Fidelity Previews...</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950">Rasterizing Binary Streams...</p>
                       </div>
                     ) : (
                       <>
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-6 bg-white/60 p-6 rounded-3xl border border-black/5 shadow-2xl backdrop-blur-3xl">
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-3 text-primary">
-                              <Eye className="w-5 h-5" />
-                              <h3 className="text-lg font-black uppercase tracking-tighter">Visionary Inspection</h3>
+                        <div className="flex flex-col lg:flex-row gap-6">
+                          <div className="flex-1 bg-white/60 p-6 rounded-3xl border border-black/5 shadow-2xl backdrop-blur-3xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-3 text-primary">
+                                <Eye className="w-5 h-5" />
+                                <h3 className="text-lg font-black uppercase tracking-tighter">Visionary Inspect</h3>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set(pages.map(p => p.id)))} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50"><ListChecks className="w-3 h-3" /> All</Button>
+                                <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set())} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50"><Eraser className="w-3 h-3" /> Clear</Button>
+                              </div>
                             </div>
-                            <div className="flex gap-2">
-                              <Button variant="outline" size="sm" onClick={selectAllPages} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50"><ListChecks className="w-3 h-3" /> All Nodes</Button>
-                              <Button variant="outline" size="sm" onClick={deselectAllPages} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50"><Eraser className="w-3 h-3" /> Clear</Button>
+
+                            <div className="flex items-center gap-3">
+                              <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest">
+                                {isSurgicalTool ? selectedPages.size : pages.length} Segments
+                              </Badge>
+                              <Button onClick={handleConfirmedExecution} className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl transition-all">
+                                Execute Mastery <ChevronRight className="ml-2 w-4 h-4" />
+                              </Button>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3 w-full md:w-auto">
-                            <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest shadow-sm">
-                              {selectedPages.size} Segments Active
-                            </Badge>
-                            <Button onClick={handleConfirmedExecution} className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl hover:scale-105 active:scale-95 transition-all">
-                              Execute Mastery <ChevronRight className="ml-2 w-4 h-4" />
-                            </Button>
-                          </div>
+
+                          {(isSplitTool || isCompressTool) && (
+                            <div className="w-full lg:w-80 bg-white/60 p-6 rounded-3xl border border-black/5 shadow-2xl backdrop-blur-3xl space-y-4">
+                              <div className="flex items-center gap-2 text-primary">
+                                <Settings2 className="w-4 h-4" />
+                                <h4 className="text-[10px] font-black uppercase tracking-widest">Unit Config</h4>
+                              </div>
+                              {isSplitTool && (
+                                <div className="space-y-3">
+                                  <div className="flex gap-2">
+                                    <button onClick={() => setSplitMode('range')} className={cn("flex-1 h-8 rounded-lg text-[9px] font-black uppercase border transition-all", splitMode === 'range' ? "bg-primary text-white" : "bg-black/5 border-black/5")}>Range</button>
+                                    <button onClick={() => setSplitMode('interval')} className={cn("flex-1 h-8 rounded-lg text-[9px] font-black uppercase border transition-all", splitMode === 'interval' ? "bg-primary text-white" : "bg-black/5 border-black/5")}>Interval</button>
+                                  </div>
+                                  {splitMode === 'interval' && (
+                                    <div className="flex items-center gap-3">
+                                      <span className="text-[9px] font-bold uppercase opacity-40 whitespace-nowrap">Every X Pages:</span>
+                                      <input type="number" min="1" value={splitInterval} onChange={(e) => setSplitInterval(parseInt(e.target.value))} className="w-full h-8 bg-black/5 border-none rounded-lg px-3 text-xs font-bold" />
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                              {isCompressTool && (
+                                <div className="space-y-3">
+                                  <div className="flex gap-2">
+                                    <button onClick={() => setCompressionLevel('basic')} className={cn("flex-1 h-8 rounded-lg text-[9px] font-black uppercase border transition-all", compressionLevel === 'basic' ? "bg-primary text-white" : "bg-black/5 border-black/5")}>Basic</button>
+                                    <button onClick={() => setCompressionLevel('strong')} className={cn("flex-1 h-8 rounded-lg text-[9px] font-black uppercase border transition-all", compressionLevel === 'strong' ? "bg-primary text-white" : "bg-black/5 border-black/5")}>Strong</button>
+                                  </div>
+                                  <p className="text-[8px] font-bold text-slate-950/40 uppercase leading-relaxed">
+                                    {compressionLevel === 'basic' ? "Maintains high quality with 300DPI buffers." : "Aggressive 150DPI downsampling for smallest size."}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                         
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-4 md:gap-6">
-                          {pages.map((page) => {
+                          {pages.map((page, idx) => {
                             const isSelected = selectedPages.has(page.id);
                             return (
-                              <div 
-                                key={page.id} 
-                                onClick={() => togglePageSelection(page.id)} 
-                                className={cn(
-                                  "relative aspect-[1/1.414] rounded-2xl border-4 transition-all cursor-pointer overflow-hidden shadow-lg group",
-                                  isSelected ? "border-primary bg-primary/10 scale-[1.03] z-10" : isSurgicalTool ? "border-red-500/20 opacity-60" : "border-black/5"
-                                )}
-                              >
-                                <img src={page.url} alt={`Page ${page.pageIdx + 1}`} className={cn("w-full h-full object-cover transition-opacity duration-500", isSelected ? "opacity-100" : "opacity-40")} />
-                                <div className="absolute top-3 left-3 bg-black/60 text-white text-[8px] font-black px-2 py-1 rounded-md backdrop-blur-md uppercase shadow-lg">P{page.pageIdx + 1}</div>
-                                {isSelected ? (
-                                  <div className="absolute inset-0 flex items-center justify-center bg-primary/10 animate-in zoom-in-50 duration-300">
-                                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shadow-xl border-2 border-white/20"><CheckCircle2 className="w-6 h-6" /></div>
-                                  </div>
-                                ) : isSurgicalTool && (
-                                  <div className="absolute inset-0 flex items-center justify-center opacity-40 group-hover:opacity-100 transition-opacity">
-                                    <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white shadow-xl border-2 border-white/20"><Trash2 className="w-5 h-5" /></div>
-                                  </div>
-                                )}
+                              <div key={page.id} className="space-y-2 group">
+                                <div 
+                                  onClick={() => togglePageSelection(page.id)} 
+                                  className={cn(
+                                    "relative aspect-[1/1.414] rounded-2xl border-4 transition-all cursor-pointer overflow-hidden shadow-lg",
+                                    isSelected ? "border-primary bg-primary/10 scale-[1.03] z-10" : isSurgicalTool ? "border-red-500/20 opacity-60" : "border-black/5"
+                                  )}
+                                >
+                                  <img 
+                                    src={page.url} 
+                                    alt={`Page ${page.pageIdx + 1}`} 
+                                    className={cn("w-full h-full object-cover transition-all duration-500", isSelected ? "opacity-100" : "opacity-40")} 
+                                    style={{ transform: `rotate(${page.rotation}deg)` }}
+                                  />
+                                  <div className="absolute top-3 left-3 bg-black/60 text-white text-[8px] font-black px-2 py-1 rounded-md backdrop-blur-md uppercase shadow-lg">P{idx + 1}</div>
+                                  {isSelected && (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-primary/10">
+                                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shadow-xl border-2 border-white/20"><CheckCircle2 className="w-6 h-6" /></div>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <Button size="icon" variant="outline" onClick={(e) => { e.stopPropagation(); movePage(idx, 'up'); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><ArrowLeft className="w-3.5 h-3.5" /></Button>
+                                  <Button size="icon" variant="outline" onClick={(e) => { e.stopPropagation(); rotatePage(page.id); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><RotateCw className="w-3.5 h-3.5" /></Button>
+                                  <Button size="icon" variant="outline" onClick={(e) => { e.stopPropagation(); movePage(idx, 'down'); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><ArrowRight className="w-3.5 h-3.5" /></Button>
+                                </div>
                               </div>
                             );
                           })}
@@ -248,7 +317,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                           <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
                             <Layers className="w-5 h-5 animate-bounce" />
                           </div>
-                          <h3 className="text-xl font-black uppercase tracking-tighter">Processing Sequence...</h3>
+                          <h3 className="text-xl font-black uppercase tracking-tighter">Executing Pipeline...</h3>
                         </div>
                         <span className="text-3xl font-black text-primary tracking-tighter">{Math.round(progress.pct)}%</span>
                       </div>
@@ -262,19 +331,19 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   <motion.div key="done" initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="max-w-3xl mx-auto w-full pt-12">
                     <Card className="bg-white/80 border-2 border-emerald-500/20 p-10 md:p-16 rounded-[4rem] shadow-2xl space-y-10 text-center backdrop-blur-3xl">
                       <div className="flex flex-col items-center space-y-6">
-                        <div className="w-20 h-20 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center border-2 border-emerald-500/20 shadow-lg shadow-emerald-500/10"><CheckCircle2 className="w-10 h-10 text-emerald-600" /></div>
+                        <div className="w-20 h-20 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center border-2 border-emerald-500/20 shadow-lg"><CheckCircle2 className="w-10 h-10 text-emerald-600" /></div>
                         <div className="space-y-2">
                           <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] px-4 h-6 rounded-full uppercase tracking-widest mb-2 shadow-sm">Mastery Successful</Badge>
-                          <h3 className="text-2xl md:text-3xl font-black tracking-tighter uppercase truncate max-w-md mx-auto text-slate-950">{result.fileName}</h3>
-                          <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">{(result.byteLength / 1024).toFixed(1)} KB Synthesized Asset</p>
+                          <h3 className="text-2xl md:text-3xl font-black tracking-tighter uppercase truncate max-w-md mx-auto">{result.fileName}</h3>
+                          <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">Verified Secure Binary Buffer</p>
                         </div>
                       </div>
                       <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button onClick={handleDownload} className="h-16 px-12 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 shadow-2xl shadow-emerald-500/20 transition-all hover:scale-105">
+                        <Button onClick={handleDownload} className="h-16 px-12 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 shadow-2xl transition-all hover:scale-105">
                           <Download className="w-5 h-5" /> Download Asset
                         </Button>
                         <Button variant="outline" onClick={reset} className="h-16 px-10 border-black/10 bg-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 hover:bg-black/5 transition-all">
-                          <RefreshCw className="w-5 h-5" /> New Task
+                          <RefreshCw className="w-5 h-5" /> Reset Node
                         </Button>
                       </div>
                     </Card>
@@ -285,14 +354,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   <motion.div key="error" initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="max-w-2xl mx-auto w-full pt-12">
                     <Card className="p-16 bg-red-50 border-2 border-red-100 rounded-[3rem] text-center space-y-8 shadow-2xl">
                       <div className="w-16 h-16 bg-red-100 rounded-[2rem] flex items-center justify-center mx-auto"><XCircle className="w-8 h-8 text-red-600" /></div>
-                      <h3 className="text-2xl font-black text-red-900 uppercase tracking-tighter leading-tight">{error || "Pipeline Interrupted."}</h3>
+                      <h3 className="text-2xl font-black text-red-900 uppercase tracking-tighter leading-tight">{error || "Synthesis Interrupted."}</h3>
                       <div className="flex flex-col gap-3">
-                        <Button onClick={handleConfirmedExecution} variant="outline" className="h-14 rounded-2xl font-black text-xs uppercase tracking-widest border-red-200 bg-white hover:bg-red-50 text-red-900">
-                          Retry Mastery Sequence
-                        </Button>
-                        <Button onClick={reset} variant="ghost" className="h-10 font-bold uppercase text-[10px] text-red-400 hover:text-red-600">
-                          Reset Registry Node
-                        </Button>
+                        <Button onClick={handleConfirmedExecution} variant="outline" className="h-14 rounded-2xl font-black text-xs uppercase tracking-widest border-red-200 bg-white hover:bg-red-50 text-red-900">Retry Mastery Sequence</Button>
+                        <Button onClick={reset} variant="ghost" className="h-10 font-bold uppercase text-[10px] text-red-400">Reset Registry</Button>
                       </div>
                     </Card>
                   </motion.div>
