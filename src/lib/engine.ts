@@ -1,7 +1,5 @@
 'use client';
 
-import { PDFDocument } from 'pdf-lib';
-
 /**
  * AJN Master Engineering Orchestrator
  * High-fidelity logic routing for 30+ specialized binary service units.
@@ -99,6 +97,7 @@ class AJNPDFEngine {
       // 5. UNIVERSAL RECOVERY FALLBACK
       else {
         onProgressCallback({ stage: "Recovery", detail: "Executing universal binary recovery...", pct: 60 });
+        const { PDFDocument } = await import('pdf-lib');
         const pdfDoc = await PDFDocument.create();
         pdfDoc.addPage();
         const bytes = await pdfDoc.save();

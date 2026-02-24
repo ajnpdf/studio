@@ -28,20 +28,20 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const { phase, progress, logs, result, run, reset } = useAJNTool(initialUnitId || 'merge-pdf');
 
   useEffect(() => {
-    // Fix hydration mismatch by generating random values only on client mount
+    // FIX: Generate random values only on client to prevent hydration mismatch
     setLatency((Math.random() * 50 + 10).toFixed(0));
   }, []);
 
   const getAcceptedExtensions = () => {
     if (!unit) return ".pdf";
     const id = unit.id;
-    // PDF Source Tools
+    // PDF Source Tools: ONLY allow PDF selection
     if (id.startsWith("pdf-") || id === "merge-pdf" || id === "split-pdf" || id === "rotate-pdf" || 
         id === "compress-pdf" || id === "redact-pdf" || id === "protect-pdf" || id === "sign-pdf" || 
         id === "summarize-pdf" || id === "translate-pdf" || id === "ocr-pdf") {
       return ".pdf";
     }
-    // PDF Creation Tools
+    // PDF Creation Tools: ONLY allow source format selection
     if (id.endsWith("-pdf")) {
       if (id.includes("jpg") || id.includes("image")) return ".jpg,.jpeg,.png,.webp";
       if (id.includes("word")) return ".docx,.doc";
