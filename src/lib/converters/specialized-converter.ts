@@ -9,7 +9,7 @@ if (typeof window !== 'undefined') {
 
 /**
  * AJN Specialized Services Core - Master Vision & Intelligence Layer
- * Integrated with robust fallback mechanisms and safe save protocols.
+ * Hardened with Fault-Tolerant Translation and Safe-Save Protocols.
  */
 export class SpecializedConverter {
   private file: File;
@@ -37,8 +37,7 @@ export class SpecializedConverter {
       const data = await resp.json();
       return data.translatedText || text;
     } catch {
-      // Robustness Fix: Return original text if translation node fails
-      return text;
+      return text; // Original text fallback on failure
     }
   }
 
@@ -54,9 +53,6 @@ export class SpecializedConverter {
     throw new Error(`Specialized tool ${target} not supported.`);
   }
 
-  /**
-   * Robust PDF Translation - Drop-in Patch Implementation
-   */
   private async runHardenedTranslation(baseName: string, options: any): Promise<ConversionResult> {
     const { sourceLang = 'auto', targetLang = 'es' } = options;
     const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib');
@@ -117,10 +113,9 @@ export class SpecializedConverter {
               color: rgb(0, 0, 0),
               maxWidth: (item.width / vp.width) * pw + 20
             });
-          } catch { /* skip if text draw fails */ }
+          } catch { /* skip failed draw */ }
         }
       } catch (err: any) {
-        // Fix 3: Per-page resilience - never let one page kill the job
         console.warn(`Page ${i + 1} skipped: ${err.message}`);
         continue;
       }
@@ -128,7 +123,7 @@ export class SpecializedConverter {
 
     this.updateProgress(95, "Synchronizing binary buffer...");
     
-    // Fix 2: Safe Save Protocol
+    // Safe Save Protocol
     let bytes;
     try {
       bytes = await doc.save();

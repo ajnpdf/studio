@@ -15,7 +15,8 @@ import {
   Trash2, 
   ChevronRight,
   Eye,
-  Layers
+  Layers,
+  FileIcon
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -35,9 +36,9 @@ interface Props {
 }
 
 /**
- * AJN Engineering Workspace - Universal Visionary Layer
- * Implements real-time page inspection for all tools.
- * Fixed Next.js Hydration errors by deferring random metrics.
+ * AJN Engineering Workspace - Universal Real-Time Visionary
+ * Implements high-fidelity page inspection for all tools.
+ * Standardized on Arial typography.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const unit = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -50,7 +51,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Tools that require surgical selection (start empty)
+  // Tools that require manual selection (start empty)
   const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf'].includes(unit?.id || '');
 
   const getAcceptedExtensions = () => {
@@ -75,7 +76,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     if (files.some(f => f.type === 'application/pdf')) {
       await loadAllPdfPages(files);
     } else {
-      // Direct run for non-PDFs (like JPG to PDF)
       run(files, { quality: 90, targetFormat: unit?.id.split('-').pop()?.toUpperCase() || 'PDF' });
     }
   };
@@ -109,7 +109,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             pageIdx: pIdx - 1
           });
 
-          // Default: Select all for transformation tools (Review mode)
+          // Transformation tools: Select all by default for review
           if (!isSurgicalTool) {
             initialSelected.add(pageId);
           }
@@ -136,7 +136,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       return;
     }
 
-    const indices = Array.from(selectedPages).map(id => parseInt(id.split('-')[1]));
+    const indices = Array.from(selectedPages).map(id => parseInt(id.split('-')[1]) - 1);
     
     run(sourceFiles, { 
       pageIndices: indices,
@@ -180,7 +180,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
               </div>
               <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/40 border border-black/5 rounded-2xl shadow-sm">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span className="text-[10px] font-black text-slate-950/60 uppercase tracking-widest">Master Buffer Secured</span>
+                <span className="text-[10px] font-black text-slate-950/60 uppercase tracking-widest">Buffer Secured</span>
               </div>
             </header>
 

@@ -3,6 +3,7 @@
 /**
  * AJN Master Engineering Orchestrator
  * High-fidelity logic routing for specialized binary service units.
+ * Error-safe execution handler.
  */
 
 class AJNPDFEngine {
@@ -49,10 +50,9 @@ class AJNPDFEngine {
         const converter = new SplitConverter(firstFile, (p, m) => onProgressCallback({ stage: "Split", detail: m, pct: p }));
         
         if (toolId === 'delete-pages') {
-          // Flip logic for delete: keep what isn't selected
           const buf = await firstFile.arrayBuffer();
           const { PDFDocument } = await import('pdf-lib');
-          const pdf = await PDFDocument.load(buf);
+          const pdf = await PDFDocument.load(buf, { ignoreEncryption: true });
           const allIndices = Array.from({ length: pdf.getPageCount() }, (_, i) => i);
           const keepIndices = allIndices.filter(i => !options.pageIndices?.includes(i));
           result = await converter.split({ ...options, pageIndices: keepIndices });
@@ -110,8 +110,7 @@ class AJNPDFEngine {
       onProgressCallback({ stage: "Established", detail: "Binary synchronization successful.", pct: 100 });
       return { success: true, fileName: result.fileName, byteLength: result.blob.size, blob: result.blob };
     } catch (err: any) {
-      console.error("[AJN Core] Error during execution:", err);
-      // Fallback message to prevent "reading property of undefined" error
+      console.error("[AJN Core] Execution Error:", err);
       const msg = err?.message || "Synthesis failure during binary processing.";
       throw new Error(msg);
     }
