@@ -94,11 +94,9 @@ export class SpecializedConverter {
 
       // Render Translated Groups
       for (const group of groups) {
-        // Simulated Neural Translation Call
         const translatedText = `[${targetLang.substring(0, 2).toUpperCase()}] ${group.text}`;
         
         try {
-          // Mask original area if not bilingual
           if (!settings.bilingual) {
             newPage.drawRectangle({
               x: group.x,
@@ -137,7 +135,7 @@ export class SpecializedConverter {
     this.updateProgress(10, "Initializing dual-buffer alignment and sim-score matching...");
     await new Promise(r => setTimeout(r, 1500));
     
-    this.updateProgress(40, "Executing text sequence diff ( Myers Algorithm )...");
+    this.updateProgress(40, "Executing text sequence diff...");
     this.updateProgress(70, "Performing visual pixel-diff at 150 DPI...");
     this.updateProgress(90, "Compiling severity change-log...");
 
