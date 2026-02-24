@@ -33,7 +33,7 @@ class AJNPDFEngine {
 
     try {
       // 1. PDF-TO-X ROUTING (Export Mastery)
-      if (toolId.startsWith('pdf-')) {
+      if (toolId.startsWith('pdf-') && toolId !== 'pdf-pdfa') {
         const target = toolId.split('-')[1].toUpperCase();
         onProgressCallback({ stage: "Deconstructing", detail: `Executing PDF binary deconstruction for ${target} reconstruction...`, pct: 20 });
 
@@ -71,7 +71,7 @@ class AJNPDFEngine {
       }
       
       // 3. CORE MANIPULATION & SECURITY (Surgical Edits)
-      else if (['merge-pdf', 'split-pdf', 'rotate-pdf', 'compress-pdf', 'redact-pdf', 'protect-pdf', 'sign-pdf', 'repair-pdf', 'organize-pdf'].includes(toolId)) {
+      else if (['merge-pdf', 'split-pdf', 'rotate-pdf', 'compress-pdf', 'redact-pdf', 'protect-pdf', 'sign-pdf', 'repair-pdf', 'organize-pdf', 'delete-pages', 'extract-pages', 'add-page-numbers', 'edit-pdf', 'unlock-pdf', 'flatten-pdf', 'pdf-pdfa', 'grayscale-pdf'].includes(toolId)) {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Manipulation", detail: m, pct: p }));
         
@@ -83,6 +83,13 @@ class AJNPDFEngine {
         else if (toolId === 'sign-pdf') result = await manipulator.sign((options as any).signature, options);
         else if (toolId === 'repair-pdf') result = await manipulator.repair(options);
         else if (toolId === 'organize-pdf') result = await manipulator.organize((options as any).permutation);
+        else if (toolId === 'delete-pages') result = await manipulator.removePages((options as any).indices);
+        else if (toolId === 'extract-pages') result = await manipulator.extractPages((options as any).indices);
+        else if (toolId === 'add-page-numbers') result = await manipulator.addPageNumbers(options);
+        else if (toolId === 'edit-pdf') result = await manipulator.edit(options);
+        else if (toolId === 'unlock-pdf') result = await manipulator.unlock((options as any).password);
+        else if (toolId === 'pdf-pdfa') result = await manipulator.toPDFA('B');
+        else if (toolId === 'grayscale-pdf') result = await manipulator.grayscale();
         else result = await manipulator.rotate(options);
       }
       
