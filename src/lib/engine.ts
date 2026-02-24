@@ -32,17 +32,29 @@ class AJNPDFEngine {
         const map: Record<string, string> = { 'translate-pdf': 'TRANSLATE', 'ocr-pdf': 'OCR', 'summarize-pdf': 'SUMMARIZE', 'compare-pdf': 'COMPARE' };
         result = await converter.convertTo(map[toolId], options);
       } 
-      // 2. EXPORT CORE (PDF to X)
+      // 2. MERGE CORE
+      else if (toolId === 'merge-pdf') {
+        const { MergeConverter } = await import('@/lib/converters/merge-converter');
+        const converter = new MergeConverter(files, (p, m) => onProgressCallback({ stage: "Merge", detail: m, pct: p }));
+        result = await converter.merge();
+      }
+      // 3. SPLIT CORE
+      else if (toolId === 'split-pdf') {
+        const { SplitConverter } = await import('@/lib/converters/split-converter');
+        const converter = new SplitConverter(firstFile, (p, m) => onProgressCallback({ stage: "Split", detail: m, pct: p }));
+        result = await converter.split(options);
+      }
+      // 4. EXPORT CORE (PDF to X)
       else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt'].includes(toolId)) {
         const { PDFConverter } = await import('@/lib/converters/pdf-converter');
         const converter = new PDFConverter(firstFile, (p, m) => onProgressCallback({ stage: "Synthesis", detail: m, pct: p }));
         const map: Record<string, string> = { 'pdf-jpg': 'JPG', 'pdf-png': 'PNG', 'pdf-webp': 'WEBP', 'pdf-word': 'WORD', 'pdf-pptx': 'PPTX', 'pdf-excel': 'EXCEL', 'pdf-txt': 'TXT' };
         result = await converter.convertTo(map[toolId], options);
       }
-      // 3. DEVELOPMENT CORE (X to PDF)
+      // 5. DEVELOPMENT CORE (X to PDF)
       else if (toolId.endsWith('-pdf')) {
         const source = toolId.split('-')[0];
-        if (['jpg', 'jpeg', 'png', 'webp'].includes(source)) {
+        if (['jpg', 'jpeg', 'png', 'webp'].includes(source!)) {
           const { ImageConverter } = await import('@/lib/converters/image-converter');
           const converter = new ImageConverter(firstFile, (p, m) => onProgressCallback({ stage: "Imagery", detail: m, pct: p }));
           result = await converter.toMasterPDF(files, options);
@@ -60,12 +72,11 @@ class AJNPDFEngine {
           result = await new CodeConverter(firstFile, (p, m) => onProgressCallback({ stage: "Data", detail: m, pct: p })).convertTo('PDF');
         }
       }
-      // 4. MANIPULATION & SECURITY
+      // 6. MANIPULATION & SECURITY
       else {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Manipulation", detail: m, pct: p }));
-        if (toolId === 'merge-pdf') result = await manipulator.merge();
-        else if (toolId === 'delete-pages') result = await manipulator.removePages(options);
+        if (toolId === 'delete-pages') result = await manipulator.removePages(options);
         else if (toolId === 'rotate-pdf') result = await manipulator.rotate();
         else if (toolId === 'add-page-numbers') result = await manipulator.addPageNumbers();
         else if (toolId === 'sign-pdf') result = await manipulator.sign(options.signatureBuf);
