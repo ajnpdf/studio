@@ -29,7 +29,6 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 /**
  * All-in-one Junction Network - Landing Hub 2026
- * Strictly formatted for Professional industrial standards.
  */
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
@@ -84,7 +83,6 @@ export default function LandingPage() {
 
       <main className="w-full relative z-10">
         
-        {/* HERO SECTION */}
         <section className="pt-48 pb-20 text-center max-w-5xl mx-auto px-6 space-y-12">
           <div className="space-y-8">
             <div className="space-y-4">
@@ -101,10 +99,7 @@ export default function LandingPage() {
                 </div>
                 <div className="px-6 py-3 bg-primary/5 border border-primary/10 rounded-[2rem] shadow-sm max-w-3xl mx-auto space-y-1">
                   <p className="text-[10px] font-black uppercase tracking-widest text-primary leading-relaxed">
-                    Only this site provides professional PDF tools and real-time conversion services entirely free
-                  </p>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-950/40">
-                    Use for student purpose and business purpose • useful to students and business and more
+                    Professional document tools and real-time conversion services entirely free
                   </p>
                 </div>
               </div>
@@ -120,10 +115,9 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* TOOLS GRID SECTION */}
         <section id="tools" className="py-20 px-6 max-w-7xl mx-auto space-y-12">
           <div className="text-center space-y-2">
-            <h2 className="text-3xl font-black uppercase tracking-tighter">Popular <span className="text-primary">PDF Tools</span></h2>
+            <h2 className="text-3xl font-black uppercase tracking-tighter">Popular <span className="text-primary">Tools</span></h2>
             <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-950/40">Immediate access to professional processing for every workflow</p>
           </div>
 
@@ -154,11 +148,10 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* FEATURES SECTION */}
         <section id="features" className="py-20 px-6 max-w-7xl mx-auto space-y-12">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-black uppercase tracking-tighter">Core <span className="text-primary">Features</span></h2>
-            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-950/40">Reliable Performance Standards for students and professionals</p>
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-950/40">Reliable Performance Standards for global professional use</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -178,22 +171,20 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* SOLUTIONS SECTION */}
         <section id="solutions" className="py-24 bg-white/20 border-y border-black/5">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center space-y-4 mb-16">
               <h2 className="text-4xl font-black uppercase tracking-tighter">Workflow <span className="text-primary">Solutions</span></h2>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Professional tools useful to students and business and more</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Professional toolsets for academic and commercial use</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              {/* FOR INDIVIDUALS / STUDENTS */}
               <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-12 rounded-[3.5rem] space-y-10 shadow-2xl hover:border-primary/30 transition-all">
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center"><User className="w-7 h-7 text-primary" /></div>
                   <div className="space-y-1">
                     <h3 className="text-3xl font-black uppercase tracking-tighter">For Individuals</h3>
-                    <p className="text-[10px] font-bold text-primary uppercase tracking-widest leading-none">Use for student purpose - useful to students and more</p>
+                    <p className="text-[10px] font-bold text-primary uppercase tracking-widest leading-none">Optimized for academic and personal workflows</p>
                   </div>
                 </div>
                 <ul className="space-y-5">
@@ -213,7 +204,6 @@ export default function LandingPage() {
                 </Link>
               </Card>
 
-              {/* FOR BUSINESS */}
               <Card className="bg-primary text-white border-none p-12 rounded-[3.5rem] space-y-10 shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-700">
                   <Globe className="w-64 h-64" />
@@ -222,7 +212,7 @@ export default function LandingPage() {
                   <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center"><Globe className="w-7 h-7 text-white" /></div>
                   <div className="space-y-1">
                     <h3 className="text-3xl font-black uppercase tracking-tighter">For Business</h3>
-                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest leading-none">Use for business purpose - useful to business and more</p>
+                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest leading-none">Scalable infrastructure for commercial operations</p>
                   </div>
                 </div>
                 <ul className="space-y-5 relative z-10">
@@ -245,7 +235,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* STORY SECTION */}
         <section id="story" className="py-24 px-6 bg-white/40 border-y border-black/5 overflow-hidden">
           <div className="max-w-7xl mx-auto space-y-20">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
@@ -273,11 +262,11 @@ export default function LandingPage() {
               <div className="lg:col-span-7 space-y-8">
                 <div className="space-y-4">
                   <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Our Mission</span>
-                  <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-[0.9] uppercase">Simple Document <br /><span className="text-primary">Processing</span></h2>
+                  <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-[0.9] uppercase">Professional <br /><span className="text-primary">Processing</span></h2>
                 </div>
                 <div className="prose prose-slate max-w-none text-slate-950/70 font-medium space-y-6 leading-relaxed text-lg uppercase tracking-widest">
                   <p>"AJN was created to make professional document tools accessible to everyone."</p>
-                  <p>"We've built a platform that runs entirely in your browser. Your data stays with you while you get the results you need. Useful for student purpose and business purpose alike."</p>
+                  <p>"We've built a platform that runs entirely in your browser. Your data stays with you while you get the results you need."</p>
                   <p className="font-bold text-slate-950 italic">— Anjan Patel</p>
                 </div>
                 <div className="flex gap-10 pt-4">
@@ -299,41 +288,8 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* NEWS SECTION */}
-        <section id="news" className="py-24 px-6 max-w-7xl mx-auto space-y-16">
-          <div className="flex items-end justify-between border-b border-black/5 pb-8">
-            <div className="space-y-2">
-              <h2 className="text-4xl font-black uppercase tracking-tighter">Latest <span className="text-primary">News</span></h2>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Platform Updates 2026</p>
-            </div>
-            <Button variant="ghost" className="font-black text-[10px] uppercase tracking-widest gap-2">View All Updates <ArrowRight className="w-3 h-3" /></Button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { title: "Browser-Based Document Processing", cat: "Updates", date: "FEB 15" },
-              { title: "Protecting Your Files with Encryption", cat: "Security", date: "FEB 12" },
-              { title: "Advanced Text Recognition Updates", cat: "Features", date: "FEB 10" }
-            ].map((post, i) => (
-              <Card key={i} className="bg-white/40 border-black/5 hover:border-primary/20 transition-all rounded-[3.5rem] overflow-hidden group shadow-xl">
-                <CardContent className="p-10 space-y-6">
-                  <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="bg-primary/5 text-primary border-none text-[8px] font-black uppercase h-5">{post.cat}</Badge>
-                    <span className="text-[9px] font-bold text-slate-950/40">{post.date}</span>
-                  </div>
-                  <h4 className="text-xl font-black leading-tight uppercase group-hover:text-primary transition-colors">{post.title}</h4>
-                  <div className="pt-6 border-t border-black/5 flex justify-end">
-                    <Button variant="ghost" size="icon" className="group-hover:bg-primary group-hover:text-white rounded-full transition-all"><ArrowRight className="w-4 h-4" /></Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
       </main>
 
-      {/* FOOTER */}
       <footer className="w-full py-20 border-t border-black/5 flex flex-col items-center gap-10 relative z-10">
         <LogoAnimation className="w-20 h-10 opacity-40" showGlow={false} />
         

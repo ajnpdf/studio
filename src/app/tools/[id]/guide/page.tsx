@@ -72,7 +72,7 @@ export default function ToolGuidePage({ params }: Props) {
             <span className="text-primary/40">Technical Briefing</span>
           </h1>
           <p className="text-sm font-bold text-slate-950/40 uppercase tracking-[0.4em] max-w-2xl mx-auto leading-relaxed">
-            Use for student purpose and business purpose • useful to students and business and more
+            Professional guidance for advanced document transformation workflows
           </p>
         </section>
 

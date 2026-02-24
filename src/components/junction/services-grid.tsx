@@ -29,7 +29,7 @@ export const ALL_UNITS: ServiceUnit[] = [
   { 
     id: 'merge-pdf', 
     name: 'Merge PDF', 
-    desc: 'Combine multiple documents into one.', 
+    desc: 'Consolidate separate PDF files into a single document.', 
     icon: Layout, 
     tag: 'Merge', 
     cat: 'Organize', 
@@ -37,7 +37,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     color: '#3B82F6',
     benefits: ['Consolidates fragmented records', 'Reduces file management overhead', 'Optimizes document portability'],
     instructions: ['Inhale source files into the secure buffer.', 'Arrange segments in the desired sequence.', 'Execute the binary merge protocol.'],
-    useCases: ['Student purpose: Merging assignment chapters.', 'Business purpose: Consolidating monthly financial reports.']
+    useCases: ['Merging assignment chapters.', 'Consolidating monthly financial reports.']
   },
   { 
     id: 'split-pdf', 
@@ -50,7 +50,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     color: '#6366F1',
     benefits: ['Extracts critical data points', 'Enables targeted information sharing', 'Decomposes oversized binaries'],
     instructions: ['Load document into the visual workspace.', 'Select specific page ranges for extraction.', 'Finalize segment isolation.'],
-    useCases: ['Student purpose: Extracting specific textbook chapters.', 'Business purpose: Isolating individual invoices from a batch run.']
+    useCases: ['Extracting specific textbook chapters.', 'Isolating individual invoices from a batch run.']
   },
   { 
     id: 'compress-pdf', 
@@ -63,7 +63,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     color: '#10B981',
     benefits: ['Minimizes storage infrastructure costs', 'Bypasses email attachment limits', 'Accelerates web-based document loading'],
     instructions: ['Select the target document.', 'Define the required reduction level (MB/KB).', 'Execute surgical stream deflation.'],
-    useCases: ['Student purpose: Uploading compressed portfolios to portals.', 'Business purpose: Optimizing archival document storage.']
+    useCases: ['Uploading compressed portfolios to portals.', 'Optimizing archival document storage.']
   },
   { 
     id: 'ocr-pdf', 
@@ -76,7 +76,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     color: '#047857',
     benefits: ['Enables text searching in legacy scans', 'Supports automated data indexing', 'Improves document accessibility'],
     instructions: ['Inhale the raster image or scanned PDF.', 'Choose the target recognition language.', 'Run the character identification protocol.'],
-    useCases: ['Student purpose: Converting handwritten notes to text.', 'Business purpose: Digitizing physical contracts for searchable archives.']
+    useCases: ['Converting handwritten notes to text.', 'Digitizing physical contracts for searchable archives.']
   },
   { 
     id: 'sign-pdf', 
@@ -89,7 +89,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     color: '#1F2937',
     benefits: ['Executes legally binding authorizations', 'Operates entirely in local secure buffer', 'Eliminates physical printing costs'],
     instructions: ['Load document segment into editor.', 'Draw, type, or upload your signature asset.', 'Place signature box and commit to binary.'],
-    useCases: ['Student purpose: Signing internship applications.', 'Business purpose: Authorizing commercial vendor agreements.']
+    useCases: ['Signing internship applications.', 'Authorizing commercial vendor agreements.']
   },
   { 
     id: 'word-pdf', 
@@ -102,11 +102,11 @@ export const ALL_UNITS: ServiceUnit[] = [
     color: '#D97706',
     benefits: ['Preserves complex document layouts', 'Ensures universal platform compatibility', 'Locks content against accidental edits'],
     instructions: ['Browse and select Word-compatible files.', 'Verify page layout in the visionary preview.', 'Launch the OOXML-to-PDF transformation.'],
-    useCases: ['Student purpose: Converting essays for submission.', 'Business purpose: Preparing professional proposals for clients.']
+    useCases: ['Converting essays for submission.', 'Preparing professional proposals for clients.']
   },
-  { id: 'repair-pdf', name: 'Repair PDF', desc: 'Fix corrupted PDF file structures.', icon: Wrench, tag: 'Repair', cat: 'Optimize', mode: 'Standard', color: '#059669', benefits: ['Restores access to damaged binaries', 'Corrects invalid cross-reference tables', 'Recovers lost page objects'], instructions: ['Upload the corrupted PDF asset.', 'Select the recovery protocol level.', 'Execute structural reconstruction.'], useCases: ['Business purpose: Recovering corrupted archive data.', 'Useful to students and business and more.'] },
-  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Modify existing document layers.', icon: MousePointer2, tag: 'Edit', cat: 'Edit', mode: 'Advanced', color: '#BE185D', benefits: ['Direct layer manipulation', 'Real-time text and image injection', 'Professional markup tools'], instructions: ['Open document in advanced editor.', 'Select object or add new text/image layer.', 'Commit surgical changes to binary.'], useCases: ['Useful for student purpose and business purpose.', 'Advanced professional setup in real time.'] },
-  { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Convert PDF segments to images.', icon: ImageIcon, tag: 'Export', cat: 'Export', mode: 'Standard', color: '#EF4444', benefits: ['Enables social media document sharing', 'Creates lightweight presentation assets', 'Universal image compatibility'], instructions: ['Load target PDF document.', 'Select specific pages or full range.', 'Export to high-fidelity JPEG matrix.'], useCases: ['Student purpose: Sharing infographics.', 'Business purpose: Extracting slide frames for social channels.'] },
+  { id: 'repair-pdf', name: 'Repair PDF', desc: 'Fix corrupted PDF file structures.', icon: Wrench, tag: 'Repair', cat: 'Optimize', mode: 'Standard', color: '#059669', benefits: ['Restores access to damaged binaries', 'Corrects invalid cross-reference tables', 'Recovers lost page objects'], instructions: ['Upload the corrupted PDF asset.', 'Select the recovery protocol level.', 'Execute structural reconstruction.'], useCases: ['Recovering corrupted archive data.'] },
+  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Modify existing document layers.', icon: MousePointer2, tag: 'Edit', cat: 'Edit', mode: 'Advanced', color: '#BE185D', benefits: ['Direct layer manipulation', 'Real-time text and image injection', 'Professional markup tools'], instructions: ['Open document in advanced editor.', 'Select object or add new text/image layer.', 'Commit surgical changes to binary.'], useCases: ['Editing document text and images in real time.'] },
+  { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Convert PDF segments to images.', icon: ImageIcon, tag: 'Export', cat: 'Export', mode: 'Standard', color: '#EF4444', benefits: ['Enables social media document sharing', 'Creates lightweight presentation assets', 'Universal image compatibility'], instructions: ['Load target PDF document.', 'Select specific pages or full range.', 'Export to high-fidelity JPEG matrix.'], useCases: ['Sharing infographics.', 'Extracting slide frames for social channels.'] },
 ];
 
 const containerVariants = {
@@ -159,7 +159,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
                     <p className="text-[8px] md:text-[9px] font-bold text-slate-950/40 uppercase tracking-widest line-clamp-2 md:line-clamp-none">{unit.desc}</p>
                   </div>
                   <div className="pt-4 border-t border-black/5 mt-4 md:mt-6 flex items-center justify-between">
-                    <span className="text-[7px] md:text-[8px] font-black text-slate-950/30 uppercase tracking-[0.2em]">{unit.cat === 'Intelligence' ? 'Advanced' : unit.cat}</span>
+                    <span className="text-[7px] md:text-[8px] font-black text-slate-950/30 uppercase tracking-[0.2em]">{unit.cat}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-primary translate-x-2 group-hover/card:translate-x-0 transition-all opacity-0 group-hover/card:opacity-100" />
                   </div>
                 </CardContent>

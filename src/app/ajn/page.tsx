@@ -83,8 +83,8 @@ export default function AJNPage() {
         <section className="space-y-10 pb-24">
           <div className="flex items-end justify-between px-6 border-b border-black/5 pb-6">
             <div className="space-y-1 text-left">
-              <h2 className="text-3xl font-black tracking-tighter text-slate-950 leading-none">PDF Tool Library</h2>
-              <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.4em]">Fast and secure document processing • Use for student purpose and business purpose • Useful to students and business and more</p>
+              <h2 className="text-3xl font-black tracking-tighter text-slate-950 leading-none">Document Tool Library</h2>
+              <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.4em]">Fast and secure document processing for global professional networks</p>
             </div>
             {searchQuery && (
               <button onClick={() => setSearchQuery('')} className="text-[10px] font-black uppercase text-primary hover:underline underline-offset-4 tracking-widest">

@@ -58,7 +58,7 @@ interface Props {
 
 /**
  * AJN Tools Workspace - Professional Industrial Setup 2026
- * Hardened for real-time execution with advanced compression and repair logic.
+ * Hardened for real-time execution with corrected Execute logic.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const tool = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -152,6 +152,12 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     toast({ title: "Export Complete", description: "Asset successfully retrieved." });
   };
 
+  const getBrowseAccept = () => {
+    if (isWordTool) return ".doc,.docx,.odt,.rtf";
+    if (isCompressTool || isRepairTool) return "application/pdf";
+    return "*/*";
+  };
+
   return (
     <div className="flex h-full bg-transparent overflow-hidden relative text-slate-950 font-sans">
       <main className="flex-1 flex flex-col min-w-0 relative h-full">
@@ -161,101 +167,112 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             <AnimatePresence mode="wait">
               {phase === 'idle' && (
                 <motion.div key="idle" className="space-y-6">
-                  <div className="bg-primary/5 border border-primary/10 p-4 rounded-2xl text-center">
-                    <p className="text-[10px] font-black uppercase text-primary tracking-widest leading-relaxed">
-                      Use for student purpose and business purpose • useful to students and business and more
-                    </p>
-                  </div>
-                  <DropZone onFiles={handleFilesAdded} accept={isCompressTool || isRepairTool ? "application/pdf" : "*/*"} />
+                  <DropZone onFiles={handleFilesAdded} accept={getBrowseAccept()} />
                 </motion.div>
               )}
 
               {phase === 'selecting' && (
-                <motion.div key="selecting" className="space-y-8">
+                <motion.div key="selecting" className="space-y-8 animate-in fade-in duration-500">
                   {isInitializing ? (
                     <div className="py-32 text-center opacity-40">
                       <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
                       <p className="text-[10px] font-black uppercase tracking-widest">Calibrating Buffer...</p>
                     </div>
                   ) : (
-                    <div className="flex flex-col xl:flex-row gap-8">
-                      <div className="flex-1">
-                        {isCompressTool || isRepairTool ? (
-                          <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10">
-                            <div className="flex items-center gap-4 text-primary">
-                              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-sm">
-                                {isCompressTool ? <Shrink className="w-7 h-7" /> : <RefreshCw className="w-7 h-7" />}
-                              </div>
-                              <div>
-                                <h3 className="text-3xl font-black uppercase tracking-tighter text-slate-950">{isCompressTool ? 'Advanced Compression' : 'System Repair'}</h3>
-                                <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">{isCompressTool ? 'Configure Target reduction' : 'Multi-Stage structural recovery'}</p>
-                              </div>
+                    <div className="flex flex-col gap-8">
+                      {isCompressTool || isRepairTool ? (
+                        <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10">
+                          <div className="flex items-center gap-4 text-primary">
+                            <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-sm">
+                              {isCompressTool ? <Shrink className="w-7 h-7" /> : <RefreshCw className="w-7 h-7" />}
                             </div>
+                            <div>
+                              <h3 className="text-3xl font-black uppercase tracking-tighter text-slate-950">{isCompressTool ? 'Advanced Compression' : 'System Repair'}</h3>
+                              <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">{isCompressTool ? 'Configure Target reduction' : 'Multi-Stage structural recovery'}</p>
+                            </div>
+                          </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                              <div className="space-y-6">
-                                {isCompressTool && (
-                                  <>
-                                    <div className="space-y-3">
-                                      <Label className="text-[11px] font-black uppercase tracking-widest text-primary flex justify-between">
-                                        <span>Reduction Level</span>
-                                        <span>{config.quality}%</span>
-                                      </Label>
-                                      <Slider value={[config.quality]} onValueChange={([v]) => setConfig({...config, quality: v})} max={90} min={10} step={5} />
-                                    </div>
-                                    <div className="space-y-3">
-                                      <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Target Max Size</Label>
-                                      <div className="flex gap-3">
-                                        <Input type="number" placeholder="e.g. 500" value={config.targetSize} onChange={(e) => setConfig({...config, targetSize: e.target.value})} className="h-12 bg-black/5 border-none rounded-2xl font-bold" />
-                                        <select value={config.targetUnit} onChange={(e) => setConfig({...config, targetUnit: e.target.value})} className="h-12 bg-black/5 border-none rounded-2xl font-black text-[10px]">
-                                          <option value="KB">KB</option><option value="MB">MB</option>
-                                        </select>
-                                      </div>
-                                    </div>
-                                  </>
-                                )}
-                                {isRepairTool && (
-                                  <div className="space-y-4 p-6 bg-emerald-500/5 rounded-3xl border border-emerald-500/10">
-                                    <div className="flex items-center gap-3 text-emerald-600 mb-2">
-                                      <CheckCircle2 className="w-5 h-5" />
-                                      <p className="text-xs font-black uppercase">Fidelity Restoration</p>
-                                    </div>
-                                    <p className="text-[10px] leading-relaxed text-slate-950/60 font-medium">The system will attempt structural rebuilding, object recovery, and header correction to restore access to your document.</p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div className="space-y-6">
+                              {isCompressTool && (
+                                <>
+                                  <div className="space-y-3">
+                                    <Label className="text-[11px] font-black uppercase tracking-widest text-primary flex justify-between">
+                                      <span>Reduction Level</span>
+                                      <span>{config.quality}%</span>
+                                    </Label>
+                                    <Slider value={[config.quality]} onValueChange={([v]) => setConfig({...config, quality: v})} max={90} min={10} step={5} />
                                   </div>
-                                )}
-                              </div>
-                              <div className="space-y-6">
-                                <div className="p-6 bg-primary/5 border border-primary/10 rounded-3xl">
-                                  <div className="flex items-center justify-between mb-4">
-                                    <p className="text-xs font-black uppercase">Strong Optimization</p>
-                                    <Switch checked={config.strongCompression} onCheckedChange={(v) => setConfig({...config, strongCompression: v})} />
+                                  <div className="space-y-3">
+                                    <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Target Max Size</Label>
+                                    <div className="flex gap-3">
+                                      <Input type="number" placeholder="e.g. 500" value={config.targetSize} onChange={(e) => setConfig({...config, targetSize: e.target.value})} className="h-12 bg-black/5 border-none rounded-2xl font-bold" />
+                                      <select value={config.targetUnit} onChange={(e) => setConfig({...config, targetUnit: e.target.value})} className="h-12 bg-black/5 border-none rounded-2xl font-black text-[10px]">
+                                        <option value="KB">KB</option><option value="MB">MB</option>
+                                      </select>
+                                    </div>
                                   </div>
-                                  <p className="text-[9px] text-slate-950/40 font-bold uppercase">Use for student purpose and business purpose.</p>
+                                </>
+                              )}
+                              {isRepairTool && (
+                                <div className="space-y-4 p-6 bg-emerald-500/5 rounded-3xl border border-emerald-500/10">
+                                  <div className="flex items-center gap-3 text-emerald-600 mb-2">
+                                    <CheckCircle2 className="w-5 h-5" />
+                                    <p className="text-xs font-black uppercase">Fidelity Restoration</p>
+                                  </div>
+                                  <p className="text-[10px] leading-relaxed text-slate-950/60 font-medium">The system will attempt structural rebuilding, object recovery, and header correction to restore access to your document.</p>
                                 </div>
+                              )}
+                            </div>
+                            <div className="space-y-6">
+                              <div className="p-6 bg-primary/5 border border-primary/10 rounded-3xl">
+                                <div className="flex items-center justify-between mb-4">
+                                  <p className="text-xs font-black uppercase">Strong Optimization</p>
+                                  <Switch checked={config.strongCompression} onCheckedChange={(v) => setConfig({...config, strongCompression: v})} />
+                                </div>
+                                <p className="text-[9px] text-slate-950/40 font-bold uppercase">Executing High-Fidelity Binary Deflation.</p>
                               </div>
                             </div>
+                          </div>
 
-                            <div className="pt-6 border-t border-black/5 flex justify-end">
-                              <Button onClick={handleConfirmedExecution} className="h-16 px-16 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-3xl shadow-2xl hover:scale-105 transition-all gap-3">
-                                EXECUTE MODULE <ArrowRight className="w-5 h-5" />
-                              </Button>
-                            </div>
-                          </section>
-                        ) : (
+                          <div className="pt-6 border-t border-black/5 flex justify-end">
+                            <Button onClick={handleConfirmedExecution} className="h-16 px-16 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-3xl shadow-2xl hover:scale-105 transition-all gap-3">
+                              EXECUTE MODULE <ArrowRight className="w-5 h-5" />
+                            </Button>
+                          </div>
+                        </section>
+                      ) : (
+                        <div className="space-y-10">
                           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                             {pages.map((page, idx) => (
                               <Card key={page.id} onClick={() => {
                                 const next = new Set(selectedPages);
                                 if (next.has(page.id)) next.delete(page.id); else next.add(page.id);
                                 setSelectedPages(next);
-                              }} className={cn("relative aspect-[1/1.414] rounded-xl border-4 transition-all cursor-pointer", selectedPages.has(page.id) ? "border-primary scale-[1.02]" : "border-black/5 opacity-40")}>
+                              }} className={cn("relative aspect-[1/1.414] rounded-xl border-4 transition-all cursor-pointer overflow-hidden", selectedPages.has(page.id) ? "border-primary scale-[1.02] shadow-2xl" : "border-black/5 opacity-40")}>
                                 <img src={page.url} alt="" className="w-full h-full object-cover" />
                                 <div className="absolute top-2 left-2 bg-black/60 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase">#{idx + 1}</div>
+                                {selectedPages.has(page.id) && (
+                                  <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1 shadow-lg">
+                                    <CheckCircle2 className="w-3 h-3" />
+                                  </div>
+                                )}
                               </Card>
                             ))}
                           </div>
-                        )}
-                      </div>
+                          
+                          {/* GLOBAL EXECUTE BAR */}
+                          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-6">
+                            <Button 
+                              onClick={handleConfirmedExecution} 
+                              disabled={selectedPages.size === 0}
+                              className="w-full h-16 bg-primary text-white font-black text-sm uppercase tracking-widest rounded-full shadow-[0_20px_50px_rgba(30,58,138,0.4)] hover:scale-105 transition-all gap-4 border-2 border-white/20"
+                            >
+                              <Zap className="w-5 h-5" /> EXECUTE PROCESS ({selectedPages.size} SEGMENTS)
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </motion.div>
@@ -285,7 +302,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                       <Badge className="bg-emerald-500 text-white font-black px-4 h-6 rounded-full mb-2">Process Successful</Badge>
                       <h3 className="text-2xl font-black uppercase truncate text-slate-950">{result.fileName}</h3>
                       <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-widest mt-2">
-                        Use for student purpose and business purpose • useful to students and business and more
+                        Professional Result Exported to Secure Local Buffer.
                       </p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -306,7 +323,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       </main>
       <footer className="fixed bottom-0 left-0 right-0 h-12 bg-white/40 backdrop-blur-md border-t border-black/5 flex items-center justify-center z-[100]">
         <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.5em]">
-          All-in-one Junction Network • 2026 • Made in INDIAN<span className="animate-heart-beat ml-1">❤️</span>
+          AJN Core • 2026 • Made in INDIAN<span className="animate-heart-beat ml-1">❤️</span>
         </p>
       </footer>
     </div>

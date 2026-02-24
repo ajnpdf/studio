@@ -85,14 +85,14 @@ export default function ToolPage({ params }: Props) {
               </h1>
             </div>
             <p className="text-[10px] text-slate-950/40 font-bold uppercase tracking-[0.3em]">
-              {tool.desc} • Use for student purpose and business purpose • useful to students and business and more
+              {tool.desc} • High-Fidelity Processing Core
             </p>
           </div>
           
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 px-4 py-2 bg-black/5 rounded-xl border border-black/5">
               <Settings2 className="w-3.5 h-3.5 text-slate-950/40" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-slate-950/60">Advanced Protocol</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-slate-950/60">Unit Configuration</span>
             </div>
           </div>
         </div>
@@ -104,7 +104,7 @@ export default function ToolPage({ params }: Props) {
         {/* Footer Attribution */}
         <footer className="h-12 border-t border-black/5 bg-white/40 backdrop-blur-md flex items-center justify-center px-8 shrink-0">
           <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.5em]">
-            AJN Workspace • 2026 • Made in INDIAN<span className="animate-heart-beat ml-1">❤️</span>
+            AJN Core • 2026 • Made in INDIAN<span className="animate-heart-beat ml-1">❤️</span>
           </p>
         </footer>
       </main>
