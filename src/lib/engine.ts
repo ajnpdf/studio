@@ -110,7 +110,8 @@ class AJNPDFEngine {
     };
 
     await WASMWorkerSim.execute(toolId, options, internalOnProgress, (log: string) => {
-      onProgressCallback({ stage: "Processing", detail: log, pct: 0 }); // Passing logs through progress callback for simplified UI stream
+      // Pass technical logs back to UI
+      onProgressCallback({ stage: "Processing", detail: log, pct: 0, isLog: true });
     });
     
     // Create a virtual download link result

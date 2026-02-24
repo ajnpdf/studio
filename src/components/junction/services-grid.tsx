@@ -93,7 +93,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
           <motion.div key={unit.id} layout variants={cardVariants} className="group">
             <Link href={`/tools/${unit.id}`}>
               <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 transition-all duration-700 cursor-pointer overflow-hidden border backdrop-blur-xl shadow-md group/card rounded-3xl">
-                <CardContent className="p-6 flex flex-col h-full text-slate-950 relative z-10">
+                <CardContent className="p-5 flex flex-col h-full text-slate-950 relative z-10">
                   <div className="flex items-start justify-between mb-5">
                     <div className="w-11 h-11 bg-white/60 rounded-2xl flex items-center justify-center border border-black/5 group-hover/card:scale-110 group-hover/card:shadow-lg transition-all duration-700">
                       <unit.icon className="w-5.5 h-5.5 text-slate-950 group-hover/card:text-primary transition-colors" />
