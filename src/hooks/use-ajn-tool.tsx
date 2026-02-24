@@ -6,7 +6,6 @@ export interface ProgressState {
   stage: string;
   detail: string;
   pct: number;
-  isLog?: boolean;
 }
 
 export interface LogEntry extends ProgressState {
@@ -26,11 +25,8 @@ export function useAJNTool(toolId: string) {
 
   const onProgress = useCallback((p: ProgressState) => {
     if (abortRef.current) return;
-    if (p.isLog) {
-      setLogs(prev => [...prev.slice(-49), { ...p, ts: Date.now() }]);
-    } else {
-      setProgress(p);
-    }
+    setProgress(p);
+    setLogs(prev => [...prev.slice(-49), { ...p, ts: Date.now() }]);
   }, []);
 
   const run = useCallback(async (inputs: any, options = {}) => {

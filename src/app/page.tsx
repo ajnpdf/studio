@@ -32,7 +32,7 @@ export default function LandingPage() {
         </Link>
       </header>
 
-      <main className="w-full max-w-5xl flex flex-col items-center gap-12 relative z-10 pt-20 md:pt-32 pb-32 text-center">
+      <main className="w-full max-w-5xl flex flex-col items-center gap-12 relative z-10 pt-20 md:pt-32 pb-32 text-center flex-1">
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -68,17 +68,6 @@ export default function LandingPage() {
               </Button>
             </Link>
           </div>
-
-          <div className="pt-10 flex items-center justify-center gap-10 opacity-40">
-            <div className="flex items-center gap-3">
-              <ShieldCheck className="w-5 h-5 text-slate-950" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Secure Sandbox</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <Layers className="w-5 h-5 text-slate-950" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Neural Engine</span>
-            </div>
-          </div>
         </div>
 
         <section className="w-full pt-24 grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
@@ -95,7 +84,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      {/* Founder Recognition */}
+      {/* Founder Recognition - Name Removed */}
       <div className="absolute top-10 right-10 flex flex-col items-end gap-1 text-right opacity-40 group hover:opacity-100 transition-opacity">
         <span className="text-[9px] font-black uppercase tracking-[0.3em]">Founder & CEO</span>
       </div>
@@ -115,9 +104,6 @@ export default function LandingPage() {
           <div className="flex items-center gap-2.5 px-4 py-1.5 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
             <span className="text-[9px] font-black text-primary uppercase tracking-widest">Made by Indian ❤️</span>
           </div>
-          <p className="text-[9px] font-bold text-slate-950/30 uppercase tracking-widest">
-            Contact: anjanpatel325@gmail.com
-          </p>
         </div>
       </footer>
     </div>

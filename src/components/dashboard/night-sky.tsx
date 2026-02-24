@@ -14,13 +14,14 @@ interface Star {
 
 /**
  * AJN Night Sky - Optimized for Lavender Gradient
- * Hydration-hardened: Ensures dynamic star values only generate on client.
+ * Hydration-hardened: Star values only generate on client.
  */
 export function NightSky() {
   const [stars, setStars] = useState<Star[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const generatedStars = [...Array(30)].map((_, i) => ({
       id: i,
       width: `${Math.random() * 1.5 + 1}px`,
@@ -31,21 +32,18 @@ export function NightSky() {
       animationDelay: `${Math.random() * 5}s`,
     }));
     setStars(generatedStars);
-    setMounted(true);
   }, []);
 
   if (!mounted) return null;
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-transparent">
-      {/* Dynamic Mesh Layer */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(139,92,246,0.08)_0%,transparent_60%)] opacity-50" />
-      
       <div className="absolute inset-0">
         {stars.map((star) => (
           <div
             key={star.id}
-            className="absolute bg-white rounded-full opacity-40 animate-twinkle shadow-[0_0_8px_rgba(255,255,255,0.5)]"
+            className="absolute bg-white rounded-full opacity-40 animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.5)]"
             style={{
               width: star.width,
               height: star.height,

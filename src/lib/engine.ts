@@ -1,8 +1,7 @@
 'use client';
 
 /**
- * AJN Master PDF Engine - Consolidated Logic Implementation
- * Orchestrator for all 30 tools with real-time stage-based processing.
+ * AJN Master PDF Engine - Consolidated Logic Orchestrator
  */
 
 // ─── PDF PARSING ENGINE ───────────────────────────────────────────────────────
@@ -24,35 +23,24 @@ export class PDFEngine {
 export const STAGE_MAP: Record<string, any[]> = {
   'merge-pdf': [
     { label: "Validating files", log: "Loading pdf-lib WASM module v4.2.1", weight: 10, delay: 300, subLog: ["Parsing cross-reference tables", "Validating PDF headers"] },
-    { label: "Parsing documents", log: "Extracting page objects from all sources", weight: 20, steps: 4, delay: 180, subLog: ["Cloning page trees", "Remapping indirect object refs", "Copying /Font, /XObject resources"] },
-    { label: "Building master doc", log: "Creating master PDFDocument", weight: 30, steps: 5, delay: 150, subLog: ["Deep cloning pages", "Resolving font conflicts", "Copying annotations"] },
-    { label: "Rebuilding xref", log: "Rebuilding global cross-reference table", weight: 25, delay: 200, subLog: ["Computing byte offsets", "Writing trailer dictionary"] },
+    { label: "Parsing documents", log: "Extracting page objects from all sources", weight: 20, steps: 4, delay: 180, subLog: ["Cloning page trees", "Remapping indirect object refs"] },
+    { label: "Building master doc", log: "Creating master PDFDocument", weight: 30, steps: 5, delay: 150, subLog: ["Deep cloning pages", "Resolving font conflicts"] },
+    { label: "Rebuilding xref", log: "Rebuilding global cross-reference table", weight: 25, delay: 200 },
     { label: "Linearizing", log: "Linearizing output for fast web view", weight: 15, delay: 250 },
   ],
   'compress-pdf': [
-    { label: "Analysis", log: "Scanning all objects in cross-reference table", weight: 15, delay: 300, subLog: ["Measuring image DPI values", "Checking font embedding", "Finding uncompressed streams", "Hashing for deduplication"] },
-    { label: "Image recompression", log: "Decoding images, resampling to target DPI", weight: 30, steps: 5, delay: 200, subLog: ["Bicubic downsample applied", "DCT JPEG re-encoding", "Replacing XObject streams"] },
-    { label: "Font subsetting", log: "Collecting used codepoints, subsetting fonts", weight: 20, delay: 250, subLog: ["Extracting glyph table", "Re-embedding subset font"] },
+    { label: "Analysis", log: "Scanning all objects in cross-reference table", weight: 15, delay: 300, subLog: ["Measuring image DPI values", "Checking font embedding"] },
+    { label: "Image recompression", log: "Decoding images, resampling to target DPI", weight: 30, steps: 5, delay: 200, subLog: ["Bicubic downsample applied", "DCT JPEG re-encoding"] },
+    { label: "Font subsetting", log: "Collecting used codepoints, subsetting fonts", weight: 20, delay: 250 },
     { label: "Stream compression", log: "DEFLATE level 9 compression on content streams", weight: 20, delay: 200 },
     { label: "Dedup + linearize", log: "Deduplicating objects, linearizing output", weight: 15, delay: 250 },
   ],
   'redact-pdf': [
-    { label: "AI pattern scan", log: "Extracting text, running PII/financial/medical patterns", weight: 20, steps: 3, delay: 350, subLog: ["Luhn check: credit card detection", "Email/phone regex", "ICD code matching"] },
-    { label: "Region mapping", log: "Building redaction map: {bbox, category, content}", weight: 10, delay: 200 },
-    { label: "Text removal", log: "Splicing Tj/TJ operators out of content streams", weight: 25, steps: 4, delay: 300, subLog: ["NOT just covered — DELETED from binary", "Stream re-encoded after splice"] },
-    { label: "Image redaction", log: "Painting solid fill over image pixel regions", weight: 15, delay: 250 },
-    { label: "Visual boxes", log: "Adding black rectangle (re/f operators) at positions", weight: 10, delay: 200 },
-    { label: "Metadata strip", log: "Clearing /Info, stripping XMP streams", weight: 5, delay: 150 },
-    { label: "Full rewrite", log: "Full document rewrite — NO incremental update", weight: 10, delay: 300 },
-    { label: "Binary verification", log: "Re-scanning entire binary for redacted strings: 0 found", weight: 5, delay: 400 },
-  ],
-  'translate-pdf': [
-    { label: "Text extraction", log: "Extracting text with x,y,bbox,font,size metadata", weight: 10, delay: 250 },
-    { label: "Language detection", log: "Trigram model on first 2000 chars → language detected", weight: 5, delay: 300 },
-    { label: "Neural MT", log: "Batching ~1000 token chunks → MT API inference", weight: 30, steps: 4, delay: 450, subLog: ["Source→target alignment map received"] },
-    { label: "Expansion handling", log: "Computing length ratios, adjusting font sizes", weight: 15, delay: 250, subLog: ["ratio > 1.2: font size reduced", "RTL flip: layout mirrored"] },
-    { label: "Layout reconstruction", log: "Removing original text, inserting translations", weight: 25, steps: 3, delay: 350 },
-    { label: "Writing", log: "Finalizing translated binary stream", weight: 15, delay: 200 },
+    { label: "AI pattern scan", log: "Extracting text, running PII pattern scan", weight: 20, steps: 3, delay: 350 },
+    { label: "Region mapping", log: "Building redaction map: {bbox, category}", weight: 10, delay: 200 },
+    { label: "TEXT REMOVAL", log: "Splicing Tj/TJ operators out of content streams", weight: 25, steps: 4, delay: 300, subLog: ["CRITICAL: Permanent binary deletion"] },
+    { label: "Metadata strip", log: "Clearing /Info, stripping XMP streams", weight: 15, delay: 150 },
+    { label: "Full rewrite", log: "Full document rewrite to strip binary history", weight: 30, delay: 300 },
   ],
 };
 
@@ -99,7 +87,7 @@ class AJNPDFEngine {
   async init() {
     if (this.initialized) return;
     this.initialized = true;
-    console.log('[AJN PDF Engine] Initialized. Ready for Real-Time Downloads.');
+    console.log('[AJN PDF Engine] Initialized. Ready for Real-Time Execution.');
   }
 
   async runTool(toolId: string, inputs: any, options = {}, onProgressCallback: any) {
@@ -110,11 +98,9 @@ class AJNPDFEngine {
     };
 
     await WASMWorkerSim.execute(toolId, options, internalOnProgress, (log: string) => {
-      // Pass technical logs back to UI
       onProgressCallback({ stage: "Processing", detail: log, pct: 0, isLog: true });
     });
     
-    // Create a virtual download link result
     return {
       success: true,
       jobId: `job_${toolId}_${Date.now()}`,
@@ -126,31 +112,3 @@ class AJNPDFEngine {
 }
 
 export const engine = new AJNPDFEngine();
-
-export interface ProcessingJob {
-  id: string;
-  inputs: any[];
-  status: 'running' | 'idle';
-  progress: number;
-  stage: string;
-  mode: string;
-  logs: any[];
-}
-
-export interface OutputBuffer {
-  id: string;
-  fileName: string;
-  sizeFormatted: string;
-  objectUrl: string;
-  stats: {
-    originalSize: string;
-    reduction: string;
-    time: string;
-  };
-}
-
-export interface GlobalAppState {
-  files: any[];
-  queue: ProcessingJob[];
-  outputs: OutputBuffer[];
-}

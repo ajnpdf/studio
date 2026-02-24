@@ -69,16 +69,12 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
             <p className="text-[10px] font-black uppercase">Bookmark Per File</p>
             <Switch checked={config.bookmarks} onCheckedChange={v=>set("bookmarks",v)} />
           </div>
-          <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10">
-            <p className="text-[10px] font-black uppercase">Linearize Output</p>
-            <Switch checked={config.linearize} onCheckedChange={v=>set("linearize",v)} />
-          </div>
         </div>
       );
       case 'compress-pdf': return (
         <div className="space-y-6">
           <div className="space-y-3">
-            <Label className={S}>Compression Profile</Label>
+            <Label className={S}>Profile</Label>
             <Select value={config.profile||"ebook"} onValueChange={v=>set("profile",v)}>
               <SelectTrigger className="h-11 bg-white/60 rounded-xl font-black text-[10px] uppercase">
                 <SelectValue />
@@ -91,10 +87,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
           <div className="space-y-3">
             <Label className={S}>Quality Factor</Label>
             <Slider value={[config.quality||75]} onValueChange={([v])=>set("quality",v)} max={100} />
-            <div className="flex justify-between text-[8px] font-black opacity-40">
-              <span>Smallest</span>
-              <span>Best</span>
-            </div>
           </div>
         </div>
       );
@@ -124,10 +116,6 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                     Active Mastery Instance
                   </p>
                 </div>
-              </div>
-              <div className="hidden sm:flex items-center gap-2 px-4 py-1.5 bg-white/60 border border-black/5 rounded-xl shadow-sm">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Buffer Secured</span>
               </div>
             </header>
 
@@ -162,7 +150,7 @@ export function UnitWorkspace({ defaultCategory, initialUnitId }: Props) {
                           <CheckCircle2 className="w-10 h-10 text-emerald-600" />
                         </div>
                         <h3 className="text-2xl font-black tracking-tight uppercase">Asset Mastered</h3>
-                        <p className="text-xs font-bold text-slate-950/40 uppercase tracking-widest">{result.fileName} • 8.4 MB</p>
+                        <p className="text-xs font-bold text-slate-950/40 uppercase tracking-widest">{result.fileName}</p>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
