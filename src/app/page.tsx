@@ -1,4 +1,3 @@
-
 "use client";
 
 import { motion } from 'framer-motion';
@@ -10,8 +9,7 @@ import { ArrowRight, Layers, ShieldCheck, User, CheckCircle2 } from 'lucide-reac
 import { NightSky } from '@/components/dashboard/night-sky';
 
 /**
- * AJN Landing Page - Professional Standard
- * Featuring Founder & CEO Anjan Patel and 'Made by Indian' signature.
+ * AJN Landing Page - Modern Professional
  */
 export default function LandingPage() {
   return (
@@ -100,7 +98,6 @@ export default function LandingPage() {
       {/* Founder Recognition */}
       <div className="absolute top-10 right-10 flex flex-col items-end gap-1 text-right opacity-40 group hover:opacity-100 transition-opacity">
         <span className="text-[9px] font-black uppercase tracking-[0.3em]">Founder & CEO</span>
-        <Link href="/story" className="text-sm font-black tracking-tighter text-primary hover:underline">Anjan Patel</Link>
       </div>
 
       <footer className="w-full py-16 mt-auto border-t border-black/5 flex flex-col items-center gap-8 relative z-10">
