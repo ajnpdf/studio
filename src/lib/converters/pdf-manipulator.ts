@@ -34,21 +34,18 @@ export class PDFManipulator {
       return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `${baseName}_Rotated.pdf`, mimeType: 'application/pdf' };
     }
 
-    if (toolId === 'extract-pages' || toolId === 'split-pdf' || toolId === 'delete-pages' || toolId === 'organize-pdf') {
+    if (['extract-pages', 'split-pdf', 'delete-pages', 'organize-pdf'].includes(toolId)) {
       const { pageIndices = [] } = options;
       
-      // Calculate final target sequence based on tool intent
       let targetIndices = pageIndices;
-      
       if (toolId === 'delete-pages') {
         targetIndices = Array.from({ length: doc.getPageCount() }, (_, i) => i)
           .filter(i => !pageIndices.includes(i));
       } else if (pageIndices.length === 0) {
-        // Default to all pages if visionary was bypassed
         targetIndices = Array.from({ length: doc.getPageCount() }, (_, i) => i);
       }
 
-      if (targetIndices.length === 0) throw new Error("No segments selected for execution.");
+      if (targetIndices.length === 0) throw new Error("No selection detected.");
 
       this.updateProgress(40, `Surgically isolating ${targetIndices.length} segments...`);
       const newDoc = await PDFDocument.create();
@@ -59,39 +56,37 @@ export class PDFManipulator {
       return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `${baseName}_Mastered.pdf`, mimeType: 'application/pdf' };
     }
 
+    if (toolId === 'merge-pdf') {
+      return this.merge();
+    }
+
     if (toolId === 'sign-pdf') {
       this.updateProgress(50, "Injecting high-fidelity signature overlay...");
       const font = await doc.embedFont(StandardFonts.HelveticaBold);
       const pages = doc.getPages();
       const lastPage = pages[pages.length - 1];
-      
-      // Professional Seal Branding
-      lastPage.drawText(`Digitally Signed via AJN Neural Buffer\nTS: ${new Date().toISOString()}\nVerified Node Output`, {
-        x: 50, y: 50, size: 8, font, color: rgb(0.1, 0.1, 0.5), lineHeight: 10
+      lastPage.drawText(`Digitally Signed via AJN Node\nTS: ${new Date().toISOString()}`, {
+        x: 50, y: 50, size: 8, font, color: rgb(0.1, 0.1, 0.5)
       });
-      
       const bytes = await doc.save();
       return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `${baseName}_Signed.pdf`, mimeType: 'application/pdf' };
     }
 
-    throw new Error(`Manipulation unit ${toolId} not yet calibrated.`);
+    throw new Error(`Unit ${toolId} not yet calibrated.`);
   }
 
   async merge(): Promise<ConversionResult> {
-    this.updateProgress(10, "Initializing Master Assembly Buffer...");
+    this.updateProgress(10, "Initializing Master Buffer...");
     const master = await PDFDocument.create();
-    
     for (let i = 0; i < this.files.length; i++) {
       const prog = 10 + Math.round((i / this.files.length) * 80);
-      this.updateProgress(prog, `Syncing binary stream: ${this.files[i].name}...`);
+      this.updateProgress(prog, `Syncing stream: ${this.files[i].name}...`);
       const fileBytes = await this.files[i].arrayBuffer();
       const pdf = await PDFDocument.load(fileBytes, { ignoreEncryption: true });
       const copied = await master.copyPages(pdf, pdf.getPageIndices());
       copied.forEach(p => master.addPage(p));
     }
-    
-    this.updateProgress(95, "Synchronizing assembly and trailer...");
     const bytes = await master.save();
-    return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `Merged_Master_${Date.now()}.pdf`, mimeType: 'application/pdf' };
+    return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `Merged_${Date.now()}.pdf`, mimeType: 'application/pdf' };
   }
 }

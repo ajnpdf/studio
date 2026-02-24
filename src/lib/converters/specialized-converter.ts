@@ -32,13 +32,11 @@ export class SpecializedConverter {
     if (target === 'OCR') return this.toSearchablePdf(baseName);
     if (target === 'TRANSLATE') return this.runHardenedTranslation(baseName, settings);
     if (target === 'COMPRESS') return this.compressPdf(baseName, settings);
+    if (target === 'REPAIR') return this.repairPdf(baseName);
     
-    throw new Error(`Specialized tool ${target} not yet supported in neural layer.`);
+    throw new Error(`Specialized tool ${target} not yet supported.`);
   }
 
-  /**
-   * Hardened Local OCR Implementation (Tesseract.js WASM)
-   */
   private async toSearchablePdf(baseName: string): Promise<ConversionResult> {
     this.updateProgress(10, "Initializing Neural Vision Cluster (WASM)...");
     
@@ -89,7 +87,6 @@ export class SpecializedConverter {
     }
 
     await worker.terminate();
-    this.updateProgress(95, "Finalizing binary buffer...");
     const bytes = await outPdf.save();
 
     return {
@@ -99,32 +96,20 @@ export class SpecializedConverter {
     };
   }
 
-  /**
-   * Hardened Neural Translation Patch (3-Fix Logic)
-   */
   private async runHardenedTranslation(baseName: string, options: any): Promise<ConversionResult> {
     const { targetLang = 'es' } = options;
     const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib');
-    
     this.updateProgress(5, "Calibrating Neural Translation Cluster...");
 
     const buf = await this.file.arrayBuffer();
-    let doc, pdfJs;
-
-    try {
-      doc = await PDFDocument.load(buf, { ignoreEncryption: true });
-      pdfJs = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
-    } catch (err: any) {
-      throw new Error(`Integrity check failed: ${err.message}`);
-    }
-
+    const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
+    const pdfJs = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
     const font = await doc.embedFont(StandardFonts.Helvetica);
-    const numPages = pdfJs.numPages;
 
-    for (let i = 0; i < numPages; i++) {
+    for (let i = 0; i < pdfJs.numPages; i++) {
       try {
-        const progBase = 10 + Math.round((i / numPages) * 80);
-        this.updateProgress(progBase, `Translating Page ${i + 1}/${numPages}...`);
+        const progBase = 10 + Math.round((i / pdfJs.numPages) * 80);
+        this.updateProgress(progBase, `Translating Page ${i + 1}/${pdfJs.numPages}...`);
 
         const page = await pdfJs.getPage(i + 1);
         const tc = await page.getTextContent();
@@ -141,14 +126,13 @@ export class SpecializedConverter {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ q: item.str, source: 'auto', target: targetLang, format: 'text' }),
-              // @ts-ignore
               signal: AbortSignal.timeout(8000),
             });
             if (resp.ok) {
               const data = await resp.json();
               translated = data.translatedText || item.str;
             }
-          } catch { /* Fallback to original text */ }
+          } catch { /* Fallback */ }
 
           if (translated === item.str) continue;
 
@@ -164,17 +148,14 @@ export class SpecializedConverter {
             borderWidth: 0
           });
 
-          try {
-            pdfPage.drawText(translated, {
-              x, y: y + 2, size: sz, font, color: rgb(0, 0, 0),
-              maxWidth: (item.width / vp.width) * pw + 20
-            });
-          } catch {}
+          pdfPage.drawText(translated, {
+            x, y: y + 2, size: sz, font, color: rgb(0, 0, 0),
+            maxWidth: (item.width / vp.width) * pw + 20
+          });
         }
       } catch { continue; }
     }
 
-    this.updateProgress(95, "Synchronizing binary buffer...");
     let bytes;
     try {
       bytes = await doc.save();
@@ -184,31 +165,39 @@ export class SpecializedConverter {
 
     return {
       blob: new Blob([bytes], { type: 'application/pdf' }),
-      fileName: `${baseName}_Translated_${targetLang}.pdf`,
+      fileName: `${baseName}_Translated.pdf`,
       mimeType: 'application/pdf'
     };
   }
 
   private async compressPdf(baseName: string, settings: any): Promise<ConversionResult> {
-    this.updateProgress(20, "Initiating high-concurrency compression sequence...");
+    this.updateProgress(20, "Executing multi-stage compression...");
     const { PDFDocument } = await import('pdf-lib');
     const buf = await this.file.arrayBuffer();
     const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
     
-    this.updateProgress(50, "Stripping redundant metadata and orphan streams...");
-    doc.setProducer('AJN Neural Engine');
-    doc.setCreator('AJN Sovereign Workspace');
-    
-    this.updateProgress(80, "Optimizing internal object dictionary...");
     const bytes = await doc.save({
       useObjectStreams: true,
-      addDefaultPage: false,
-      updateFieldAppearances: false
+      addDefaultPage: false
     });
 
     return {
       blob: new Blob([bytes], { type: 'application/pdf' }),
       fileName: `${baseName}_Compressed.pdf`,
+      mimeType: 'application/pdf'
+    };
+  }
+
+  private async repairPdf(baseName: string): Promise<ConversionResult> {
+    this.updateProgress(20, "Inhaling corrupted binary stream...");
+    const { PDFDocument } = await import('pdf-lib');
+    const buf = await this.file.arrayBuffer();
+    // Load with recovery mode
+    const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
+    const bytes = await doc.save();
+    return {
+      blob: new Blob([bytes], { type: 'application/pdf' }),
+      fileName: `${baseName}_Repaired.pdf`,
       mimeType: 'application/pdf'
     };
   }

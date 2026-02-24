@@ -27,7 +27,7 @@ class AJNPDFEngine {
 
     try {
       // 1. INTELLIGENCE & SPECIALIZED LAYER
-      if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf', 'compress-pdf'].includes(toolId)) {
+      if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf', 'compress-pdf', 'repair-pdf'].includes(toolId)) {
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
         const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Intelligence", detail: m, pct: p }));
         const map: Record<string, string> = { 
@@ -35,24 +35,19 @@ class AJNPDFEngine {
           'ocr-pdf': 'OCR', 
           'summarize-pdf': 'SUMMARIZE', 
           'compare-pdf': 'COMPARE',
-          'compress-pdf': 'COMPRESS'
+          'compress-pdf': 'COMPRESS',
+          'repair-pdf': 'REPAIR'
         };
         result = await converter.convertTo(map[toolId], options);
       } 
-      // 2. MERGE CORE
-      else if (toolId === 'merge-pdf') {
-        const { MergeConverter } = await import('@/lib/converters/merge-converter');
-        const converter = new MergeConverter(files, (p, m) => onProgressCallback({ stage: "Merge", detail: m, pct: p }));
-        result = await converter.merge();
-      }
-      // 3. SURGICAL MANIPULATION CORE
-      else if (['split-pdf', 'extract-pages', 'delete-pages', 'rotate-pdf', 'sign-pdf', 'organize-pdf'].includes(toolId)) {
+      // 2. SURGICAL MANIPULATION CORE
+      else if (['merge-pdf', 'split-pdf', 'extract-pages', 'delete-pages', 'rotate-pdf', 'sign-pdf', 'organize-pdf', 'protect-pdf', 'unlock-pdf', 'redact-pdf', 'flatten-pdf', 'add-page-numbers'].includes(toolId)) {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Manipulation", detail: m, pct: p }));
         result = await manipulator.runOperation(toolId, options);
       }
-      // 4. EXPORT CORE (PDF to X)
-      else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt'].includes(toolId)) {
+      // 3. EXPORT CORE (PDF to X)
+      else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt', 'pdf-pdfa', 'grayscale-pdf'].includes(toolId)) {
         const { PDFConverter } = await import('@/lib/converters/pdf-converter');
         const converter = new PDFConverter(firstFile, (p, m) => onProgressCallback({ stage: "Synthesis", detail: m, pct: p }));
         const map: Record<string, string> = { 
@@ -62,11 +57,13 @@ class AJNPDFEngine {
           'pdf-word': 'DOCX', 
           'pdf-pptx': 'PPTX', 
           'pdf-excel': 'XLSX', 
-          'pdf-txt': 'TXT' 
+          'pdf-txt': 'TXT',
+          'pdf-pdfa': 'PDFA',
+          'grayscale-pdf': 'GRAYSCALE'
         };
         result = await converter.convertTo(map[toolId], options);
       }
-      // 5. DEVELOPMENT CORE (X to PDF)
+      // 4. DEVELOPMENT CORE (X to PDF)
       else if (toolId.endsWith('-pdf')) {
         const source = toolId.split('-')[0];
         if (['jpg', 'jpeg', 'png', 'webp'].includes(source!)) {
