@@ -78,11 +78,17 @@ export class PDFConverter {
     let totalHeight = 0;
     let maxWidth = 0;
 
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const progBase = 10 + Math.round((i / pdf.numPages) * 70);
-      const page = await pdf.getPage(i);
+    // Use pageIndices if provided by the visual selector
+    const indices = settings.pageIndices && settings.pageIndices.length > 0 
+      ? settings.pageIndices.map((i: number) => i + 1)
+      : Array.from({ length: pdf.numPages }, (_, i) => i + 1);
+
+    for (let i = 0; i < indices.length; i++) {
+      const pageNum = indices[i];
+      const progBase = 10 + Math.round((i / indices.length) * 70);
+      const page = await pdf.getPage(pageNum);
       const viewport = page.getViewport({ scale });
-      this.updateProgress(progBase, `Rasterizing Page ${i}...`);
+      this.updateProgress(progBase, `Rasterizing Page ${pageNum}...`);
 
       const canvas = document.createElement("canvas");
       canvas.width = viewport.width;
@@ -142,7 +148,7 @@ export class PDFConverter {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
       const text = (content.items as any[]).map((it: any) => it.str).join(' ');
-      docXml += `<w:p><w:r><w:t>${text}</w:t></w:r></w:p>`;
+      docXml += `<w:p><w:r><w:t>${this.xmlEscape(text)}</w:t></w:r></w:p>`;
     }
     docXml += `</w:body></w:document>`;
     zip.file("word/document.xml", docXml);
@@ -171,5 +177,9 @@ export class PDFConverter {
       text += (content.items as any[]).map((it: any) => it.str).join(' ') + '\n';
     }
     return { blob: new Blob([text]), fileName: `${baseName}.txt`, mimeType: 'text/plain' };
+  }
+
+  private xmlEscape(str: string): string {
+    return str.replace(/[<>&"']/g, (m) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' }[m] || m));
   }
 }

@@ -14,7 +14,10 @@ import {
   XCircle, 
   Trash2, 
   ChevronRight,
-  Scissors
+  Scissors,
+  Eye,
+  Layers,
+  FileText
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -34,8 +37,8 @@ interface Props {
 }
 
 /**
- * AJN Engineering Workspace
- * Unified real-time environment for binary transformations.
+ * AJN Engineering Workspace - Universal Visionary Layer
+ * Implements real-time page inspection for all tools.
  * Standardized on Arial Typography.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
@@ -43,14 +46,14 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const { phase, progress, logs, result, error, run, reset, setPhase } = useAJNTool(initialUnitId || 'merge-pdf');
   
   const [sourceFiles, setSourceFiles] = useState<File[]>([]);
-  const [pages, setPages] = useState<{ id: number, url: string }[]>([]);
-  const [selectedPages, setSelectedPages] = useState<Set<number>>(new Set());
+  const [pages, setPages] = useState<{ id: string, url: string, fileIdx: number, pageIdx: number }[]>([]);
+  const [selectedPages, setSelectedPages] = useState<Set<string>>(new Set());
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Tools that require visual page selection
-  const isInteractive = ['delete-pages', 'extract-pages', 'split-pdf', 'rotate-pdf', 'organize-pdf'].includes(unit?.id || '');
+  // Tools that require manual selection vs just review
+  const needsManualSelection = ['delete-pages', 'extract-pages', 'split-pdf'].includes(unit?.id || '');
 
   const getAcceptedExtensions = () => {
     if (!unit) return ".pdf";
@@ -69,51 +72,80 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
-    if (isInteractive && files[0]?.type === 'application/pdf') {
-      await loadPdfPages(files[0]);
+    
+    // Always attempt visionary load for PDF inputs
+    if (files.some(f => f.type === 'application/pdf')) {
+      await loadAllPdfPages(files);
     } else {
+      // Direct run for non-PDFs (like JPG to PDF)
       run(files, { quality: 90, targetFormat: unit?.id.split('-').pop()?.toUpperCase() || 'PDF' });
     }
   };
 
-  const loadPdfPages = async (file: File) => {
+  const loadAllPdfPages = async (files: File[]) => {
     setPhase('selecting' as any);
+    const allLoadedPages: any[] = [];
+    const initialSelected = new Set<string>();
+
     try {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
-      const loadedPages = [];
-      
-      const maxPreview = Math.min(pdf.numPages, 100);
-      for (let i = 1; i <= maxPreview; i++) {
-        const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: 0.4 });
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d')!;
-        canvas.width = viewport.width; canvas.height = viewport.height;
-        await page.render({ canvasContext: ctx, viewport }).promise;
-        loadedPages.push({ id: i - 1, url: canvas.toDataURL('image/jpeg', 0.7) });
+      for (let fIdx = 0; fIdx < files.length; fIdx++) {
+        const file = files[fIdx];
+        if (file.type !== 'application/pdf') continue;
+
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+        
+        for (let pIdx = 1; pIdx <= pdf.numPages; pIdx++) {
+          const page = await pdf.getPage(pIdx);
+          const viewport = page.getViewport({ scale: 0.4 });
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d')!;
+          canvas.width = viewport.width; canvas.height = viewport.height;
+          await page.render({ canvasContext: ctx, viewport }).promise;
+          
+          const pageId = `${fIdx}-${pIdx}`;
+          allLoadedPages.push({ 
+            id: pageId, 
+            url: canvas.toDataURL('image/jpeg', 0.7),
+            fileIdx: fIdx,
+            pageIdx: pIdx - 1
+          });
+
+          // Default: Select all for review tools, none for surgical tools
+          if (!needsManualSelection) {
+            initialSelected.add(pageId);
+          }
+        }
       }
-      setPages(loadedPages);
+      setPages(allLoadedPages);
+      setSelectedPages(initialSelected);
     } catch (err) {
-      toast({ title: "Load Error", description: "Failed to parse document structure.", variant: "destructive" });
+      toast({ title: "Load Error", description: "Failed to parse document visionary buffer.", variant: "destructive" });
       reset();
     }
   };
 
-  const togglePageSelection = (idx: number) => {
+  const togglePageSelection = (pageId: string) => {
     const next = new Set(selectedPages);
-    if (next.has(idx)) next.delete(idx);
-    else next.add(idx);
+    if (next.has(pageId)) next.delete(pageId);
+    else next.add(pageId);
     setSelectedPages(next);
   };
 
   const handleConfirmedExecution = () => {
-    const indices = Array.from(selectedPages);
-    if (indices.length === 0 && unit?.id !== 'rotate-pdf') {
+    if (selectedPages.size === 0 && unit?.id !== 'rotate-pdf') {
       toast({ title: "Selection Required", description: "Please select at least one page to process." });
       return;
     }
-    run(sourceFiles, { pageIndices: indices });
+
+    // Map selection back to numerical indices if needed by the specific tool
+    const indices = Array.from(selectedPages).map(id => parseInt(id.split('-')[1]));
+    
+    run(sourceFiles, { 
+      pageIndices: indices,
+      quality: 90,
+      targetFormat: unit?.id.split('-').pop()?.toUpperCase() || 'PDF'
+    });
   };
 
   const handleDownload = () => {
@@ -132,7 +164,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     <div className="flex h-full bg-transparent overflow-hidden relative text-slate-950 font-sans">
       <main className="flex-1 flex flex-col min-w-0 relative h-full">
         <div className="flex-1 overflow-y-auto scrollbar-hide">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 md:p-12 space-y-10 max-w-5xl mx-auto pb-32">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 md:p-12 space-y-10 max-w-6xl mx-auto pb-32">
             
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4">
               <div className="flex items-center gap-6">
@@ -167,15 +199,20 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   <motion.div key="selecting" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                     <div className="flex items-center justify-between px-4 bg-white/40 p-6 rounded-3xl border border-black/5 shadow-xl backdrop-blur-xl">
                       <div className="space-y-1">
-                        <h3 className="text-xl font-black uppercase tracking-tighter">Visual Inspection</h3>
+                        <div className="flex items-center gap-3">
+                          <Eye className="w-5 h-5 text-primary" />
+                          <h3 className="text-xl font-black uppercase tracking-tighter">Real-Time Visionary Review</h3>
+                        </div>
                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                          {unit?.id === 'delete-pages' ? 'Select pages to remove from buffer' : 
-                           unit?.id === 'split-pdf' ? 'Select pages to extract into new file' :
-                           'Mark targets for neural processing'}
+                          {needsManualSelection 
+                            ? 'Select specific pages for surgical processing' 
+                            : 'Reviewing buffer contents before mastery execution'}
                         </p>
                       </div>
                       <div className="flex items-center gap-4">
-                        <Badge className="bg-primary text-white border-none h-10 px-6 font-black rounded-xl text-xs">{selectedPages.size} Selected</Badge>
+                        <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest">
+                          {selectedPages.size} Target Pages
+                        </Badge>
                         <Button 
                           onClick={handleConfirmedExecution} 
                           className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl gap-2 hover:scale-105 active:scale-95 transition-all"
@@ -185,7 +222,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                       {pages.map((page) => (
                         <div 
                           key={page.id} 
@@ -199,13 +236,15 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                         >
                           <img 
                             src={page.url} 
-                            alt={`Page ${page.id + 1}`}
+                            alt={`Page ${page.pageIdx + 1}`}
                             className={cn(
                               "w-full h-full object-cover transition-all duration-500", 
                               selectedPages.has(page.id) && (unit?.id === 'delete-pages' ? "opacity-40 grayscale blur-[2px]" : "opacity-80 scale-95")
                             )} 
                           />
-                          <div className="absolute top-3 left-3 bg-black/60 text-white text-[9px] font-black px-2 py-1 rounded-lg backdrop-blur-md">PAGE {page.id + 1}</div>
+                          <div className="absolute top-3 left-3 bg-black/60 text-white text-[9px] font-black px-2 py-1 rounded-lg backdrop-blur-md uppercase">
+                            {sourceFiles.length > 1 ? `File ${page.fileIdx + 1} • P${page.pageIdx + 1}` : `Page ${page.pageIdx + 1}`}
+                          </div>
                           
                           {selectedPages.has(page.id) && (
                             <div className="absolute inset-0 flex items-center justify-center animate-in zoom-in-50 duration-300">
@@ -213,7 +252,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                 "w-12 h-12 rounded-full flex items-center justify-center shadow-2xl",
                                 unit?.id === 'delete-pages' ? "bg-red-500" : "bg-primary"
                               )}>
-                                {unit?.id === 'delete-pages' ? <Trash2 className="w-6 h-6 text-white" /> : <Scissors className="w-6 h-6 text-white" />}
+                                {unit?.id === 'delete-pages' ? <Trash2 className="w-6 h-6 text-white" /> : <CheckCircle2 className="w-6 h-6 text-white" />}
                               </div>
                             </div>
                           )}
@@ -228,7 +267,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   <motion.div key="running" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                     <Card className="p-10 bg-white/60 border-2 border-black/5 rounded-[3rem] space-y-10 shadow-2xl backdrop-blur-3xl">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-black uppercase tracking-tighter text-slate-950 flex items-center gap-3"><RefreshCw className="w-5 h-5 animate-spin text-primary" /> Executing Logic</h3>
+                        <div className="flex items-center gap-4">
+                          <Layers className="w-6 h-6 text-primary animate-bounce" />
+                          <h3 className="text-xl font-black uppercase tracking-tighter text-slate-950">Executing Binary Logic</h3>
+                        </div>
                         <span className="text-3xl font-black text-primary tracking-tighter">{Math.round(progress.pct)}%</span>
                       </div>
                       <ProgressBar pct={progress.pct} label={progress.detail} />
@@ -243,7 +285,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                       <div className="flex flex-col items-center space-y-6">
                         <div className="w-20 h-20 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center border-2 border-emerald-500/20"><CheckCircle2 className="w-10 h-10 text-emerald-600" /></div>
                         <div className="space-y-2">
-                          <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] px-4 h-6 rounded-full uppercase tracking-widest mb-2">Success</Badge>
+                          <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] px-4 h-6 rounded-full uppercase tracking-widest mb-2">Synthesis Success</Badge>
                           <h3 className="text-3xl font-black tracking-tighter uppercase">{result.fileName}</h3>
                           <p className="text-xs font-bold text-slate-950/40 uppercase tracking-[0.3em]">{(result.byteLength / 1024).toFixed(1)} KB Mastered Buffer</p>
                         </div>

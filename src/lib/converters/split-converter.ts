@@ -6,7 +6,7 @@ import { ConversionResult, ProgressCallback } from './pdf-converter';
 /**
  * AJN Master Split Engine
  * Surgical binary extraction for document decomposition.
- * Strictly outputs .pdf, no ZIP archives.
+ * Strictly outputs .pdf containing ONLY selected pages.
  */
 export class SplitConverter {
   private file: File;
@@ -22,8 +22,8 @@ export class SplitConverter {
   }
 
   /**
-   * Splits/Extracts pages into a single new PDF document.
-   * @param options Object containing pageIndices array from the UI selection
+   * Extracts selected pages into a single new PDF document.
+   * @param options Object containing pageIndices array from the UI visionary
    */
   async split(options: any = {}): Promise<ConversionResult> {
     const { pageIndices = [] } = options;
@@ -41,7 +41,7 @@ export class SplitConverter {
 
     const totalPages = sourceDoc.getPageCount();
     
-    // Default to all pages if none selected (standard copy)
+    // Use visionary selection or default to all
     const targetIndices = pageIndices.length > 0 ? pageIndices : Array.from({ length: totalPages }, (_, i) => i);
 
     this.updateProgress(30, `Isolating ${targetIndices.length} neural segments...`);
@@ -60,7 +60,6 @@ export class SplitConverter {
 
     this.updateProgress(95, "Synchronizing binary buffer and finalizing trailer...");
     
-    // Use high-performance save settings
     const pdfBytes = await newDoc.save({
       useObjectStreams: true,
       addDefaultPage: false
