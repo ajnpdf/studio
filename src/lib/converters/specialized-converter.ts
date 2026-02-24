@@ -39,7 +39,7 @@ export class SpecializedConverter {
   }
 
   private async toSearchablePdf(baseName: string): Promise<ConversionResult> {
-    this.updateProgress(10, "Initializing Vision Cluster...");
+    this.updateProgress(10, "Initializing Text Recognition Engine...");
     const worker = await createWorker('eng', 1);
 
     const buf = await this.file.arrayBuffer();
@@ -91,7 +91,6 @@ export class SpecializedConverter {
     const buf = await this.file.arrayBuffer();
     const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
     
-    // Binary optimization sequence
     const bytes = await doc.save({
       useObjectStreams: true,
       addDefaultPage: false,
@@ -152,13 +151,12 @@ export class SpecializedConverter {
     const { PDFDocument } = await import('pdf-lib');
     const buf = await this.file.arrayBuffer();
     
-    this.updateProgress(30, "Analyzing cross-reference tables and binary trailers...");
+    this.updateProgress(30, "Analyzing cross-reference tables and trailers...");
     
     try {
-      // Re-serializes the PDF, which fixes many corrupted internal references
       const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
       
-      this.updateProgress(60, "Reconstructing object streams and repairing font maps...");
+      this.updateProgress(60, "Reconstructing object streams and font maps...");
       const bytes = await doc.save({
         useObjectStreams: true,
         addDefaultPage: false,
@@ -173,7 +171,7 @@ export class SpecializedConverter {
       };
     } catch (err: any) {
       this.updateProgress(100, "Structure recovery failed. File is severely corrupted.");
-      throw new Error(`Master Repair Failed: ${err.message}`);
+      throw new Error(`Professional Repair Failed: ${err.message}`);
     }
   }
 
