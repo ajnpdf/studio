@@ -30,7 +30,8 @@ import { NightSky } from '@/components/dashboard/night-sky';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 /**
- * AJN Landing Page - Simple Professional PDF Tools Hub
+ * All-in-one Junction Network - Unified Landing Hub
+ * Simple Professional Industrial Design
  */
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
@@ -90,7 +91,7 @@ export default function LandingPage() {
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-950 leading-[0.9] uppercase">
-                All-in-one <br /> PDF Hub
+                All-in-one <br /> Junction Network
               </h1>
               <div className="flex flex-col items-center justify-center gap-4">
                 <div className="flex items-center justify-center gap-6">
