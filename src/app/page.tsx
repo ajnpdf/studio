@@ -19,13 +19,8 @@ import {
   Globe, 
   Cpu, 
   Calendar, 
-  ExternalLink,
   ChevronRight,
-  Sparkles,
-  MousePointer2,
-  Lock,
-  Search,
-  Wand2
+  Sparkles
 } from 'lucide-react';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -91,7 +86,8 @@ export default function LandingPage() {
           
           <div className="space-y-8">
             <div className="space-y-4">
-              <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-slate-950 leading-[0.85] uppercase">
+              {/* REDUCED SIZE HEADING */}
+              <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-950 leading-[0.9] uppercase">
                 All-in-one <br /> Junction <span className="text-primary">Network</span>
               </h1>
               <div className="flex flex-col items-center justify-center gap-4">
@@ -102,7 +98,7 @@ export default function LandingPage() {
                   </p>
                   <span className="w-12 h-px bg-slate-950/10"></span>
                 </div>
-                <div className="px-6 py-2 bg-primary/5 border border-primary/10 rounded-full animate-in fade-in zoom-in duration-1000 delay-500">
+                <div className="px-6 py-2 bg-primary/5 border border-primary/10 rounded-full animate-in fade-in zoom-in duration-1000 delay-500 shadow-sm">
                   <p className="text-[10px] font-black uppercase tracking-widest text-primary">
                     Only this site provides PDF tools and services conversion in real time free
                   </p>
@@ -278,7 +274,7 @@ export default function LandingPage() {
               <div className="lg:col-span-7 space-y-8">
                 <div className="space-y-4">
                   <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Our Story</span>
-                  <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.85] uppercase">Mastering the <br /><span className="text-primary">Browser Buffer</span></h2>
+                  <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-[0.9] uppercase">Mastering the <br /><span className="text-primary">Browser Buffer</span></h2>
                 </div>
                 <div className="prose prose-slate max-w-none text-slate-950/70 font-medium space-y-6 leading-relaxed text-lg uppercase tracking-widest">
                   <p>"AJN was born from a singular vision: To dismantle the barriers between complex file engineering and the everyday professional."</p>
@@ -344,7 +340,7 @@ export default function LandingPage() {
         
         <nav className="flex gap-12 flex-wrap justify-center">
           {['Privacy', 'Terms', 'Support', 'API'].map((link) => (
-            <Link key={link} href={`/${link.toLowerCase()}`} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-950/40 hover:text-primary transition-colors">
+            <Link key={link} href={`/${link.toLowerCase()}`} className="text-[10px] font-black uppercase tracking-widest text-slate-950/40 hover:text-primary transition-colors">
               {link}
             </Link>
           ))}
