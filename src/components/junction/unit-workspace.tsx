@@ -16,7 +16,9 @@ import {
   ChevronRight,
   Eye,
   Layers,
-  FileIcon
+  FileIcon,
+  Scissors,
+  Settings2
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -37,7 +39,7 @@ interface Props {
 
 /**
  * AJN Engineering Workspace - Universal Real-Time Visionary
- * Optimized for professional full-width engineering.
+ * Optimized for professional surgical PDF extraction and organization.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const unit = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -50,14 +52,12 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   useEffect(() => { setMounted(true); }, []);
 
-  const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf'].includes(unit?.id || '');
+  const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf', 'organize-pdf'].includes(unit?.id || '');
 
   const getAcceptedExtensions = () => {
     if (!unit) return ".pdf";
     const id = unit.id;
-    if (id.startsWith("pdf-") || id === "merge-pdf" || id === "split-pdf" || id === "rotate-pdf" || 
-        id === "compress-pdf" || id === "redact-pdf" || id === "protect-pdf" || id === "sign-pdf" || 
-        id === "summarize-pdf" || id === "translate-pdf" || id === "ocr-pdf" || id.includes("pdf")) return ".pdf";
+    if (id.includes("pdf") || id === "merge-pdf") return ".pdf";
     if (id.endsWith("-pdf")) {
       if (id.includes("jpg")) return ".jpg,.jpeg,.png,.webp";
       if (id.includes("word")) return ".docx,.doc";
@@ -69,6 +69,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
+    // Every tool now uses the Visionary Inspection Layer for PDFs
     if (files.some(f => f.type === 'application/pdf')) {
       await loadAllPdfPages(files);
     } else {
@@ -77,7 +78,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const loadAllPdfPages = async (files: File[]) => {
-    setPhase('selecting' as any);
+    setPhase('selecting');
     const allLoadedPages: any[] = [];
     const initialSelected = new Set<string>();
 
@@ -105,13 +106,15 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             pageIdx: pIdx - 1
           });
 
+          // Tools like Translate/JPG select all by default for "Review"
+          // Tools like Extract/Delete select zero by default for "Surgery"
           if (!isSurgicalTool) initialSelected.add(pageId);
         }
       }
       setPages(allLoadedPages);
       setSelectedPages(initialSelected);
     } catch (err) {
-      toast({ title: "Load Error", description: "Failed to parse visionary buffer.", variant: "destructive" });
+      toast({ title: "Load Error", description: "Failed to parse document buffer.", variant: "destructive" });
       reset();
     }
   };
@@ -125,6 +128,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   const handleConfirmedExecution = () => {
     const indices = Array.from(selectedPages).map(id => parseInt(id.split('-')[1]) - 1);
+    if (indices.length === 0 && isSurgicalTool) {
+      toast({ title: "No Selection", description: "Please select target pages." });
+      return;
+    }
     run(sourceFiles, { pageIndices: indices, targetLang: 'es' });
   };
 
@@ -132,9 +139,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     if (!result?.blob) return;
     const url = URL.createObjectURL(result.blob);
     const a = document.createElement('a');
-    a.href = url; 
-    a.download = result.fileName; 
-    a.click();
+    a.href = url; a.download = result.fileName; a.click();
     toast({ title: "Asset Exported", description: `${result.fileName} saved successfully.` });
   };
 
@@ -157,13 +162,13 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[8px] font-black h-5 uppercase tracking-widest">{unit?.mode || 'WASM'}</Badge>
                   </div>
                   <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.4em] flex items-center gap-2">
-                    <Activity className="w-3 h-3 text-emerald-600" /> Neural Registry Instance • Active Hub
+                    <Activity className="w-3 h-3 text-emerald-600" /> Active Registry Hub
                   </p>
                 </div>
               </div>
               <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/40 border border-black/5 rounded-2xl shadow-sm">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span className="text-[10px] font-black text-slate-950/60 uppercase tracking-widest">WASM Pipeline Secured</span>
+                <span className="text-[10px] font-black text-slate-950/60 uppercase tracking-widest">Pipeline Secured</span>
               </div>
             </header>
 
@@ -175,21 +180,21 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   </motion.div>
                 )}
 
-                {phase === ('selecting' as any) && (
+                {phase === 'selecting' && (
                   <motion.div key="selecting" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                     <div className="flex items-center justify-between px-4 bg-white/40 p-6 rounded-3xl border border-black/5 shadow-xl backdrop-blur-xl">
                       <div className="space-y-1">
                         <div className="flex items-center gap-3">
                           <Eye className="w-5 h-5 text-primary" />
-                          <h3 className="text-xl font-black uppercase tracking-tighter">Visionary Review Layer</h3>
+                          <h3 className="text-xl font-black uppercase tracking-tighter">Visionary Inspection</h3>
                         </div>
                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                          {isSurgicalTool ? 'Select target segments' : 'Review visionary contents before execution'}
+                          {isSurgicalTool ? 'Visually select pages for extraction or deletion.' : 'Review document buffer before execution.'}
                         </p>
                       </div>
                       <div className="flex items-center gap-4">
                         <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest">
-                          {selectedPages.size} Targets
+                          {selectedPages.size} Target Segments
                         </Badge>
                         <Button 
                           onClick={handleConfirmedExecution} 
@@ -201,28 +206,39 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     </div>
                     
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                      {pages.map((page) => (
-                        <div 
-                          key={page.id} 
-                          onClick={() => togglePageSelection(page.id)} 
-                          className={cn(
-                            "relative aspect-[1/1.414] rounded-2xl border-4 transition-all cursor-pointer overflow-hidden shadow-lg group", 
-                            selectedPages.has(page.id) ? "border-primary bg-primary/10" : "border-black/5 hover:border-primary/40 bg-white"
-                          )}
-                        >
-                          <img src={page.url} alt={`Page ${page.pageIdx + 1}`} className={cn("w-full h-full object-cover transition-all", selectedPages.has(page.id) && "opacity-80 scale-95")} />
-                          <div className="absolute top-3 left-3 bg-black/60 text-white text-[9px] font-black px-2 py-1 rounded-lg backdrop-blur-md uppercase">
-                            {sourceFiles.length > 1 ? `F${page.fileIdx + 1} • P${page.pageIdx + 1}` : `P${page.pageIdx + 1}`}
-                          </div>
-                          {selectedPages.has(page.id) && (
-                            <div className="absolute inset-0 flex items-center justify-center animate-in zoom-in-50 duration-300">
-                              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-2xl">
-                                <CheckCircle2 className="w-6 h-6 text-white" />
-                              </div>
+                      {pages.map((page) => {
+                        const isSelected = selectedPages.has(page.id);
+                        return (
+                          <div 
+                            key={page.id} 
+                            onClick={() => togglePageSelection(page.id)} 
+                            className={cn(
+                              "relative aspect-[1/1.414] rounded-2xl border-4 transition-all cursor-pointer overflow-hidden shadow-lg group", 
+                              isSelected 
+                                ? "border-primary bg-primary/10" 
+                                : isSurgicalTool ? "border-red-500/20 bg-red-50 grayscale" : "border-black/5 bg-white"
+                            )}
+                          >
+                            <img src={page.url} alt={`Page ${page.pageIdx + 1}`} className={cn("w-full h-full object-cover transition-all", isSelected ? "opacity-80 scale-95" : "opacity-40")} />
+                            
+                            <div className="absolute top-3 left-3 bg-black/60 text-white text-[9px] font-black px-2 py-1 rounded-lg backdrop-blur-md uppercase">
+                              {`P${page.pageIdx + 1}`}
                             </div>
-                          )}
-                        </div>
-                      ))}
+
+                            {isSelected ? (
+                              <div className="absolute inset-0 flex items-center justify-center animate-in zoom-in-50 duration-300">
+                                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-2xl">
+                                  <CheckCircle2 className="w-6 h-6 text-white" />
+                                </div>
+                              </div>
+                            ) : isSurgicalTool && (
+                              <div className="absolute inset-0 flex items-center justify-center opacity-40">
+                                <Trash2 className="w-10 h-10 text-red-500" />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </motion.div>
                 )}
@@ -233,7 +249,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           <Layers className="w-6 h-6 text-primary animate-bounce" />
-                          <h3 className="text-xl font-black uppercase tracking-tighter">Executing Binary Synthesis</h3>
+                          <h3 className="text-xl font-black uppercase tracking-tighter">Binary Synthesis Active</h3>
                         </div>
                         <span className="text-3xl font-black text-primary tracking-tighter">{Math.round(progress.pct)}%</span>
                       </div>

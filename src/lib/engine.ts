@@ -27,38 +27,29 @@ class AJNPDFEngine {
 
     try {
       // 1. INTELLIGENCE & SPECIALIZED LAYER
-      if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf'].includes(toolId)) {
+      if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf', 'compress-pdf'].includes(toolId)) {
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
         const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Intelligence", detail: m, pct: p }));
         const map: Record<string, string> = { 
           'translate-pdf': 'TRANSLATE', 
           'ocr-pdf': 'OCR', 
           'summarize-pdf': 'SUMMARIZE', 
-          'compare-pdf': 'COMPARE' 
+          'compare-pdf': 'COMPARE',
+          'compress-pdf': 'COMPRESS'
         };
         result = await converter.convertTo(map[toolId], options);
       } 
       // 2. MERGE CORE
       else if (toolId === 'merge-pdf') {
-        const { MergeConverter } = await import('@/lib/converters/merge-converter');
-        const converter = new MergeConverter(files, (p, m) => onProgressCallback({ stage: "Merge", detail: m, pct: p }));
-        result = await converter.merge();
+        const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
+        const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Merge", detail: m, pct: p }));
+        result = await manipulator.merge();
       }
-      // 3. SPLIT & EXTRACTION CORE
-      else if (toolId === 'split-pdf' || toolId === 'extract-pages' || toolId === 'delete-pages') {
-        const { SplitConverter } = await import('@/lib/converters/split-converter');
-        const converter = new SplitConverter(firstFile, (p, m) => onProgressCallback({ stage: "Split", detail: m, pct: p }));
-        
-        if (toolId === 'delete-pages') {
-          const buf = await firstFile.arrayBuffer();
-          const { PDFDocument } = await import('pdf-lib');
-          const pdf = await PDFDocument.load(buf, { ignoreEncryption: true });
-          const allIndices = Array.from({ length: pdf.getPageCount() }, (_, i) => i);
-          const keepIndices = allIndices.filter(i => !options.pageIndices?.includes(i));
-          result = await converter.split({ ...options, pageIndices: keepIndices });
-        } else {
-          result = await converter.split(options);
-        }
+      // 3. SURGICAL MANIPULATION CORE
+      else if (['split-pdf', 'extract-pages', 'delete-pages', 'rotate-pdf', 'sign-pdf'].includes(toolId)) {
+        const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
+        const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Manipulation", detail: m, pct: p }));
+        result = await manipulator.runOperation(toolId, options);
       }
       // 4. EXPORT CORE (PDF to X)
       else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt'].includes(toolId)) {
@@ -95,23 +86,14 @@ class AJNPDFEngine {
           const { CodeConverter } = await import('@/lib/converters/code-converter');
           result = await new CodeConverter(firstFile, (p, m) => onProgressCallback({ stage: "Data", detail: m, pct: p })).convertTo('PDF', options);
         }
-      }
-      // 6. MANIPULATION & SECURITY
-      else {
-        const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
-        const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Manipulation", detail: m, pct: p }));
-        
-        if (toolId === 'rotate-pdf') result = await manipulator.rotate();
-        else if (toolId === 'add-page-numbers') result = await manipulator.addPageNumbers();
-        else if (toolId === 'sign-pdf') result = await manipulator.sign(options);
-        else result = await manipulator.merge();
+      } else {
+        throw new Error(`Engine routing for ${toolId} not yet calibrated.`);
       }
 
       onProgressCallback({ stage: "Established", detail: "Binary synchronization successful.", pct: 100 });
       return { success: true, fileName: result.fileName, byteLength: result.blob.size, blob: result.blob };
     } catch (err: any) {
       console.error("[AJN Core] Execution Error:", err);
-      // Fallback for undefined error objects
       const msg = err?.message || "Synthesis failure during binary processing.";
       throw new Error(msg);
     }
