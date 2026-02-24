@@ -92,7 +92,7 @@ export default function JunctionPage() {
             AJN Junction • 2025
           </p>
           <div className="flex items-center gap-2.5 px-4 py-1.5 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
-            <span className="text-[9px] font-black text-primary uppercase tracking-widest">Made by Indian ❤️</span>
+            <span className="text-[9px] font-black text-primary uppercase tracking-widest">Made in INDIAN❤️</span>
           </div>
         </footer>
       </main>

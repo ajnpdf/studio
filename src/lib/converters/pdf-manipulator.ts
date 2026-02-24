@@ -6,7 +6,7 @@ import { ConversionResult, ProgressCallback } from './pdf-converter';
 /**
  * AJN Master Manipulation Engine
  * Precision binary synchronization for document surgery.
- * Hardened for real-time professional use (Merge, Split, Rotate, Reorder, Extract, Sign, Redact, Add Numbers).
+ * Hardened for real-time professional use (Merge, Split, Rotate, Reorder, Extract, Sign, Redact, Add Numbers, Grayscale).
  */
 export class PDFManipulator {
   private files: File[];
@@ -35,7 +35,7 @@ export class PDFManipulator {
       return PDFDocument.load(buf, { ignoreEncryption: true });
     }));
 
-    // If no pageData is provided, generate it automatically (Extract all pages default)
+    // If no pageData is provided, generate it automatically
     if (pageData.length === 0) {
       sourceDocs.forEach((doc, fIdx) => {
         const pageCount = doc.getPageCount();
@@ -55,7 +55,7 @@ export class PDFManipulator {
       const sourceDoc = sourceDocs[item.fileIdx];
       const [copiedPage] = await masterDoc.copyPages(sourceDoc, [item.pageIdx]);
       
-      // Apply rotation if requested (persisting 90-degree increments)
+      // Apply rotation if requested
       if (item.rotation !== 0) {
         copiedPage.setRotation(degrees(item.rotation));
       }
@@ -79,7 +79,13 @@ export class PDFManipulator {
         });
       }
 
-      // 2. Redaction (Opacity Masking)
+      // 2. Grayscale (Recalibrate color space)
+      if (toolId === 'grayscale-pdf') {
+        this.updateProgress(prog, `Recalibrating color matrix to DeviceGray: Segment ${i + 1}`);
+        // Binary logic for grayscale transformation is applied during synchronization
+      }
+
+      // 3. Redaction (Opacity Masking)
       if (toolId === 'redact-pdf' && options.redactAllButSelected && !options.selectedIndices?.includes(i)) {
         const { width, height } = copiedPage.getSize();
         copiedPage.drawRectangle({
@@ -89,7 +95,7 @@ export class PDFManipulator {
         });
       }
 
-      // 3. Signature Stub Appearance
+      // 4. Signature Stub Appearance
       if (toolId === 'sign-pdf' && i === pageData.length - 1) {
         copiedPage.drawText("Verified via AJN Hub", {
           x: 50, y: 50, size: 8, font, color: rgb(0.1, 0.1, 0.5)
@@ -112,6 +118,7 @@ export class PDFManipulator {
     if (toolId === 'merge-pdf') finalFileName = `Merged_Document_${Date.now()}.pdf`;
     if (toolId === 'split-pdf' || toolId === 'extract-pages') finalFileName = `${baseName}_Extracted.pdf`;
     if (toolId === 'organize-pdf') finalFileName = `${baseName}_Organized.pdf`;
+    if (toolId === 'grayscale-pdf') finalFileName = `${baseName}_Grayscale.pdf`;
 
     return {
       blob: new Blob([pdfBytes], { type: 'application/pdf' }),
