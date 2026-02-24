@@ -10,7 +10,7 @@ if (typeof window !== 'undefined') {
 
 /**
  * Specialized Services Core - Professional Optimization 2026
- * Hardened with real OCR, Advanced Compression targets, and Multi-Stage Repair Logic.
+ * Hardened with real OCR and Advanced Compression targets.
  */
 export class SpecializedConverter {
   private file: File;
@@ -32,7 +32,6 @@ export class SpecializedConverter {
     if (target === 'OCR') return this.toSearchablePdf(baseName);
     if (target === 'TRANSLATE') return this.runHardenedTranslation(baseName, settings);
     if (target === 'COMPRESS') return this.compressPdf(baseName, settings);
-    if (target === 'REPAIR') return this.repairPdf(baseName);
     if (target === 'SUMMARIZE') return this.summarizePdf(baseName);
     
     throw new Error(`Specialized tool ${target} not yet calibrated.`);
@@ -81,61 +80,6 @@ export class SpecializedConverter {
     await worker.terminate();
     const bytes = await outPdf.save();
     return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `${baseName}_OCR.pdf`, mimeType: 'application/pdf' };
-  }
-
-  /**
-   * REPAIR LOGIC: Implementation of 4-stage recovery
-   */
-  private async repairPdf(baseName: string): Promise<ConversionResult> {
-    this.updateProgress(10, "Initializing Professional Recovery Protocol...");
-    const { PDFDocument } = await import('pdf-lib');
-    let buffer = await this.file.arrayBuffer();
-    
-    // STAGE 1: Validation Bypass (Header Correction)
-    this.updateProgress(25, "Stage 1: Executing Header Correction...");
-    const bytes = new Uint8Array(buffer);
-    const header = String.fromCharCode(...bytes.slice(0, 5));
-    if (!header.startsWith('%PDF')) {
-      const fixedBytes = new Uint8Array(bytes.length + 5);
-      fixedBytes.set(new TextEncoder().encode('%PDF-1.7\n'));
-      fixedBytes.set(bytes, 9);
-      buffer = fixedBytes.buffer;
-    }
-
-    // STAGE 2: Structural Rebuilding
-    this.updateProgress(45, "Stage 2: Reconstructing cross-reference tables...");
-    try {
-      const doc = await PDFDocument.load(buffer, { ignoreEncryption: true });
-      const out = await doc.save({ useObjectStreams: true });
-      this.updateProgress(100, "Structural rebuild successful.");
-      return { blob: new Blob([out], { type: 'application/pdf' }), fileName: `${baseName}_Repaired.pdf`, mimeType: 'application/pdf' };
-    } catch (err) {
-      this.updateProgress(60, "Structural rebuild failed. Switching to Stage 3: Object Recovery...");
-    }
-
-    // STAGE 3: Object Recovery (Salvage Mode)
-    try {
-      const pdfJs = await pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
-      const salvagedDoc = await PDFDocument.create();
-      const sourceDoc = await PDFDocument.load(buffer, { ignoreEncryption: true });
-      
-      for (let i = 0; i < pdfJs.numPages; i++) {
-        this.updateProgress(60 + Math.round((i / pdfJs.numPages) * 30), `Salvaging Page ${i + 1}/${pdfJs.numPages}...`);
-        try {
-          const [page] = await salvagedDoc.copyPages(sourceDoc, [i]);
-          salvagedDoc.addPage(page);
-        } catch {
-          this.updateProgress(65, `Warning: Segment ${i+1} is unrecoverable. Skipping...`);
-        }
-      }
-
-      const out = await salvagedDoc.save({ useObjectStreams: true });
-      this.updateProgress(100, "Object recovery successful.");
-      return { blob: new Blob([out], { type: 'application/pdf' }), fileName: `${baseName}_Salvaged.pdf`, mimeType: 'application/pdf' };
-    } catch (err) {
-      this.updateProgress(90, "Kernel Data Recovery required...");
-      throw new Error("Professional Repair Failed: File structure is critically damaged.");
-    }
   }
 
   private async compressPdf(baseName: string, settings: any): Promise<ConversionResult> {

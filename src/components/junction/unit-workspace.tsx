@@ -58,7 +58,6 @@ interface Props {
 
 /**
  * AJN Tools Workspace - Professional Industrial Setup 2026
- * Hardened for real-time execution with corrected Execute logic.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const tool = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -74,6 +73,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     strongCompression: true,
     targetSize: '',
     targetUnit: 'KB',
+    password: '',
     ocrLanguage: 'eng',
     splitMode: 'range',
     optimizationLevel: 'balanced'
@@ -81,12 +81,12 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   const isWordTool = tool?.id === 'word-pdf';
   const isCompressTool = tool?.id === 'compress-pdf';
-  const isRepairTool = tool?.id === 'repair-pdf';
+  const isProtectTool = tool?.id === 'protect-pdf';
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
     
-    if (isCompressTool || isRepairTool) {
+    if (isCompressTool || isProtectTool) {
       setPhase('selecting'); 
     } else if (files.some(f => f.type === 'application/pdf') || isWordTool) {
       await loadDocumentPages(files, isWordTool);
@@ -136,7 +136,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleConfirmedExecution = () => {
-    if (isCompressTool || isRepairTool) {
+    if (isCompressTool || isProtectTool) {
       run(sourceFiles, config);
       return;
     }
@@ -154,7 +154,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   const getBrowseAccept = () => {
     if (isWordTool) return ".doc,.docx,.odt,.rtf";
-    if (isCompressTool || isRepairTool) return "application/pdf";
+    if (isCompressTool || isProtectTool) return "application/pdf";
     return "*/*";
   };
 
@@ -180,15 +180,15 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     </div>
                   ) : (
                     <div className="flex flex-col gap-8">
-                      {isCompressTool || isRepairTool ? (
+                      {isCompressTool || isProtectTool ? (
                         <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10">
                           <div className="flex items-center gap-4 text-primary">
                             <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-sm">
-                              {isCompressTool ? <Shrink className="w-7 h-7" /> : <RefreshCw className="w-7 h-7" />}
+                              {isCompressTool ? <Shrink className="w-7 h-7" /> : <Lock className="w-7 h-7" />}
                             </div>
                             <div>
-                              <h3 className="text-3xl font-black uppercase tracking-tighter text-slate-950">{isCompressTool ? 'Advanced Compression' : 'System Repair'}</h3>
-                              <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">{isCompressTool ? 'Configure Target reduction' : 'Multi-Stage structural recovery'}</p>
+                              <h3 className="text-3xl font-black uppercase tracking-tighter text-slate-950">{isCompressTool ? 'Advanced Compression' : 'System Protection'}</h3>
+                              <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">{isCompressTool ? 'Configure Target reduction' : 'Secure with master password'}</p>
                             </div>
                           </div>
 
@@ -214,13 +214,17 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                   </div>
                                 </>
                               )}
-                              {isRepairTool && (
-                                <div className="space-y-4 p-6 bg-emerald-500/5 rounded-3xl border border-emerald-500/10">
-                                  <div className="flex items-center gap-3 text-emerald-600 mb-2">
-                                    <CheckCircle2 className="w-5 h-5" />
-                                    <p className="text-xs font-black uppercase">Fidelity Restoration</p>
-                                  </div>
-                                  <p className="text-[10px] leading-relaxed text-slate-950/60 font-medium">The system will attempt structural rebuilding, object recovery, and header correction to restore access to your document.</p>
+                              {isProtectTool && (
+                                <div className="space-y-4">
+                                  <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Set Master Password</Label>
+                                  <Input 
+                                    type="password" 
+                                    placeholder="Enter secure password..." 
+                                    value={config.password} 
+                                    onChange={(e) => setConfig({...config, password: e.target.value})} 
+                                    className="h-12 bg-black/5 border-none rounded-2xl font-bold" 
+                                  />
+                                  <p className="text-[9px] text-slate-950/40 font-bold uppercase">This password will be required to access the document binary.</p>
                                 </div>
                               )}
                             </div>
@@ -230,7 +234,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                   <p className="text-xs font-black uppercase">Strong Optimization</p>
                                   <Switch checked={config.strongCompression} onCheckedChange={(v) => setConfig({...config, strongCompression: v})} />
                                 </div>
-                                <p className="text-[9px] text-slate-950/40 font-bold uppercase">Executing High-Fidelity Binary Deflation.</p>
+                                <p className="text-[9px] text-slate-950/40 font-bold uppercase">Executing High-Fidelity Binary Protocols.</p>
                               </div>
                             </div>
                           </div>

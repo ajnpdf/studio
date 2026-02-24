@@ -104,9 +104,45 @@ export const ALL_UNITS: ServiceUnit[] = [
     instructions: ['Browse and select Word-compatible files.', 'Verify page layout in the visionary preview.', 'Launch the OOXML-to-PDF transformation.'],
     useCases: ['Converting essays for submission.', 'Preparing professional proposals for clients.']
   },
-  { id: 'repair-pdf', name: 'Repair PDF', desc: 'Fix corrupted PDF file structures.', icon: Wrench, tag: 'Repair', cat: 'Optimize', mode: 'Standard', color: '#059669', benefits: ['Restores access to damaged binaries', 'Corrects invalid cross-reference tables', 'Recovers lost page objects'], instructions: ['Upload the corrupted PDF asset.', 'Select the recovery protocol level.', 'Execute structural reconstruction.'], useCases: ['Recovering corrupted archive data.'] },
-  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Modify existing document layers.', icon: MousePointer2, tag: 'Edit', cat: 'Edit', mode: 'Advanced', color: '#BE185D', benefits: ['Direct layer manipulation', 'Real-time text and image injection', 'Professional markup tools'], instructions: ['Open document in advanced editor.', 'Select object or add new text/image layer.', 'Commit surgical changes to binary.'], useCases: ['Editing document text and images in real time.'] },
-  { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Convert PDF segments to images.', icon: ImageIcon, tag: 'Export', cat: 'Export', mode: 'Standard', color: '#EF4444', benefits: ['Enables social media document sharing', 'Creates lightweight presentation assets', 'Universal image compatibility'], instructions: ['Load target PDF document.', 'Select specific pages or full range.', 'Export to high-fidelity JPEG matrix.'], useCases: ['Sharing infographics.', 'Extracting slide frames for social channels.'] },
+  { 
+    id: 'protect-pdf', 
+    name: 'Protect PDF', 
+    desc: 'Secure documents with 256-bit encryption.', 
+    icon: Lock, 
+    tag: 'Protect', 
+    cat: 'Security', 
+    mode: 'Standard', 
+    color: '#059669', 
+    benefits: ['Restricts unauthorized document access', 'Enforces strict viewing permissions', 'Secures sensitive personal data'], 
+    instructions: ['Inhale the target document.', 'Define a robust master password.', 'Execute the encryption protocol.'], 
+    useCases: ['Securing financial statements.', 'Protecting private legal records.'] 
+  },
+  { 
+    id: 'edit-pdf', 
+    name: 'Edit PDF', 
+    desc: 'Modify existing document layers.', 
+    icon: MousePointer2, 
+    tag: 'Edit', 
+    cat: 'Edit', 
+    mode: 'Advanced', 
+    color: '#BE185D', 
+    benefits: ['Direct layer manipulation', 'Real-time text and image injection', 'Professional markup tools'], 
+    instructions: ['Open document in advanced editor.', 'Select object or add new text/image layer.', 'Commit surgical changes to binary.'], 
+    useCases: ['Editing document text and images in real time.'] 
+  },
+  { 
+    id: 'pdf-jpg', 
+    name: 'PDF to JPG', 
+    desc: 'Convert PDF segments to images.', 
+    icon: ImageIcon, 
+    tag: 'Export', 
+    cat: 'Export', 
+    mode: 'Standard', 
+    color: '#EF4444', 
+    benefits: ['Enables social media document sharing', 'Creates lightweight presentation assets', 'Universal image compatibility'], 
+    instructions: ['Load target PDF document.', 'Select specific pages or full range.', 'Export to high-fidelity JPEG matrix.'], 
+    useCases: ['Sharing infographics.', 'Extracting slide frames for social channels.'] 
+  },
 ];
 
 const containerVariants = {
