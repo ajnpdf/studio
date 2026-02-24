@@ -6,7 +6,7 @@ import { ConversionResult, ProgressCallback } from './pdf-converter';
 /**
  * AJN Master Manipulation Engine
  * Precision binary synchronization for document surgery.
- * Hardened for real-time professional use (Rotate, Reorder, Extract, Sign, Redact, Add Numbers).
+ * Hardened for real-time professional use (Merge, Rotate, Reorder, Extract, Sign, Redact, Add Numbers).
  */
 export class PDFManipulator {
   private files: File[];
@@ -35,7 +35,7 @@ export class PDFManipulator {
       return PDFDocument.load(buf, { ignoreEncryption: true });
     }));
 
-    // If no pageData is provided (e.g. Add Numbers on entire file), generate it automatically
+    // If no pageData is provided, generate it automatically
     if (pageData.length === 0) {
       sourceDocs.forEach((doc, fIdx) => {
         const pageCount = doc.getPageCount();
@@ -101,7 +101,6 @@ export class PDFManipulator {
 
     this.updateProgress(95, "Finalizing binary buffer and synchronization...");
     
-    // Save with incremental features
     const pdfBytes = await masterDoc.save({
       useObjectStreams: true,
       addDefaultPage: false
@@ -111,7 +110,7 @@ export class PDFManipulator {
 
     return {
       blob: new Blob([pdfBytes], { type: 'application/pdf' }),
-      fileName: `${baseName}_AJN_${Date.now()}.pdf`,
+      fileName: toolId === 'merge-pdf' ? `Merged_Document_${Date.now()}.pdf` : `${baseName}_Processed_${Date.now()}.pdf`,
       mimeType: 'application/pdf'
     };
   }

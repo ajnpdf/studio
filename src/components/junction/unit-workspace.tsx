@@ -19,9 +19,6 @@ import {
   Loader2,
   Settings2,
   Zap,
-  FileCode,
-  Layers,
-  Wand2,
   Lock,
   History
 } from 'lucide-react';
@@ -119,7 +116,8 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             rotation: 0
           });
 
-          if (!isSurgicalTool) initialSelected.add(pageId);
+          // Merge tool selects all pages by default
+          if (!isSurgicalTool || tool?.id === 'merge-pdf') initialSelected.add(pageId);
         }
       }
       setPages(allLoadedPages);
@@ -154,14 +152,14 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   const handleConfirmedExecution = () => {
     const pageData = pages
-      .filter(p => !isSurgicalTool || selectedPages.has(p.id))
+      .filter(p => selectedPages.has(p.id))
       .map(p => ({
         fileIdx: p.fileIdx,
         pageIdx: p.pageIdx,
         rotation: p.rotation
       }));
 
-    if (pageData.length === 0 && isSurgicalTool) {
+    if (pageData.length === 0) {
       toast({ title: "Selection Required", description: "Select at least one page to process." });
       return;
     }
@@ -250,9 +248,9 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                   )}
                                 </div>
                                 <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <Button size="icon" variant="outline" onClick={(e) => { e.stopPropagation(); movePage(idx, 'up'); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><ArrowLeft className="w-3.5 h-3.5" /></Button>
-                                  <Button size="icon" variant="outline" onClick={(e) => { e.stopPropagation(); rotatePage(page.id); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><RotateCw className="w-3.5 h-3.5" /></Button>
-                                  <Button size="icon" variant="outline" onClick={(e) => { e.stopPropagation(); movePage(idx, 'down'); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><ArrowRight className="w-3.5 h-3.5" /></Button>
+                                  <Button size="icon" variant="outline" title="Move Up" onClick={(e) => { e.stopPropagation(); movePage(idx, 'up'); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><ArrowLeft className="w-3.5 h-3.5" /></Button>
+                                  <Button size="icon" variant="outline" title="Rotate" onClick={(e) => { e.stopPropagation(); rotatePage(page.id); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><RotateCw className="w-3.5 h-3.5" /></Button>
+                                  <Button size="icon" variant="outline" title="Move Down" onClick={(e) => { e.stopPropagation(); movePage(idx, 'down'); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><ArrowRight className="w-3.5 h-3.5" /></Button>
                                 </div>
                               </div>
                             );

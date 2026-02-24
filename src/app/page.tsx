@@ -128,7 +128,7 @@ export default function LandingPage() {
             {popularTools.map((tool) => (
               <Link key={tool.id} href={`/tools/${tool.id}`}>
                 <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 transition-all duration-500 cursor-pointer overflow-hidden border backdrop-blur-xl shadow-md group rounded-[2rem]">
-                  <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
+                  <CardContent className="p-4 md:p-6 flex flex-col items-center text-center space-y-4">
                     <div className="w-12 h-12 bg-white/60 rounded-2xl flex items-center justify-center border border-black/5 group-hover:scale-110 transition-all">
                       <tool.icon className={`w-6 h-6 ${tool.color}`} />
                     </div>
@@ -278,7 +278,7 @@ export default function LandingPage() {
                   </div>
                   <div className="text-center space-y-2">
                     <p className="text-3xl font-black tracking-tighter">100%</p>
-                    <p className="text-[8px] font-black uppercase tracking-widest text-slate-950/40">PRIVATE</p>
+                    <p className="text-[8px] font-black uppercase tracking-widest text-slate-950/40">PRIVACY</p>
                   </div>
                   <div className="text-center space-y-2">
                     <p className="text-3xl font-black tracking-tighter">30+</p>
