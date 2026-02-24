@@ -25,10 +25,10 @@ class AJNPDFEngine {
     let result: { blob: Blob; fileName: string; mimeType: string };
 
     try {
-      // 1. ADVANCED SERVICES
+      // 1. Advanced Processing
       if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf', 'compress-pdf', 'repair-pdf'].includes(toolId)) {
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
-        const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Analyzing", detail: m, pct: p }));
+        const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Processing", detail: m, pct: p }));
         
         const map: Record<string, string> = { 
           'translate-pdf': 'TRANSLATE', 
@@ -40,13 +40,13 @@ class AJNPDFEngine {
         };
         result = await converter.convertTo(map[toolId] || 'OCR', options);
       } 
-      // 2. DOCUMENT TOOLS
+      // 2. Document Surgical Tools
       else if (['merge-pdf', 'split-pdf', 'extract-pages', 'delete-pages', 'rotate-pdf', 'sign-pdf', 'organize-pdf', 'protect-pdf', 'unlock-pdf', 'redact-pdf', 'flatten-pdf', 'add-page-numbers', 'grayscale-pdf'].includes(toolId)) {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Processing", detail: m, pct: p }));
         result = await manipulator.runOperation(toolId, options);
       }
-      // 3. EXPORT TOOLS
+      // 3. Export Formats
       else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt', 'pdf-pdfa'].includes(toolId)) {
         const { PDFConverter } = await import('@/lib/converters/pdf-converter');
         const converter = new PDFConverter(firstFile, (p, m) => onProgressCallback({ stage: "Exporting", detail: m, pct: p }));
@@ -63,7 +63,7 @@ class AJNPDFEngine {
         };
         result = await converter.convertTo(map[toolId] || 'JPG', options);
       }
-      // 4. CONVERSION TOOLS
+      // 4. Inbound Conversions
       else if (toolId.endsWith('-pdf')) {
         const source = toolId.split('-')[0];
         if (['jpg', 'jpeg', 'png', 'webp'].includes(source!)) {
@@ -84,14 +84,14 @@ class AJNPDFEngine {
           result = await new CodeConverter(firstFile, (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p })).convertTo('PDF', options);
         }
       } else {
-        throw new Error(`Tool ${toolId} is not available.`);
+        throw new Error(`Tool ${toolId} is currently offline.`);
       }
 
-      onProgressCallback({ stage: "Ready", detail: "File processed successfully.", pct: 100 });
+      onProgressCallback({ stage: "Complete", detail: "Process finished successfully.", pct: 100 });
       return { success: true, fileName: result.fileName, byteLength: result.blob.size, blob: result.blob };
     } catch (err: any) {
-      console.error("[AJN Core] Processing error:", err);
-      const msg = err?.message || "Failed to process the file.";
+      console.error("[AJN Core] Execution failure:", err);
+      const msg = err?.message || "Internal process failure.";
       throw new Error(msg);
     }
   }

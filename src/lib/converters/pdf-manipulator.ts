@@ -25,7 +25,7 @@ export class PDFManipulator {
     const baseName = this.files[0].name.split('.')[0];
     let { pageData = [] } = options;
 
-    this.updateProgress(10, "Inhaling source binary streams...");
+    this.updateProgress(10, "Loading source document structure...");
     const masterDoc = await PDFDocument.create();
     const font = await masterDoc.embedFont(StandardFonts.Helvetica);
 
@@ -35,7 +35,7 @@ export class PDFManipulator {
       return PDFDocument.load(buf, { ignoreEncryption: true });
     }));
 
-    // If no pageData is provided (e.g. Add Numbers on entire file), generate it
+    // If no pageData is provided (e.g. Add Numbers on entire file), generate it automatically
     if (pageData.length === 0) {
       sourceDocs.forEach((doc, fIdx) => {
         const pageCount = doc.getPageCount();
@@ -45,7 +45,7 @@ export class PDFManipulator {
       });
     }
 
-    this.updateProgress(30, `Executing surgical binary rewrite: ${pageData.length} nodes...`);
+    this.updateProgress(30, `Executing document process: ${pageData.length} segments...`);
     
     for (let i = 0; i < pageData.length; i++) {
       const item = pageData[i];
@@ -55,14 +55,14 @@ export class PDFManipulator {
       const sourceDoc = sourceDocs[item.fileIdx];
       const [copiedPage] = await masterDoc.copyPages(sourceDoc, [item.pageIdx]);
       
-      // Apply rotation if requested
+      // Apply rotation if requested (persisting 90-degree increments)
       if (item.rotation !== 0) {
         copiedPage.setRotation(degrees(item.rotation));
       }
 
       // TOOL SPECIFIC SURGERY
       
-      // 1. Add Page Numbers
+      // 1. Add Page Numbers (Precision Centering)
       if (toolId === 'add-page-numbers') {
         const { width } = copiedPage.getSize();
         const text = `Page ${i + 1} of ${pageData.length}`;
@@ -79,7 +79,7 @@ export class PDFManipulator {
         });
       }
 
-      // 2. Redaction
+      // 2. Redaction (Opacity Masking)
       if (toolId === 'redact-pdf' && options.redactAllButSelected && !options.selectedIndices?.includes(i)) {
         const { width, height } = copiedPage.getSize();
         copiedPage.drawRectangle({
@@ -89,9 +89,9 @@ export class PDFManipulator {
         });
       }
 
-      // 3. E-Sign Stub Appearance
+      // 3. Signature Stub Appearance
       if (toolId === 'sign-pdf' && i === pageData.length - 1) {
-        copiedPage.drawText("Digitally Signed via AJN Hub", {
+        copiedPage.drawText("Verified via AJN Hub", {
           x: 50, y: 50, size: 8, font, color: rgb(0.1, 0.1, 0.5)
         });
       }
@@ -99,9 +99,9 @@ export class PDFManipulator {
       masterDoc.addPage(copiedPage);
     }
 
-    this.updateProgress(95, "Synchronizing binary buffer and finalizing document trailer...");
+    this.updateProgress(95, "Finalizing binary buffer and synchronization...");
     
-    // Save with compression features
+    // Save with incremental features
     const pdfBytes = await masterDoc.save({
       useObjectStreams: true,
       addDefaultPage: false

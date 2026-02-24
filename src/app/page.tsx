@@ -99,9 +99,9 @@ export default function LandingPage() {
                   </p>
                   <span className="w-12 h-px bg-slate-950/10"></span>
                 </div>
-                <div className="px-6 py-2 bg-primary/5 border border-primary/10 rounded-full shadow-sm">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-primary">
-                    Only this site provides professional PDF tools and real-time conversion free
+                <div className="px-6 py-2 bg-primary/5 border border-primary/10 rounded-full shadow-sm max-w-2xl mx-auto">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary leading-relaxed">
+                    Only this site provides professional PDF tools and real-time conversion services entirely free
                   </p>
                 </div>
               </div>
@@ -161,7 +161,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { icon: Zap, title: "Fast Processing", desc: "Optimized local execution for instant document transformations." },
-              { icon: ShieldCheck, title: "Secure Privacy", desc: "Your files are processed entirely in your browser memory." },
+              { icon: ShieldCheck, title: "Secure Privacy", desc: "Your files are processed entirely in your local buffer." },
               { icon: Activity, title: "Advanced Tools", desc: "Integrated tools for accurate text extraction and document editing." }
             ].map((f, i) => (
               <Card key={i} className="bg-white/40 backdrop-blur-xl border-black/5 p-10 rounded-[3rem] space-y-6 hover:border-primary/20 transition-all shadow-2xl group">

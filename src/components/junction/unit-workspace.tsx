@@ -67,7 +67,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [selectedPages, setSelectedPages] = useState<Set<string>>(new Set());
   const [isInitializing, setIsInitializing] = useState(false);
   
-  // Advanced Configuration State
+  // Configuration State
   const [config, setConfig] = useState({
     quality: 90,
     strongCompression: false,
@@ -77,10 +77,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     optimizationLevel: 'balanced'
   });
 
-  // Tools that require surgical page selection
   const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf', 'organize-pdf', 'redact-pdf'].includes(tool?.id || '');
-  // Tools that can run directly but benefit from a preview phase
-  const isHybridTool = ['add-page-numbers', 'rotate-pdf', 'sign-pdf', 'grayscale-pdf'].includes(tool?.id || '');
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
@@ -122,7 +119,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             rotation: 0
           });
 
-          // Default selection behavior
           if (!isSurgicalTool) initialSelected.add(pageId);
         }
       }
@@ -201,27 +197,26 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   {isInitializing ? (
                     <div className="py-32 text-center space-y-6 opacity-40">
                       <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
-                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950">Calibrating Session Buffer...</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950">Preparing Local Buffer...</p>
                     </div>
                   ) : (
                     <div className="flex flex-col xl:flex-row gap-8">
-                      {/* Main Grid Sector */}
                       <div className="flex-1 space-y-6">
                         <div className="bg-white/60 p-6 rounded-3xl border border-black/5 shadow-2xl backdrop-blur-3xl flex flex-col md:flex-row md:items-center justify-between gap-6">
                           <div className="space-y-3">
                             <div className="flex items-center gap-3 text-primary">
                               <Eye className="w-5 h-5" />
-                              <h3 className="text-lg font-black uppercase tracking-tighter">Segment Preview</h3>
+                              <h3 className="text-lg font-black uppercase tracking-tighter text-slate-950">Visual Preview</h3>
                             </div>
                             <div className="flex gap-2">
-                              <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set(pages.map(p => p.id)))} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><ListChecks className="w-3 h-3" /> All</Button>
-                              <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set())} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><Eraser className="w-3 h-3" /> None</Button>
+                              <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set(pages.map(p => p.id)))} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><ListChecks className="w-3 h-3" /> Select All</Button>
+                              <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set())} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><Eraser className="w-3 h-3" /> Deselect</Button>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-3">
                             <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest">
-                              {(isSurgicalTool) ? selectedPages.size : pages.length} Segments
+                              {selectedPages.size} Selected
                             </Badge>
                             <Button onClick={handleConfirmedExecution} className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl hover:scale-105 transition-all">
                               Process Document <ChevronRight className="ml-2 w-4 h-4" />
@@ -238,7 +233,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                   onClick={() => togglePageSelection(page.id)} 
                                   className={cn(
                                     "relative aspect-[1/1.414] rounded-2xl border-4 transition-all cursor-pointer overflow-hidden shadow-lg",
-                                    isSelected ? "border-primary bg-primary/10 scale-[1.03] z-10" : isSurgicalTool ? "border-red-500/20 opacity-60" : "border-black/5"
+                                    isSelected ? "border-primary bg-primary/10 scale-[1.03] z-10" : "border-black/5 opacity-60"
                                   )}
                                 >
                                   <img 
@@ -265,19 +260,18 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                         </div>
                       </div>
 
-                      {/* Advance Config Sidebar */}
                       <aside className="w-full xl:w-80 space-y-6 shrink-0">
                         <Card className="p-6 bg-white/60 border border-black/5 rounded-3xl shadow-xl backdrop-blur-3xl space-y-8">
                           <div className="flex items-center gap-3 text-primary border-b border-black/5 pb-4">
                             <Settings2 className="w-5 h-5" />
-                            <h3 className="text-sm font-black uppercase tracking-widest">Configuration</h3>
+                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-950">Configuration</h3>
                           </div>
 
                           <div className="space-y-6">
                             <div className="space-y-3">
-                              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-950/40">Fidelity Index</Label>
+                              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-950/40">Output Quality</Label>
                               <div className="flex justify-between items-center px-1">
-                                <span className="text-xs font-bold">{config.quality}%</span>
+                                <span className="text-xs font-bold text-slate-950">{config.quality}%</span>
                               </div>
                               <Slider 
                                 value={[config.quality]} 
@@ -288,23 +282,23 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                             </div>
 
                             <div className="space-y-3">
-                              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-950/40">Output Strategy</Label>
+                              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-950/40">Fidelity Level</Label>
                               <Select value={config.optimizationLevel} onValueChange={(v) => setConfig({...config, optimizationLevel: v})}>
-                                <SelectTrigger className="h-10 bg-black/5 border-none rounded-xl font-bold text-xs uppercase">
+                                <SelectTrigger className="h-10 bg-black/5 border-none rounded-xl font-bold text-xs uppercase text-slate-950">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="rounded-xl border-black/5">
-                                  <SelectItem value="balanced">Balanced Output</SelectItem>
-                                  <SelectItem value="performance">Fast Processing</SelectItem>
-                                  <SelectItem value="high">Maximum Quality</SelectItem>
+                                  <SelectItem value="balanced">Balanced</SelectItem>
+                                  <SelectItem value="performance">Fast</SelectItem>
+                                  <SelectItem value="high">High Fidelity</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
 
                             <div className="flex items-center justify-between p-4 bg-black/5 rounded-2xl group transition-all hover:bg-black/10">
                               <div className="space-y-0.5">
-                                <p className="text-[10px] font-black uppercase text-slate-950">Strong Compression</p>
-                                <p className="text-[8px] text-slate-950/40 font-bold uppercase">Reduce File Size</p>
+                                <p className="text-[10px] font-black uppercase text-slate-950">Compress Output</p>
+                                <p className="text-[8px] text-slate-950/40 font-bold uppercase">Smaller File Size</p>
                               </div>
                               <Switch 
                                 checked={config.strongCompression} 
@@ -315,11 +309,11 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                             <div className="pt-4 border-t border-black/5 space-y-4">
                               <div className="flex items-center gap-3 text-emerald-600">
                                 <Lock className="w-3.5 h-3.5" />
-                                <span className="text-[9px] font-black uppercase tracking-widest">Local Session Sync</span>
+                                <span className="text-[9px] font-black uppercase tracking-widest">Secure Local Processing</span>
                               </div>
                               <div className="flex items-center gap-3 text-slate-950/40">
                                 <History className="w-3.5 h-3.5" />
-                                <span className="text-[9px] font-black uppercase tracking-widest">No Permanent Storage</span>
+                                <span className="text-[9px] font-black uppercase tracking-widest">No Server Storage</span>
                               </div>
                             </div>
                           </div>
@@ -338,7 +332,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                         <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
                           <Zap className="w-5 h-5 animate-pulse" />
                         </div>
-                        <h3 className="text-xl font-black uppercase tracking-tighter">Executing Pipeline...</h3>
+                        <h3 className="text-xl font-black uppercase tracking-tighter text-slate-950">Executing Process...</h3>
                       </div>
                       <span className="text-3xl font-black text-primary tracking-tighter">{Math.round(progress.pct)}%</span>
                     </div>
@@ -354,17 +348,17 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     <div className="flex flex-col items-center space-y-6">
                       <div className="w-20 h-20 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center border-2 border-emerald-500/20 shadow-lg"><CheckCircle2 className="w-10 h-10 text-emerald-600" /></div>
                       <div className="space-y-2">
-                        <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] px-4 h-6 rounded-full uppercase tracking-widest mb-2 shadow-sm">SUCCESSFUL</Badge>
-                        <h3 className="text-2xl md:text-3xl font-black tracking-tighter uppercase truncate max-w-md mx-auto">{result.fileName}</h3>
+                        <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] px-4 h-6 rounded-full uppercase tracking-widest mb-2 shadow-sm">Process Successful</Badge>
+                        <h3 className="text-2xl md:text-3xl font-black tracking-tighter uppercase truncate max-w-md mx-auto text-slate-950">{result.fileName}</h3>
                         <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">Ready for Retrieval</p>
                       </div>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       <Button onClick={handleDownload} className="h-16 px-12 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 shadow-2xl transition-all hover:scale-105">
-                        <Download className="w-5 h-5" /> Download Result
+                        <Download className="w-5 h-5" /> Download Now
                       </Button>
-                      <Button variant="outline" onClick={reset} className="h-16 px-10 border-black/10 bg-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 hover:bg-black/5 transition-all">
-                        <RefreshCw className="w-5 h-5" /> New Process
+                      <Button variant="outline" onClick={reset} className="h-16 px-10 border-black/10 bg-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 hover:bg-black/5 transition-all text-slate-950">
+                        <RefreshCw className="w-5 h-5" /> New Session
                       </Button>
                     </div>
                   </Card>
@@ -375,9 +369,9 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                 <motion.div key="error" initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="max-w-2xl mx-auto w-full pt-12">
                   <Card className="p-16 bg-red-50 border-2 border-red-100 rounded-[3rem] text-center space-y-8 shadow-2xl">
                     <div className="w-16 h-16 bg-red-100 rounded-[2rem] flex items-center justify-center mx-auto"><XCircle className="w-8 h-8 text-red-600" /></div>
-                    <h3 className="text-2xl font-black text-red-900 uppercase tracking-tighter leading-tight">{error || "Process interrupted."}</h3>
+                    <h3 className="text-2xl font-black text-red-900 uppercase tracking-tighter leading-tight">{error || "Process Interrupted."}</h3>
                     <div className="flex flex-col gap-3">
-                      <Button onClick={handleConfirmedExecution} variant="outline" className="h-14 rounded-2xl font-black text-xs uppercase tracking-widest border-red-200 bg-white hover:bg-red-50 text-red-900">Retry Execution</Button>
+                      <Button onClick={handleConfirmedExecution} variant="outline" className="h-14 rounded-2xl font-black text-xs uppercase tracking-widest border-red-200 bg-white hover:bg-red-50 text-red-900">Retry Process</Button>
                       <Button onClick={reset} variant="ghost" className="h-10 font-bold uppercase text-[10px] text-red-400">Cancel</Button>
                     </div>
                   </Card>
@@ -387,6 +381,12 @@ export function UnitWorkspace({ initialUnitId }: Props) {
           </motion.div>
         </div>
       </main>
+      
+      <footer className="fixed bottom-0 left-0 right-0 h-12 bg-white/40 backdrop-blur-md border-t border-black/5 flex items-center justify-center z-[100]">
+        <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.5em]">
+          All-in-one Junction Network • 2025 • Made by Indian ❤️
+        </p>
+      </footer>
     </div>
   );
 }
