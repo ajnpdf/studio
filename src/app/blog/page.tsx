@@ -106,7 +106,7 @@ export default function BlogPage() {
 
         <section className="py-20 text-center space-y-4">
           <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.5em]">
-            Made in INDIAN❤️
+            Made in INDIAN<span className="animate-heart-beat ml-1">❤️</span>
           </p>
         </section>
       </main>

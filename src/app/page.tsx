@@ -350,7 +350,7 @@ export default function LandingPage() {
             AJN Core • 2026
           </p>
           <div className="flex items-center gap-2.5 px-5 py-2 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
-            <span className="text-[10px] font-black text-primary uppercase tracking-widest">Made in INDIAN❤️</span>
+            <span className="text-[10px] font-black text-primary uppercase tracking-widest">Made in INDIAN<span className="animate-heart-beat ml-1">❤️</span></span>
           </div>
         </div>
       </footer>
