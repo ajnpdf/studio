@@ -1,4 +1,4 @@
-'use server';
+'use client';
 
 import * as pdfjsLib from 'pdfjs-dist';
 import JSZip from 'jszip';

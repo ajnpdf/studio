@@ -1,4 +1,4 @@
-'use server';
+'use client';
 
 import Tesseract from 'tesseract.js';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
@@ -26,9 +26,6 @@ export class SpecializedConverter {
     this.onProgress?.(percent, message);
   }
 
-  /**
-   * FIX 1: Non-blocking fallback for translation node.
-   */
   async translateText(text: string, source: string, target: string): Promise<string> {
     if (!text.trim() || text.length < 2) return text;
     try {
@@ -59,9 +56,6 @@ export class SpecializedConverter {
     throw new Error(`Specialized tool ${target} not supported.`);
   }
 
-  /**
-   * FIX 2 & 3: Hardened Translation Run logic with per-page resilience and safe save fallback.
-   */
   private async runHardenedTranslation(baseName: string, options: any): Promise<ConversionResult> {
     const { sourceLang = 'auto', targetLang = 'es' } = options;
     this.updateProgress(5, "Calibrating Neural Translation Cluster...");
@@ -133,7 +127,6 @@ export class SpecializedConverter {
     try {
       bytes = await doc.save();
     } catch {
-      // Safe fallback save
       bytes = await doc.save({ useObjectStreams: false, objectsPerTick: 5 });
     }
 
