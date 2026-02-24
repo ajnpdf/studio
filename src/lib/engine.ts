@@ -3,7 +3,7 @@
 /**
  * AJN Master Engineering Orchestrator
  * High-fidelity logic routing for specialized binary service units.
- * Error-safe execution handler.
+ * Hardened for Client-Side execution only.
  */
 
 class AJNPDFEngine {
@@ -103,7 +103,7 @@ class AJNPDFEngine {
         
         if (toolId === 'rotate-pdf') result = await manipulator.rotate();
         else if (toolId === 'add-page-numbers') result = await manipulator.addPageNumbers();
-        else if (toolId === 'sign-pdf') result = await manipulator.sign(options.signatureBuf);
+        else if (toolId === 'sign-pdf') result = await manipulator.sign(options);
         else result = await manipulator.merge();
       }
 
@@ -111,6 +111,7 @@ class AJNPDFEngine {
       return { success: true, fileName: result.fileName, byteLength: result.blob.size, blob: result.blob };
     } catch (err: any) {
       console.error("[AJN Core] Execution Error:", err);
+      // Fallback for undefined error objects
       const msg = err?.message || "Synthesis failure during binary processing.";
       throw new Error(msg);
     }

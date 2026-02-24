@@ -19,7 +19,7 @@ export type ProgressCallback = (percent: number, message: string) => void;
 
 /**
  * AJN Neural PDF Conversion Engine
- * Hardened for Vertical Stitching (Single JPG Output) and Client-Side Execution.
+ * Hardened for Client-Side execution only.
  */
 export class PDFConverter {
   private file: File;

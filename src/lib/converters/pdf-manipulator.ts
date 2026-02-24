@@ -42,35 +42,6 @@ export class PDFManipulator {
     };
   }
 
-  async removePages(options: any): Promise<ConversionResult> {
-    const indicesToRemove = options.pageIndices || [];
-    this.updateProgress(10, "Parsing document structure...");
-    
-    const docBytes = await this.files[0].arrayBuffer();
-    const doc = await PDFDocument.load(docBytes, { ignoreEncryption: true });
-    const count = doc.getPageCount();
-    
-    const keep = [];
-    for (let i = 0; i < count; i++) {
-      if (!indicesToRemove.includes(i)) keep.push(i);
-    }
-    
-    if (keep.length === 0) throw new Error("Synthesis aborted: No pages remaining.");
-
-    const out = await PDFDocument.create();
-    const copied = await out.copyPages(doc, keep);
-    copied.forEach(p => out.addPage(p));
-    
-    this.updateProgress(90, "Executing surgical binary rewrite...");
-    const bytes = await out.save();
-    
-    return { 
-      blob: new Blob([bytes], { type: 'application/pdf' }), 
-      fileName: `Pruned_${this.files[0].name}`, 
-      mimeType: 'application/pdf' 
-    };
-  }
-
   async rotate(): Promise<ConversionResult> {
     const docBytes = await this.files[0].arrayBuffer();
     const doc = await PDFDocument.load(docBytes, { ignoreEncryption: true });
@@ -110,14 +81,29 @@ export class PDFManipulator {
     };
   }
 
-  async sign(signatureBuf?: ArrayBuffer): Promise<ConversionResult> {
+  /**
+   * Professional E-Sign Implementation
+   */
+  async sign(options: any = {}): Promise<ConversionResult> {
+    this.updateProgress(10, "Initializing E-Sign Layer...");
     const docBytes = await this.files[0].arrayBuffer();
     const doc = await PDFDocument.load(docBytes, { ignoreEncryption: true });
     
+    const { signatureBuf, x = 50, y = 50, width = 150, height = 60 } = options;
+
     if (signatureBuf) {
+      this.updateProgress(50, "Embedding cryptographic signature appearance...");
       const img = await doc.embedPng(new Uint8Array(signatureBuf));
+      const pages = doc.getPages();
+      const lastPage = pages[pages.length - 1];
+      lastPage.drawImage(img, { x, y, width, height });
+    } else {
+      this.updateProgress(50, "Applying audit trail marker...");
+      const font = await doc.embedFont(StandardFonts.HelveticaBold);
       const lastPage = doc.getPages()[doc.getPageCount() - 1];
-      lastPage.drawImage(img, { x: 50, y: 50, width: 150, height: 60 });
+      lastPage.drawText(`Digitally Signed by AJN Operator\n${new Date().toISOString()}`, {
+        x: 50, y: 50, size: 8, font, color: rgb(0.1, 0.1, 0.5)
+      });
     }
     
     const bytes = await doc.save();

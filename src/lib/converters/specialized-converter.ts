@@ -1,6 +1,7 @@
 'use client';
 
 import * as pdfjsLib from 'pdfjs-dist';
+import { createWorker } from 'tesseract.js';
 import { ConversionResult, ProgressCallback } from './pdf-converter';
 
 if (typeof window !== 'undefined') {
@@ -9,7 +10,7 @@ if (typeof window !== 'undefined') {
 
 /**
  * AJN Specialized Services Core - Master Vision & Intelligence Layer
- * Hardened with Fault-Tolerant Translation and Safe-Save Protocols.
+ * Hardened with local OCR and Fault-Tolerant Translation.
  */
 export class SpecializedConverter {
   private file: File;
@@ -24,23 +25,6 @@ export class SpecializedConverter {
     this.onProgress?.(percent, message);
   }
 
-  async translateText(text: string, source: string, target: string): Promise<string> {
-    try {
-      const resp = await fetch('https://libretranslate.com/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ q: text, source, target, format: 'text' }),
-        // @ts-ignore
-        signal: AbortSignal.timeout(8000),
-      });
-      if (!resp.ok) throw new Error(`API ${resp.status}`);
-      const data = await resp.json();
-      return data.translatedText || text;
-    } catch {
-      return text; // Original text fallback on failure
-    }
-  }
-
   async convertTo(targetFormat: string, settings: any = {}): Promise<ConversionResult> {
     const target = targetFormat.toUpperCase();
     const baseName = this.file.name.split('.')[0];
@@ -53,31 +37,98 @@ export class SpecializedConverter {
     throw new Error(`Specialized tool ${target} not supported.`);
   }
 
+  /**
+   * Hardened Local OCR Implementation (Tesseract.js WASM)
+   */
+  private async toSearchablePdf(baseName: string): Promise<ConversionResult> {
+    this.updateProgress(10, "Initializing Neural Vision Cluster (WASM)...");
+    
+    const worker = await createWorker('eng', 1, {
+      logger: m => {
+        if (m.status === 'recognizing text') {
+          this.updateProgress(20 + Math.round(m.progress * 70), `Recognizing: ${Math.round(m.progress * 100)}%`);
+        }
+      }
+    });
+
+    const buf = await this.file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
+    const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib');
+    const outPdf = await PDFDocument.create();
+    const font = await outPdf.embedFont(StandardFonts.Helvetica);
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      this.updateProgress(20, `Capturing Vision: Page ${i}/${pdf.numPages}`);
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale: 2 });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width; canvas.height = viewport.height;
+      await page.render({ canvasContext: canvas.getContext('2d')!, viewport }).promise;
+      
+      const { data: { text, blocks } } = await worker.recognize(canvas);
+      
+      const outPage = outPdf.addPage([viewport.width / 2, viewport.height / 2]);
+      const img = await outPdf.embedJpg(canvas.toDataURL('image/jpeg', 0.8));
+      outPage.drawImage(img, { x: 0, y: 0, width: outPage.getWidth(), height: outPage.getHeight() });
+
+      // Overlay invisible text layer for searchability
+      blocks?.forEach(block => {
+        block.paragraphs.forEach(para => {
+          para.lines.forEach(line => {
+            try {
+              outPage.drawText(line.text, {
+                x: line.bbox.x0 / 2,
+                y: outPage.getHeight() - (line.bbox.y1 / 2),
+                size: (line.bbox.y1 - line.bbox.y0) / 2.5,
+                font,
+                color: rgb(0, 0, 0),
+                opacity: 0 // Invisible layer
+              });
+            } catch {}
+          });
+        });
+      });
+    }
+
+    await worker.terminate();
+    this.updateProgress(95, "Finalizing binary buffer...");
+    const bytes = await outPdf.save();
+
+    return {
+      blob: new Blob([bytes], { type: 'application/pdf' }),
+      fileName: `${baseName}_OCR.pdf`,
+      mimeType: 'application/pdf'
+    };
+  }
+
+  /**
+   * Hardened Neural Translation Patch (Requested 3-Fix Logic)
+   */
   private async runHardenedTranslation(baseName: string, options: any): Promise<ConversionResult> {
-    const { sourceLang = 'auto', targetLang = 'es' } = options;
+    const { targetLang = 'es' } = options;
     const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib');
     
     this.updateProgress(5, "Calibrating Neural Translation Cluster...");
 
     const buf = await this.file.arrayBuffer();
-    let doc, pdfDocJs;
+    let doc, pdfJs;
 
     try {
-      pdfDocJs = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
       doc = await PDFDocument.load(buf, { ignoreEncryption: true });
+      pdfJs = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
     } catch (err: any) {
       throw new Error(`Cannot open PDF: ${err.message}`);
     }
 
     const font = await doc.embedFont(StandardFonts.Helvetica);
-    const numPages = pdfDocJs.numPages;
+    const numPages = pdfJs.numPages;
 
     for (let i = 0; i < numPages; i++) {
       try {
         const progBase = 10 + Math.round((i / numPages) * 80);
         this.updateProgress(progBase, `Translating Page ${i + 1}/${numPages}...`);
 
-        const page = await pdfDocJs.getPage(i + 1);
+        const page = await pdfJs.getPage(i + 1);
         const tc = await page.getTextContent();
         const vp = page.getViewport({ scale: 1 });
         const pdfPage = doc.getPage(i);
@@ -86,17 +137,31 @@ export class SpecializedConverter {
         for (const item of (tc.items as any[])) {
           if (!item.str?.trim() || item.str.length < 3) continue;
 
-          const translated = await this.translateText(item.str, sourceLang, targetLang);
+          // Hardened non-blocking fetch with 5s timeout
+          let translated = item.str;
+          try {
+            const resp = await fetch('https://libretranslate.com/translate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ q: item.str, source: 'auto', target: targetLang, format: 'text' }),
+              // @ts-ignore
+              signal: AbortSignal.timeout(5000),
+            });
+            if (resp.ok) {
+              const data = await resp.json();
+              translated = data.translatedText || item.str;
+            }
+          } catch { /* Fallback to original text */ }
+
           if (translated === item.str) continue;
 
           const x = (item.transform[4] / vp.width) * pw;
           const y = ph - ((item.transform[5] + (Math.abs(item.transform[0]) || 10)) / vp.height) * ph;
           const sz = Math.max(6, Math.min(14, (Math.abs(item.transform[0]) / vp.width) * pw * 0.9));
 
-          // White out original
+          // Mask original
           pdfPage.drawRectangle({
-            x: x - 1,
-            y: y - 2,
+            x: x - 1, y: y - 2,
             width: (item.width / vp.width) * pw + 4,
             height: sz + 4,
             color: rgb(1, 1, 1),
@@ -106,18 +171,14 @@ export class SpecializedConverter {
           // Draw translation
           try {
             pdfPage.drawText(translated, {
-              x,
-              y: y + 2,
-              size: sz,
-              font,
-              color: rgb(0, 0, 0),
+              x, y: y + 2, size: sz, font, color: rgb(0, 0, 0),
               maxWidth: (item.width / vp.width) * pw + 20
             });
-          } catch { /* skip failed draw */ }
+          } catch {}
         }
       } catch (err: any) {
         console.warn(`Page ${i + 1} skipped: ${err.message}`);
-        continue;
+        continue; // Resilience: Don't kill the job
       }
     }
 
@@ -128,26 +189,12 @@ export class SpecializedConverter {
     try {
       bytes = await doc.save();
     } catch {
-      bytes = await doc.save({
-        useObjectStreams: false,
-        addDefaultPage: false,
-        objectsPerTick: 5,
-      });
+      bytes = await doc.save({ useObjectStreams: false, objectsPerTick: 5 });
     }
 
     return {
       blob: new Blob([bytes], { type: 'application/pdf' }),
       fileName: `${baseName}_Translated_${targetLang}.pdf`,
-      mimeType: 'application/pdf'
-    };
-  }
-
-  private async toSearchablePdf(baseName: string): Promise<ConversionResult> {
-    this.updateProgress(10, "Initializing Neural OCR...");
-    await new Promise(r => setTimeout(r, 2000));
-    return {
-      blob: new Blob([await this.file.arrayBuffer()], { type: 'application/pdf' }),
-      fileName: `${baseName}_OCR.pdf`,
       mimeType: 'application/pdf'
     };
   }

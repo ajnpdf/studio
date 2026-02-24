@@ -37,8 +37,7 @@ interface Props {
 
 /**
  * AJN Engineering Workspace - Universal Real-Time Visionary
- * Implements high-fidelity page inspection for all tools.
- * Standardized on Arial typography.
+ * Optimized for professional full-width engineering.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const unit = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -51,7 +50,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Tools that require manual selection (start empty)
   const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf'].includes(unit?.id || '');
 
   const getAcceptedExtensions = () => {
@@ -71,12 +69,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
-    
-    // Always attempt visionary load for PDF inputs
     if (files.some(f => f.type === 'application/pdf')) {
       await loadAllPdfPages(files);
     } else {
-      run(files, { quality: 90, targetFormat: unit?.id.split('-').pop()?.toUpperCase() || 'PDF' });
+      run(files, { quality: 90 });
     }
   };
 
@@ -109,10 +105,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             pageIdx: pIdx - 1
           });
 
-          // Transformation tools: Select all by default for review
-          if (!isSurgicalTool) {
-            initialSelected.add(pageId);
-          }
+          if (!isSurgicalTool) initialSelected.add(pageId);
         }
       }
       setPages(allLoadedPages);
@@ -131,18 +124,8 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleConfirmedExecution = () => {
-    if (selectedPages.size === 0 && isSurgicalTool) {
-      toast({ title: "Selection Required", description: "Please select at least one page to process." });
-      return;
-    }
-
     const indices = Array.from(selectedPages).map(id => parseInt(id.split('-')[1]) - 1);
-    
-    run(sourceFiles, { 
-      pageIndices: indices,
-      quality: 90,
-      targetFormat: unit?.id.split('-').pop()?.toUpperCase() || 'PDF'
-    });
+    run(sourceFiles, { pageIndices: indices, targetLang: 'es' });
   };
 
   const handleDownload = () => {
@@ -161,7 +144,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     <div className="flex h-full bg-transparent overflow-hidden relative text-slate-950 font-sans">
       <main className="flex-1 flex flex-col min-w-0 relative h-full">
         <div className="flex-1 overflow-y-auto scrollbar-hide">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 md:p-12 space-y-10 max-w-6xl mx-auto pb-32">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 md:p-12 space-y-10 max-w-7xl mx-auto pb-32">
             
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4">
               <div className="flex items-center gap-6">
@@ -174,13 +157,13 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[8px] font-black h-5 uppercase tracking-widest">{unit?.mode || 'WASM'}</Badge>
                   </div>
                   <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.4em] flex items-center gap-2">
-                    <Activity className="w-3 h-3 text-emerald-600" /> Neural Registry Instance • Active Sector
+                    <Activity className="w-3 h-3 text-emerald-600" /> Neural Registry Instance • Active Hub
                   </p>
                 </div>
               </div>
               <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/40 border border-black/5 rounded-2xl shadow-sm">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span className="text-[10px] font-black text-slate-950/60 uppercase tracking-widest">Buffer Secured</span>
+                <span className="text-[10px] font-black text-slate-950/60 uppercase tracking-widest">WASM Pipeline Secured</span>
               </div>
             </header>
 
@@ -201,18 +184,16 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                           <h3 className="text-xl font-black uppercase tracking-tighter">Visionary Review Layer</h3>
                         </div>
                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                          {isSurgicalTool 
-                            ? 'Select specific pages for surgical processing' 
-                            : 'Reviewing document visionary contents before execution'}
+                          {isSurgicalTool ? 'Select target segments' : 'Review visionary contents before execution'}
                         </p>
                       </div>
                       <div className="flex items-center gap-4">
                         <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest">
-                          {selectedPages.size} Target Segments
+                          {selectedPages.size} Targets
                         </Badge>
                         <Button 
                           onClick={handleConfirmedExecution} 
-                          className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl gap-2 hover:scale-105 active:scale-95 transition-all"
+                          className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl gap-2 hover:scale-105 transition-all"
                         >
                           Execute Mastery <ChevronRight className="w-4 h-4" />
                         </Button>
@@ -226,34 +207,20 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                           onClick={() => togglePageSelection(page.id)} 
                           className={cn(
                             "relative aspect-[1/1.414] rounded-2xl border-4 transition-all cursor-pointer overflow-hidden shadow-lg group", 
-                            selectedPages.has(page.id) 
-                              ? (unit?.id === 'delete-pages' ? "border-red-500 bg-red-50" : "border-primary bg-primary/10") 
-                              : "border-black/5 hover:border-primary/40 bg-white"
+                            selectedPages.has(page.id) ? "border-primary bg-primary/10" : "border-black/5 hover:border-primary/40 bg-white"
                           )}
                         >
-                          <img 
-                            src={page.url} 
-                            alt={`Page ${page.pageIdx + 1}`}
-                            className={cn(
-                              "w-full h-full object-cover transition-all duration-500", 
-                              selectedPages.has(page.id) && (unit?.id === 'delete-pages' ? "opacity-40 grayscale blur-[2px]" : "opacity-80 scale-95")
-                            )} 
-                          />
+                          <img src={page.url} alt={`Page ${page.pageIdx + 1}`} className={cn("w-full h-full object-cover transition-all", selectedPages.has(page.id) && "opacity-80 scale-95")} />
                           <div className="absolute top-3 left-3 bg-black/60 text-white text-[9px] font-black px-2 py-1 rounded-lg backdrop-blur-md uppercase">
-                            {sourceFiles.length > 1 ? `File ${page.fileIdx + 1} • P${page.pageIdx + 1}` : `Page ${page.pageIdx + 1}`}
+                            {sourceFiles.length > 1 ? `F${page.fileIdx + 1} • P${page.pageIdx + 1}` : `P${page.pageIdx + 1}`}
                           </div>
-                          
                           {selectedPages.has(page.id) && (
                             <div className="absolute inset-0 flex items-center justify-center animate-in zoom-in-50 duration-300">
-                              <div className={cn(
-                                "w-12 h-12 rounded-full flex items-center justify-center shadow-2xl",
-                                unit?.id === 'delete-pages' ? "bg-red-500" : "bg-primary"
-                              )}>
-                                {unit?.id === 'delete-pages' ? <Trash2 className="w-6 h-6 text-white" /> : <CheckCircle2 className="w-6 h-6 text-white" />}
+                              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-2xl">
+                                <CheckCircle2 className="w-6 h-6 text-white" />
                               </div>
                             </div>
                           )}
-                          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                       ))}
                     </div>
@@ -266,7 +233,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           <Layers className="w-6 h-6 text-primary animate-bounce" />
-                          <h3 className="text-xl font-black uppercase tracking-tighter text-slate-950">Executing Binary Synthesis</h3>
+                          <h3 className="text-xl font-black uppercase tracking-tighter">Executing Binary Synthesis</h3>
                         </div>
                         <span className="text-3xl font-black text-primary tracking-tighter">{Math.round(progress.pct)}%</span>
                       </div>
@@ -284,7 +251,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                         <div className="space-y-2">
                           <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] px-4 h-6 rounded-full uppercase tracking-widest mb-2">Synthesis Success</Badge>
                           <h3 className="text-3xl font-black tracking-tighter uppercase">{result.fileName}</h3>
-                          <p className="text-xs font-bold text-slate-950/40 uppercase tracking-[0.3em]">{(result.byteLength / 1024).toFixed(1)} KB Mastered Buffer</p>
+                          <p className="text-xs font-bold text-slate-950/40 uppercase tracking-[0.3em]">{(result.byteLength / 1024).toFixed(1)} KB Mastered Output</p>
                         </div>
                       </div>
                       <div className="flex gap-4 justify-center">
@@ -304,7 +271,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     <Card className="p-12 bg-red-50 border-2 border-red-100 rounded-[4rem] text-center space-y-8 shadow-2xl">
                       <div className="w-20 h-20 bg-red-100 rounded-[2rem] flex items-center justify-center mx-auto"><XCircle className="w-10 h-10 text-red-600" /></div>
                       <h3 className="text-3xl font-black text-red-900 uppercase tracking-tighter">{error || "Synthesis failure"}</h3>
-                      <Button onClick={reset} variant="destructive" className="h-14 px-12 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl">Restart Session</Button>
+                      <Button onClick={reset} variant="destructive" className="h-14 px-12 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl">Restart Hub</Button>
                     </Card>
                   </motion.div>
                 )}
