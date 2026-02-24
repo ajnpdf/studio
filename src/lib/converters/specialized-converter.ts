@@ -9,8 +9,8 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * AJN Specialized Services Core - Master Intelligence & Optimization
- * Hardened with real Neural OCR, Compression levels, and Fault-Tolerant Translation.
+ * Specialized Services Core - Professional Intelligence & Optimization
+ * Hardened with real OCR, Compression levels, and Fault-Tolerant Translation.
  */
 export class SpecializedConverter {
   private file: File;
@@ -35,11 +35,11 @@ export class SpecializedConverter {
     if (target === 'REPAIR') return this.repairPdf(baseName);
     if (target === 'SUMMARIZE') return this.summarizePdf(baseName);
     
-    throw new Error(`Specialized registry node ${target} not yet calibrated.`);
+    throw new Error(`Specialized tool ${target} not yet calibrated.`);
   }
 
   private async toSearchablePdf(baseName: string): Promise<ConversionResult> {
-    this.updateProgress(10, "Initializing Neural Vision Cluster (WASM)...");
+    this.updateProgress(10, "Initializing Vision Cluster...");
     const worker = await createWorker('eng', 1);
 
     const buf = await this.file.arrayBuffer();
@@ -49,7 +49,7 @@ export class SpecializedConverter {
     const font = await outPdf.embedFont(StandardFonts.Helvetica);
 
     for (let i = 1; i <= pdf.numPages; i++) {
-      this.updateProgress(20 + Math.round((i / pdf.numPages) * 70), `Recognizing Glyphs: Page ${i}/${pdf.numPages}`);
+      this.updateProgress(20 + Math.round((i / pdf.numPages) * 70), `Recognizing Text: Page ${i}/${pdf.numPages}`);
       const page = await pdf.getPage(i);
       const viewport = page.getViewport({ scale: 2 });
       const canvas = document.createElement('canvas');
@@ -65,13 +65,12 @@ export class SpecializedConverter {
         block.paragraphs.forEach(para => {
           para.lines.forEach(line => {
             try {
-              // Map hidden text to original coordinates
               outPage.drawText(line.text, {
                 x: line.bbox.x0 / 2,
                 y: outPage.getHeight() - (line.bbox.y1 / 2),
                 size: Math.max(4, (line.bbox.y1 - line.bbox.y0) / 2.5),
                 font,
-                opacity: 0 // Keep text layer invisible but searchable
+                opacity: 0 
               });
             } catch {}
           });
@@ -85,14 +84,14 @@ export class SpecializedConverter {
   }
 
   private async compressPdf(baseName: string, settings: any): Promise<ConversionResult> {
-    const isStrong = settings.compressionLevel === 'strong';
-    this.updateProgress(20, `Executing ${isStrong ? 'Strong' : 'Basic'} neural compression...`);
+    const isStrong = settings.strongCompression === true;
+    this.updateProgress(20, `Executing ${isStrong ? 'High' : 'Standard'} compression...`);
     
     const { PDFDocument } = await import('pdf-lib');
     const buf = await this.file.arrayBuffer();
     const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
     
-    // Binary optimization sequence: Object streams & Deflate
+    // Binary optimization sequence
     const bytes = await doc.save({
       useObjectStreams: true,
       addDefaultPage: false,
@@ -109,7 +108,7 @@ export class SpecializedConverter {
   private async runHardenedTranslation(baseName: string, options: any): Promise<ConversionResult> {
     const targetLang = options?.targetLang || 'es';
     const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib');
-    this.updateProgress(5, "Calibrating Neural Translation Cluster...");
+    this.updateProgress(5, "Calibrating Translation Cluster...");
 
     const buf = await this.file.arrayBuffer();
     let doc: any, pdfJs: any;
@@ -131,7 +130,6 @@ export class SpecializedConverter {
         const pdfPage = doc.getPage(i);
         const { width: pw, height: ph } = pdfPage.getSize();
 
-        // 3-FIX PATCH: Robust fallback for complex layouts
         for (const item of (tc.items as any[])) {
           if (!item.str?.trim() || item.str.length < 3) continue;
           
@@ -139,20 +137,18 @@ export class SpecializedConverter {
           const y = ph - ((item.transform[5] + (Math.abs(item.transform[0]) || 10)) / vp.height) * ph;
           const sz = Math.max(6, Math.min(14, (Math.abs(item.transform[0]) / vp.width) * pw * 0.9));
 
-          // Draw mask and replace text
           pdfPage.drawRectangle({ x: x - 1, y: y - 2, width: (item.width / vp.width) * pw + 4, height: sz + 4, color: rgb(1, 1, 1) });
           pdfPage.drawText(item.str, { x, y: y + 2, size: sz, font, color: rgb(0, 0, 0) });
         }
       } catch { continue; }
     }
 
-    // SAFE SAVE PROTOCOL
     const bytes = await doc.save({ useObjectStreams: false });
     return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `${baseName}_Translated.pdf`, mimeType: 'application/pdf' };
   }
 
   private async repairPdf(baseName: string): Promise<ConversionResult> {
-    this.updateProgress(20, "Reconstructing corrupted document trailers...");
+    this.updateProgress(20, "Reconstructing document structure...");
     const { PDFDocument } = await import('pdf-lib');
     const buf = await this.file.arrayBuffer();
     const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
@@ -161,13 +157,13 @@ export class SpecializedConverter {
   }
 
   private async summarizePdf(baseName: string): Promise<ConversionResult> {
-    this.updateProgress(30, "Extracting semantic semantic entities...");
+    this.updateProgress(30, "Extracting document content...");
     const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib');
     const outDoc = await PDFDocument.create();
     const page = outDoc.addPage();
     const font = await outDoc.embedFont(StandardFonts.HelveticaBold);
-    page.drawText(`AI SUMMARY REPORT: ${baseName}`, { x: 50, y: 750, size: 18, font, color: rgb(0, 0, 0.5) });
-    page.drawText("Summary generated via AJN Neural Engine.", { x: 50, y: 720, size: 12, font: await outDoc.embedFont(StandardFonts.Helvetica) });
+    page.drawText(`SUMMARY REPORT: ${baseName}`, { x: 50, y: 750, size: 18, font, color: rgb(0, 0, 0.5) });
+    page.drawText("Summary generated via professional processing.", { x: 50, y: 720, size: 12, font: await outDoc.embedFont(StandardFonts.Helvetica) });
     const bytes = await outDoc.save();
     return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `${baseName}_Summary.pdf`, mimeType: 'application/pdf' };
   }

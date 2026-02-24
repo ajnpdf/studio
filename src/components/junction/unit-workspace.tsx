@@ -116,7 +116,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             rotation: 0
           });
 
-          // Selection logic: Merge, Reorder, and Delete tools select all by default
           if (!isSurgicalTool || tool?.id === 'merge-pdf' || tool?.id === 'delete-pages' || tool?.id === 'organize-pdf' || tool?.id === 'extract-pages') {
             initialSelected.add(pageId);
           }
