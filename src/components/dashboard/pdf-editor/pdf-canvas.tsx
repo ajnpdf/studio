@@ -3,7 +3,7 @@
 import { PDFPage, PDFElement, PDFTool } from './types';
 import { cn } from '@/lib/utils';
 import { useState, useRef, useEffect } from 'react';
-import { PenTool, Type, Image as ImageIcon, CheckCircle2, Link as LinkIcon, Trash2, Move, MousePointer2, Crosshair } from 'lucide-react';
+import { PenTool, Type, Image as ImageIcon, CheckCircle2, Link as LinkIcon, Trash2, Move, MousePointer2, Crosshair, Plus } from 'lucide-react';
 
 interface Props {
   page: PDFPage;
@@ -19,9 +19,11 @@ interface Props {
 /**
  * AJN High-Fidelity PDF Canvas
  * Professional interaction engine for document manipulation.
+ * Supports real-time text, image, and signature injection.
  */
 export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectElement, onUpdateElement, onAddElement, onRequestSignature }: Props) {
   const canvasRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isDrawingBox, setIsDrawingBox] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -38,7 +40,7 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
     const x = (e.clientX - rect.left) / scale;
     const y = (e.clientY - rect.top) / scale;
 
-    if (activeTool === 'signature') {
+    if (activeTool === 'signature' || activeTool === 'insert-image') {
       setIsDrawingBox(true);
       setDragStart({ x: e.clientX, y: e.clientY });
       setBoxPreview({ x, y, w: 0, h: 0 });
@@ -126,11 +128,42 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
       const h = Math.abs(boxPreview.h);
       
       if (w > 10 && h > 10) {
-        onRequestSignature(x, y, w, h);
+        if (activeTool === 'signature') {
+          onRequestSignature(x, y, w, h);
+        } else if (activeTool === 'insert-image') {
+          setPendingImageArea({ x, y, w, h });
+          fileInputRef.current?.click();
+        }
       }
       setBoxPreview(null);
     }
     setIsDragging(false);
+  };
+
+  const [pendingImageArea, setPendingImageArea] = useState<{x: number, y: number, w: number, h: number} | null>(null);
+
+  const handleImageFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && pendingImageArea) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (ev.target?.result) {
+          onAddElement({
+            id: Math.random().toString(36).substr(2, 9),
+            type: 'image',
+            x: pendingImageArea.x,
+            y: pendingImageArea.y,
+            width: pendingImageArea.w,
+            height: pendingImageArea.h,
+            content: ev.target.result as string,
+            opacity: 1,
+            zIndex: page.elements.length,
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+    setPendingImageArea(null);
   };
 
   return (
@@ -142,7 +175,7 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
       onMouseLeave={handleMouseUp}
       className={cn(
         "bg-white rounded-sm shadow-[0_0_100px_rgba(0,0,0,0.5)] relative transition-all duration-300 origin-center mb-24",
-        activeTool === 'signature' ? 'cursor-crosshair' : 'cursor-default'
+        (activeTool === 'signature' || activeTool === 'insert-image') ? 'cursor-crosshair' : 'cursor-default'
       )}
       style={{ 
         width: pageWidth * scale, 
@@ -150,6 +183,8 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
         transform: `rotate(${page.rotation}deg)`
       }}
     >
+      <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageFileSelect} />
+
       {/* PDF STATIC CONTENT EMULATION */}
       <div className="absolute inset-0 p-16 flex flex-col gap-8 pointer-events-none select-none overflow-hidden opacity-20">
         <div className="flex items-center justify-between border-b-2 border-slate-200 pb-8">
@@ -174,7 +209,10 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
             height: Math.abs(boxPreview.h)
           }}
         >
-          <Crosshair className="w-4 h-4 text-primary animate-pulse" />
+          <div className="flex flex-col items-center gap-2">
+            <Crosshair className="w-4 h-4 text-primary animate-pulse" />
+            <span className="text-[8px] font-black uppercase text-primary bg-white/80 px-1 rounded">Define Area</span>
+          </div>
         </div>
       )}
 
@@ -204,6 +242,9 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
             {el.type === 'text' && (
               <div 
                 className="w-full h-full flex items-center p-2 outline-none font-medium whitespace-pre-wrap leading-tight"
+                contentEditable={selectedElementId === el.id}
+                onBlur={(e) => onUpdateElement({ ...el, content: e.currentTarget.innerText })}
+                suppressContentEditableWarning
                 style={{ 
                   fontSize: el.fontSize, 
                   fontFamily: el.fontFamily, 
@@ -218,6 +259,10 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
 
             {el.type === 'shape' && (
               <div className="w-full h-full" style={{ backgroundColor: el.color }} />
+            )}
+
+            {el.type === 'image' && el.content && (
+              <img src={el.content} className="w-full h-full object-cover pointer-events-none" alt="" />
             )}
 
             {el.type === 'signature' && el.signatureData && (

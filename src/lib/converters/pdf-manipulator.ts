@@ -6,7 +6,7 @@ import { ConversionResult, ProgressCallback } from './pdf-converter';
 /**
  * AJN Master Manipulation Engine
  * Precision binary synchronization for document surgery.
- * Hardened for E-Sign injection and real-time execution.
+ * Hardened for E-Sign injection, Image layering, and real-time execution.
  */
 export class PDFManipulator {
   private files: File[];
@@ -79,23 +79,30 @@ export class PDFManipulator {
         this.updateProgress(prog, `Recalibrating color matrix: Segment ${i + 1}`);
       }
 
-      // HIGH-FIDELITY SIGNATURE INJECTION
-      // Checks for signatures mapped to this page index
-      if (options.signatures?.[i]) {
-        for (const sig of options.signatures[i]) {
+      // HIGH-FIDELITY LAYER INJECTION (SIGNATURES, IMAGES, TEXT)
+      if (options.document?.pages?.[i]) {
+        const elements = options.document.pages[i].elements;
+        for (const el of elements) {
           try {
-            // Handle Data URIs (PNG/JPG)
-            const sigBytes = await fetch(sig.data).then(res => res.arrayBuffer());
-            const sigImage = await masterDoc.embedPng(sigBytes);
-            
-            copiedPage.drawImage(sigImage, {
-              x: sig.x,
-              y: sig.y,
-              width: sig.width,
-              height: sig.height,
-            });
+            if (el.type === 'signature' && el.signatureData) {
+              const sigBytes = await fetch(el.signatureData).then(res => res.arrayBuffer());
+              const sigImage = await masterDoc.embedPng(sigBytes);
+              copiedPage.drawImage(sigImage, {
+                x: el.x, y: el.y, width: el.width, height: el.height
+              });
+            } else if (el.type === 'image' && el.content) {
+              const imgBytes = await fetch(el.content).then(res => res.arrayBuffer());
+              const img = el.content.includes('png') ? await masterDoc.embedPng(imgBytes) : await masterDoc.embedJpg(imgBytes);
+              copiedPage.drawImage(img, {
+                x: el.x, y: el.y, width: el.width, height: el.height
+              });
+            } else if (el.type === 'text' && el.content) {
+              copiedPage.drawText(el.content, {
+                x: el.x, y: el.y, size: el.fontSize || 12, font, color: rgb(0, 0, 0)
+              });
+            }
           } catch (err) {
-            console.error("[Surgical Engine] Signature injection failed:", err);
+            console.error("[Surgical Engine] Element injection failed:", err);
           }
         }
       }

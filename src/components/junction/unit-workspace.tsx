@@ -162,7 +162,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
               {phase === 'idle' && (
                 <motion.div key="idle" className="space-y-6">
                   <div className="bg-primary/5 border border-primary/10 p-4 rounded-2xl text-center">
-                    <p className="text-[10px] font-black uppercase text-primary tracking-widest">
+                    <p className="text-[10px] font-black uppercase text-primary tracking-widest leading-relaxed">
                       Use for student purpose and business purpose • useful to students and business and more
                     </p>
                   </div>
@@ -230,7 +230,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                     <p className="text-xs font-black uppercase">Strong Optimization</p>
                                     <Switch checked={config.strongCompression} onCheckedChange={(v) => setConfig({...config, strongCompression: v})} />
                                   </div>
-                                  <p className="text-[9px] text-slate-950/40 font-bold uppercase">Best for student and business purposes alike.</p>
+                                  <p className="text-[9px] text-slate-950/40 font-bold uppercase">Use for student purpose and business purpose.</p>
                                 </div>
                               </div>
                             </div>
@@ -284,11 +284,16 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     <div className="space-y-2">
                       <Badge className="bg-emerald-500 text-white font-black px-4 h-6 rounded-full mb-2">Process Successful</Badge>
                       <h3 className="text-2xl font-black uppercase truncate text-slate-950">{result.fileName}</h3>
+                      <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-widest mt-2">
+                        Use for student purpose and business purpose • useful to students and business and more
+                      </p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       <Button onClick={handleDownload} className="h-16 px-12 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm uppercase tracking-widest rounded-2xl shadow-2xl transition-all gap-4"><Download className="w-5 h-5" /> Download</Button>
                       <Link href="/dashboard/pdf-editor">
-                        <Button variant="outline" className="h-16 px-12 border-primary/20 bg-white text-primary font-black text-sm uppercase tracking-widest rounded-2xl gap-4"><Edit3 className="w-5 h-5" /> Open in Editor</Button>
+                        <Button variant="outline" className="h-16 px-12 border-primary/20 bg-white text-primary font-black text-sm uppercase tracking-widest rounded-2xl gap-4 shadow-xl hover:scale-105 transition-all">
+                          <Edit3 className="w-5 h-5" /> Open in Editor
+                        </Button>
                       </Link>
                       <Button variant="ghost" onClick={reset} className="h-16 px-8 text-slate-950/40 font-black text-xs uppercase tracking-widest">New Session</Button>
                     </div>
