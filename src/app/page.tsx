@@ -14,10 +14,10 @@ import { NightSky } from '@/components/dashboard/night-sky';
  */
 export default function LandingPage() {
   return (
-    <div className="min-h-screen w-full flex flex-col items-center p-6 relative text-slate-950 bg-transparent overflow-x-hidden font-sans">
+    <div className="min-h-screen w-full text-slate-950 bg-transparent overflow-x-hidden font-sans">
       <NightSky />
       
-      <header className="w-full max-w-7xl flex items-center justify-between h-20 px-6 z-50">
+      <header className="w-full max-w-7xl mx-auto flex items-center justify-between h-20 px-6 z-50">
         <LogoAnimation className="w-20 h-10" showGlow={false} />
         <nav className="hidden md:flex items-center gap-10">
           {['Features', 'Solutions', 'Pricing', 'Story'].map((item) => (
@@ -26,14 +26,16 @@ export default function LandingPage() {
             </Link>
           ))}
         </nav>
-        <Link href="/ajn">
-          <Button variant="outline" className="h-10 border-black/10 bg-white/40 font-black text-[10px] tracking-[0.2em] rounded-xl uppercase px-6">
-            Access Hub
-          </Button>
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/ajn">
+            <Button variant="outline" className="h-10 border-black/10 bg-white/40 font-black text-[10px] tracking-[0.2em] rounded-xl uppercase px-6">
+              Access Hub
+            </Button>
+          </Link>
+        </div>
       </header>
 
-      <main className="w-full max-w-5xl flex flex-col items-center gap-12 relative z-10 pt-20 md:pt-32 pb-32 text-center flex-1">
+      <main className="w-full max-w-5xl mx-auto flex flex-col items-center gap-12 relative z-10 pt-20 md:pt-32 pb-32 text-center flex-1">
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
