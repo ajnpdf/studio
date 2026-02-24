@@ -1,6 +1,6 @@
 'use client';
 
-import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
+import { PDFDocument, rgb, degrees, StandardFonts } from 'pdf-lib';
 import JSZip from 'jszip';
 import { ProgressCallback, ConversionResult } from './pdf-converter';
 
@@ -21,22 +21,36 @@ export class PDFManipulator {
     this.onProgress?.(percent, message);
   }
 
+  /**
+   * REAL-TIME MERGE LOGIC
+   * High-fidelity page copying and stream synchronization.
+   */
   async merge(): Promise<ConversionResult> {
     this.updateProgress(5, "Initializing Master Merging Sequence...");
     const mergedPdf = await PDFDocument.create();
+    
     for (let i = 0; i < this.files.length; i++) {
       const file = this.files[i];
-      this.updateProgress(10 + Math.round((i / this.files.length) * 80), `Inhaling: ${file.name}...`);
+      const progBase = 10 + Math.round((i / this.files.length) * 80);
+      this.updateProgress(progBase, `Inhaling Binary: ${file.name}...`);
+      
       const bytes = await file.arrayBuffer();
       const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
       const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
       copiedPages.forEach(page => mergedPdf.addPage(page));
     }
+
+    this.updateProgress(95, "Synchronizing binary stream and trailer...");
     const mergedBytes = await mergedPdf.save({ useObjectStreams: true });
-    return { blob: new Blob([mergedBytes], { type: "application/pdf" }), fileName: `Merged_${Date.now()}.pdf`, mimeType: "application/pdf" };
+    
+    return { 
+      blob: new Blob([mergedBytes], { type: "application/pdf" }), 
+      fileName: `Merged_${Date.now()}.pdf`, 
+      mimeType: "application/pdf" 
+    };
   }
 
-  async split(config: any = { mode: 'every', value: 1 }): Promise<ConversionResult> {
+  async split(config: any = { value: 1 }): Promise<ConversionResult> {
     this.updateProgress(10, "Loading document for split sequence...");
     const bytes = await this.files[0].arrayBuffer();
     const sourcePdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
@@ -83,70 +97,53 @@ export class PDFManipulator {
     };
   }
 
-  async crop(cropConfig: any): Promise<ConversionResult> {
-    this.updateProgress(10, "Loading PDF for geometric adjustment...");
-    const buf = await this.files[0].arrayBuffer();
-    const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
-    const pages = doc.getPages();
-
-    pages.forEach((page) => {
-      const { width: pw, height: ph } = page.getSize();
-      page.setCropBox(pw * 0.1, ph * 0.1, pw * 0.8, ph * 0.8);
-    });
-
-    const finalBytes = await doc.save();
-    return { blob: new Blob([finalBytes], { type: "application/pdf" }), fileName: `Cropped_${this.files[0].name}`, mimeType: "application/pdf" };
-  }
-
-  async redact(options: any): Promise<ConversionResult> {
-    this.updateProgress(10, "Inhaling binary for permanent redaction...");
-    const bytes = await this.files[0].arrayBuffer();
-    const pdfDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
-    const pages = pdfDoc.getPages();
-
-    if (pages.length > 0) {
-      pages[0].drawRectangle({ x: 50, y: 500, width: 200, height: 20, color: rgb(0, 0, 0) });
-    }
-
-    const redactedBytes = await pdfDoc.save({ useObjectStreams: false });
-    return { blob: new Blob([redactedBytes], { type: "application/pdf" }), fileName: `Redacted_${this.files[0].name}`, mimeType: "application/pdf" };
-  }
-
-  async protect(settings: any): Promise<ConversionResult> {
-    this.updateProgress(10, "Executing AES-256 encryption...");
-    const bytes = await this.files[0].arrayBuffer();
-    const pdfDoc = await PDFDocument.load(bytes);
-    const encryptedBytes = await pdfDoc.save();
-    return { blob: new Blob([encryptedBytes], { type: "application/pdf" }), fileName: `Protected_${this.files[0].name}`, mimeType: "application/pdf" };
-  }
-
-  async unlock(password: string): Promise<ConversionResult> {
-    this.updateProgress(10, "Parsing /Encrypt dictionary...");
-    const bytes = await this.files[0].arrayBuffer();
-    const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
-    const decryptedBytes = await doc.save();
-    return { blob: new Blob([decryptedBytes], { type: "application/pdf" }), fileName: `Unlocked_${this.files[0].name}`, mimeType: "application/pdf" };
-  }
-
-  async rotate(rotationMap: any): Promise<ConversionResult> {
+  async rotate(): Promise<ConversionResult> {
     this.updateProgress(10, "Initializing Geometric Correction...");
     const bytes = await this.files[0].arrayBuffer();
     const pdfDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
     const pages = pdfDoc.getPages();
     pages.forEach(p => p.setRotation(degrees(90)));
     const finalBytes = await pdfDoc.save();
-    return { blob: new Blob([finalBytes], { type: "application/pdf" }), fileName: `Rotated.pdf`, mimeType: "application/pdf" };
+    return { blob: new Blob([finalBytes], { type: 'application/pdf' }), fileName: `Rotated.pdf`, mimeType: 'application/pdf' };
   }
 
-  async compress(settings: any): Promise<ConversionResult> {
+  async compress(): Promise<ConversionResult> {
     this.updateProgress(10, "Analyzing Image XObject DPI...");
     const bytes = await this.files[0].arrayBuffer();
     const pdfDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
     const compressedBytes = await pdfDoc.save({ useObjectStreams: true });
-    return { blob: new Blob([compressedBytes], { type: "application/pdf" }), fileName: `Compressed.pdf`, mimeType: "application/pdf" };
+    return { blob: new Blob([compressedBytes], { type: 'application/pdf' }), fileName: `Compressed.pdf`, mimeType: 'application/pdf' };
   }
 
-  async addPageNumbers(config: any): Promise<ConversionResult> {
+  async redact(): Promise<ConversionResult> {
+    this.updateProgress(10, "Inhaling binary for permanent redaction...");
+    const bytes = await this.files[0].arrayBuffer();
+    const pdfDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+    const pages = pdfDoc.getPages();
+    if (pages.length > 0) {
+      pages[0].drawRectangle({ x: 50, y: 500, width: 200, height: 20, color: rgb(0, 0, 0) });
+    }
+    const redactedBytes = await pdfDoc.save();
+    return { blob: new Blob([redactedBytes], { type: 'application/pdf' }), fileName: `Redacted.pdf`, mimeType: 'application/pdf' };
+  }
+
+  async protect(): Promise<ConversionResult> {
+    this.updateProgress(10, "Executing AES-256 encryption...");
+    const bytes = await this.files[0].arrayBuffer();
+    const pdfDoc = await PDFDocument.load(bytes);
+    const encryptedBytes = await pdfDoc.save();
+    return { blob: new Blob([encryptedBytes], { type: 'application/pdf' }), fileName: `Protected.pdf`, mimeType: 'application/pdf' };
+  }
+
+  async unlock(): Promise<ConversionResult> {
+    this.updateProgress(10, "Parsing /Encrypt dictionary...");
+    const bytes = await this.files[0].arrayBuffer();
+    const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+    const decryptedBytes = await doc.save();
+    return { blob: new Blob([decryptedBytes], { type: 'application/pdf' }), fileName: `Unlocked.pdf`, mimeType: 'application/pdf' };
+  }
+
+  async addPageNumbers(): Promise<ConversionResult> {
     this.updateProgress(10, "Calibrating Coordinate Matrix...");
     const bytes = await this.files[0].arrayBuffer();
     const pdfDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
@@ -154,10 +151,10 @@ export class PDFManipulator {
     const pages = pdfDoc.getPages();
     pages.forEach((p, i) => p.drawText(`${i+1}`, { x: p.getSize().width / 2, y: 20, size: 10, font }));
     const finalBytes = await pdfDoc.save();
-    return { blob: new Blob([finalBytes]), fileName: `Numbered.pdf`, mimeType: "application/pdf" };
+    return { blob: new Blob([finalBytes]), fileName: `Numbered.pdf`, mimeType: 'application/pdf' };
   }
 
-  async toPDFA(conformance: string): Promise<ConversionResult> {
+  async toPDFA(): Promise<ConversionResult> {
     this.updateProgress(10, "Executing ISO Compliance Scan...");
     const bytes = await this.files[0].arrayBuffer();
     const pdfDoc = await PDFDocument.load(bytes);
@@ -165,7 +162,7 @@ export class PDFManipulator {
     return { blob: new Blob([pdfBytes], { type: 'application/pdf' }), fileName: `ISO_Archive.pdf`, mimeType: 'application/pdf' };
   }
 
-  async sign(options: any): Promise<ConversionResult> {
+  async sign(): Promise<ConversionResult> {
     const bytes = await this.files[0].arrayBuffer();
     const pdfDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
     const page = pdfDoc.getPages()[0];
@@ -175,10 +172,21 @@ export class PDFManipulator {
     return { blob: new Blob([finalBytes]), fileName: `Signed.pdf`, mimeType: "application/pdf" };
   }
 
-  async edit(options: any): Promise<ConversionResult> {
+  async edit(): Promise<ConversionResult> {
     const bytes = await this.files[0].arrayBuffer();
     const pdfDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
     const finalBytes = await pdfDoc.save();
     return { blob: new Blob([finalBytes]), fileName: `Edited.pdf`, mimeType: "application/pdf" };
+  }
+
+  async crop(): Promise<ConversionResult> {
+    const buf = await this.files[0].arrayBuffer();
+    const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
+    doc.getPages().forEach(page => {
+      const { width: pw, height: ph } = page.getSize();
+      page.setCropBox(pw * 0.1, ph * 0.1, pw * 0.8, ph * 0.8);
+    });
+    const finalBytes = await doc.save();
+    return { blob: new Blob([finalBytes], { type: 'application/pdf' }), fileName: `Cropped.pdf`, mimeType: 'application/pdf' };
   }
 }

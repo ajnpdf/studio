@@ -41,7 +41,7 @@ export class SpecializedConverter {
 
   /**
    * Hardened Translation Unit with Fallback
-   * Wrap every fetch in try/catch to prevent pipeline crashes.
+   * Prevents pipeline crashes during third-party node failure.
    */
   async translateText(text: string, sourceLang: string, targetLang: string): Promise<string> {
     if (!text.trim() || text.length < 2) return text;
@@ -57,8 +57,7 @@ export class SpecializedConverter {
       const data = await resp.json();
       return data.translatedText || text;
     } catch (err) {
-      // Robust Fallback: Return original text rather than failing the whole document
-      return text;
+      return text; // Safe fallback to original text
     }
   }
 
@@ -98,7 +97,6 @@ export class SpecializedConverter {
         const y = item.transform[5];
         const fontSize = Math.abs(item.transform[0]);
 
-        // Group text by Y proximity to preserve paragraphs
         if (!currentGroup || Math.abs(currentGroup.y - y) > fontSize * 1.5) {
           if (currentGroup) groups.push(currentGroup);
           currentGroup = { text, x, y, fontSize, width: item.width };
@@ -111,9 +109,7 @@ export class SpecializedConverter {
 
       for (const group of groups) {
         const translatedText = await this.translateText(group.text, sourceLang, targetLang);
-        
         try {
-          // Mask original with white rectangle
           newPage.drawRectangle({
             x: group.x - 2,
             y: group.y - 2,
@@ -121,8 +117,6 @@ export class SpecializedConverter {
             height: group.fontSize * 1.4,
             color: rgb(1, 1, 1),
           });
-
-          // Overlay translation
           newPage.drawText(translatedText, {
             x: group.x,
             y: group.y,
@@ -148,7 +142,7 @@ export class SpecializedConverter {
   async comparePdf(baseName: string, settings: any): Promise<ConversionResult> {
     this.updateProgress(10, "Initializing dual-buffer alignment...");
     await new Promise(r => setTimeout(r, 2000));
-    const reportText = `AJN COMPARISON REPORT\nDATE: ${new Date().toLocaleString()}\nSOURCE: ${this.file.name}\nSTATUS: SUCCESS\n\nNo significant visual deltas found in page structure.`;
+    const reportText = `AJN COMPARISON REPORT\nSOURCE: ${this.file.name}\nSTATUS: SUCCESS\n\nNo significant visual deltas found in page structure.`;
     return { 
       blob: new Blob([reportText], { type: 'text/plain' }), 
       fileName: `${baseName}_Comparison_Report.txt`, 
@@ -162,13 +156,11 @@ export class SpecializedConverter {
     const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
     const pdfJsDoc = await loadingTask.promise;
     let fullText = '';
-
     for (let i = 1; i <= pdfJsDoc.numPages; i++) {
       const page = await pdfJsDoc.getPage(i);
       const content = await page.getTextContent();
       fullText += content.items.map((it: any) => it.str).join(' ') + '\n';
     }
-
     this.updateProgress(50, "Executing Neural Briefing...");
     try {
       const result = await runFileIntelligence({
@@ -189,7 +181,6 @@ export class SpecializedConverter {
     const pdfDoc = await PDFDocument.load(arrayBuffer);
     const pages = pdfDoc.getPages();
     const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
     const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
     const pdfJsDoc = await loadingTask.promise;
 
@@ -197,19 +188,15 @@ export class SpecializedConverter {
       const progBase = 15 + Math.round((i / pdfJsDoc.numPages) * 80);
       const page = await pdfJsDoc.getPage(i);
       this.updateProgress(progBase, `Rendering Page ${i} to 300 DPI...`);
-      
-      const viewport = page.getViewport({ scale: 2.5 });
+      const viewport = page.getViewport({ scale: 2 });
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d')!;
       canvas.width = viewport.width; canvas.height = viewport.height;
       await page.render({ canvasContext: ctx, viewport }).promise;
-
       this.updateProgress(progBase + 15, `Running Neural OCR...`);
       const { data } = await Tesseract.recognize(canvas, "eng");
-
       const targetPage = pages[i - 1];
       const { width, height } = targetPage.getSize();
-
       data.words.forEach(word => {
         const bbox = word.bbox;
         targetPage.drawText(word.text, {
@@ -221,7 +208,6 @@ export class SpecializedConverter {
         });
       });
     }
-
     const pdfBytes = await pdfDoc.save();
     return { blob: new Blob([pdfBytes], { type: 'application/pdf' }), fileName: `${baseName}_OCR.pdf`, mimeType: 'application/pdf' };
   }

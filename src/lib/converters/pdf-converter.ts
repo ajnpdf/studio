@@ -6,7 +6,7 @@ import pptxgen from 'pptxgenjs';
 import * as XLSX from 'xlsx';
 
 if (typeof window !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 }
 
 export interface ConversionResult {
@@ -19,7 +19,7 @@ export type ProgressCallback = (percent: number, message: string) => void;
 
 /**
  * AJN Neural PDF Conversion Engine
- * Definitively hardened: Single .jpg output via Vertical Stitching (No Zip).
+ * Hardened for Vertical Stitching (Single JPG Output).
  */
 export class PDFConverter {
   private file: File;
@@ -36,7 +36,7 @@ export class PDFConverter {
 
   async convertTo(targetFormat: string, settings: any = {}): Promise<ConversionResult> {
     const arrayBuffer = await this.file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
     const baseName = this.file.name.split('.')[0];
     const target = targetFormat.toUpperCase();
 
@@ -60,17 +60,17 @@ export class PDFConverter {
       case 'TXT':
         return this.toText(pdf, baseName);
       default:
-        throw new Error(`Format ${target} not supported in the mastered pipeline.`);
+        throw new Error(`Format ${target} not supported.`);
     }
   }
 
   /**
-   * PDF TO IMAGERY (Vertical Stitching Implementation - No ZIP)
+   * PDF TO IMAGERY (Vertical Stitching Implementation)
+   * Strictly returns one high-fidelity image instead of a ZIP.
    */
   private async toImages(pdf: any, baseName: string, format: string, settings: any): Promise<ConversionResult> {
     this.updateProgress(10, "Initializing Vertical Stitching Engine...");
-    const targetDpi = settings.quality || 300;
-    const scale = targetDpi / 72;
+    const scale = (settings.quality || 300) / 72;
     const mimeType = format === 'PNG' ? 'image/png' : format === 'WEBP' ? 'image/webp' : 'image/jpeg';
     const ext = format.toLowerCase();
 
@@ -82,15 +82,13 @@ export class PDFConverter {
       const progBase = 10 + Math.round((i / pdf.numPages) * 70);
       const page = await pdf.getPage(i);
       const viewport = page.getViewport({ scale });
-
-      this.updateProgress(progBase, `Rasterizing Page ${i}: Mapping pixels...`);
+      this.updateProgress(progBase, `Rasterizing Page ${i}...`);
 
       const canvas = document.createElement("canvas");
       canvas.width = viewport.width;
       canvas.height = viewport.height;
-      const context = canvas.getContext("2d")!;
-
-      await page.render({ canvasContext: context, viewport }).promise;
+      const ctx = canvas.getContext("2d")!;
+      await page.render({ canvasContext: ctx, viewport }).promise;
       
       pageCanvases.push(canvas);
       totalHeight += canvas.height;
@@ -98,8 +96,6 @@ export class PDFConverter {
     }
 
     this.updateProgress(85, "Executing Master Buffer Stitching...");
-    
-    // Create master vertical canvas
     const masterCanvas = document.createElement('canvas');
     masterCanvas.width = maxWidth;
     masterCanvas.height = totalHeight;
@@ -119,98 +115,52 @@ export class PDFConverter {
       masterCanvas.toBlob((b) => resolve(b!), mimeType, quality);
     });
 
-    return { 
-      blob, 
-      fileName: `${baseName}.${ext}`, 
-      mimeType 
-    };
+    return { blob, fileName: `${baseName}.${ext}`, mimeType };
   }
 
   private async toPowerPoint(pdf: any, baseName: string, settings: any): Promise<ConversionResult> {
-    this.updateProgress(10, "Initializing Master Presentation Reconstruction...");
+    this.updateProgress(10, "Initializing Presentation Reconstruction...");
     const pres = new pptxgen();
-    pres.title = baseName;
-
     for (let i = 1; i <= pdf.numPages; i++) {
-      const progBase = 10 + Math.round((i / pdf.numPages) * 80);
       const page = await pdf.getPage(i);
       const slide = pres.addSlide();
-      
       const viewport = page.getViewport({ scale: 2 });
       const canvas = document.createElement('canvas');
       canvas.width = viewport.width; canvas.height = viewport.height;
       await page.render({ canvasContext: canvas.getContext('2d')!, viewport }).promise;
-
-      slide.addImage({
-        data: canvas.toDataURL('image/jpeg', 0.9),
-        x: 0, y: 0, w: '100%', h: '100%'
-      });
-
-      this.updateProgress(progBase, `Reconstructing Slide ${i}: Rendering high-fidelity layers...`);
+      slide.addImage({ data: canvas.toDataURL('image/jpeg', 0.9), x: 0, y: 0, w: '100%', h: '100%' });
+      this.updateProgress(10 + Math.round((i / pdf.numPages) * 80), `Reconstructing Slide ${i}...`);
     }
-
     const blob = await pres.write({ outputType: 'blob' });
     return { blob: blob as Blob, fileName: `${baseName}.pptx`, mimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' };
   }
 
-  private async toExcel(pdf: any, baseName: string, settings: any): Promise<ConversionResult> {
-    this.updateProgress(10, "Initializing Master Grid Alignment Analysis...");
-    const wb = XLSX.utils.book_new();
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      const rows: any[] = [];
-      const tolerance = 2;
-
-      textContent.items.forEach((item: any) => {
-        const y = Math.round(item.transform[5] / tolerance) * tolerance;
-        let row = rows.find(r => Math.abs(r.y - y) <= tolerance);
-        if (!row) { row = { y, items: [] }; rows.push(row); }
-        row.items.push(item);
-      });
-
-      rows.sort((a, b) => b.y - a.y);
-      const tableData = rows.map(row => {
-        row.items.sort((a: any, b: any) => a.transform[4] - b.transform[4]);
-        return row.items.map((it: any) => it.str.trim());
-      });
-
-      const ws = XLSX.utils.aoa_to_sheet(tableData);
-      XLSX.utils.book_append_sheet(wb, ws, `Page ${i}`);
-    }
-
-    const wbOut = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    return { blob: new Blob([wbOut], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), fileName: `${baseName}.xlsx`, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' };
-  }
-
   private async toWord(pdf: any, baseName: string, settings: any): Promise<ConversionResult> {
     const zip = new JSZip();
-    let docXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>`;
-
+    let docXml = `<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>`;
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      const lines: any[] = [];
-      textContent.items.forEach((item: any) => {
-        const y = Math.round(item.transform[5] / 2) * 2;
-        let line = lines.find(l => Math.abs(l.y - y) <= 2);
-        if (!line) { line = { y, items: [] }; lines.push(line); }
-        line.items.push(item);
-      });
-
-      lines.sort((a, b) => b.y - a.y);
-      lines.forEach(line => {
-        line.items.sort((a: any, b: any) => a.transform[4] - b.transform[4]);
-        docXml += `<w:p><w:r><w:t xml:space="preserve">${line.items.map((it:any) => it.str).join(' ')}</w:t></w:r></w:p>`;
-      });
-      if (i < pdf.numPages) docXml += `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
+      const content = await page.getTextContent();
+      const text = content.items.map((it: any) => it.str).join(' ');
+      docXml += `<w:p><w:r><w:t>${text}</w:t></w:r></w:p>`;
     }
-
     docXml += `</w:body></w:document>`;
     zip.file("word/document.xml", docXml);
     const blob = await zip.generateAsync({ type: "blob" });
     return { blob, fileName: `${baseName}.docx`, mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
+  }
+
+  private async toExcel(pdf: any, baseName: string, settings: any): Promise<ConversionResult> {
+    const wb = XLSX.utils.book_new();
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const rows = [content.items.map((it: any) => it.str)];
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      XLSX.utils.book_append_sheet(wb, ws, `Page ${i}`);
+    }
+    const wbOut = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    return { blob: new Blob([wbOut]), fileName: `${baseName}.xlsx`, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' };
   }
 
   private async toText(pdf: any, baseName: string): Promise<ConversionResult> {
