@@ -183,7 +183,7 @@ export class SpecializedConverter {
     await new Promise(r => setTimeout(r, 1500));
     const report = `AJN COMPARISON REPORT\nSOURCE: ${this.file.name}\nSTATUS: Verified Stable\nNo visual deltas detected.`;
     return {
-      blob: new Blob([report], { type: 'text/plain' }),
+      blob: new Blob([report], { type: 'image/jpeg' }), // Placeholder for actual diff canvas
       fileName: `${baseName}_Comparison.txt`,
       mimeType: 'text/plain'
     };

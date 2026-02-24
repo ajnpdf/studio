@@ -1,4 +1,1 @@
-
-export function ToolCategories() {
-  return null;
-}
+export const ToolCategories = () => null;

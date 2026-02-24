@@ -1,4 +1,1 @@
-
-export function PricingPreview() {
-  return null;
-}
+export const PricingPreview = () => null;

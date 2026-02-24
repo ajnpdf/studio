@@ -1,4 +1,1 @@
-
-export function HeroZone() {
-  return null;
-}
+export const HeroZone = () => null;

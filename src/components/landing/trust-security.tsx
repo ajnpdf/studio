@@ -1,4 +1,1 @@
-
-export function TrustSecurity() {
-  return null;
-}
+export const TrustSecurity = () => null;

@@ -1,4 +1,1 @@
-
-export function SocialProof() {
-  return null;
-}
+export const SocialProof = () => null;

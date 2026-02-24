@@ -1,4 +1,1 @@
-
-export function FormatStrip() {
-  return null;
-}
+export const FormatStrip = () => null;

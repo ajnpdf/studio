@@ -1,4 +1,1 @@
-
-export function Footer() {
-  return null;
-}
+export const Footer = () => null;

@@ -1,4 +1,1 @@
-
-export function LiveDemo() {
-  return null;
-}
+export const LiveDemo = () => null;

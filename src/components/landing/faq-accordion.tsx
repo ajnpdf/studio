@@ -1,4 +1,1 @@
-
-export function FaqAccordion() {
-  return null;
-}
+export const FaqAccordion = () => null;
