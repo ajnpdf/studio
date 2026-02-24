@@ -19,7 +19,11 @@ import {
   Loader2,
   Settings2,
   Zap,
-  FileCode
+  FileCode,
+  Layers,
+  Wand2,
+  Lock,
+  History
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -28,6 +32,10 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import * as pdfjsLib from 'pdfjs-dist';
 import { cn } from '@/lib/utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
 if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
@@ -47,7 +55,8 @@ interface Props {
 }
 
 /**
- * AJN Tools Workspace - Simple Professional Document Processing
+ * AJN Tools Workspace - Professional Advance Setup
+ * Standardized on simple professional language and industrial aesthetics.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const tool = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -57,20 +66,25 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [pages, setPages] = useState<PageNode[]>([]);
   const [selectedPages, setSelectedPages] = useState<Set<string>>(new Set());
   const [isInitializing, setIsInitializing] = useState(false);
-  const [splitInterval, setSplitInterval] = useState(1);
-  const [splitMode, setSplitMode] = useState<'range' | 'interval'>('range');
-  const [compressionLevel, setCompressionLevel] = useState<'basic' | 'strong'>('basic');
+  
+  // Advanced Configuration State
+  const [config, setConfig] = useState({
+    quality: 90,
+    strongCompression: false,
+    ocrLanguage: 'eng',
+    splitMode: 'range',
+    splitInterval: 1,
+    optimizationLevel: 'balanced'
+  });
 
   const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf', 'organize-pdf', 'redact-pdf'].includes(tool?.id || '');
-  const isSplitTool = tool?.id === 'split-pdf';
-  const isCompressTool = tool?.id === 'compress-pdf';
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
     if (files.some(f => f.type === 'application/pdf')) {
       await loadAllPdfPages(files);
     } else {
-      run(files, { quality: 90 });
+      run(files, config);
     }
   };
 
@@ -148,16 +162,11 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       }));
 
     if (pageData.length === 0 && isSurgicalTool) {
-      toast({ title: "Selection Required", description: "Select pages to continue." });
+      toast({ title: "Selection Required", description: "Select at least one page to process." });
       return;
     }
 
-    run(sourceFiles, { 
-      pageData,
-      splitMode,
-      splitInterval,
-      compressionLevel
-    });
+    run(sourceFiles, { ...config, pageData });
   };
 
   const handleDownload = () => {
@@ -167,105 +176,56 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     a.href = url; 
     a.download = result.fileName; 
     a.click();
-    toast({ title: "Success", description: "File saved to your computer." });
+    toast({ title: "Export Complete", description: "File successfully retrieved." });
   };
 
   return (
     <div className="flex h-full bg-transparent overflow-hidden relative text-slate-950 font-sans">
       <main className="flex-1 flex flex-col min-w-0 relative h-full">
         <div className="flex-1 overflow-y-auto scrollbar-hide">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-4 md:p-10 space-y-10 max-w-7xl mx-auto pb-32">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 md:p-10 space-y-10 max-w-7xl mx-auto pb-32">
             
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-sm">
-                  <FileCode className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <h2 className="text-xl md:text-3xl font-black tracking-tighter uppercase leading-none">{tool?.name || "File Tool"}</h2>
-                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[8px] font-black h-5 uppercase tracking-widest">FREE</Badge>
-                  </div>
-                  <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em] flex items-center gap-2">
-                    Professional Processing
-                  </p>
-                </div>
-              </div>
-            </header>
+            <AnimatePresence mode="wait">
+              {phase === 'idle' && (
+                <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <DropZone onFiles={handleFilesAdded} />
+                </motion.div>
+              )}
 
-            <div className="space-y-10">
-              <AnimatePresence mode="wait">
-                {phase === 'idle' && (
-                  <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                    <DropZone onFiles={handleFilesAdded} />
-                  </motion.div>
-                )}
-
-                {phase === 'selecting' && (
-                  <motion.div key="selecting" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-                    {isInitializing ? (
-                      <div className="py-32 text-center space-y-6 opacity-40">
-                        <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
-                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950">Preparing document...</p>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="flex flex-col lg:flex-row gap-6">
-                          <div className="flex-1 bg-white/60 p-6 rounded-3xl border border-black/5 shadow-2xl backdrop-blur-3xl flex flex-col md:flex-row md:items-center justify-between gap-6">
-                            <div className="space-y-3">
-                              <div className="flex items-center gap-3 text-primary">
-                                <Eye className="w-5 h-5" />
-                                <h3 className="text-lg font-black uppercase tracking-tighter">Preview Pages</h3>
-                              </div>
-                              <div className="flex gap-2">
-                                <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set(pages.map(p => p.id)))} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><ListChecks className="w-3 h-3" /> Select All</Button>
-                                <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set())} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><Eraser className="w-3 h-3" /> Clear All</Button>
-                              </div>
+              {phase === 'selecting' && (
+                <motion.div key="selecting" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+                  {isInitializing ? (
+                    <div className="py-32 text-center space-y-6 opacity-40">
+                      <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
+                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950">Calibrating Session Buffer...</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col xl:flex-row gap-8">
+                      {/* Main Grid Sector */}
+                      <div className="flex-1 space-y-6">
+                        <div className="bg-white/60 p-6 rounded-3xl border border-black/5 shadow-2xl backdrop-blur-3xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3 text-primary">
+                              <Eye className="w-5 h-5" />
+                              <h3 className="text-lg font-black uppercase tracking-tighter">Segment Preview</h3>
                             </div>
-
-                            <div className="flex items-center gap-3">
-                              <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest">
-                                {isSurgicalTool ? selectedPages.size : pages.length} Selected
-                              </Badge>
-                              <Button onClick={handleConfirmedExecution} className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl transition-all">
-                                Process Document <ChevronRight className="ml-2 w-4 h-4" />
-                              </Button>
+                            <div className="flex gap-2">
+                              <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set(pages.map(p => p.id)))} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><ListChecks className="w-3 h-3" /> All</Button>
+                              <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set())} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><Eraser className="w-3 h-3" /> None</Button>
                             </div>
                           </div>
 
-                          {(isSplitTool || isCompressTool) && (
-                            <div className="w-full lg:w-80 bg-white/60 p-6 rounded-3xl border border-black/5 shadow-2xl backdrop-blur-3xl space-y-4">
-                              <div className="flex items-center gap-2 text-primary">
-                                <Settings2 className="w-4 h-4" />
-                                <h4 className="text-[10px] font-black uppercase tracking-widest">Settings</h4>
-                              </div>
-                              {isSplitTool && (
-                                <div className="space-y-3">
-                                  <div className="flex gap-2">
-                                    <button onClick={() => setSplitMode('range')} className={cn("flex-1 h-8 rounded-lg text-[9px] font-black uppercase border transition-all", splitMode === 'range' ? "bg-primary text-white" : "bg-black/5 border-black/5")}>Range</button>
-                                    <button onClick={() => setSplitMode('interval')} className={cn("flex-1 h-8 rounded-lg text-[9px] font-black uppercase border transition-all", splitMode === 'interval' ? "bg-primary text-white" : "bg-black/5 border-black/5")}>Interval</button>
-                                  </div>
-                                  {splitMode === 'interval' && (
-                                    <div className="flex items-center gap-3">
-                                      <span className="text-[9px] font-bold uppercase opacity-40 whitespace-nowrap">Pages:</span>
-                                      <input type="number" min="1" value={splitInterval} onChange={(e) => setSplitInterval(parseInt(e.target.value))} className="w-full h-8 bg-black/5 border-none rounded-lg px-3 text-xs font-bold" />
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                              {isCompressTool && (
-                                <div className="space-y-3">
-                                  <div className="flex gap-2">
-                                    <button onClick={() => setCompressionLevel('basic')} className={cn("flex-1 h-8 rounded-lg text-[9px] font-black uppercase border transition-all", compressionLevel === 'basic' ? "bg-primary text-white" : "bg-black/5 border-black/5")}>Basic</button>
-                                    <button onClick={() => setCompressionLevel('strong')} className={cn("flex-1 h-8 rounded-lg text-[9px] font-black uppercase border transition-all", compressionLevel === 'strong' ? "bg-primary text-white" : "bg-black/5 border-black/5")}>Strong</button>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
+                          <div className="flex items-center gap-3">
+                            <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest">
+                              {isSurgicalTool ? selectedPages.size : pages.length} Segments
+                            </Badge>
+                            <Button onClick={handleConfirmedExecution} className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl hover:scale-105 transition-all">
+                              Process Document <ChevronRight className="ml-2 w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
                         
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-4 md:gap-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
                           {pages.map((page, idx) => {
                             const isSelected = selectedPages.has(page.id);
                             return (
@@ -283,7 +243,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                     className={cn("w-full h-full object-cover transition-all duration-500", isSelected ? "opacity-100" : "opacity-40")} 
                                     style={{ transform: `rotate(${page.rotation}deg)` }}
                                   />
-                                  <div className="absolute top-3 left-3 bg-black/60 text-white text-[8px] font-black px-2 py-1 rounded-md backdrop-blur-md uppercase shadow-lg">P{idx + 1}</div>
+                                  <div className="absolute top-3 left-3 bg-black/60 text-white text-[8px] font-black px-2 py-1 rounded-md backdrop-blur-md uppercase shadow-lg">#{idx + 1}</div>
                                   {isSelected && (
                                     <div className="absolute inset-0 flex items-center justify-center bg-primary/10">
                                       <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shadow-xl border-2 border-white/20"><CheckCircle2 className="w-6 h-6" /></div>
@@ -299,66 +259,127 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                             );
                           })}
                         </div>
-                      </>
-                    )}
-                  </motion.div>
-                )}
-                
-                {phase === 'running' && (
-                  <motion.div key="running" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="max-w-3xl auto w-full pt-12">
-                    <Card className="p-8 md:p-12 bg-white/60 border-2 border-black/5 rounded-[3rem] space-y-10 shadow-2xl backdrop-blur-3xl">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-primary">
-                          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
-                            <Zap className="w-5 h-5 animate-pulse" />
+                      </div>
+
+                      {/* Advance Config Sidebar */}
+                      <aside className="w-full xl:w-80 space-y-6 shrink-0">
+                        <Card className="p-6 bg-white/60 border border-black/5 rounded-3xl shadow-xl backdrop-blur-3xl space-y-8">
+                          <div className="flex items-center gap-3 text-primary border-b border-black/5 pb-4">
+                            <Settings2 className="w-5 h-5" />
+                            <h3 className="text-sm font-black uppercase tracking-widest">Configuration</h3>
                           </div>
-                          <h3 className="text-xl font-black uppercase tracking-tighter">Processing...</h3>
-                        </div>
-                        <span className="text-3xl font-black text-primary tracking-tighter">{Math.round(progress.pct)}%</span>
-                      </div>
-                      <ProgressBar pct={progress.pct} label={progress.detail} />
-                      <LogStream logs={logs} />
-                    </Card>
-                  </motion.div>
-                )}
 
-                {phase === 'done' && result && (
-                  <motion.div key="done" initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="max-w-3xl mx-auto w-full pt-12">
-                    <Card className="bg-white/80 border-2 border-emerald-500/20 p-10 md:p-16 rounded-[4rem] shadow-2xl space-y-10 text-center backdrop-blur-3xl">
-                      <div className="flex flex-col items-center space-y-6">
-                        <div className="w-20 h-20 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center border-2 border-emerald-500/20 shadow-lg"><CheckCircle2 className="w-10 h-10 text-emerald-600" /></div>
-                        <div className="space-y-2">
-                          <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] px-4 h-6 rounded-full uppercase tracking-widest mb-2 shadow-sm">Completed</Badge>
-                          <h3 className="text-2xl md:text-3xl font-black tracking-tighter uppercase truncate max-w-md mx-auto">{result.fileName}</h3>
-                          <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">Your file is ready</p>
-                        </div>
-                      </div>
-                      <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button onClick={handleDownload} className="h-16 px-12 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 shadow-2xl transition-all hover:scale-105">
-                          <Download className="w-5 h-5" /> Download File
-                        </Button>
-                        <Button variant="outline" onClick={reset} className="h-16 px-10 border-black/10 bg-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 hover:bg-black/5 transition-all">
-                          <RefreshCw className="w-5 h-5" /> Start New
-                        </Button>
-                      </div>
-                    </Card>
-                  </motion.div>
-                )}
+                          <div className="space-y-6">
+                            <div className="space-y-3">
+                              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-950/40">Fidelity Index</Label>
+                              <div className="flex justify-between items-center px-1">
+                                <span className="text-xs font-bold">{config.quality}%</span>
+                              </div>
+                              <Slider 
+                                value={[config.quality]} 
+                                onValueChange={([v]) => setConfig({...config, quality: v})} 
+                                max={100} 
+                                step={1} 
+                              />
+                            </div>
 
-                {phase === 'error' && (
-                  <motion.div key="error" initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="max-w-2xl mx-auto w-full pt-12">
-                    <Card className="p-16 bg-red-50 border-2 border-red-100 rounded-[3rem] text-center space-y-8 shadow-2xl">
-                      <div className="w-16 h-16 bg-red-100 rounded-[2rem] flex items-center justify-center mx-auto"><XCircle className="w-8 h-8 text-red-600" /></div>
-                      <h3 className="text-2xl font-black text-red-900 uppercase tracking-tighter leading-tight">{error || "Processing error."}</h3>
-                      <div className="flex flex-col gap-3">
-                        <Button onClick={handleConfirmedExecution} variant="outline" className="h-14 rounded-2xl font-black text-xs uppercase tracking-widest border-red-200 bg-white hover:bg-red-50 text-red-900">Retry</Button>
-                        <Button onClick={reset} variant="ghost" className="h-10 font-bold uppercase text-[10px] text-red-400">Cancel</Button>
+                            <div className="space-y-3">
+                              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-950/40">Output Strategy</Label>
+                              <Select value={config.optimizationLevel} onValueChange={(v) => setConfig({...config, optimizationLevel: v})}>
+                                <SelectTrigger className="h-10 bg-black/5 border-none rounded-xl font-bold text-xs uppercase">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl border-black/5">
+                                  <SelectItem value="balanced">Balanced Output</SelectItem>
+                                  <SelectItem value="performance">Fast Processing</SelectItem>
+                                  <SelectItem value="high">Maximum Quality</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="flex items-center justify-between p-4 bg-black/5 rounded-2xl group transition-all hover:bg-black/10">
+                              <div className="space-y-0.5">
+                                <p className="text-[10px] font-black uppercase text-slate-950">Strong Compression</p>
+                                <p className="text-[8px] text-slate-950/40 font-bold uppercase">Reduce File Size</p>
+                              </div>
+                              <Switch 
+                                checked={config.strongCompression} 
+                                onCheckedChange={(v) => setConfig({...config, strongCompression: v})} 
+                              />
+                            </div>
+
+                            <div className="pt-4 border-t border-black/5 space-y-4">
+                              <div className="flex items-center gap-3 text-emerald-600">
+                                <Lock className="w-3.5 h-3.5" />
+                                <span className="text-[9px] font-black uppercase tracking-widest">Local Session Sync</span>
+                              </div>
+                              <div className="flex items-center gap-3 text-slate-950/40">
+                                <History className="w-3.5 h-3.5" />
+                                <span className="text-[9px] font-black uppercase tracking-widest">No Permanent Storage</span>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      </aside>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+              
+              {phase === 'running' && (
+                <motion.div key="running" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="max-w-3xl mx-auto w-full pt-12">
+                  <Card className="p-8 md:p-12 bg-white/60 border-2 border-black/5 rounded-[3rem] space-y-10 shadow-2xl backdrop-blur-3xl">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-primary">
+                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
+                          <Zap className="w-5 h-5 animate-pulse" />
+                        </div>
+                        <h3 className="text-xl font-black uppercase tracking-tighter">Executing Pipeline...</h3>
                       </div>
-                    </Card>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                      <span className="text-3xl font-black text-primary tracking-tighter">{Math.round(progress.pct)}%</span>
+                    </div>
+                    <ProgressBar pct={progress.pct} label={progress.detail} />
+                    <LogStream logs={logs} />
+                  </Card>
+                </motion.div>
+              )}
+
+              {phase === 'done' && result && (
+                <motion.div key="done" initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="max-w-3xl mx-auto w-full pt-12">
+                  <Card className="bg-white/80 border-2 border-emerald-500/20 p-10 md:p-16 rounded-[4rem] shadow-2xl space-y-10 text-center backdrop-blur-3xl">
+                    <div className="flex flex-col items-center space-y-6">
+                      <div className="w-20 h-20 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center border-2 border-emerald-500/20 shadow-lg"><CheckCircle2 className="w-10 h-10 text-emerald-600" /></div>
+                      <div className="space-y-2">
+                        <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] px-4 h-6 rounded-full uppercase tracking-widest mb-2 shadow-sm">SUCCESSFUL</Badge>
+                        <h3 className="text-2xl md:text-3xl font-black tracking-tighter uppercase truncate max-w-md mx-auto">{result.fileName}</h3>
+                        <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">Ready for Retrieval</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <Button onClick={handleDownload} className="h-16 px-12 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 shadow-2xl transition-all hover:scale-105">
+                        <Download className="w-5 h-5" /> Download Result
+                      </Button>
+                      <Button variant="outline" onClick={reset} className="h-16 px-10 border-black/10 bg-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 hover:bg-black/5 transition-all">
+                        <RefreshCw className="w-5 h-5" /> New Process
+                      </Button>
+                    </div>
+                  </Card>
+                </motion.div>
+              )}
+
+              {phase === 'error' && (
+                <motion.div key="error" initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="max-w-2xl mx-auto w-full pt-12">
+                  <Card className="p-16 bg-red-50 border-2 border-red-100 rounded-[3rem] text-center space-y-8 shadow-2xl">
+                    <div className="w-16 h-16 bg-red-100 rounded-[2rem] flex items-center justify-center mx-auto"><XCircle className="w-8 h-8 text-red-600" /></div>
+                    <h3 className="text-2xl font-black text-red-900 uppercase tracking-tighter leading-tight">{error || "Process interrupted."}</h3>
+                    <div className="flex flex-col gap-3">
+                      <Button onClick={handleConfirmedExecution} variant="outline" className="h-14 rounded-2xl font-black text-xs uppercase tracking-widest border-red-200 bg-white hover:bg-red-50 text-red-900">Retry Execution</Button>
+                      <Button onClick={reset} variant="ghost" className="h-10 font-bold uppercase text-[10px] text-red-400">Cancel</Button>
+                    </div>
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </div>
       </main>
