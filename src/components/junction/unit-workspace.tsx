@@ -35,15 +35,16 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const getAcceptedExtensions = () => {
     if (!unit) return ".pdf";
     
-    // Tools that convert FROM PDF
+    // Tools that convert FROM PDF (Restrict to PDF)
     if (unit.id.startsWith("pdf-")) return ".pdf";
     
-    // Tools that convert TO PDF
+    // Tools that convert TO PDF (Restrict to Source)
     if (unit.id.endsWith("-pdf")) {
       if (unit.id.includes("jpg") || unit.id.includes("image")) return ".jpg,.jpeg,.png,.webp";
       if (unit.id.includes("word")) return ".docx,.doc";
       if (unit.id.includes("ppt")) return ".pptx,.ppt";
       if (unit.id.includes("excel")) return ".xlsx,.xls";
+      if (unit.id.includes("html")) return ".html,.htm";
     }
     
     // Management tools (Merge, Compress, etc.)
@@ -120,7 +121,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       );
       default: return (
         <div className="p-10 border-2 border-dashed border-black/5 rounded-3xl text-center">
-          <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.2em]">High-fidelity params active</p>
+          <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.2em]">Adaptive configuration active</p>
         </div>
       );
     }
@@ -130,15 +131,15 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     <div className="flex h-full bg-transparent overflow-hidden relative text-slate-950 font-sans">
       <main className="flex-1 flex flex-col min-w-0 relative h-full">
         <div className="flex-1 overflow-y-auto scrollbar-hide pb-32">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 md:p-12 space-y-10 max-w-6xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 md:p-12 space-y-8 max-w-6xl mx-auto">
             <header className="flex items-center justify-between px-4">
               <div className="flex items-center gap-6">
-                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border-2 border-primary/20 shadow-xl">
-                  <Cpu className="w-7 h-7 text-primary animate-pulse" />
+                <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center border-2 border-primary/20 shadow-xl">
+                  <Cpu className="w-6 h-6 text-primary animate-pulse" />
                 </div>
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-black tracking-tighter uppercase leading-none">{unit?.name || "Junction Node"}</h2>
-                  <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-[0.4em] mt-1.5 flex items-center gap-2">
+                  <h2 className="text-2xl font-black tracking-tighter uppercase leading-none">{unit?.name || "Junction Node"}</h2>
+                  <p className="text-[9px] font-black text-slate-950/40 uppercase tracking-[0.4em] mt-1.5 flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     Active Engineering Instance
                   </p>
@@ -173,8 +174,8 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
                     <Card className="bg-white/80 border-2 border-emerald-500/20 p-8 rounded-[3.5rem] shadow-2xl space-y-8 overflow-hidden">
                       <div className="flex flex-col items-center text-center space-y-4">
-                        <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center">
-                          <CheckCircle2 className="w-10 h-10 text-emerald-600" />
+                        <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center">
+                          <CheckCircle2 className="w-8 h-8 text-emerald-600" />
                         </div>
                         <h3 className="text-2xl font-black tracking-tight uppercase">Mastery Complete</h3>
                         <div className="space-y-1">

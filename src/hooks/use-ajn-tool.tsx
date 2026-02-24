@@ -77,7 +77,7 @@ export function ProgressBar({ pct, color = "#3B82F6", label }: { pct: number, co
           <span>{Math.round(pct)}%</span>
         </div>
       )}
-      <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
+      <div className="h-1 bg-black/5 rounded-full overflow-hidden">
         <motion.div 
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -93,14 +93,14 @@ export function ProgressBar({ pct, color = "#3B82F6", label }: { pct: number, co
 /**
  * AJN Live Terminal Log
  */
-export function LogStream({ logs, color = "#3B82F6" }: { logs: LogEntry[], color?: string }) {
+export function LogStream({ logs }: { logs: LogEntry[] }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => { 
     if (ref.current) ref.current.scrollTop = ref.current.scrollHeight; 
   }, [logs]);
 
   return (
-    <div ref={ref} className="h-48 overflow-y-auto p-4 bg-black rounded-2xl border border-white/10 font-mono text-[10px] leading-relaxed scrollbar-hide">
+    <div ref={ref} className="h-40 overflow-y-auto p-5 bg-black rounded-[1.5rem] border border-white/10 font-mono text-[10px] leading-relaxed scrollbar-hide">
       {logs.map((log, i) => (
         <div key={i} className="mb-1 text-slate-400">
           <span className="text-primary/60 mr-2">[{((log.ts - (logs[0]?.ts || log.ts)) / 1000).toFixed(2)}s]</span>
