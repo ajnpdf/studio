@@ -99,7 +99,7 @@ export default function ToolPage({ params }: Props) {
         {/* Footer Attribution */}
         <footer className="h-12 border-t border-black/5 bg-white/40 backdrop-blur-md flex items-center justify-center px-8 shrink-0">
           <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.5em]">
-            AJN Workspace • 2025 • Made by Indian ❤️
+            AJN Workspace • 2026 • Made in INDIAN❤️
           </p>
         </footer>
       </main>

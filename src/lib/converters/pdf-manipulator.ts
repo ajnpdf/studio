@@ -22,24 +22,42 @@ export class PDFManipulator {
   }
 
   async runOperation(toolId: string, options: any = {}): Promise<ConversionResult> {
-    const baseName = this.files[0].name.split('.')[0];
+    // Safety check for base name to avoid undefined errors
+    const firstFile = this.files && this.files.length > 0 ? this.files[0] : null;
+    const baseName = firstFile ? firstFile.name.split('.')[0] : (options.document?.name?.split('.')[0] || "Document");
+    
     let { pageData = [] } = options;
 
     this.updateProgress(10, "Inhaling document binary structure...");
     const masterDoc = await PDFDocument.create();
     const font = await masterDoc.embedFont(StandardFonts.Helvetica);
 
-    const sourceDocs = await Promise.all(this.files.map(async (f) => {
-      const buf = await f.arrayBuffer();
-      return PDFDocument.load(buf, { ignoreEncryption: true });
+    // Safely load source documents if files exist
+    const sourceDocs = await Promise.all((this.files || []).map(async (f) => {
+      try {
+        const buf = await f.arrayBuffer();
+        return await PDFDocument.load(buf, { ignoreEncryption: true });
+      } catch (e) {
+        console.warn(`[Manipulator] Failed to load source file ${f.name}`, e);
+        return null;
+      }
     }));
 
-    if (pageData.length === 0) {
+    // If no specific page data was passed, default to all pages from all source docs
+    if (pageData.length === 0 && sourceDocs.length > 0) {
       sourceDocs.forEach((doc, fIdx) => {
+        if (!doc) return;
         const pageCount = doc.getPageCount();
         for (let pIdx = 0; pIdx < pageCount; pIdx++) {
           pageData.push({ fileIdx: fIdx, pageIdx: pIdx, rotation: 0 });
         }
+      });
+    }
+
+    // If still no page data (e.g. editor start), use the document object model if available
+    if (pageData.length === 0 && options.document?.pages) {
+      options.document.pages.forEach((p: any, idx: number) => {
+        pageData.push({ fileIdx: -1, pageIdx: idx, rotation: p.rotation || 0 });
       });
     }
 
@@ -50,8 +68,16 @@ export class PDFManipulator {
       const prog = 30 + Math.round((i / pageData.length) * 60);
       this.updateProgress(prog, `Syncing segment ${i + 1}/${pageData.length}...`);
 
-      const sourceDoc = sourceDocs[item.fileIdx];
-      const [copiedPage] = await masterDoc.copyPages(sourceDoc, [item.pageIdx]);
+      let copiedPage;
+      
+      // If we have a source doc, copy the page
+      if (item.fileIdx !== -1 && sourceDocs[item.fileIdx]) {
+        const sourceDoc = sourceDocs[item.fileIdx]!;
+        [copiedPage] = await masterDoc.copyPages(sourceDoc, [item.pageIdx]);
+      } else {
+        // Otherwise create a blank page for the injection
+        copiedPage = masterDoc.addPage([595.28, 841.89]);
+      }
       
       if (item.rotation !== 0) {
         copiedPage.setRotation(degrees(item.rotation));
@@ -107,7 +133,15 @@ export class PDFManipulator {
         }
       }
       
-      masterDoc.addPage(copiedPage);
+      // Ensure the page is attached if we copied it (addPage for copied pages)
+      if (item.fileIdx !== -1) {
+        masterDoc.addPage(copiedPage);
+      }
+    }
+
+    // Safety: ensure at least one page exists
+    if (masterDoc.getPageCount() === 0) {
+      masterDoc.addPage();
     }
 
     this.updateProgress(95, "Synchronizing final binary buffer...");
