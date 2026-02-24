@@ -38,7 +38,7 @@ class AJNPDFEngine {
         const converter = new MergeConverter(files, (p, m) => onProgressCallback({ stage: "Merge", detail: m, pct: p }));
         result = await converter.merge();
       }
-      // 3. SPLIT CORE
+      // 3. SPLIT CORE (Extract selection into single PDF)
       else if (toolId === 'split-pdf') {
         const { SplitConverter } = await import('@/lib/converters/split-converter');
         const converter = new SplitConverter(firstFile, (p, m) => onProgressCallback({ stage: "Split", detail: m, pct: p }));

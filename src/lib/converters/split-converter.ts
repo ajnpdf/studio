@@ -1,12 +1,12 @@
 'use client';
 
 import { PDFDocument } from 'pdf-lib';
-import JSZip from 'jszip';
 import { ConversionResult, ProgressCallback } from './pdf-converter';
 
 /**
  * AJN Master Split Engine
  * Surgical binary extraction for document decomposition.
+ * Strictly outputs .pdf, no ZIP archives.
  */
 export class SplitConverter {
   private file: File;
@@ -21,61 +21,57 @@ export class SplitConverter {
     this.onProgress?.(percent, message);
   }
 
+  /**
+   * Splits/Extracts pages into a single new PDF document.
+   * @param options Object containing pageIndices array from the UI selection
+   */
   async split(options: any = {}): Promise<ConversionResult> {
-    const { mode = 'fixed', value = 1, filename } = options;
+    const { pageIndices = [], filename } = options;
     const baseName = this.file.name.split('.')[0];
 
     this.updateProgress(10, "Inhaling source binary structure...");
     const buf = await this.file.arrayBuffer();
-    const sourceDoc = await PDFDocument.load(buf, { ignoreEncryption: true });
-    const totalPages = sourceDoc.getPageCount();
-
-    this.updateProgress(20, `Decomposing ${totalPages} pages into neural segments...`);
-
-    const zip = new JSZip();
-    let documentsCreated = 0;
-
-    if (mode === 'fixed') {
-      // Split every X pages
-      const interval = Math.max(1, parseInt(value));
-      for (let i = 0; i < totalPages; i += interval) {
-        const prog = 20 + Math.round((i / totalPages) * 70);
-        this.updateProgress(prog, `Synthesizing segment ${documentsCreated + 1}...`);
-
-        const newDoc = await PDFDocument.create();
-        const indices = [];
-        for (let j = i; j < Math.min(i + interval, totalPages); j++) {
-          indices.push(j);
-        }
-
-        const copiedPages = await newDoc.copyPages(sourceDoc, indices);
-        copiedPages.forEach(p => newDoc.addPage(p));
-
-        const bytes = await newDoc.save();
-        zip.file(`${baseName}_Part_${documentsCreated + 1}.pdf`, bytes);
-        documentsCreated++;
-      }
-    } else {
-      // Manual Range Extraction (Simplified for prototype)
-      this.updateProgress(50, "Executing range-specific extraction...");
-      const newDoc = await PDFDocument.create();
-      const copiedPages = await newDoc.copyPages(sourceDoc, sourceDoc.getPageIndices());
-      copiedPages.forEach(p => newDoc.addPage(p));
-      const bytes = await newDoc.save();
-      return {
-        blob: new Blob([bytes], { type: 'application/pdf' }),
-        fileName: `${baseName}_Extracted.pdf`,
-        mimeType: 'application/pdf'
-      };
+    
+    let sourceDoc;
+    try {
+      sourceDoc = await PDFDocument.load(buf, { ignoreEncryption: true });
+    } catch (err: any) {
+      throw new Error(`Integrity check failed: ${err.message}`);
     }
 
-    this.updateProgress(95, "Finalizing archive package...");
-    const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+    const totalPages = sourceDoc.getPageCount();
+    
+    // Default to all pages if none selected (standard split/copy)
+    const targetIndices = pageIndices.length > 0 ? pageIndices : Array.from({ length: totalPages }, (_, i) => i);
+
+    this.updateProgress(30, `Isolating ${targetIndices.length} neural segments...`);
+
+    const newDoc = await PDFDocument.create();
+    
+    this.updateProgress(50, "Executing surgical binary transfer...");
+    const copiedPages = await newDoc.copyPages(sourceDoc, targetIndices);
+    
+    copiedPages.forEach((page, idx) => {
+      newDoc.addPage(page);
+      if (idx % 5 === 0) {
+        this.updateProgress(50 + Math.round((idx / copiedPages.length) * 40), `Stitching page ${idx + 1}...`);
+      }
+    });
+
+    this.updateProgress(95, "Synchronizing binary buffer and finalizing trailer...");
+    
+    // Use high-performance save settings
+    const pdfBytes = await newDoc.save({
+      useObjectStreams: true,
+      addDefaultPage: false
+    });
+
+    this.updateProgress(100, "Mastery execution successful.");
 
     return {
-      blob: zipBlob,
-      fileName: `${baseName}_Split_Archive.zip`,
-      mimeType: 'application/zip'
+      blob: new Blob([pdfBytes], { type: 'application/pdf' }),
+      fileName: `${baseName}_Split_${Date.now()}.pdf`,
+      mimeType: 'application/pdf'
     };
   }
 }
