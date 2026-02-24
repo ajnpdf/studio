@@ -238,12 +238,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                               </div>
                             </div>
                           </div>
-
-                          <div className="pt-6 border-t border-black/5 flex justify-end">
-                            <Button onClick={handleConfirmedExecution} className="h-16 px-16 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-3xl shadow-2xl hover:scale-105 transition-all gap-3">
-                              EXECUTE MODULE <ArrowRight className="w-5 h-5" />
-                            </Button>
-                          </div>
                         </section>
                       ) : (
                         <div className="space-y-10">
@@ -264,19 +258,20 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                               </Card>
                             ))}
                           </div>
-                          
-                          {/* GLOBAL EXECUTE BAR */}
-                          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-6">
-                            <Button 
-                              onClick={handleConfirmedExecution} 
-                              disabled={selectedPages.size === 0}
-                              className="w-full h-16 bg-primary text-white font-black text-sm uppercase tracking-widest rounded-full shadow-[0_20px_50px_rgba(30,58,138,0.4)] hover:scale-105 transition-all gap-4 border-2 border-white/20"
-                            >
-                              <Zap className="w-5 h-5" /> EXECUTE PROCESS ({selectedPages.size} SEGMENTS)
-                            </Button>
-                          </div>
                         </div>
                       )}
+
+                      {/* GLOBAL FIXED EXECUTE BAR */}
+                      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-6">
+                        <Button 
+                          onClick={handleConfirmedExecution} 
+                          disabled={!(isCompressTool || isProtectTool) && selectedPages.size === 0}
+                          className="w-full h-16 bg-primary text-white font-black text-sm uppercase tracking-widest rounded-full shadow-[0_20px_50px_rgba(30,58,138,0.4)] hover:scale-105 transition-all gap-4 border-2 border-white/20"
+                        >
+                          <Zap className="w-5 h-5" /> 
+                          {isCompressTool || isProtectTool ? "EXECUTE MODULE" : `EXECUTE PROCESS (${selectedPages.size} SEGMENTS)`}
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </motion.div>

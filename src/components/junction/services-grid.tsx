@@ -6,7 +6,7 @@ import {
   Layout, Scissors, Trash2, Copy, Search, Shrink, Wrench, Hash, Unlock, Lock, 
   PenTool, EyeOff, GitCompare, Globe, FolderOpen, Presentation, ShieldCheck, 
   MousePointer2, History, Paintbrush, Layers, ImageIcon, FileText, Table, ArrowRight,
-  FileCode, Plus, RotateCw, Type, ListChecks, Scan
+  FileCode, Plus, RotateCw, Type, ListChecks, Scan, Archive
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,9 +21,6 @@ export type ServiceUnit = {
   cat: 'Organize' | 'Optimize' | 'Convert' | 'Edit' | 'Security' | 'Export' | 'Intelligence';
   mode: 'Standard' | 'Advanced';
   color: string;
-  benefits?: string[];
-  instructions?: string[];
-  useCases?: string[];
 };
 
 export const ALL_UNITS: ServiceUnit[] = [

@@ -22,7 +22,6 @@ export class PDFManipulator {
   }
 
   async runOperation(toolId: string, options: any = {}): Promise<ConversionResult> {
-    // Safety check for base name to avoid undefined errors
     const firstFile = this.files && this.files.length > 0 ? this.files[0] : null;
     const baseName = firstFile ? firstFile.name.split('.')[0] : (options.document?.name?.split('.')[0] || "Document");
     
@@ -100,11 +99,6 @@ export class PDFManipulator {
         });
       }
 
-      // Advanced Color Matrix
-      if (toolId === 'grayscale-pdf') {
-        this.updateProgress(prog, `Recalibrating color matrix: Segment ${i + 1}`);
-      }
-
       // HIGH-FIDELITY LAYER INJECTION (SIGNATURES, IMAGES, TEXT)
       if (options.document?.pages?.[i]) {
         const elements = options.document.pages[i].elements;
@@ -133,13 +127,12 @@ export class PDFManipulator {
         }
       }
       
-      // Ensure the page is attached if we copied it (addPage for copied pages)
+      // Ensure the page is attached if we copied it
       if (item.fileIdx !== -1) {
         masterDoc.addPage(copiedPage);
       }
     }
 
-    // Safety: ensure at least one page exists
     if (masterDoc.getPageCount() === 0) {
       masterDoc.addPage();
     }
