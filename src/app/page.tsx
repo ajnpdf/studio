@@ -5,7 +5,7 @@ import { LogoAnimation } from '@/components/landing/logo-animation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
-import { ArrowRight, Layers, ShieldCheck, User, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Layers, User, CheckCircle2 } from 'lucide-react';
 import { NightSky } from '@/components/dashboard/night-sky';
 
 /**

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { CategorySidebar } from '@/components/dashboard/conversion/category-sidebar';
 import { DropZone } from '@/components/dashboard/conversion/drop-zone';
 import { useAJNTool, ProgressBar, LogStream } from '@/hooks/use-ajn-tool';
-import { Settings2, ShieldCheck, Cpu, Zap, Download, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Settings2, Cpu, Zap, Download, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
