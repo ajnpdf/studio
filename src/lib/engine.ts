@@ -12,7 +12,7 @@ class AJNPDFEngine {
   async init() {
     if (this.initialized) return;
     this.initialized = true;
-    console.log('[AJN Core] synchronized.');
+    console.log('[AJN Core] Neural pipeline synchronized.');
   }
 
   async runTool(toolId: string, inputs: any, options = {}, onProgressCallback: any) {
@@ -21,12 +21,12 @@ class AJNPDFEngine {
 
     const files = Array.isArray(inputs) ? inputs : [inputs];
     const firstFile = files[0];
-    if (!firstFile) throw new Error("No asset detected in sequence.");
+    if (!firstFile) throw new Error("No asset detected in sequence buffer.");
 
     let result: { blob: Blob; fileName: string; mimeType: string };
 
     try {
-      // 1. INTELLIGENCE & VISION LAYER (OCR, Summarize, Translate)
+      // 1. INTELLIGENCE & VISION LAYER
       if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf', 'compress-pdf', 'repair-pdf'].includes(toolId)) {
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
         const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Intelligence", detail: m, pct: p }));
@@ -39,9 +39,9 @@ class AJNPDFEngine {
           'compress-pdf': 'COMPRESS',
           'repair-pdf': 'REPAIR'
         };
-        result = await converter.convertTo(map[toolId], options);
+        result = await converter.convertTo(map[toolId] || 'OCR', options);
       } 
-      // 2. SURGICAL MANIPULATION CORE (Merge, Split, Delete, Sign)
+      // 2. SURGICAL MANIPULATION CORE
       else if (['merge-pdf', 'split-pdf', 'extract-pages', 'delete-pages', 'rotate-pdf', 'sign-pdf', 'organize-pdf', 'protect-pdf', 'unlock-pdf', 'redact-pdf', 'flatten-pdf', 'add-page-numbers', 'grayscale-pdf'].includes(toolId)) {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Manipulation", detail: m, pct: p }));
@@ -62,7 +62,7 @@ class AJNPDFEngine {
           'pdf-txt': 'TXT',
           'pdf-pdfa': 'PDFA'
         };
-        result = await converter.convertTo(map[toolId], options);
+        result = await converter.convertTo(map[toolId] || 'JPG', options);
       }
       // 4. DEVELOPMENT CORE (Office/Image to PDF)
       else if (toolId.endsWith('-pdf')) {
@@ -85,16 +85,14 @@ class AJNPDFEngine {
           result = await new CodeConverter(firstFile, (p, m) => onProgressCallback({ stage: "Data", detail: m, pct: p })).convertTo('PDF', options);
         }
       } else {
-        throw new Error(`Engine routing for ${toolId} is in calibration.`);
+        throw new Error(`Engine routing for node ${toolId} is in calibration.`);
       }
 
       onProgressCallback({ stage: "Established", detail: "Binary synchronization successful.", pct: 100 });
       return { success: true, fileName: result.fileName, byteLength: result.blob.size, blob: result.blob };
     } catch (err: any) {
-      console.error("[AJN Core] execution failure:", err);
-      // Robust error reporting to resolve Next.js crash
-      const msg = err?.message || "Synthesis failure during binary processing.";
-      throw new Error(msg);
+      console.error("[AJN Core] Execution failure:", err);
+      throw new Error(err?.message || "Synthesis failure during binary processing.");
     }
   }
 }
