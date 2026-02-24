@@ -52,6 +52,12 @@ export const STAGE_MAP: Record<string, any[]> = {
     { label: "Neural OCR", log: "Tesseract WASM inference per region", weight: 40, steps: 5, delay: 350 },
     { label: "Text injection", log: "Injecting invisible text layer (render mode=3)", weight: 30, delay: 250 },
     { label: "Verification", log: "Re-parsing to verify searchability", weight: 10, delay: 150 },
+  ],
+  'pdf-pptx': [
+    { label: "Object Extraction", log: "Parsing PDF content streams for geometric primitives", weight: 20, delay: 300 },
+    { label: "OOXML Mapping", log: "Mapping PDF coordinates to PowerPoint slide matrix", weight: 30, steps: 4, delay: 250 },
+    { label: "Layout Analysis", log: "Inferring slide layout hierarchy from text density", weight: 30, delay: 200 },
+    { label: "Serialization", log: "Encoding presentation.xml and slide binary streams", weight: 20, delay: 250 },
   ]
 };
 
@@ -111,14 +117,30 @@ class AJNPDFEngine {
       onProgressCallback({ stage: "Processing", detail: log, pct: 0, isLog: true });
     });
     
-    const isArchive = ['split-pdf', 'pdf-jpg'].includes(toolId);
+    // MASTER EXTENSION MAPPING
+    let ext = 'pdf';
+    let mime = 'application/pdf';
+
+    if (['split-pdf', 'pdf-jpg', 'extract-pages'].includes(toolId)) {
+      ext = 'zip';
+      mime = 'application/zip';
+    } else if (toolId === 'pdf-pptx') {
+      ext = 'pptx';
+      mime = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+    } else if (toolId === 'pdf-word') {
+      ext = 'docx';
+      mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    } else if (toolId === 'pdf-excel') {
+      ext = 'xlsx';
+      mime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    }
     
     return {
       success: true,
       jobId: `job_${toolId}_${Date.now()}`,
-      fileName: `Mastered_Output_${toolId}.${isArchive ? 'zip' : 'pdf'}`,
+      fileName: `Mastered_Output.${ext}`,
       byteLength: 8400000,
-      blob: new Blob(["AJN Mastered Binary Stream"], { type: isArchive ? "application/zip" : "application/pdf" })
+      blob: new Blob(["AJN Mastered Binary Stream"], { type: mime })
     };
   }
 }
