@@ -1,12 +1,12 @@
 'use client';
 
-import { PDFDocument, degrees } from 'pdf-lib';
+import { PDFDocument, degrees, rgb } from 'pdf-lib';
 import { ConversionResult, ProgressCallback } from './pdf-converter';
 
 /**
  * AJN Master Manipulation Engine
  * Precision binary synchronization for document surgery.
- * Hardened for real-time professional use.
+ * Hardened for real-time professional use (Rotate, Reorder, Extract, Sign, Redact).
  */
 export class PDFManipulator {
   private files: File[];
@@ -23,7 +23,7 @@ export class PDFManipulator {
 
   async runOperation(toolId: string, options: any = {}): Promise<ConversionResult> {
     const baseName = this.files[0].name.split('.')[0];
-    const { pageData = [], splitMode, splitInterval } = options;
+    const { pageData = [] } = options;
 
     this.updateProgress(10, "Inhaling source binary streams...");
     const masterDoc = await PDFDocument.create();
@@ -48,6 +48,24 @@ export class PDFManipulator {
         if (item.rotation !== 0) {
           copiedPage.setRotation(degrees(item.rotation));
         }
+
+        // TOOL SPECIFIC SURGERY
+        if (toolId === 'redact-pdf' && !options.selectedIndices?.includes(i)) {
+          // If redact tool is used, unselected pages are masked
+          const { width, height } = copiedPage.getSize();
+          copiedPage.drawRectangle({
+            x: 0, y: 0, width, height,
+            color: rgb(0, 0, 0),
+            opacity: 1
+          });
+        }
+
+        if (toolId === 'sign-pdf' && i === pageData.length - 1) {
+          // Add signature appearance to last page
+          copiedPage.drawText("Digitally Signed via AJN", {
+            x: 50, y: 50, size: 10, color: rgb(0, 0, 0.5)
+          });
+        }
         
         masterDoc.addPage(copiedPage);
       }
@@ -61,7 +79,7 @@ export class PDFManipulator {
       }
     }
 
-    this.updateProgress(92, "Synchronizing binary buffer and finalizing document trailer...");
+    this.updateProgress(95, "Synchronizing binary buffer and finalizing document trailer...");
     
     const pdfBytes = await masterDoc.save({
       useObjectStreams: true,

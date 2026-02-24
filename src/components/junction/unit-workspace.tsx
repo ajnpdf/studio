@@ -52,6 +52,10 @@ interface Props {
   initialUnitId?: string;
 }
 
+/**
+ * AJN Unit Workspace - Advanced Surgical Mastery
+ * Features universal visionary inspection, reordering, and rotation.
+ */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const unit = ALL_UNITS.find(u => u.id === initialUnitId);
   const { phase, progress, logs, result, error, run, reset, setPhase } = useAJNTool(initialUnitId || 'merge-pdf');
@@ -64,6 +68,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [splitMode, setSplitMode] = useState<'range' | 'interval'>('range');
   const [compressionLevel, setCompressionLevel] = useState<'basic' | 'strong'>('basic');
 
+  // Surgical tools default to zero selection for extraction/deletion logic
   const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf', 'organize-pdf', 'redact-pdf'].includes(unit?.id || '');
   const isOrganizeTool = unit?.id === 'organize-pdf';
   const isSplitTool = unit?.id === 'split-pdf';
@@ -71,9 +76,11 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
+    // Every tool now provides a visionary inspection phase for PDFs
     if (files.some(f => f.type === 'application/pdf')) {
       await loadAllPdfPages(files);
     } else {
+      // Non-PDF files skip visionary and run immediately
       run(files, { quality: 90 });
     }
   };
@@ -109,6 +116,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             rotation: 0
           });
 
+          // Transformation tools select all by default for "Mastery Review"
           if (!isSurgicalTool) initialSelected.add(pageId);
         }
       }
@@ -116,7 +124,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       setSelectedPages(initialSelected);
     } catch (err) {
       console.error(err);
-      toast({ title: "Binary Integrity Error", description: "Could not rasterize document.", variant: "destructive" });
+      toast({ title: "Binary Integrity Error", description: "Could not rasterize document segments.", variant: "destructive" });
       reset();
     } finally {
       setIsInitializing(false);
@@ -143,6 +151,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleConfirmedExecution = () => {
+    // Collect surgical instructions
     const pageData = pages
       .filter(p => !isSurgicalTool || selectedPages.has(p.id))
       .map(p => ({
@@ -152,7 +161,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       }));
 
     if (pageData.length === 0 && isSurgicalTool) {
-      toast({ title: "No Pages Selected", description: "Identify document nodes for extraction." });
+      toast({ title: "Selection Required", description: "Identify document nodes for extraction." });
       return;
     }
 
@@ -168,8 +177,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     if (!result?.blob) return;
     const url = URL.createObjectURL(result.blob);
     const a = document.createElement('a');
-    a.href = url; a.download = result.fileName; a.click();
-    toast({ title: "Asset Exported", description: "Download successful." });
+    a.href = url; 
+    a.download = result.fileName; 
+    a.click();
+    toast({ title: "Asset Exported", description: "Binary buffer saved locally." });
   };
 
   return (
@@ -220,8 +231,8 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                 <h3 className="text-lg font-black uppercase tracking-tighter">Visionary Inspect</h3>
                               </div>
                               <div className="flex gap-2">
-                                <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set(pages.map(p => p.id)))} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50"><ListChecks className="w-3 h-3" /> All</Button>
-                                <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set())} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50"><Eraser className="w-3 h-3" /> Clear</Button>
+                                <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set(pages.map(p => p.id)))} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><ListChecks className="w-3 h-3" /> Select All</Button>
+                                <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set())} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><Eraser className="w-3 h-3" /> Clear All</Button>
                               </div>
                             </div>
 

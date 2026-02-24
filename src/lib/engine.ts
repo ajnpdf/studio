@@ -92,7 +92,9 @@ class AJNPDFEngine {
       return { success: true, fileName: result.fileName, byteLength: result.blob.size, blob: result.blob };
     } catch (err: any) {
       console.error("[AJN Core] Execution failure:", err);
-      throw new Error(err?.message || "Synthesis failure during binary processing.");
+      // HARDENED ERROR HANDLING: Prevent 'reading node' crash
+      const msg = err?.message || (typeof err === 'string' ? err : "Synthesis failure during binary processing.");
+      throw new Error(msg);
     }
   }
 }
