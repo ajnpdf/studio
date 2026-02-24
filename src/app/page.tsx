@@ -203,7 +203,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link href="/ajn" className="block pt-4">
-                  <Button className="w-full h-16 bg-primary text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl">Start for Individuals</Button>
+                  <Button className="w-full h-16 bg-primary text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl shadow-xl">Start for Individuals</Button>
                 </Link>
               </Card>
 
@@ -255,7 +255,7 @@ export default function LandingPage() {
                     data-ai-hint="portrait"
                   />
                   <div className="absolute bottom-8 left-8 right-8 p-6 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-white/60 shadow-2xl">
-                    <p className="text-xl font-black tracking-tighter uppercase">Anjan Patel</p>
+                    <p className="text-xl font-black tracking-tighter uppercase text-slate-950">Anjan Patel</p>
                     <p className="text-[9px] font-black text-primary uppercase tracking-widest mt-0.5">Founder of AJN</p>
                   </div>
                 </div>

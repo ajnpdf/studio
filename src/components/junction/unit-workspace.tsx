@@ -116,8 +116,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             rotation: 0
           });
 
-          // Merge tool selects all pages by default
-          if (!isSurgicalTool || tool?.id === 'merge-pdf') initialSelected.add(pageId);
+          // Selection logic: Merge, Reorder, and Delete tools select all by default
+          if (!isSurgicalTool || tool?.id === 'merge-pdf' || tool?.id === 'delete-pages' || tool?.id === 'organize-pdf') {
+            initialSelected.add(pageId);
+          }
         }
       }
       setPages(allLoadedPages);
@@ -159,7 +161,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
         rotation: p.rotation
       }));
 
-    if (pageData.length === 0) {
+    if (pageData.length === 0 && tool?.id !== 'delete-pages') {
       toast({ title: "Selection Required", description: "Select at least one page to process." });
       return;
     }
@@ -214,10 +216,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
                           <div className="flex items-center gap-3">
                             <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest">
-                              {selectedPages.size} Selected
+                              {selectedPages.size} to Keep
                             </Badge>
                             <Button onClick={handleConfirmedExecution} className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl hover:scale-105 transition-all">
-                              Process Document <ChevronRight className="ml-2 w-4 h-4" />
+                              {tool?.id === 'delete-pages' ? 'Apply Removal' : 'Process Document'} <ChevronRight className="ml-2 w-4 h-4" />
                             </Button>
                           </div>
                         </div>
@@ -241,9 +243,13 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                     style={{ transform: `rotate(${page.rotation}deg)` }}
                                   />
                                   <div className="absolute top-3 left-3 bg-black/60 text-white text-[8px] font-black px-2 py-1 rounded-md backdrop-blur-md uppercase shadow-lg">#{idx + 1}</div>
-                                  {isSelected && (
+                                  {isSelected ? (
                                     <div className="absolute inset-0 flex items-center justify-center bg-primary/10">
                                       <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shadow-xl border-2 border-white/20"><CheckCircle2 className="w-6 h-6" /></div>
+                                    </div>
+                                  ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-red-500/20">
+                                      <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white shadow-xl border-2 border-white/20"><XCircle className="w-6 h-6" /></div>
                                     </div>
                                   )}
                                 </div>
@@ -281,16 +287,15 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
                             <div className="space-y-3">
                               <Label className="text-[10px] font-black uppercase tracking-widest text-slate-950/40">Fidelity Level</Label>
-                              <Select value={config.optimizationLevel} onValueChange={(v) => setConfig({...config, optimizationLevel: v})}>
-                                <SelectTrigger className="h-10 bg-black/5 border-none rounded-xl font-bold text-xs uppercase text-slate-950">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="rounded-xl border-black/5">
-                                  <SelectItem value="balanced">Balanced</SelectItem>
-                                  <SelectItem value="performance">Fast</SelectItem>
-                                  <SelectItem value="high">High Fidelity</SelectItem>
-                                </SelectContent>
-                              </Select>
+                              <select 
+                                value={config.optimizationLevel} 
+                                onChange={(e) => setConfig({...config, optimizationLevel: e.target.value})}
+                                className="w-full h-10 bg-black/5 border-none rounded-xl font-bold text-xs uppercase text-slate-950 px-3"
+                              >
+                                <option value="balanced">Balanced</option>
+                                <option value="performance">Fast</option>
+                                <option value="high">High Fidelity</option>
+                              </select>
                             </div>
 
                             <div className="flex items-center justify-between p-4 bg-black/5 rounded-2xl group transition-all hover:bg-black/10">
