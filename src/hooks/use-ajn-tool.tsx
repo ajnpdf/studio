@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import { motion } from "framer-motion";
 
 export interface ProgressState {
   stage: string;
@@ -67,10 +68,6 @@ export function useAJNTool(toolId: string) {
  * AJN Progress Bar - High Fidelity
  */
 export function ProgressBar({ pct, color = "#3B82F6", label }: { pct: number, color?: string, label?: string }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return null;
-
   return (
     <div className="w-full font-mono">
       {label && (
@@ -80,9 +77,12 @@ export function ProgressBar({ pct, color = "#3B82F6", label }: { pct: number, co
         </div>
       )}
       <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
-        <div 
-          className="h-full transition-all duration-300 ease-out" 
-          style={{ width: `${pct}%`, backgroundColor: color }} 
+        <motion.div 
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="h-full" 
+          style={{ backgroundColor: color }} 
         />
       </div>
     </div>
@@ -94,14 +94,9 @@ export function ProgressBar({ pct, color = "#3B82F6", label }: { pct: number, co
  */
 export function LogStream({ logs, color = "#3B82F6" }: { logs: LogEntry[], color?: string }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
-  
   useEffect(() => { 
-    setMounted(true);
     if (ref.current) ref.current.scrollTop = ref.current.scrollHeight; 
   }, [logs]);
-
-  if (!mounted) return null;
 
   return (
     <div ref={ref} className="h-48 overflow-y-auto p-4 bg-black rounded-2xl border border-white/10 font-mono text-[10px] leading-relaxed scrollbar-hide">
