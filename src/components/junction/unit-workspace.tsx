@@ -52,8 +52,8 @@ interface Props {
 }
 
 /**
- * AJN Tools Workspace - Visionary Setup 2026
- * Hardened for Word to PDF real-time execution with full page visibility.
+ * AJN Tools Workspace - Professional Industrial Setup 2026
+ * Hardened for Word to PDF real-time execution with visionary page management.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const tool = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -73,7 +73,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     optimizationLevel: 'balanced'
   });
 
-  const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf', 'organize-pdf', 'redact-pdf'].includes(tool?.id || '');
   const isWordTool = tool?.id === 'word-pdf';
 
   const getAcceptString = () => {
@@ -87,7 +86,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
     
-    // Visionary Logic: If PDF or Word, load all pages for visual control
+    // Visionary Logic: If PDF or Word, load all pages for visual control in real-time
     if (files.some(f => f.type === 'application/pdf') || isWordTool) {
       await loadDocumentPages(files, isWordTool);
     } else {
@@ -334,7 +333,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
                             <div className="pt-4 border-t border-black/5 space-y-4">
                               <p className="text-[8px] font-bold text-slate-950/40 uppercase tracking-widest text-center">
-                                Use for student purpose and business purpose useful to students and business and more
+                                Use for student purpose and business purpose • useful to students and business and more
                               </p>
                               <div className="flex items-center gap-3 text-emerald-600">
                                 <Lock className="w-3.5 h-3.5" />

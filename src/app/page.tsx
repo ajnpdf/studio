@@ -165,7 +165,7 @@ export default function LandingPage() {
             {[
               { icon: Zap, title: "Fast Processing", desc: "Optimized local execution for instant document transformations." },
               { icon: ShieldCheck, title: "Secure Privacy", desc: "Your files are processed entirely in your local buffer." },
-              { icon: Activity, title: "Advanced Tools", desc: "Integrated tools for accurate text extraction and document editing." }
+              { icon: Activity, title: "Advanced Tools", desc: "Integrated units for accurate text extraction and document editing." }
             ].map((f, i) => (
               <Card key={i} className="bg-white/40 backdrop-blur-xl border-black/5 p-10 rounded-[3rem] space-y-6 hover:border-primary/20 transition-all shadow-2xl group">
                 <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">

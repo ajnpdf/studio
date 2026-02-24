@@ -39,7 +39,7 @@ class AJNPDFEngine {
         };
         result = await converter.convertTo(map[toolId] || 'OCR', options);
       } 
-      // 2. Document Surgical Tools
+      // 2. Document Surgical Units
       else if (['merge-pdf', 'split-pdf', 'extract-pages', 'delete-pages', 'rotate-pdf', 'sign-pdf', 'organize-pdf', 'protect-pdf', 'unlock-pdf', 'redact-pdf', 'flatten-pdf', 'add-page-numbers', 'grayscale-pdf'].includes(toolId)) {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Processing", detail: m, pct: p }));
