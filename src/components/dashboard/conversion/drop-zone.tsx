@@ -126,7 +126,7 @@ export function DropZone({ onFiles, accept = "*/*" }: Props) {
                     <FileIcon className="w-4 h-4" />
                   </div>
                   <div className="overflow-hidden space-y-0.5">
-                    <p className="text-[11px] font-black truncate pr-4 text-slate-950 uppercase tracking-tighter">{file.name}</p>
+                    <p className="text-xs font-black truncate pr-4 text-slate-950 uppercase tracking-tighter">{file.name}</p>
                     <p className="text-[9px] font-black text-slate-950/40 uppercase tracking-widest">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
                   </div>
                 </div>

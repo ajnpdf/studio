@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DropZone } from '@/components/dashboard/conversion/drop-zone';
 import { useAJNTool, ProgressBar, LogStream } from '@/hooks/use-ajn-tool';
@@ -23,8 +23,14 @@ interface Props {
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const [config] = useState<any>({});
+  const [latency, setLatency] = useState<string | null>(null);
   const unit = ALL_UNITS.find(u => u.id === initialUnitId);
   const { phase, progress, logs, result, run, reset } = useAJNTool(initialUnitId || 'merge-pdf');
+
+  useEffect(() => {
+    // Fix hydration mismatch by generating random values only on client mount
+    setLatency((Math.random() * 50 + 10).toFixed(0));
+  }, []);
 
   const getAcceptedExtensions = () => {
     if (!unit) return ".pdf";
@@ -215,7 +221,9 @@ export function UnitWorkspace({ initialUnitId }: Props) {
               </div>
               <div className="flex items-center gap-3">
                 <Activity className="w-4 h-4" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Latency: {(Math.random() * 50 + 10).toFixed(0)}ms</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                  Latency: {latency ? `${latency}ms` : 'Calculating...'}
+                </span>
               </div>
             </footer>
           </motion.div>
