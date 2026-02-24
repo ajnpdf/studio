@@ -25,7 +25,7 @@ export class PDFManipulator {
     const baseName = this.files[0].name.split('.')[0];
     let { pageData = [] } = options;
 
-    this.updateProgress(10, "Loading source document structure...");
+    this.updateProgress(10, "Inhaling document binary structure...");
     const masterDoc = await PDFDocument.create();
     const font = await masterDoc.embedFont(StandardFonts.Helvetica);
 
@@ -99,7 +99,7 @@ export class PDFManipulator {
       masterDoc.addPage(copiedPage);
     }
 
-    this.updateProgress(95, "Synchronizing binary buffer and finalizing document trailer...");
+    this.updateProgress(95, "Synchronizing binary buffer and finalizing trailer...");
     
     const pdfBytes = await masterDoc.save({
       useObjectStreams: true,
@@ -111,6 +111,7 @@ export class PDFManipulator {
     let finalFileName = `${baseName}_Processed.pdf`;
     if (toolId === 'merge-pdf') finalFileName = `Merged_Document_${Date.now()}.pdf`;
     if (toolId === 'split-pdf' || toolId === 'extract-pages') finalFileName = `${baseName}_Extracted.pdf`;
+    if (toolId === 'organize-pdf') finalFileName = `${baseName}_Organized.pdf`;
 
     return {
       blob: new Blob([pdfBytes], { type: 'application/pdf' }),

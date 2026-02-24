@@ -28,7 +28,7 @@ import { NightSky } from '@/components/dashboard/night-sky';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 /**
- * All-in-one Junction Network - Unified Landing Hub
+ * All-in-one Junction Network - Landing Hub
  * Simple Professional Industrial Design
  */
 export default function LandingPage() {
@@ -341,7 +341,7 @@ export default function LandingPage() {
             AJN Core • 2025
           </p>
           <div className="flex items-center gap-2.5 px-5 py-2 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
-            <span className="text-[10px] font-black text-primary uppercase tracking-widest">Made in India ❤️</span>
+            <span className="text-[10px] font-black text-primary uppercase tracking-widest">Made in INDIAN❤️</span>
           </div>
         </div>
       </footer>

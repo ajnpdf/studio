@@ -117,7 +117,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
           });
 
           // Selection logic: Merge, Reorder, and Delete tools select all by default
-          if (!isSurgicalTool || tool?.id === 'merge-pdf' || tool?.id === 'delete-pages' || tool?.id === 'organize-pdf') {
+          if (!isSurgicalTool || tool?.id === 'merge-pdf' || tool?.id === 'delete-pages' || tool?.id === 'organize-pdf' || tool?.id === 'extract-pages') {
             initialSelected.add(pageId);
           }
         }
@@ -387,7 +387,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       
       <footer className="fixed bottom-0 left-0 right-0 h-12 bg-white/40 backdrop-blur-md border-t border-black/5 flex items-center justify-center z-[100]">
         <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.5em]">
-          All-in-one Junction Network • 2025 • Made in India ❤️
+          All-in-one Junction Network • 2025 • Made in INDIAN❤️
         </p>
       </footer>
     </div>
