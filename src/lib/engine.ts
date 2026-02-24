@@ -3,7 +3,7 @@
 /**
  * AJN Master Engineering Orchestrator
  * High-fidelity logic routing for 30+ specialized binary service units.
- * Ensures 99.9% working, industry-standard documents for every execution.
+ * Hardened to resolve Intelligence Layer routing errors.
  */
 
 class AJNPDFEngine {
@@ -17,7 +17,7 @@ class AJNPDFEngine {
 
   /**
    * Main tool execution router.
-   * Bridges tool IDs to specialized implementations.
+   * Explicit mapping ensures correct routing for intelligence units.
    */
   async runTool(toolId: string, inputs: any, options = {}, onProgressCallback: any) {
     await this.init();
@@ -31,20 +31,22 @@ class AJNPDFEngine {
     let result: { blob: Blob; fileName: string; mimeType: string };
 
     try {
-      // 1. PDF-TO-X (Export Mastery)
-      if (toolId.startsWith('pdf-') && !['pdf-pdfa', 'pdf-excel', 'pdf-word', 'pdf-pptx', 'pdf-jpg', 'pdf-png', 'pdf-webp'].includes(toolId)) {
-        // Fallback for generic pdf-X if needed
-      }
-
-      // 2. INTELLIGENCE & VISION (Priority IDs - Prevents routing to generic X-TO-PDF)
-      if (['summarize-pdf', 'translate-pdf', 'compare-pdf', 'ocr-pdf'].includes(toolId)) {
+      // 1. INTELLIGENCE & VISION (Priority Mapping)
+      const intelligenceIds = ['summarize-pdf', 'translate-pdf', 'compare-pdf', 'ocr-pdf'];
+      if (intelligenceIds.includes(toolId)) {
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
         const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Intelligence", detail: m, pct: p }));
-        const target = toolId.split('-')[0].toUpperCase();
+        
+        // Map UI IDs to specialized method targets
+        let target = 'SUMMARIZE';
+        if (toolId === 'translate-pdf') target = 'TRANSLATE';
+        else if (toolId === 'ocr-pdf') target = 'OCR';
+        else if (toolId === 'compare-pdf') target = 'COMPARE';
+        
         result = await converter.convertTo(target, options);
       } 
       
-      // 3. EXPORT SPECIALISTS
+      // 2. EXPORT SPECIALISTS
       else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt'].includes(toolId)) {
         const targetMap: Record<string, string> = {
           'pdf-jpg': 'JPG', 'pdf-png': 'PNG', 'pdf-webp': 'WEBP',
@@ -56,7 +58,7 @@ class AJNPDFEngine {
         result = await converter.convertTo(target, options);
       }
 
-      // 4. X-TO-PDF (Development Mastery)
+      // 3. X-TO-PDF (Development Mastery)
       else if (toolId.endsWith('-pdf')) {
         const source = toolId.split('-')[0];
         if (['jpg', 'jpeg', 'png', 'webp'].includes(source)) {
@@ -82,7 +84,7 @@ class AJNPDFEngine {
         }
       }
       
-      // 5. CORE MANIPULATION & SECURITY
+      // 4. CORE MANIPULATION & SECURITY
       else if (['merge-pdf', 'split-pdf', 'rotate-pdf', 'compress-pdf', 'redact-pdf', 'protect-pdf', 'sign-pdf', 'repair-pdf', 'organize-pdf', 'delete-pages', 'extract-pages', 'add-page-numbers', 'edit-pdf', 'unlock-pdf', 'flatten-pdf', 'pdf-pdfa', 'grayscale-pdf', 'crop-pdf'].includes(toolId)) {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Manipulation", detail: m, pct: p }));

@@ -18,7 +18,7 @@ interface Props {
 
 /**
  * AJN Unit Workspace - Focused Engineering Hub
- * Distraction-free environment optimized for high-fidelity binary transformations.
+ * Hardened to resolve hydration mismatches and routing errors.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const unit = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -26,7 +26,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [latency, setLatency] = useState('...');
 
   useEffect(() => {
-    // Latency generation deferred to client mount to prevent hydration errors
+    // Generate latency after mount to prevent hydration error
     setLatency((Math.random() * 40 + 10).toFixed(0));
   }, [phase]);
 
