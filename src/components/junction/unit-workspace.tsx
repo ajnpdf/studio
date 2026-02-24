@@ -32,6 +32,7 @@ import { cn } from '@/lib/utils';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { engine } from '@/lib/engine';
 
 if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
@@ -51,8 +52,8 @@ interface Props {
 }
 
 /**
- * AJN Tools Workspace - Professional Advance Setup 2026
- * Hardened for Word to PDF real-time execution.
+ * AJN Tools Workspace - Visionary Setup 2026
+ * Hardened for Word to PDF real-time execution with full page visibility.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const tool = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -63,7 +64,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [selectedPages, setSelectedPages] = useState<Set<string>>(new Set());
   const [isInitializing, setIsInitializing] = useState(false);
   
-  // Configuration State
   const [config, setConfig] = useState({
     quality: 90,
     strongCompression: false,
@@ -74,10 +74,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   });
 
   const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf', 'organize-pdf', 'redact-pdf'].includes(tool?.id || '');
+  const isWordTool = tool?.id === 'word-pdf';
 
-  // Dynamic Accept String based on tool
   const getAcceptString = () => {
-    if (tool?.id === 'word-pdf') return ".doc,.docx,.odt,.rtf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    if (isWordTool) return ".doc,.docx,.odt,.rtf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     if (tool?.id === 'excel-pdf') return ".xls,.xlsx,.csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     if (tool?.id === 'ppt-pdf') return ".ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation";
     if (tool?.id === 'jpg-pdf') return "image/jpeg,image/jpg";
@@ -86,14 +86,16 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
-    if (files.some(f => f.type === 'application/pdf')) {
-      await loadAllPdfPages(files);
+    
+    // Visionary Logic: If PDF or Word, load all pages for visual control
+    if (files.some(f => f.type === 'application/pdf') || isWordTool) {
+      await loadDocumentPages(files, isWordTool);
     } else {
       run(files, config);
     }
   };
 
-  const loadAllPdfPages = async (files: File[]) => {
+  const loadDocumentPages = async (files: File[], convertFromWord: boolean) => {
     setIsInitializing(true);
     setPhase('selecting');
     const allLoadedPages: PageNode[] = [];
@@ -101,7 +103,18 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
     try {
       for (let fIdx = 0; fIdx < files.length; fIdx++) {
-        const file = files[fIdx];
+        let file = files[fIdx];
+        
+        // If it's a Word file, do a pre-flight conversion to PDF for preview
+        if (convertFromWord) {
+          const preRes = await engine.runTool('word-pdf', [file], config, () => {});
+          if (preRes.success && preRes.blob) {
+            file = new File([preRes.blob], 'preview.pdf', { type: 'application/pdf' });
+          } else {
+            throw new Error("Pre-flight conversion failed.");
+          }
+        }
+
         if (file.type !== 'application/pdf') continue;
 
         const arrayBuffer = await file.arrayBuffer();
@@ -124,16 +137,14 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             rotation: 0
           });
 
-          if (!isSurgicalTool || tool?.id === 'merge-pdf' || tool?.id === 'delete-pages' || tool?.id === 'organize-pdf' || tool?.id === 'extract-pages') {
-            initialSelected.add(pageId);
-          }
+          initialSelected.add(pageId);
         }
       }
       setPages(allLoadedPages);
       setSelectedPages(initialSelected);
     } catch (err) {
       console.error(err);
-      toast({ title: "Error", description: "Could not load document pages.", variant: "destructive" });
+      toast({ title: "Error", description: "Could not load document pages for preview.", variant: "destructive" });
       reset();
     } finally {
       setIsInitializing(false);
@@ -168,7 +179,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
         rotation: p.rotation
       }));
 
-    if (pageData.length === 0 && tool?.id !== 'delete-pages') {
+    if (pageData.length === 0) {
       toast({ title: "Selection Required", description: "Select at least one page to process." });
       return;
     }
@@ -209,7 +220,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   {isInitializing ? (
                     <div className="py-32 text-center space-y-6 opacity-40">
                       <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
-                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950">Preparing Local Buffer...</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950">Preparing Document Buffer...</p>
                     </div>
                   ) : (
                     <div className="flex flex-col xl:flex-row gap-8">
@@ -218,7 +229,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                           <div className="space-y-3">
                             <div className="flex items-center gap-3 text-primary">
                               <Eye className="w-5 h-5" />
-                              <h3 className="text-lg font-black uppercase tracking-tighter text-slate-950">Visual Preview</h3>
+                              <h3 className="text-lg font-black uppercase tracking-tighter text-slate-950">Visionary Preview</h3>
                             </div>
                             <div className="flex gap-2">
                               <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set(pages.map(p => p.id)))} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><ListChecks className="w-3 h-3" /> Select All</Button>
@@ -228,10 +239,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
                           <div className="flex items-center gap-3">
                             <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest">
-                              {selectedPages.size} to Keep
+                              {selectedPages.size} Segments Active
                             </Badge>
                             <Button onClick={handleConfirmedExecution} className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl hover:scale-105 transition-all">
-                              {tool?.id === 'delete-pages' ? 'Apply Removal' : 'Process Document'} <ChevronRight className="ml-2 w-4 h-4" />
+                              Finalize Conversion <ChevronRight className="ml-2 w-4 h-4" />
                             </Button>
                           </div>
                         </div>
@@ -280,12 +291,12 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                         <Card className="p-6 bg-white/60 border border-black/5 rounded-3xl shadow-xl backdrop-blur-3xl space-y-8">
                           <div className="flex items-center gap-3 text-primary border-b border-black/5 pb-4">
                             <Settings2 className="w-5 h-5" />
-                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-950">Configuration</h3>
+                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-950">Unit Configuration</h3>
                           </div>
 
                           <div className="space-y-6">
                             <div className="space-y-3">
-                              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-950/40">Output Quality</Label>
+                              <Label className="text-[10px] font-black uppercase text-slate-950/40 tracking-widest">Output Fidelity</Label>
                               <div className="flex justify-between items-center px-1">
                                 <span className="text-xs font-bold text-slate-950">{config.quality}%</span>
                               </div>
@@ -298,22 +309,22 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                             </div>
 
                             <div className="space-y-3">
-                              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-950/40">Fidelity Level</Label>
+                              <Label className="text-[10px] font-black uppercase text-slate-950/40 tracking-widest">Optimization Strategy</Label>
                               <select 
                                 value={config.optimizationLevel} 
                                 onChange={(e) => setConfig({...config, optimizationLevel: e.target.value})}
                                 className="w-full h-10 bg-black/5 border-none rounded-xl font-bold text-xs uppercase text-slate-950 px-3"
                               >
                                 <option value="balanced">Balanced</option>
-                                <option value="performance">Fast</option>
-                                <option value="high">High Fidelity</option>
+                                <option value="performance">Fast Processing</option>
+                                <option value="high">High Accuracy</option>
                               </select>
                             </div>
 
                             <div className="flex items-center justify-between p-4 bg-black/5 rounded-2xl group transition-all hover:bg-black/10">
                               <div className="space-y-0.5">
-                                <p className="text-[10px] font-black uppercase text-slate-950">Compress Output</p>
-                                <p className="text-[8px] text-slate-950/40 font-bold uppercase">Smaller File Size</p>
+                                <p className="text-[10px] font-black uppercase text-slate-950">Binary Compression</p>
+                                <p className="text-[8px] text-slate-950/40 font-bold uppercase">Reduce footprint</p>
                               </div>
                               <Switch 
                                 checked={config.strongCompression} 
@@ -327,11 +338,11 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                               </p>
                               <div className="flex items-center gap-3 text-emerald-600">
                                 <Lock className="w-3.5 h-3.5" />
-                                <span className="text-[9px] font-black uppercase tracking-widest">Secure Local Processing</span>
+                                <span className="text-[9px] font-black uppercase tracking-widest">Secure Local Execution</span>
                               </div>
                               <div className="flex items-center gap-3 text-slate-950/40">
                                 <History className="w-3.5 h-3.5" />
-                                <span className="text-[9px] font-black uppercase tracking-widest">No Server Storage</span>
+                                <span className="text-[9px] font-black uppercase tracking-widest">Wipe Cache on Exit</span>
                               </div>
                             </div>
                           </div>
@@ -366,17 +377,17 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     <div className="flex flex-col items-center space-y-6">
                       <div className="w-20 h-20 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center border-2 border-emerald-500/20 shadow-lg"><CheckCircle2 className="w-10 h-10 text-emerald-600" /></div>
                       <div className="space-y-2">
-                        <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] px-4 h-6 rounded-full uppercase tracking-widest mb-2 shadow-sm">Process Successful</Badge>
+                        <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] px-4 h-6 rounded-full uppercase tracking-widest mb-2 shadow-sm">Conversion Successful</Badge>
                         <h3 className="text-2xl md:text-3xl font-black tracking-tighter uppercase truncate max-w-md mx-auto text-slate-950">{result.fileName}</h3>
                         <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">Ready for Retrieval</p>
                       </div>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       <Button onClick={handleDownload} className="h-16 px-12 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 shadow-2xl transition-all hover:scale-105">
-                        <Download className="w-5 h-5" /> Download Now
+                        <Download className="w-5 h-5" /> Download PDF
                       </Button>
                       <Button variant="outline" onClick={reset} className="h-16 px-10 border-black/10 bg-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 hover:bg-black/5 transition-all text-slate-950">
-                        <RefreshCw className="w-5 h-5" /> New Session
+                        <RefreshCw className="w-5 h-5" /> New Batch
                       </Button>
                     </div>
                   </Card>
