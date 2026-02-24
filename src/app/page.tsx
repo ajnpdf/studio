@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,45 +17,38 @@ import {
   ShieldCheck, 
   Activity, 
   Globe, 
-  Cpu, 
   Calendar, 
   ChevronRight,
   Sparkles,
   Layout,
   Scissors,
-  Trash2,
-  Copy,
   Search,
   Shrink,
-  Wrench,
   Lock,
-  Unlock,
   PenTool,
   EyeOff,
-  GitCompare,
-  FileText,
-  MousePointer2
+  MousePointer2,
+  FileText
 } from 'lucide-react';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 /**
- * AJN Master Landing Page - Integrated Industrial Hub
- * iLovePDF-inspired Tool Grid & Unified Sections
+ * AJN Landing Page - Simple Professional PDF Tools Hub
  */
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
   const founderImage = PlaceHolderImages.find(img => img.id === 'founder-portrait');
 
   const popularTools = [
-    { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple assets.', icon: Layout, color: 'text-blue-500' },
-    { id: 'split-pdf', name: 'Split PDF', desc: 'Divide by selection.', icon: Scissors, color: 'text-indigo-500' },
-    { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce file size.', icon: Shrink, color: 'text-emerald-500' },
-    { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Text recognition.', icon: Search, color: 'text-orange-500' },
-    { id: 'edit-pdf', name: 'Edit PDF', desc: 'Modify content.', icon: MousePointer2, color: 'text-pink-500' },
-    { id: 'sign-pdf', name: 'Sign PDF', desc: 'E-signature.', icon: PenTool, color: 'text-slate-900' },
-    { id: 'redact-pdf', name: 'Redact PDF', desc: 'Mask sensitive data.', icon: EyeOff, color: 'text-red-500' },
-    { id: 'protect-pdf', name: 'Protect PDF', desc: 'Add encryption.', icon: Lock, color: 'text-purple-500' },
+    { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple documents.', icon: Layout, color: 'text-blue-500' },
+    { id: 'split-pdf', name: 'Split PDF', desc: 'Divide files by page range.', icon: Scissors, color: 'text-indigo-500' },
+    { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce document size.', icon: Shrink, color: 'text-emerald-500' },
+    { id: 'ocr-pdf', name: 'PDF OCR', desc: 'Recognize text in scans.', icon: Search, color: 'text-orange-500' },
+    { id: 'edit-pdf', name: 'Edit PDF', desc: 'Modify existing content.', icon: MousePointer2, color: 'text-pink-500' },
+    { id: 'sign-pdf', name: 'Sign PDF', desc: 'Add digital signatures.', icon: PenTool, color: 'text-slate-900' },
+    { id: 'redact-pdf', name: 'Redact PDF', desc: 'Hide sensitive data.', icon: EyeOff, color: 'text-red-500' },
+    { id: 'protect-pdf', name: 'Protect PDF', desc: 'Encrypt your files.', icon: Lock, color: 'text-purple-500' },
   ];
 
   useEffect(() => {
@@ -68,7 +61,6 @@ export default function LandingPage() {
     <div className="min-h-screen w-full text-slate-950 bg-transparent overflow-x-hidden font-sans scroll-smooth">
       <NightSky />
       
-      {/* HUD HEADER */}
       <header className="fixed top-0 left-0 right-0 h-20 bg-white/40 backdrop-blur-xl border-b border-black/5 z-[100]">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-full px-6">
           <Link href="/" className="flex items-center group">
@@ -90,7 +82,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-4">
             <Link href="/ajn">
               <Button className="h-10 bg-primary text-white hover:bg-primary/90 font-black text-[10px] tracking-[0.2em] rounded-xl uppercase px-6 shadow-xl">
-                Enter Junction
+                Open Tools
               </Button>
             </Link>
           </div>
@@ -101,26 +93,22 @@ export default function LandingPage() {
         
         {/* HERO SECTION */}
         <section className="pt-48 pb-20 text-center max-w-5xl mx-auto px-6 space-y-12">
-          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 1 }}>
-            <LogoAnimation className="w-56 h-28 md:w-72 md:h-36 mx-auto" />
-          </motion.div>
-          
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-950 leading-[0.9] uppercase">
-                All-in-one <br /> Junction <span className="text-primary">Network</span>
+                All-in-one <br /> PDF Hub
               </h1>
               <div className="flex flex-col items-center justify-center gap-4">
                 <div className="flex items-center justify-center gap-6">
                   <span className="w-12 h-px bg-slate-950/10"></span>
                   <p className="text-slate-950/60 text-[10px] md:text-[12px] font-black tracking-[0.4em] uppercase">
-                    Every File. One Smart Network.
+                    Every File. One Simple Network.
                   </p>
                   <span className="w-12 h-px bg-slate-950/10"></span>
                 </div>
                 <div className="px-6 py-2 bg-primary/5 border border-primary/10 rounded-full shadow-sm">
                   <p className="text-[10px] font-black uppercase tracking-widest text-primary">
-                    Only this site provides professional PDF tools and real-time services conversion free
+                    Only this site provides professional PDF tools and real-time services free
                   </p>
                 </div>
               </div>
@@ -129,18 +117,18 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
               <Link href="/ajn">
                 <Button className="h-16 px-12 bg-primary text-white font-black text-xs rounded-2xl transition-all gap-4 shadow-2xl hover:scale-105 uppercase tracking-widest">
-                  Start Engineering <ArrowRight className="w-4 h-4" />
+                  Get Started <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
             </div>
           </div>
         </section>
 
-        {/* TOOLS GRID SECTION (iLovePDF Style) */}
+        {/* TOOLS GRID SECTION */}
         <section id="tools" className="py-20 px-6 max-w-7xl mx-auto space-y-12">
           <div className="text-center space-y-2">
-            <h2 className="text-3xl font-black uppercase tracking-tighter">Popular <span className="text-primary">Service Units</span></h2>
-            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-950/40">Immediate access to real-time binary mastery</p>
+            <h2 className="text-3xl font-black uppercase tracking-tighter">Popular <span className="text-primary">PDF Tools</span></h2>
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-950/40">Immediate access to professional processing</p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
@@ -164,7 +152,7 @@ export default function LandingPage() {
           <div className="text-center pt-8">
             <Link href="/junction">
               <Button variant="ghost" className="font-black text-[10px] uppercase tracking-widest gap-3 text-primary hover:bg-primary/5 rounded-xl px-8 h-12">
-                <Layers className="w-4 h-4" /> View All 30+ Engineering Units
+                <Layers className="w-4 h-4" /> View All 30+ Tools
               </Button>
             </Link>
           </div>
@@ -173,15 +161,15 @@ export default function LandingPage() {
         {/* FEATURES SECTION */}
         <section id="features" className="py-20 px-6 max-w-7xl mx-auto space-y-12">
           <div className="text-center space-y-2">
-            <h2 className="text-3xl font-black uppercase tracking-tighter">Engineering <span className="text-primary">Pillars</span></h2>
-            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-950/40">The Architecture of Excellence</p>
+            <h2 className="text-3xl font-black uppercase tracking-tighter">Core <span className="text-primary">Features</span></h2>
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-950/40">Reliable Performance Standards</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: Zap, title: "Velocity", desc: "Native WebAssembly (WASM) execution for near-instant binary transformations." },
-              { icon: ShieldCheck, title: "Sovereignty", desc: "No permanent storage. Your assets are processed in an isolated memory buffer." },
-              { icon: Activity, title: "Intelligence", desc: "Integrated neural layers for layout detection and semantic analysis." }
+              { icon: Zap, title: "Fast Processing", desc: "Optimized local execution for instant document transformations." },
+              { icon: ShieldCheck, title: "Secure Privacy", desc: "No storage. Your files are processed entirely in your browser memory." },
+              { icon: Activity, title: "Advanced Tools", desc: "Integrated tools for layout detection and accurate text extraction." }
             ].map((f, i) => (
               <Card key={i} className="bg-white/40 backdrop-blur-xl border-black/5 p-10 rounded-[3rem] space-y-6 hover:border-primary/20 transition-all shadow-2xl group">
                 <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -198,8 +186,8 @@ export default function LandingPage() {
         <section id="solutions" className="py-24 bg-white/20 border-y border-black/5">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center space-y-4 mb-16">
-              <h2 className="text-4xl font-black uppercase tracking-tighter">Workflow <span className="text-primary">Mastery</span></h2>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Specialized solutions for individuals and enterprises</p>
+              <h2 className="text-4xl font-black uppercase tracking-tighter">Workflow <span className="text-primary">Solutions</span></h2>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Professional tools for individuals and teams</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -212,9 +200,9 @@ export default function LandingPage() {
                 <ul className="space-y-5">
                   {[
                     'Universal PDF Merging', 
-                    'Neural OCR Extraction', 
+                    'Text Recognition (OCR)', 
                     'Visual Split & Extract', 
-                    'Smart File Compression'
+                    'File Compression'
                   ].map(item => (
                     <li key={item} className="flex items-center gap-4 text-xs font-black uppercase tracking-widest text-slate-950/60">
                       <CheckCircle2 className="w-5 h-5 text-emerald-500" /> {item}
@@ -222,7 +210,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link href="/ajn" className="block pt-4">
-                  <Button className="w-full h-16 bg-primary text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl">Start Individual Node</Button>
+                  <Button className="w-full h-16 bg-primary text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl">Start for Individuals</Button>
                 </Link>
               </Card>
 
@@ -237,10 +225,10 @@ export default function LandingPage() {
                 </div>
                 <ul className="space-y-5 relative z-10">
                   {[
-                    'High-Concurrency Batching', 
-                    'Team Workflow Sync', 
+                    'High-Speed Batching', 
+                    'Team Sync', 
                     'API Management Portal', 
-                    'Audit Trail & Compliance'
+                    'Audit Logs & Compliance'
                   ].map(item => (
                     <li key={item} className="flex items-center gap-4 text-xs font-black uppercase tracking-widest text-white/60">
                       <CheckCircle2 className="w-5 h-5 text-emerald-400" /> {item}
@@ -248,7 +236,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link href="/login" className="block relative z-10 pt-4">
-                  <Button className="w-full h-16 bg-white text-primary hover:bg-white/90 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl">Provision Team Space</Button>
+                  <Button className="w-full h-16 bg-white text-primary hover:bg-white/90 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl">Start for Business</Button>
                 </Link>
               </Card>
             </div>
@@ -258,20 +246,20 @@ export default function LandingPage() {
         {/* PRICING SECTION */}
         <section id="pricing" className="py-24 px-6 max-w-5xl mx-auto text-center space-y-16">
           <div className="space-y-4">
-            <h2 className="text-4xl font-black uppercase tracking-tighter">Transparent <span className="text-primary">Metering</span></h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Scalable engineering tiers for everyone</p>
+            <h2 className="text-4xl font-black uppercase tracking-tighter">Simple <span className="text-primary">Pricing</span></h2>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Scalable plans for everyone</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="p-12 bg-white/40 border border-black/5 rounded-[3.5rem] space-y-8 text-left shadow-xl transition-all hover:scale-[1.02]">
               <div className="space-y-2">
-                <Badge className="bg-slate-950 text-white font-black text-[8px] uppercase px-3 h-5 tracking-widest">Free Node</Badge>
+                <Badge className="bg-slate-950 text-white font-black text-[8px] uppercase px-3 h-5 tracking-widest">Free Plan</Badge>
                 <h4 className="text-4xl font-black">$0<span className="text-sm opacity-40">/mo</span></h4>
               </div>
-              <p className="text-xs font-bold text-slate-950/40 uppercase leading-relaxed">Permanent access to real-time PDF tools and professional conversions.</p>
+              <p className="text-xs font-bold text-slate-950/40 uppercase leading-relaxed">Access to all standard PDF tools and conversions.</p>
               <div className="h-px bg-black/5" />
               <ul className="space-y-4">
-                {['50MB Max File Size', '10 Daily Tasks', 'WASM Local Engine', 'Standard PDF Tools'].map(f => (
+                {['50MB Max File Size', '10 Daily Tasks', 'Local Processing', 'Standard PDF Tools'].map(f => (
                   <li key={f} className="text-[10px] font-black uppercase tracking-widest flex items-center gap-3"><ChevronRight className="w-3 h-3 text-primary" /> {f}</li>
                 ))}
               </ul>
@@ -280,17 +268,17 @@ export default function LandingPage() {
             <div className="p-12 bg-white border-4 border-primary rounded-[3.5rem] space-y-8 text-left shadow-2xl relative transition-all hover:scale-[1.02]">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white text-[8px] font-black uppercase px-4 h-8 flex items-center rounded-full tracking-[0.2em] shadow-lg">Most Popular</div>
               <div className="space-y-2">
-                <Badge className="bg-primary text-white font-black text-[8px] uppercase px-3 h-5 tracking-widest">Pro Operator</Badge>
+                <Badge className="bg-primary text-white font-black text-[8px] uppercase px-3 h-5 tracking-widest">Pro Plan</Badge>
                 <h4 className="text-4xl font-black text-primary">$12<span className="text-sm opacity-40 text-slate-950">/mo</span></h4>
               </div>
-              <p className="text-xs font-bold text-slate-950/40 uppercase leading-relaxed">High-fidelity mastery for creative and business professionals.</p>
+              <p className="text-xs font-bold text-slate-950/40 uppercase leading-relaxed">Advanced features for professional users.</p>
               <div className="h-px bg-black/5" />
               <ul className="space-y-4">
-                {['2GB Max File Size', 'Unlimited Mastery Tasks', 'Neural Intelligence Access', 'Priority Queue Sync'].map(f => (
+                {['2GB Max File Size', 'Unlimited Tasks', 'Priority Support', 'Batch Processing'].map(f => (
                   <li key={f} className="text-[10px] font-black uppercase tracking-widest flex items-center gap-3 text-primary"><Sparkles className="w-3.5 h-3.5" /> {f}</li>
                 ))}
               </ul>
-              <Button className="w-full h-14 bg-primary text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl">Upgrade To Pro</Button>
+              <Button className="w-full h-14 bg-primary text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl">Upgrade Now</Button>
             </div>
           </div>
         </section>
@@ -315,19 +303,19 @@ export default function LandingPage() {
                   />
                   <div className="absolute bottom-8 left-8 right-8 p-6 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-white/60 shadow-2xl">
                     <p className="text-xl font-black tracking-tighter uppercase">Anjan Patel</p>
-                    <p className="text-[9px] font-black text-primary uppercase tracking-widest mt-0.5">Architect of AJN</p>
+                    <p className="text-[9px] font-black text-primary uppercase tracking-widest mt-0.5">Founder of AJN</p>
                   </div>
                 </div>
               </motion.div>
 
               <div className="lg:col-span-7 space-y-8">
                 <div className="space-y-4">
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Our Story</span>
-                  <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-[0.9] uppercase">Mastering the <br /><span className="text-primary">Browser Buffer</span></h2>
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Our Mission</span>
+                  <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-[0.9] uppercase">Simple Document <br /><span className="text-primary">Processing</span></h2>
                 </div>
                 <div className="prose prose-slate max-w-none text-slate-950/70 font-medium space-y-6 leading-relaxed text-lg uppercase tracking-widest">
-                  <p>"AJN was born from a singular vision: To dismantle the barriers between complex file engineering and the everyday professional."</p>
-                  <p>"We've built a Junction Network that runs entirely on local WASM and Neural processing layers. Your data should never have to leave your node to achieve professional mastery."</p>
+                  <p>"AJN was created to make professional document tools accessible to everyone."</p>
+                  <p>"We've built a platform that runs entirely in your browser. Your data stays with you while you get the results you need."</p>
                   <p className="font-bold text-slate-950 italic">— Anjan Patel</p>
                 </div>
                 <div className="flex gap-10 pt-4">
@@ -337,11 +325,11 @@ export default function LandingPage() {
                   </div>
                   <div className="text-center space-y-2">
                     <p className="text-3xl font-black tracking-tighter">100%</p>
-                    <p className="text-[8px] font-black uppercase tracking-widest text-slate-950/40">LOCAL OPS</p>
+                    <p className="text-[8px] font-black uppercase tracking-widest text-slate-950/40">PRIVATE</p>
                   </div>
                   <div className="text-center space-y-2">
                     <p className="text-3xl font-black tracking-tighter">30+</p>
-                    <p className="text-[8px] font-black uppercase tracking-widest text-slate-950/40">UNITS ACTIVE</p>
+                    <p className="text-[8px] font-black uppercase tracking-widest text-slate-950/40">TOOLS ACTIVE</p>
                   </div>
                 </div>
               </div>
@@ -353,17 +341,17 @@ export default function LandingPage() {
         <section id="blog" className="py-24 px-6 max-w-7xl mx-auto space-y-16">
           <div className="flex items-end justify-between border-b border-black/5 pb-8">
             <div className="space-y-2">
-              <h2 className="text-4xl font-black uppercase tracking-tighter">Neural <span className="text-primary">Insights</span></h2>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Official technological stream</p>
+              <h2 className="text-4xl font-black uppercase tracking-tighter">Latest <span className="text-primary">News</span></h2>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Platform Updates</p>
             </div>
-            <Button variant="ghost" className="font-black text-[10px] uppercase tracking-widest gap-2">View All Briefings <ArrowRight className="w-3 h-3" /></Button>
+            <Button variant="ghost" className="font-black text-[10px] uppercase tracking-widest gap-2">View All Updates <ArrowRight className="w-3 h-3" /></Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { title: "Browser-Native Transcoding: The WASM Revolution", cat: "Engineering", date: "FEB 15" },
-              { title: "Mastering PDF Security: AES-256 and Redaction", cat: "Security", date: "FEB 12" },
-              { title: "Neural OCR: Layout Reconstruction in Real-Time", cat: "Intelligence", date: "FEB 10" }
+              { title: "Browser-Based Document Processing", cat: "Updates", date: "FEB 15" },
+              { title: "Protecting Your Files with Encryption", cat: "Security", date: "FEB 12" },
+              { title: "Advanced Text Recognition Updates", cat: "Features", date: "FEB 10" }
             ].map((post, i) => (
               <Card key={i} className="bg-white/40 border-black/5 hover:border-primary/20 transition-all rounded-[3.5rem] overflow-hidden group shadow-xl">
                 <CardContent className="p-10 space-y-6">
@@ -397,7 +385,7 @@ export default function LandingPage() {
 
         <div className="flex flex-col items-center gap-4">
           <p className="text-[11px] font-black text-slate-950/20 tracking-[0.5em] uppercase">
-            AJN Engineering Core • 2025
+            AJN Core • 2025
           </p>
           <div className="flex items-center gap-2.5 px-5 py-2 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
             <span className="text-[10px] font-black text-primary uppercase tracking-widest">Made by Indian ❤️</span>

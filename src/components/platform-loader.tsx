@@ -4,18 +4,17 @@ import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 const loadingSteps = [
-  "Inhaling Core...",
-  "Calibrating Engine...",
-  "Syncing Nodes...",
-  "Provisioning Buffers...",
-  "Bootstrapping WASM...",
+  "Inhaling Hub...",
+  "Calibrating Tools...",
+  "Syncing Workspace...",
+  "Preparing Buffers...",
+  "Initializing Hub...",
   "Optimizing Output...",
   "Launching AJN..."
 ];
 
 /**
  * AJN Platform Loader
- * Hydration-hardened entrance sequence.
  */
 export function PlatformLoader() {
   const [percent, setPercent] = useState(0);

@@ -1,9 +1,8 @@
 'use client';
 
 /**
- * AJN Master Engineering Orchestrator
- * High-fidelity logic routing for specialized binary service units.
- * Hardened for Client-Side execution only.
+ * AJN Master Processing Engine
+ * Professional routing for file services.
  */
 
 class AJNPDFEngine {
@@ -12,24 +11,24 @@ class AJNPDFEngine {
   async init() {
     if (this.initialized) return;
     this.initialized = true;
-    console.log('[AJN Core] Neural pipeline synchronized.');
+    console.log('[AJN Core] System synchronized.');
   }
 
   async runTool(toolId: string, inputs: any, options = {}, onProgressCallback: any) {
     await this.init();
-    onProgressCallback({ stage: "Calibrating", detail: "Initializing isolated thread...", pct: 5 });
+    onProgressCallback({ stage: "Preparing", detail: "Initializing process...", pct: 5 });
 
     const files = Array.isArray(inputs) ? inputs : [inputs];
     const firstFile = files[0];
-    if (!firstFile) throw new Error("No asset detected in sequence buffer.");
+    if (!firstFile) throw new Error("No file selected.");
 
     let result: { blob: Blob; fileName: string; mimeType: string };
 
     try {
-      // 1. INTELLIGENCE & VISION LAYER
+      // 1. ADVANCED SERVICES
       if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf', 'compress-pdf', 'repair-pdf'].includes(toolId)) {
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
-        const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Intelligence", detail: m, pct: p }));
+        const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Analyzing", detail: m, pct: p }));
         
         const map: Record<string, string> = { 
           'translate-pdf': 'TRANSLATE', 
@@ -41,16 +40,16 @@ class AJNPDFEngine {
         };
         result = await converter.convertTo(map[toolId] || 'OCR', options);
       } 
-      // 2. SURGICAL MANIPULATION CORE
+      // 2. DOCUMENT TOOLS
       else if (['merge-pdf', 'split-pdf', 'extract-pages', 'delete-pages', 'rotate-pdf', 'sign-pdf', 'organize-pdf', 'protect-pdf', 'unlock-pdf', 'redact-pdf', 'flatten-pdf', 'add-page-numbers', 'grayscale-pdf'].includes(toolId)) {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
-        const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Manipulation", detail: m, pct: p }));
+        const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Processing", detail: m, pct: p }));
         result = await manipulator.runOperation(toolId, options);
       }
-      // 3. EXPORT CORE (PDF to Image/Office)
+      // 3. EXPORT TOOLS
       else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt', 'pdf-pdfa'].includes(toolId)) {
         const { PDFConverter } = await import('@/lib/converters/pdf-converter');
-        const converter = new PDFConverter(firstFile, (p, m) => onProgressCallback({ stage: "Synthesis", detail: m, pct: p }));
+        const converter = new PDFConverter(firstFile, (p, m) => onProgressCallback({ stage: "Exporting", detail: m, pct: p }));
         
         const map: Record<string, string> = { 
           'pdf-jpg': 'JPG', 
@@ -64,36 +63,35 @@ class AJNPDFEngine {
         };
         result = await converter.convertTo(map[toolId] || 'JPG', options);
       }
-      // 4. DEVELOPMENT CORE (Office/Image to PDF)
+      // 4. CONVERSION TOOLS
       else if (toolId.endsWith('-pdf')) {
         const source = toolId.split('-')[0];
         if (['jpg', 'jpeg', 'png', 'webp'].includes(source!)) {
           const { ImageConverter } = await import('@/lib/converters/image-converter');
-          const converter = new ImageConverter(firstFile, (p, m) => onProgressCallback({ stage: "Imagery", detail: m, pct: p }));
+          const converter = new ImageConverter(firstFile, (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p }));
           result = await converter.toMasterPDF(files, options);
         } else if (source === 'word') {
           const { WordConverter } = await import('@/lib/converters/word-converter');
-          result = await new WordConverter(firstFile, (p, m) => onProgressCallback({ stage: "Word", detail: m, pct: p })).convertTo('PDF');
+          result = await new WordConverter(firstFile, (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p })).convertTo('PDF');
         } else if (source === 'ppt') {
           const { PPTConverter } = await import('@/lib/converters/ppt-converter');
-          result = await new PPTConverter(firstFile, (p, m) => onProgressCallback({ stage: "PowerPoint", detail: m, pct: p })).convertTo('PDF');
+          result = await new PPTConverter(firstFile, (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p })).convertTo('PDF');
         } else if (source === 'excel') {
           const { ExcelConverter } = await import('@/lib/converters/excel-converter');
-          result = await new ExcelConverter(firstFile, (p, m) => onProgressCallback({ stage: "Excel", detail: m, pct: p })).convertTo('PDF');
+          result = await new ExcelConverter(firstFile, (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p })).convertTo('PDF');
         } else {
           const { CodeConverter } = await import('@/lib/converters/code-converter');
-          result = await new CodeConverter(firstFile, (p, m) => onProgressCallback({ stage: "Data", detail: m, pct: p })).convertTo('PDF', options);
+          result = await new CodeConverter(firstFile, (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p })).convertTo('PDF', options);
         }
       } else {
-        throw new Error(`Engine routing for node ${toolId} is in calibration.`);
+        throw new Error(`Tool ${toolId} is not available.`);
       }
 
-      onProgressCallback({ stage: "Established", detail: "Binary synchronization successful.", pct: 100 });
+      onProgressCallback({ stage: "Ready", detail: "File processed successfully.", pct: 100 });
       return { success: true, fileName: result.fileName, byteLength: result.blob.size, blob: result.blob };
     } catch (err: any) {
-      console.error("[AJN Core] Execution failure:", err);
-      // HARDENED ERROR HANDLING: Prevent 'reading node' crash
-      const msg = err?.message || (typeof err === 'string' ? err : "Synthesis failure during binary processing.");
+      console.error("[AJN Core] Processing error:", err);
+      const msg = err?.message || "Failed to process the file.";
       throw new Error(msg);
     }
   }

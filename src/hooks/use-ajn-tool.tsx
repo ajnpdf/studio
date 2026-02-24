@@ -14,8 +14,7 @@ export interface LogEntry extends ProgressState {
 }
 
 /**
- * AJN Tool Life-cycle Hook
- * Manages idle, selecting, running, done, and error phases for any registry unit.
+ * AJN Tool Lifecycle Hook
  */
 export function useAJNTool(toolId: string) {
   const [phase, setPhase] = useState<"idle" | "selecting" | "running" | "done" | "error">("idle");
@@ -47,7 +46,7 @@ export function useAJNTool(toolId: string) {
     } catch (err: any) {
       if (!abortRef.current) { 
         console.error(err);
-        setError(err.message || "Engine execution failed"); 
+        setError(err.message || "Operation failed."); 
         setPhase("error"); 
       }
     }
@@ -66,7 +65,7 @@ export function useAJNTool(toolId: string) {
 }
 
 /**
- * AJN Progress Bar - High Fidelity
+ * Professional Progress Bar
  */
 export function ProgressBar({ pct, color = "#3B82F6", label }: { pct: number, color?: string, label?: string }) {
   return (
@@ -91,7 +90,7 @@ export function ProgressBar({ pct, color = "#3B82F6", label }: { pct: number, co
 }
 
 /**
- * AJN Live Terminal Log
+ * Live Process Log
  */
 export function LogStream({ logs }: { logs: LogEntry[] }) {
   const ref = useRef<HTMLDivElement>(null);

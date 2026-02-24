@@ -5,27 +5,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { DropZone } from '@/components/dashboard/conversion/drop-zone';
 import { useAJNTool, ProgressBar, LogStream } from '@/hooks/use-ajn-tool';
 import { 
-  Cpu, 
   Download, 
   RefreshCw, 
   CheckCircle2, 
-  ShieldCheck, 
-  Activity, 
   XCircle, 
   Trash2, 
   ChevronRight,
   Eye,
   ListChecks,
   Eraser,
-  Layers,
   RotateCw,
   ArrowLeft,
   ArrowRight,
   Loader2,
   Settings2,
-  Scissors,
   Zap,
-  Maximize
+  FileCode
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -53,11 +48,10 @@ interface Props {
 }
 
 /**
- * AJN Unit Workspace - Advanced Surgical Mastery
- * Features universal visionary inspection, reordering, and rotation.
+ * AJN Tools Workspace - Simple Professional Document Processing
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
-  const unit = ALL_UNITS.find(u => u.id === initialUnitId);
+  const tool = ALL_UNITS.find(u => u.id === initialUnitId);
   const { phase, progress, logs, result, error, run, reset, setPhase } = useAJNTool(initialUnitId || 'merge-pdf');
   
   const [sourceFiles, setSourceFiles] = useState<File[]>([]);
@@ -68,19 +62,15 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [splitMode, setSplitMode] = useState<'range' | 'interval'>('range');
   const [compressionLevel, setCompressionLevel] = useState<'basic' | 'strong'>('basic');
 
-  // Surgical tools default to zero selection for extraction/deletion logic
-  const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf', 'organize-pdf', 'redact-pdf'].includes(unit?.id || '');
-  const isOrganizeTool = unit?.id === 'organize-pdf';
-  const isSplitTool = unit?.id === 'split-pdf';
-  const isCompressTool = unit?.id === 'compress-pdf';
+  const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf', 'organize-pdf', 'redact-pdf'].includes(tool?.id || '');
+  const isSplitTool = tool?.id === 'split-pdf';
+  const isCompressTool = tool?.id === 'compress-pdf';
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
-    // Every tool now provides a visionary inspection phase for PDFs
     if (files.some(f => f.type === 'application/pdf')) {
       await loadAllPdfPages(files);
     } else {
-      // Non-PDF files skip visionary and run immediately
       run(files, { quality: 90 });
     }
   };
@@ -116,7 +106,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             rotation: 0
           });
 
-          // Transformation tools select all by default for "Mastery Review"
           if (!isSurgicalTool) initialSelected.add(pageId);
         }
       }
@@ -124,7 +113,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       setSelectedPages(initialSelected);
     } catch (err) {
       console.error(err);
-      toast({ title: "Binary Integrity Error", description: "Could not rasterize document segments.", variant: "destructive" });
+      toast({ title: "Processing Error", description: "Could not load document pages.", variant: "destructive" });
       reset();
     } finally {
       setIsInitializing(false);
@@ -151,7 +140,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleConfirmedExecution = () => {
-    // Collect surgical instructions
     const pageData = pages
       .filter(p => !isSurgicalTool || selectedPages.has(p.id))
       .map(p => ({
@@ -161,7 +149,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       }));
 
     if (pageData.length === 0 && isSurgicalTool) {
-      toast({ title: "Selection Required", description: "Identify document nodes for extraction." });
+      toast({ title: "Selection Required", description: "Select pages to continue." });
       return;
     }
 
@@ -180,7 +168,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     a.href = url; 
     a.download = result.fileName; 
     a.click();
-    toast({ title: "Asset Exported", description: "Binary buffer saved locally." });
+    toast({ title: "Success", description: "File saved to your computer." });
   };
 
   return (
@@ -192,15 +180,15 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-sm">
-                  <Cpu className="w-6 h-6 text-primary animate-pulse" />
+                  <FileCode className="w-6 h-6 text-primary" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <h2 className="text-xl md:text-3xl font-black tracking-tighter uppercase leading-none">{unit?.name || "Registry Node"}</h2>
-                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[8px] font-black h-5 uppercase tracking-widest">{unit?.mode || 'WASM'}</Badge>
+                    <h2 className="text-xl md:text-3xl font-black tracking-tighter uppercase leading-none">{tool?.name || "Processing Tool"}</h2>
+                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[8px] font-black h-5 uppercase tracking-widest">PRO</Badge>
                   </div>
                   <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em] flex items-center gap-2">
-                    <Activity className="w-2.5 h-2.5 text-emerald-600" /> Professional Mastery Sequence
+                    Professional Document Tool
                   </p>
                 </div>
               </div>
@@ -219,7 +207,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     {isInitializing ? (
                       <div className="py-32 text-center space-y-6 opacity-40">
                         <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
-                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950">Rasterizing Binary Streams...</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950">Loading document...</p>
                       </div>
                     ) : (
                       <>
@@ -228,7 +216,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                             <div className="space-y-3">
                               <div className="flex items-center gap-3 text-primary">
                                 <Eye className="w-5 h-5" />
-                                <h3 className="text-lg font-black uppercase tracking-tighter">Visionary Inspect</h3>
+                                <h3 className="text-lg font-black uppercase tracking-tighter">Preview Pages</h3>
                               </div>
                               <div className="flex gap-2">
                                 <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set(pages.map(p => p.id)))} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><ListChecks className="w-3 h-3" /> Select All</Button>
@@ -238,10 +226,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
                             <div className="flex items-center gap-3">
                               <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest">
-                                {isSurgicalTool ? selectedPages.size : pages.length} Segments
+                                {isSurgicalTool ? selectedPages.size : pages.length} Selected
                               </Badge>
                               <Button onClick={handleConfirmedExecution} className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl transition-all">
-                                Execute Mastery <ChevronRight className="ml-2 w-4 h-4" />
+                                Continue <ChevronRight className="ml-2 w-4 h-4" />
                               </Button>
                             </div>
                           </div>
@@ -250,7 +238,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                             <div className="w-full lg:w-80 bg-white/60 p-6 rounded-3xl border border-black/5 shadow-2xl backdrop-blur-3xl space-y-4">
                               <div className="flex items-center gap-2 text-primary">
                                 <Settings2 className="w-4 h-4" />
-                                <h4 className="text-[10px] font-black uppercase tracking-widest">Unit Config</h4>
+                                <h4 className="text-[10px] font-black uppercase tracking-widest">Tool Settings</h4>
                               </div>
                               {isSplitTool && (
                                 <div className="space-y-3">
@@ -260,7 +248,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                   </div>
                                   {splitMode === 'interval' && (
                                     <div className="flex items-center gap-3">
-                                      <span className="text-[9px] font-bold uppercase opacity-40 whitespace-nowrap">Every X Pages:</span>
+                                      <span className="text-[9px] font-bold uppercase opacity-40 whitespace-nowrap">Pages:</span>
                                       <input type="number" min="1" value={splitInterval} onChange={(e) => setSplitInterval(parseInt(e.target.value))} className="w-full h-8 bg-black/5 border-none rounded-lg px-3 text-xs font-bold" />
                                     </div>
                                   )}
@@ -273,7 +261,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                     <button onClick={() => setCompressionLevel('strong')} className={cn("flex-1 h-8 rounded-lg text-[9px] font-black uppercase border transition-all", compressionLevel === 'strong' ? "bg-primary text-white" : "bg-black/5 border-black/5")}>Strong</button>
                                   </div>
                                   <p className="text-[8px] font-bold text-slate-950/40 uppercase leading-relaxed">
-                                    {compressionLevel === 'basic' ? "Maintains high quality with 300DPI buffers." : "Aggressive 150DPI downsampling for smallest size."}
+                                    {compressionLevel === 'basic' ? "Good quality, small size." : "Strong optimization, smallest size."}
                                   </p>
                                 </div>
                               )}
@@ -326,9 +314,9 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4 text-primary">
                           <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
-                            <Layers className="w-5 h-5 animate-bounce" />
+                            <Zap className="w-5 h-5 animate-pulse" />
                           </div>
-                          <h3 className="text-xl font-black uppercase tracking-tighter">Executing Pipeline...</h3>
+                          <h3 className="text-xl font-black uppercase tracking-tighter">Processing...</h3>
                         </div>
                         <span className="text-3xl font-black text-primary tracking-tighter">{Math.round(progress.pct)}%</span>
                       </div>
@@ -344,17 +332,17 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                       <div className="flex flex-col items-center space-y-6">
                         <div className="w-20 h-20 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center border-2 border-emerald-500/20 shadow-lg"><CheckCircle2 className="w-10 h-10 text-emerald-600" /></div>
                         <div className="space-y-2">
-                          <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] px-4 h-6 rounded-full uppercase tracking-widest mb-2 shadow-sm">Mastery Successful</Badge>
+                          <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] px-4 h-6 rounded-full uppercase tracking-widest mb-2 shadow-sm">Completed</Badge>
                           <h3 className="text-2xl md:text-3xl font-black tracking-tighter uppercase truncate max-w-md mx-auto">{result.fileName}</h3>
-                          <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">Verified Secure Binary Buffer</p>
+                          <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">Your file is ready</p>
                         </div>
                       </div>
                       <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Button onClick={handleDownload} className="h-16 px-12 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 shadow-2xl transition-all hover:scale-105">
-                          <Download className="w-5 h-5" /> Download Asset
+                          <Download className="w-5 h-5" /> Download File
                         </Button>
                         <Button variant="outline" onClick={reset} className="h-16 px-10 border-black/10 bg-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 hover:bg-black/5 transition-all">
-                          <RefreshCw className="w-5 h-5" /> Reset Node
+                          <RefreshCw className="w-5 h-5" /> Start New
                         </Button>
                       </div>
                     </Card>
@@ -365,10 +353,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   <motion.div key="error" initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="max-w-2xl mx-auto w-full pt-12">
                     <Card className="p-16 bg-red-50 border-2 border-red-100 rounded-[3rem] text-center space-y-8 shadow-2xl">
                       <div className="w-16 h-16 bg-red-100 rounded-[2rem] flex items-center justify-center mx-auto"><XCircle className="w-8 h-8 text-red-600" /></div>
-                      <h3 className="text-2xl font-black text-red-900 uppercase tracking-tighter leading-tight">{error || "Synthesis Interrupted."}</h3>
+                      <h3 className="text-2xl font-black text-red-900 uppercase tracking-tighter leading-tight">{error || "Processing Error."}</h3>
                       <div className="flex flex-col gap-3">
-                        <Button onClick={handleConfirmedExecution} variant="outline" className="h-14 rounded-2xl font-black text-xs uppercase tracking-widest border-red-200 bg-white hover:bg-red-50 text-red-900">Retry Mastery Sequence</Button>
-                        <Button onClick={reset} variant="ghost" className="h-10 font-bold uppercase text-[10px] text-red-400">Reset Registry</Button>
+                        <Button onClick={handleConfirmedExecution} variant="outline" className="h-14 rounded-2xl font-black text-xs uppercase tracking-widest border-red-200 bg-white hover:bg-red-50 text-red-900">Retry</Button>
+                        <Button onClick={reset} variant="ghost" className="h-10 font-bold uppercase text-[10px] text-red-400">Cancel</Button>
                       </div>
                     </Card>
                   </motion.div>
