@@ -140,7 +140,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   <h2 className="text-2xl md:text-3xl font-black tracking-tighter uppercase leading-none">{unit?.name || "Junction Node"}</h2>
                   <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-[0.4em] mt-1.5 flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Active engineering instance
+                    Active Engineering Instance
                   </p>
                 </div>
               </div>
@@ -155,7 +155,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     <CardContent className="p-0 space-y-8">
                       <div className="flex items-center justify-between">
                         <h3 className="text-sm font-black uppercase tracking-widest text-primary flex items-center gap-3">
-                          <RefreshCw className="w-4 h-4 animate-spin" /> Executing pipeline...
+                          <RefreshCw className="w-4 h-4 animate-spin" /> Executing Pipeline...
                         </h3>
                         <Badge className="bg-primary text-white border-none font-black text-[9px] px-2.5 h-5 rounded-full">
                           {Math.round(progress.pct)}%
@@ -176,7 +176,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                         <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center">
                           <CheckCircle2 className="w-10 h-10 text-emerald-600" />
                         </div>
-                        <h3 className="text-2xl font-black tracking-tight uppercase">Mastery complete</h3>
+                        <h3 className="text-2xl font-black tracking-tight uppercase">Mastery Complete</h3>
                         <div className="space-y-1">
                           <p className="text-xs font-bold text-slate-950/40 uppercase tracking-widest">{result.fileName}</p>
                           <p className="text-[10px] font-black text-emerald-600 uppercase">{(result.byteLength / 1024).toFixed(1)} KB • Verified Binary</p>
@@ -188,10 +188,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                           onClick={handleDownload}
                           className="h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl gap-3 shadow-xl"
                         >
-                          <Download className="w-4 h-4" /> Download export
+                          <Download className="w-4 h-4" /> Download Export
                         </Button>
                         <Button variant="outline" onClick={reset} className="h-14 border-black/10 bg-white hover:bg-black/5 font-black text-xs uppercase tracking-widest rounded-2xl gap-3">
-                          <RefreshCw className="w-4 h-4" /> Reset sector
+                          <RefreshCw className="w-4 h-4" /> Reset Sector
                         </Button>
                       </div>
                     </Card>
@@ -214,7 +214,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                 <Card className="bg-white/60 border-2 border-black/5 p-8 rounded-[3.5rem] shadow-2xl backdrop-blur-3xl space-y-8">
                   <div className="flex items-center justify-between">
                     <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2">
-                      <Settings2 className="w-3.5 h-3.5" /> Unit configuration
+                      <Settings2 className="w-3.5 h-3.5" /> Unit Configuration
                     </h3>
                     <Zap className="w-3.5 h-3.5 text-primary/40 animate-pulse" />
                   </div>

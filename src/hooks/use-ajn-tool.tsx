@@ -46,6 +46,7 @@ export function useAJNTool(toolId: string) {
       }
     } catch (err: any) {
       if (!abortRef.current) { 
+        console.error(err);
         setError(err.message || "Engine execution failed"); 
         setPhase("error"); 
       }
