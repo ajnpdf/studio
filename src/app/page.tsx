@@ -14,7 +14,7 @@ import { NightSky } from '@/components/dashboard/night-sky';
  */
 export default function LandingPage() {
   return (
-    <div className="min-h-screen w-full flex flex-col items-center p-6 relative text-slate-950 bg-transparent overflow-x-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center p-6 relative text-slate-950 bg-transparent overflow-x-hidden font-sans">
       <NightSky />
       
       <header className="w-full max-w-7xl flex items-center justify-between h-20 px-6 z-50">
@@ -28,7 +28,7 @@ export default function LandingPage() {
         </nav>
         <Link href="/ajn">
           <Button variant="outline" className="h-10 border-black/10 bg-white/40 font-black text-[10px] tracking-[0.2em] rounded-xl uppercase px-6">
-            Access Hub
+            Access hub
           </Button>
         </Link>
       </header>
@@ -46,12 +46,12 @@ export default function LandingPage() {
         <div className="space-y-8 md:space-y-10">
           <div className="space-y-4">
             <h1 className="text-4xl md:text-7xl font-black tracking-tighter text-slate-950 leading-[0.85] uppercase">
-              All-in-One <br className="hidden md:block" /> Junction Network
+              All-in-one <br className="hidden md:block" /> Junction network
             </h1>
             <div className="flex items-center justify-center gap-6">
               <span className="w-12 h-px bg-slate-950/10"></span>
               <p className="text-slate-950/60 text-[10px] md:text-[12px] font-black tracking-[0.4em] uppercase">
-                Every File. One Smart Network.
+                Every file. One smart network.
               </p>
               <span className="w-12 h-px bg-slate-950/10"></span>
             </div>
@@ -60,12 +60,12 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-4">
             <Link href="/ajn">
               <Button className="h-14 md:h-16 px-10 md:px-12 bg-primary text-white hover:bg-primary/90 font-black text-xs rounded-2xl transition-all gap-4 shadow-2xl hover:scale-105 active:scale-95 uppercase tracking-widest">
-                Discover Core <ArrowRight className="w-4 h-4" />
+                Discover core <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
             <Link href="/junction">
               <Button variant="outline" className="h-14 md:h-16 px-10 md:px-12 border-slate-950/10 bg-white/40 backdrop-blur-xl text-slate-950 font-black text-xs rounded-2xl transition-all gap-4 shadow-xl hover:bg-white/60 hover:border-primary/40 active:scale-95 uppercase tracking-widest">
-                <Layers className="w-4.5 h-4.5 text-primary" /> Access Junction
+                <Layers className="w-4.5 h-4.5 text-primary" /> Access junction
               </Button>
             </Link>
           </div>
@@ -74,12 +74,12 @@ export default function LandingPage() {
         <section className="w-full pt-24 grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
           <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-10 rounded-[3rem] space-y-5 hover:border-primary/20 transition-all shadow-2xl group">
             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"><User className="w-6 h-6 text-primary" /></div>
-            <h3 className="text-2xl font-black tracking-tight">For Students</h3>
+            <h3 className="text-2xl font-black tracking-tight uppercase">For students</h3>
             <p className="text-xs font-bold text-slate-950/50 leading-relaxed uppercase tracking-[0.1em]">Master assignments with PDF merging, OCR extraction, and smart formatting. Complimentary for individual nodes.</p>
           </Card>
           <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-10 rounded-[3rem] space-y-5 hover:border-primary/20 transition-all shadow-2xl group">
             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"><CheckCircle2 className="w-6 h-6 text-primary" /></div>
-            <h3 className="text-2xl font-black tracking-tight">For Business</h3>
+            <h3 className="text-2xl font-black tracking-tight uppercase">For business</h3>
             <p className="text-xs font-bold text-slate-950/50 leading-relaxed uppercase tracking-[0.1em]">Industrial-grade batch processing, team workspaces, and AES-256 encryption for corporate enterprise assets.</p>
           </Card>
         </section>
@@ -100,7 +100,7 @@ export default function LandingPage() {
         </nav>
         <div className="flex flex-col items-center gap-4">
           <p className="text-[11px] font-black text-slate-950/20 tracking-[0.5em] uppercase">
-            AJN Engineering Core • 2025
+            AJN Engineering core • 2025
           </p>
           <div className="flex items-center gap-2.5 px-4 py-1.5 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
             <span className="text-[9px] font-black text-primary uppercase tracking-widest">Made by Indian ❤️</span>

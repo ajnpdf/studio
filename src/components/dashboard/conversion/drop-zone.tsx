@@ -8,9 +8,10 @@ import { Button } from '@/components/ui/button';
 
 interface Props {
   onFiles: (files: File[]) => void;
+  accept?: string;
 }
 
-export function DropZone({ onFiles }: Props) {
+export function DropZone({ onFiles, accept = ".pdf,.jpg,.jpeg,.png,.docx,.pptx,.xlsx" }: Props) {
   const [isDragging, setIsDragging] = useState(false);
   const [previews, setPreviews] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -34,7 +35,7 @@ export function DropZone({ onFiles }: Props) {
   };
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-8 font-sans">
       <div 
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
@@ -47,9 +48,17 @@ export function DropZone({ onFiles }: Props) {
             : "border-black/5 bg-white/40 hover:border-primary/40 hover:bg-white/60"
         )}
       >
-        <input id="dropzone-input" type="file" multiple ref={inputRef} className="hidden" onChange={handleSelect} />
+        <input 
+          id="dropzone-input" 
+          type="file" 
+          multiple 
+          accept={accept} 
+          ref={inputRef} 
+          className="hidden" 
+          onChange={handleSelect} 
+        />
         
-        {/* VENGEANCEUI CORNER BRACKETS */}
+        {/* CORNER BRACKETS */}
         {[0, 1, 2, 3].map(i => (
           <motion.div 
             key={i}
@@ -88,20 +97,20 @@ export function DropZone({ onFiles }: Props) {
         </motion.div>
         
         <div className="mt-10 space-y-3 text-center relative z-10 px-12">
-          <h3 className="text-3xl font-black tracking-tighter text-slate-950 uppercase leading-none">Drop Assets for Mastery</h3>
-          <p className="text-[11px] font-black text-slate-950/40 uppercase tracking-[0.4em]">Secure Engineering Buffer</p>
+          <h3 className="text-3xl font-black tracking-tighter text-slate-950 uppercase leading-none">Drop assets for mastery</h3>
+          <p className="text-[11px] font-black text-slate-950/40 uppercase tracking-[0.4em]">Secure engineering buffer</p>
         </div>
 
         {/* DECORATIVE BACKGROUND HUD */}
         <div className="absolute bottom-10 flex items-center gap-6 opacity-20 group-hover:opacity-40 transition-opacity">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span className="text-[9px] font-black uppercase tracking-widest">WASM Pipeline</span>
+            <span className="text-[9px] font-black uppercase tracking-widest">WASM pipeline</span>
           </div>
           <div className="w-1 h-1 rounded-full bg-slate-950" />
           <div className="flex items-center gap-2">
             <Activity className="w-3.5 h-3.5" />
-            <span className="text-[9px] font-black uppercase tracking-widest">Real-Time Sync</span>
+            <span className="text-[9px] font-black uppercase tracking-widest">Real-time sync</span>
           </div>
         </div>
       </div>

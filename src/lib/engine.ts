@@ -5,7 +5,6 @@
  * Implements 100% of the technical specification for all 30 master units.
  */
 
-// ─── PDF PARSING ENGINE ───────────────────────────────────────────────────────
 export class PDFEngine {
   static validateHeader(buffer: ArrayBuffer) {
     const bytes = new Uint8Array(buffer.slice(0, 8));
@@ -20,7 +19,6 @@ export class PDFEngine {
   }
 }
 
-// ─── MASTER STAGE MATRIX ──────────────────────────────────────────────────────
 export const STAGE_MAP: Record<string, any[]> = {
   'merge-pdf': [
     { label: "Validating files", log: "Loading pdf-lib WASM module v4.2.1", weight: 10, delay: 300, subLog: ["Parsing cross-reference tables", "Validating PDF headers"] },
@@ -93,7 +91,6 @@ export class WASMWorkerSim {
   }
 }
 
-// ─── MASTER ORCHESTRATOR ─────────────────────────────────────────────────────
 class AJNPDFEngine {
   private initialized = false;
 
