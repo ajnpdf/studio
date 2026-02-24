@@ -52,7 +52,7 @@ interface Props {
 }
 
 /**
- * AJN Tools Workspace - Professional Advance Setup
+ * AJN Tools Workspace - Professional Advance Setup 2026
  * Standardized on simple professional language and industrial aesthetics.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
@@ -386,7 +386,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       
       <footer className="fixed bottom-0 left-0 right-0 h-12 bg-white/40 backdrop-blur-md border-t border-black/5 flex items-center justify-center z-[100]">
         <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.5em]">
-          All-in-one Junction Network • 2025 • Made in INDIAN❤️
+          All-in-one Junction Network • 2026 • Made in INDIAN❤️
         </p>
       </footer>
     </div>

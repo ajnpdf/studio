@@ -28,8 +28,8 @@ import { NightSky } from '@/components/dashboard/night-sky';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 /**
- * All-in-one Junction Network - Landing Hub
- * Standardized on Arial Typography and Simple Professional Language
+ * All-in-one Junction Network - Landing Hub 2026
+ * Strictly formatted for Professional industrial standards.
  */
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
@@ -273,7 +273,7 @@ export default function LandingPage() {
                 </div>
                 <div className="flex gap-10 pt-4">
                   <div className="text-center space-y-2">
-                    <p className="text-3xl font-black tracking-tighter">2025</p>
+                    <p className="text-3xl font-black tracking-tighter">2026</p>
                     <p className="text-[8px] font-black uppercase tracking-widest text-slate-950/40">ESTABLISHED</p>
                   </div>
                   <div className="text-center space-y-2">
@@ -338,7 +338,7 @@ export default function LandingPage() {
 
         <div className="flex flex-col items-center gap-4">
           <p className="text-[11px] font-black text-slate-950/20 tracking-[0.5em] uppercase">
-            AJN Core • 2025
+            AJN Core • 2026
           </p>
           <div className="flex items-center gap-2.5 px-5 py-2 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
             <span className="text-[10px] font-black text-primary uppercase tracking-widest">Made in INDIAN❤️</span>

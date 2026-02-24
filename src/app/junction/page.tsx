@@ -10,7 +10,7 @@ import { LogoAnimation } from '@/components/landing/logo-animation';
 import { Input } from '@/components/ui/input';
 
 /**
- * AJN Junction Page - Simple Professional Language
+ * AJN Junction Page - Professional Industrial Library 2026
  */
 export default function JunctionPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -89,7 +89,7 @@ export default function JunctionPage() {
 
         <footer className="py-12 text-center flex flex-col items-center gap-4">
           <p className="text-[10px] font-black text-slate-900/20 uppercase tracking-[0.5em]">
-            AJN Junction • 2025
+            AJN Junction • 2026
           </p>
           <div className="flex items-center gap-2.5 px-4 py-1.5 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
             <span className="text-[9px] font-black text-primary uppercase tracking-widest">Made in INDIAN❤️</span>

@@ -18,7 +18,7 @@ import { ServicesGrid } from '@/components/junction/services-grid';
 import { UnitScroller } from '@/components/junction/unit-scroller';
 
 /**
- * AJN Hub Page - Simple Professional Language
+ * AJN Hub Page - Professional Industrial Layout 2026
  */
 export default function AJNPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -106,7 +106,7 @@ export default function AJNPage() {
           </div>
           <div className="flex flex-col items-center gap-4">
             <p className="text-[11px] font-black text-slate-950/20 tracking-[0.5em] uppercase">
-              AJN Core • 2025
+              AJN Core • 2026
             </p>
             <div className="flex items-center gap-2.5 px-4 py-1.5 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
               <span className="text-[9px] font-black text-primary uppercase tracking-widest">Made in INDIAN❤️</span>
