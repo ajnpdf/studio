@@ -16,7 +16,7 @@ class AJNPDFEngine {
 
   async runTool(toolId: string, inputs: any, options = {}, onProgressCallback: any) {
     await this.init();
-    onProgressCallback({ stage: "Preparing", detail: "Initializing process...", pct: 5 });
+    onProgressCallback({ stage: "Preparing", detail: "Initializing professional process...", pct: 5 });
 
     const files = Array.isArray(inputs) ? inputs : [inputs];
     

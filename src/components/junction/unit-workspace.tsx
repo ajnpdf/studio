@@ -29,7 +29,6 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import * as pdfjsLib from 'pdfjs-dist';
 import { cn } from '@/lib/utils';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -53,7 +52,7 @@ interface Props {
 
 /**
  * AJN Tools Workspace - Professional Advance Setup 2026
- * Standardized on simple professional language and industrial aesthetics.
+ * Hardened for Word to PDF real-time execution.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const tool = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -75,6 +74,15 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   });
 
   const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf', 'organize-pdf', 'redact-pdf'].includes(tool?.id || '');
+
+  // Dynamic Accept String based on tool
+  const getAcceptString = () => {
+    if (tool?.id === 'word-pdf') return ".doc,.docx,.odt,.rtf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    if (tool?.id === 'excel-pdf') return ".xls,.xlsx,.csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    if (tool?.id === 'ppt-pdf') return ".ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation";
+    if (tool?.id === 'jpg-pdf') return "image/jpeg,image/jpg";
+    return "*/*";
+  };
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
@@ -186,8 +194,13 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             
             <AnimatePresence mode="wait">
               {phase === 'idle' && (
-                <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <DropZone onFiles={handleFilesAdded} />
+                <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+                  <div className="bg-primary/5 border border-primary/10 p-4 rounded-2xl text-center">
+                    <p className="text-[10px] font-black uppercase text-primary tracking-widest leading-relaxed">
+                      Use for student purpose and business purpose • useful to students and business and more
+                    </p>
+                  </div>
+                  <DropZone onFiles={handleFilesAdded} accept={getAcceptString()} />
                 </motion.div>
               )}
 
@@ -309,6 +322,9 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                             </div>
 
                             <div className="pt-4 border-t border-black/5 space-y-4">
+                              <p className="text-[8px] font-bold text-slate-950/40 uppercase tracking-widest text-center">
+                                Use for student purpose and business purpose useful to students and business and more
+                              </p>
                               <div className="flex items-center gap-3 text-emerald-600">
                                 <Lock className="w-3.5 h-3.5" />
                                 <span className="text-[9px] font-black uppercase tracking-widest">Secure Local Processing</span>
