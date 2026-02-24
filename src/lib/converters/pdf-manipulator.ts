@@ -110,7 +110,7 @@ export class PDFManipulator {
 
     let finalFileName = `${baseName}_Processed.pdf`;
     if (toolId === 'merge-pdf') finalFileName = `Merged_Document_${Date.now()}.pdf`;
-    if (toolId === 'split-pdf') finalFileName = `${baseName}_Extracted.pdf`;
+    if (toolId === 'split-pdf' || toolId === 'extract-pages') finalFileName = `${baseName}_Extracted.pdf`;
 
     return {
       blob: new Blob([pdfBytes], { type: 'application/pdf' }),
