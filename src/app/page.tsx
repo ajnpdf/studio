@@ -20,18 +20,43 @@ import {
   Cpu, 
   Calendar, 
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Layout,
+  Scissors,
+  Trash2,
+  Copy,
+  Search,
+  Shrink,
+  Wrench,
+  Lock,
+  Unlock,
+  PenTool,
+  EyeOff,
+  GitCompare,
+  FileText,
+  MousePointer2
 } from 'lucide-react';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 /**
- * AJN Master Landing Page - Integrated Single-Page Hub
- * Industrial Standard: Arial Typography
+ * AJN Master Landing Page - Integrated Industrial Hub
+ * iLovePDF-inspired Tool Grid & Unified Sections
  */
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
   const founderImage = PlaceHolderImages.find(img => img.id === 'founder-portrait');
+
+  const popularTools = [
+    { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple assets.', icon: Layout, color: 'text-blue-500' },
+    { id: 'split-pdf', name: 'Split PDF', desc: 'Divide by selection.', icon: Scissors, color: 'text-indigo-500' },
+    { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce file size.', icon: Shrink, color: 'text-emerald-500' },
+    { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Text recognition.', icon: Search, color: 'text-orange-500' },
+    { id: 'edit-pdf', name: 'Edit PDF', desc: 'Modify content.', icon: MousePointer2, color: 'text-pink-500' },
+    { id: 'sign-pdf', name: 'Sign PDF', desc: 'E-signature.', icon: PenTool, color: 'text-slate-900' },
+    { id: 'redact-pdf', name: 'Redact PDF', desc: 'Mask sensitive data.', icon: EyeOff, color: 'text-red-500' },
+    { id: 'protect-pdf', name: 'Protect PDF', desc: 'Add encryption.', icon: Lock, color: 'text-purple-500' },
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -44,14 +69,14 @@ export default function LandingPage() {
       <NightSky />
       
       {/* HUD HEADER */}
-      <header className="fixed top-0 left-0 right-0 h-20 bg-white/40 backdrop-blur-xl border-b border-black/5 z-[100] transition-all duration-500">
+      <header className="fixed top-0 left-0 right-0 h-20 bg-white/40 backdrop-blur-xl border-b border-black/5 z-[100]">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-full px-6">
           <Link href="/" className="flex items-center group">
             <LogoAnimation className="w-20 h-10" showGlow={false} />
           </Link>
           
-          <nav className="hidden md:flex items-center gap-10">
-            {['Features', 'Solutions', 'Pricing', 'Story', 'Blog'].map((item) => (
+          <nav className="hidden lg:flex items-center gap-10">
+            {['Tools', 'Features', 'Solutions', 'Pricing', 'Story', 'Blog'].map((item) => (
               <a 
                 key={item} 
                 href={`#${item.toLowerCase()}`} 
@@ -75,18 +100,13 @@ export default function LandingPage() {
       <main className="w-full relative z-10">
         
         {/* HERO SECTION */}
-        <section className="pt-48 pb-32 text-center max-w-5xl mx-auto px-6 space-y-12">
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 1 }}
-          >
+        <section className="pt-48 pb-20 text-center max-w-5xl mx-auto px-6 space-y-12">
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 1 }}>
             <LogoAnimation className="w-56 h-28 md:w-72 md:h-36 mx-auto" />
           </motion.div>
           
           <div className="space-y-8">
             <div className="space-y-4">
-              {/* REDUCED SIZE HEADING */}
               <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-950 leading-[0.9] uppercase">
                 All-in-one <br /> Junction <span className="text-primary">Network</span>
               </h1>
@@ -98,34 +118,63 @@ export default function LandingPage() {
                   </p>
                   <span className="w-12 h-px bg-slate-950/10"></span>
                 </div>
-                <div className="px-6 py-2 bg-primary/5 border border-primary/10 rounded-full animate-in fade-in zoom-in duration-1000 delay-500 shadow-sm">
+                <div className="px-6 py-2 bg-primary/5 border border-primary/10 rounded-full shadow-sm">
                   <p className="text-[10px] font-black uppercase tracking-widest text-primary">
-                    Only this site provides PDF tools and services conversion in real time free
+                    Only this site provides professional PDF tools and real-time services conversion free
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
               <Link href="/ajn">
-                <Button className="h-16 px-12 bg-primary text-white hover:bg-primary/90 font-black text-xs rounded-2xl transition-all gap-4 shadow-2xl hover:scale-105 uppercase tracking-widest">
+                <Button className="h-16 px-12 bg-primary text-white font-black text-xs rounded-2xl transition-all gap-4 shadow-2xl hover:scale-105 uppercase tracking-widest">
                   Start Engineering <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-              <Link href="/junction">
-                <Button variant="outline" className="h-16 px-12 border-slate-950/10 bg-white/40 backdrop-blur-xl text-slate-950 font-black text-xs rounded-2xl transition-all gap-4 shadow-xl hover:bg-white/60 uppercase tracking-widest">
-                  <Layers className="w-4.5 h-4.5 text-primary" /> View All Units
                 </Button>
               </Link>
             </div>
           </div>
         </section>
 
+        {/* TOOLS GRID SECTION (iLovePDF Style) */}
+        <section id="tools" className="py-20 px-6 max-w-7xl mx-auto space-y-12">
+          <div className="text-center space-y-2">
+            <h2 className="text-3xl font-black uppercase tracking-tighter">Popular <span className="text-primary">Service Units</span></h2>
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-950/40">Immediate access to real-time binary mastery</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {popularTools.map((tool) => (
+              <Link key={tool.id} href={`/tools/${tool.id}`}>
+                <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 transition-all duration-500 cursor-pointer overflow-hidden border backdrop-blur-xl shadow-md group rounded-[2rem]">
+                  <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
+                    <div className="w-12 h-12 bg-white/60 rounded-2xl flex items-center justify-center border border-black/5 group-hover:scale-110 transition-all">
+                      <tool.icon className={`w-6 h-6 ${tool.color}`} />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-xs font-black uppercase tracking-tight text-slate-950">{tool.name}</h3>
+                      <p className="text-[9px] font-bold text-slate-950/40 uppercase tracking-widest">{tool.desc}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+          
+          <div className="text-center pt-8">
+            <Link href="/junction">
+              <Button variant="ghost" className="font-black text-[10px] uppercase tracking-widest gap-3 text-primary hover:bg-primary/5 rounded-xl px-8 h-12">
+                <Layers className="w-4 h-4" /> View All 30+ Engineering Units
+              </Button>
+            </Link>
+          </div>
+        </section>
+
         {/* FEATURES SECTION */}
-        <section id="features" className="py-32 px-6 max-w-7xl mx-auto space-y-16">
-          <div className="text-center space-y-4">
-            <h2 className="text-4xl font-black uppercase tracking-tighter">Engineering <span className="text-primary">Pillars</span></h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">The Architecture of Excellence</p>
+        <section id="features" className="py-20 px-6 max-w-7xl mx-auto space-y-12">
+          <div className="text-center space-y-2">
+            <h2 className="text-3xl font-black uppercase tracking-tighter">Engineering <span className="text-primary">Pillars</span></h2>
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-950/40">The Architecture of Excellence</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -146,7 +195,7 @@ export default function LandingPage() {
         </section>
 
         {/* SOLUTIONS SECTION */}
-        <section id="solutions" className="py-32 bg-white/20 border-y border-black/5">
+        <section id="solutions" className="py-24 bg-white/20 border-y border-black/5">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center space-y-4 mb-16">
               <h2 className="text-4xl font-black uppercase tracking-tighter">Workflow <span className="text-primary">Mastery</span></h2>
@@ -155,51 +204,51 @@ export default function LandingPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               {/* INDIVIDUALS */}
-              <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-12 rounded-[3rem] space-y-8 shadow-2xl hover:border-primary/30 transition-all">
+              <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-12 rounded-[3.5rem] space-y-10 shadow-2xl hover:border-primary/30 transition-all">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center"><User className="w-6 h-6 text-primary" /></div>
+                  <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center"><User className="w-7 h-7 text-primary" /></div>
                   <h3 className="text-3xl font-black uppercase tracking-tighter">For Individuals</h3>
                 </div>
-                <ul className="space-y-4">
+                <ul className="space-y-5">
                   {[
                     'Universal PDF Merging', 
                     'Neural OCR Extraction', 
                     'Visual Split & Extract', 
                     'Smart File Compression'
                   ].map(item => (
-                    <li key={item} className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-slate-950/60">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" /> {item}
+                    <li key={item} className="flex items-center gap-4 text-xs font-black uppercase tracking-widest text-slate-950/60">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500" /> {item}
                     </li>
                   ))}
                 </ul>
-                <Link href="/ajn" className="block">
-                  <Button variant="outline" className="w-full h-14 border-black/10 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl">Start Individual Node</Button>
+                <Link href="/ajn" className="block pt-4">
+                  <Button className="w-full h-16 bg-primary text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl">Start Individual Node</Button>
                 </Link>
               </Card>
 
               {/* BUSINESS */}
-              <Card className="bg-primary text-white border-none p-12 rounded-[3rem] space-y-8 shadow-2xl relative overflow-hidden group">
+              <Card className="bg-primary text-white border-none p-12 rounded-[3.5rem] space-y-10 shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-700">
                   <Globe className="w-64 h-64" />
                 </div>
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center"><Globe className="w-6 h-6 text-white" /></div>
+                  <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center"><Globe className="w-7 h-7 text-white" /></div>
                   <h3 className="text-3xl font-black uppercase tracking-tighter">For Business</h3>
                 </div>
-                <ul className="space-y-4 relative z-10">
+                <ul className="space-y-5 relative z-10">
                   {[
                     'High-Concurrency Batching', 
                     'Team Workflow Sync', 
                     'API Management Portal', 
                     'Audit Trail & Compliance'
                   ].map(item => (
-                    <li key={item} className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-white/60">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" /> {item}
+                    <li key={item} className="flex items-center gap-4 text-xs font-black uppercase tracking-widest text-white/60">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400" /> {item}
                     </li>
                   ))}
                 </ul>
-                <Link href="/login" className="block relative z-10">
-                  <Button className="w-full h-14 bg-white text-primary hover:bg-white/90 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl">Provision Team Space</Button>
+                <Link href="/login" className="block relative z-10 pt-4">
+                  <Button className="w-full h-16 bg-white text-primary hover:bg-white/90 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl">Provision Team Space</Button>
                 </Link>
               </Card>
             </div>
@@ -207,14 +256,14 @@ export default function LandingPage() {
         </section>
 
         {/* PRICING SECTION */}
-        <section id="pricing" className="py-32 px-6 max-w-5xl mx-auto text-center space-y-16">
+        <section id="pricing" className="py-24 px-6 max-w-5xl mx-auto text-center space-y-16">
           <div className="space-y-4">
             <h2 className="text-4xl font-black uppercase tracking-tighter">Transparent <span className="text-primary">Metering</span></h2>
             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Scalable engineering tiers for everyone</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="p-12 bg-white/40 border border-black/5 rounded-[3rem] space-y-8 text-left shadow-xl transition-all hover:scale-[1.02]">
+            <div className="p-12 bg-white/40 border border-black/5 rounded-[3.5rem] space-y-8 text-left shadow-xl transition-all hover:scale-[1.02]">
               <div className="space-y-2">
                 <Badge className="bg-slate-950 text-white font-black text-[8px] uppercase px-3 h-5 tracking-widest">Free Node</Badge>
                 <h4 className="text-4xl font-black">$0<span className="text-sm opacity-40">/mo</span></h4>
@@ -228,7 +277,7 @@ export default function LandingPage() {
               </ul>
             </div>
 
-            <div className="p-12 bg-white border-4 border-primary rounded-[3rem] space-y-8 text-left shadow-2xl relative transition-all hover:scale-[1.02]">
+            <div className="p-12 bg-white border-4 border-primary rounded-[3.5rem] space-y-8 text-left shadow-2xl relative transition-all hover:scale-[1.02]">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white text-[8px] font-black uppercase px-4 h-8 flex items-center rounded-full tracking-[0.2em] shadow-lg">Most Popular</div>
               <div className="space-y-2">
                 <Badge className="bg-primary text-white font-black text-[8px] uppercase px-3 h-5 tracking-widest">Pro Operator</Badge>
@@ -247,7 +296,7 @@ export default function LandingPage() {
         </section>
 
         {/* STORY SECTION */}
-        <section id="story" className="py-32 px-6 bg-white/40 border-y border-black/5 overflow-hidden">
+        <section id="story" className="py-24 px-6 bg-white/40 border-y border-black/5 overflow-hidden">
           <div className="max-w-7xl mx-auto space-y-20">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
               <motion.div 
@@ -301,7 +350,7 @@ export default function LandingPage() {
         </section>
 
         {/* BLOG SECTION */}
-        <section id="blog" className="py-32 px-6 max-w-7xl mx-auto space-y-16">
+        <section id="blog" className="py-24 px-6 max-w-7xl mx-auto space-y-16">
           <div className="flex items-end justify-between border-b border-black/5 pb-8">
             <div className="space-y-2">
               <h2 className="text-4xl font-black uppercase tracking-tighter">Neural <span className="text-primary">Insights</span></h2>
@@ -316,7 +365,7 @@ export default function LandingPage() {
               { title: "Mastering PDF Security: AES-256 and Redaction", cat: "Security", date: "FEB 12" },
               { title: "Neural OCR: Layout Reconstruction in Real-Time", cat: "Intelligence", date: "FEB 10" }
             ].map((post, i) => (
-              <Card key={i} className="bg-white/40 border-black/5 hover:border-primary/20 transition-all rounded-[3rem] overflow-hidden group shadow-xl">
+              <Card key={i} className="bg-white/40 border-black/5 hover:border-primary/20 transition-all rounded-[3.5rem] overflow-hidden group shadow-xl">
                 <CardContent className="p-10 space-y-6">
                   <div className="flex items-center justify-between">
                     <Badge variant="outline" className="bg-primary/5 text-primary border-none text-[8px] font-black uppercase h-5">{post.cat}</Badge>
