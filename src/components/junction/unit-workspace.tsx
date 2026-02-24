@@ -26,6 +26,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [latency, setLatency] = useState('...');
 
   useEffect(() => {
+    // Latency generation deferred to client mount to prevent hydration errors
     setLatency((Math.random() * 40 + 10).toFixed(0));
   }, [phase]);
 
@@ -34,7 +35,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     const id = unit.id;
     if (id.startsWith("pdf-") || id === "merge-pdf" || id === "split-pdf" || id === "rotate-pdf" || 
         id === "compress-pdf" || id === "redact-pdf" || id === "protect-pdf" || id === "sign-pdf" || 
-        id === "summarize-pdf" || id === "translate-pdf" || id === "ocr-pdf") return ".pdf";
+        id === "summarize-pdf" || id === "translate-pdf" || id === "ocr-pdf" || id.includes("pdf")) return ".pdf";
     if (id.endsWith("-pdf")) {
       if (id.includes("jpg")) return ".jpg,.jpeg,.png,.webp";
       if (id.includes("word")) return ".docx,.doc";

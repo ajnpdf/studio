@@ -32,18 +32,31 @@ class AJNPDFEngine {
 
     try {
       // 1. PDF-TO-X (Export Mastery)
-      if (toolId.startsWith('pdf-') && !['pdf-pdfa'].includes(toolId)) {
+      if (toolId.startsWith('pdf-') && !['pdf-pdfa', 'pdf-excel', 'pdf-word', 'pdf-pptx', 'pdf-jpg', 'pdf-png', 'pdf-webp'].includes(toolId)) {
+        // Fallback for generic pdf-X if needed
+      }
+
+      // 2. INTELLIGENCE & VISION (Priority IDs - Prevents routing to generic X-TO-PDF)
+      if (['summarize-pdf', 'translate-pdf', 'compare-pdf', 'ocr-pdf'].includes(toolId)) {
+        const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
+        const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Intelligence", detail: m, pct: p }));
+        const target = toolId.split('-')[0].toUpperCase();
+        result = await converter.convertTo(target, options);
+      } 
+      
+      // 3. EXPORT SPECIALISTS
+      else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt'].includes(toolId)) {
         const targetMap: Record<string, string> = {
           'pdf-jpg': 'JPG', 'pdf-png': 'PNG', 'pdf-webp': 'WEBP',
           'pdf-word': 'DOCX', 'pdf-pptx': 'PPTX', 'pdf-excel': 'XLSX', 'pdf-txt': 'TXT'
         };
-        const target = targetMap[toolId] || 'PDF';
+        const target = targetMap[toolId];
         const { PDFConverter } = await import('@/lib/converters/pdf-converter');
         const converter = new PDFConverter(firstFile, (p, m) => onProgressCallback({ stage: "Transcoding", detail: m, pct: p }));
         result = await converter.convertTo(target, options);
-      } 
-      
-      // 2. X-TO-PDF (Development Mastery)
+      }
+
+      // 4. X-TO-PDF (Development Mastery)
       else if (toolId.endsWith('-pdf')) {
         const source = toolId.split('-')[0];
         if (['jpg', 'jpeg', 'png', 'webp'].includes(source)) {
@@ -69,7 +82,7 @@ class AJNPDFEngine {
         }
       }
       
-      // 3. CORE MANIPULATION & SECURITY
+      // 5. CORE MANIPULATION & SECURITY
       else if (['merge-pdf', 'split-pdf', 'rotate-pdf', 'compress-pdf', 'redact-pdf', 'protect-pdf', 'sign-pdf', 'repair-pdf', 'organize-pdf', 'delete-pages', 'extract-pages', 'add-page-numbers', 'edit-pdf', 'unlock-pdf', 'flatten-pdf', 'pdf-pdfa', 'grayscale-pdf', 'crop-pdf'].includes(toolId)) {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Manipulation", detail: m, pct: p }));
@@ -79,20 +92,14 @@ class AJNPDFEngine {
         else if (toolId === 'compress-pdf') result = await manipulator.compress(options);
         else if (toolId === 'redact-pdf') result = await manipulator.redact(options);
         else if (toolId === 'protect-pdf') result = await manipulator.protect(options);
-        else if (toolId === 'sign-pdf') result = await manipulator.sign((options as any).signature, options);
+        else if (toolId === 'sign-pdf') result = await manipulator.sign(options);
         else if (toolId === 'rotate-pdf') result = await manipulator.rotate(options);
         else if (toolId === 'add-page-numbers') result = await manipulator.addPageNumbers(options);
         else if (toolId === 'crop-pdf') result = await manipulator.crop(options);
         else if (toolId === 'pdf-pdfa') result = await manipulator.toPDFA('B');
+        else if (toolId === 'unlock-pdf') result = await manipulator.unlock((options as any).password);
+        else if (toolId === 'edit-pdf') result = await manipulator.edit(options);
         else result = await manipulator.merge();
-      }
-      
-      // 4. INTELLIGENCE & VISION
-      else if (['summarize-pdf', 'translate-pdf', 'compare-pdf', 'ocr-pdf'].includes(toolId)) {
-        const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
-        const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Intelligence", detail: m, pct: p }));
-        const target = toolId.split('-')[0].toUpperCase();
-        result = await converter.convertTo(target, options);
       }
       
       else throw new Error(`Unknown Tool Sequence: ${toolId}`);
