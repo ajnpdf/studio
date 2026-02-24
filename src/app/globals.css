@@ -39,12 +39,13 @@
     background-attachment: fixed;
     position: relative;
     @apply text-slate-950 antialiased selection:bg-primary/10 selection:text-primary overflow-x-hidden;
+    /* UNIVERSAL TYPOGRAPHY STANDARD */
     font-family: Arial, Helvetica, sans-serif;
   }
 
   body::before {
     content: "";
-    position: absolute;
+    position: fixed; /* Ensures background glow stays in place during scroll */
     width: 1200px;
     height: 1200px;
     border-radius: 50%;
