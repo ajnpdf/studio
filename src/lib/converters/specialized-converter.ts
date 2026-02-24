@@ -25,10 +25,6 @@ export class SpecializedConverter {
     this.onProgress?.(percent, message);
   }
 
-  /**
-   * PROBLEM: fetch to LibreTranslate throws → crashes whole pipeline
-   * FIX: Wrap every translation call in try/catch with fallback
-   */
   async translateText(text: string, source: string, target: string): Promise<string> {
     try {
       const resp = await fetch('https://libretranslate.com/translate', {
@@ -36,13 +32,13 @@ export class SpecializedConverter {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ q: text, source, target, format: 'text' }),
         // @ts-ignore
-        signal: AbortSignal.timeout(8000), // ← timeout prevents hang
+        signal: AbortSignal.timeout(8000),
       });
       if (!resp.ok) throw new Error(`API ${resp.status}`);
       const data = await resp.json();
-      return data.translatedText || text; // ← fallback to original
+      return data.translatedText || text;
     } catch {
-      return text; // ← NEVER crash, just return original text
+      return text;
     }
   }
 
@@ -122,7 +118,7 @@ export class SpecializedConverter {
         }
       } catch (err: any) {
         console.warn(`Page ${i + 1} skipped: ${err.message}`);
-        continue; // never let one page kill the job
+        continue;
       }
     }
 
@@ -131,7 +127,6 @@ export class SpecializedConverter {
     try {
       bytes = await doc.save();
     } catch {
-      // FIX: retry with safest save options
       bytes = await doc.save({
         useObjectStreams: false,
         objectsPerTick: 5,

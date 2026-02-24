@@ -145,16 +145,30 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                 {phase === ('selecting' as any) && (
                   <motion.div key="selecting" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                     <div className="flex items-center justify-between px-4">
-                      <h3 className="text-xl font-black uppercase tracking-tighter">Visual Inspection</h3>
-                      <Button onClick={() => run(sourceFiles, { pageIndices: Array.from(selectedPages) })} className="h-12 px-8 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl gap-2">
-                        Confirm Mastery <ChevronRight className="w-4 h-4" />
-                      </Button>
+                      <div className="space-y-1">
+                        <h3 className="text-xl font-black uppercase tracking-tighter">Visual Inspection</h3>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Select {unit?.id === 'delete-pages' ? 'pages to remove' : 'pages to extract'}</p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <Badge className="bg-primary text-white border-none h-8 px-4 font-black">{selectedPages.size} Selected</Badge>
+                        <Button onClick={() => run(sourceFiles, { pageIndices: Array.from(selectedPages) })} className="h-12 px-8 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl gap-2 hover:scale-105 active:scale-95 transition-all">
+                          Confirm Mastery <ChevronRight className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                       {pages.map((page) => (
-                        <div key={page.id} onClick={() => togglePageSelection(page.id)} className={cn("relative aspect-[1/1.414] rounded-2xl border-4 transition-all cursor-pointer overflow-hidden shadow-lg", selectedPages.has(page.id) ? "border-red-500 bg-red-50" : "border-black/5 hover:border-primary/40 bg-white")}>
-                          <img src={page.url} className={cn("w-full h-full object-cover", selectedPages.has(page.id) && "opacity-40 grayscale")} />
-                          {selectedPages.has(page.id) && <div className="absolute inset-0 flex items-center justify-center"><Trash2 className="w-10 h-10 text-red-600" /></div>}
+                        <div key={page.id} onClick={() => togglePageSelection(page.id)} className={cn("relative aspect-[1/1.414] rounded-2xl border-4 transition-all cursor-pointer overflow-hidden shadow-lg group", selectedPages.has(page.id) ? "border-red-500 bg-red-50" : "border-black/5 hover:border-primary/40 bg-white")}>
+                          <img src={page.url} className={cn("w-full h-full object-cover transition-all duration-500", selectedPages.has(page.id) && "opacity-40 grayscale blur-[2px]")} />
+                          <div className="absolute top-3 left-3 bg-black/60 text-white text-[9px] font-black px-2 py-1 rounded-lg backdrop-blur-md">PAGE {page.id + 1}</div>
+                          {selectedPages.has(page.id) && (
+                            <div className="absolute inset-0 flex items-center justify-center animate-in zoom-in-50 duration-300">
+                              <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center shadow-2xl">
+                                <Trash2 className="w-6 h-6 text-white" />
+                              </div>
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                       ))}
                     </div>

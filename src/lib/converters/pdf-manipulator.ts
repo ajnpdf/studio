@@ -56,26 +56,26 @@ export class PDFManipulator {
   async rotate(): Promise<ConversionResult> {
     const doc = await PDFDocument.load(await this.files[0].arrayBuffer(), { ignoreEncryption: true });
     doc.getPages().forEach(p => p.setRotation(degrees((p.getRotation().angle + 90) % 360)));
-    return { blob: new Blob([await doc.save()]), fileName: `Rotated.pdf`, mimeType: 'application/pdf' };
-  }
-
-  async sign(imgBuf: ArrayBuffer): Promise<ConversionResult> {
-    const doc = await PDFDocument.load(await this.files[0].arrayBuffer(), { ignoreEncryption: true });
-    const img = await doc.embedPng(new Uint8Array(imgBuf));
-    const lastPage = doc.getPages()[doc.getPageCount() - 1];
-    lastPage.drawImage(img, { x: 50, y: 50, width: 150, height: 60 });
-    return { blob: new Blob([await doc.save()]), fileName: `Signed.pdf`, mimeType: 'application/pdf' };
-  }
-
-  async protect(pwd: string): Promise<ConversionResult> {
-    const doc = await PDFDocument.load(await this.files[0].arrayBuffer());
-    return { blob: new Blob([await doc.save()]), fileName: `Protected.pdf`, mimeType: 'application/pdf' };
+    const bytes = await doc.save();
+    return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `Rotated.pdf`, mimeType: 'application/pdf' };
   }
 
   async addPageNumbers(): Promise<ConversionResult> {
     const doc = await PDFDocument.load(await this.files[0].arrayBuffer(), { ignoreEncryption: true });
     const font = await doc.embedFont(StandardFonts.Helvetica);
     doc.getPages().forEach((p, i) => p.drawText(`${i + 1}`, { x: p.getSize().width / 2, y: 30, size: 10, font, color: rgb(0, 0, 0) }));
-    return { blob: new Blob([await doc.save()]), fileName: `Numbered.pdf`, mimeType: 'application/pdf' };
+    const bytes = await doc.save();
+    return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `Numbered.pdf`, mimeType: 'application/pdf' };
+  }
+
+  async sign(signatureBuf?: ArrayBuffer): Promise<ConversionResult> {
+    const doc = await PDFDocument.load(await this.files[0].arrayBuffer(), { ignoreEncryption: true });
+    if (signatureBuf) {
+      const img = await doc.embedPng(new Uint8Array(signatureBuf));
+      const lastPage = doc.getPages()[doc.getPageCount() - 1];
+      lastPage.drawImage(img, { x: 50, y: 50, width: 150, height: 60 });
+    }
+    const bytes = await doc.save();
+    return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `Signed.pdf`, mimeType: 'application/pdf' };
   }
 }
