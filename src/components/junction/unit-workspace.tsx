@@ -18,8 +18,8 @@ interface Props {
 }
 
 /**
- * AJN Unit Workspace - Definitive Professional Layout
- * Features focused full-width engineering and verified binary synthesis.
+ * AJN Unit Workspace - Focused Full-Width Layout
+ * Sidebars and configuration boxes removed for professional engineering focus.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const [config] = useState<any>({});
@@ -28,15 +28,22 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   const getAcceptedExtensions = () => {
     if (!unit) return ".pdf";
-    if (unit.id.startsWith("pdf-")) return ".pdf";
-    if (unit.id.endsWith("-pdf")) {
-      if (unit.id.includes("jpg") || unit.id.includes("image")) return ".jpg,.jpeg,.png,.webp";
-      if (unit.id.includes("word")) return ".docx,.doc";
-      if (unit.id.includes("ppt")) return ".pptx,.ppt";
-      if (unit.id.includes("excel")) return ".xlsx,.xls";
-      if (unit.id.includes("html")) return ".html,.htm";
+    const id = unit.id;
+    // PDF Source Tools
+    if (id.startsWith("pdf-") || id === "merge-pdf" || id === "split-pdf" || id === "rotate-pdf" || 
+        id === "compress-pdf" || id === "redact-pdf" || id === "protect-pdf" || id === "sign-pdf" || 
+        id === "summarize-pdf" || id === "translate-pdf" || id === "ocr-pdf") {
+      return ".pdf";
     }
-    return ".pdf";
+    // PDF Creation Tools
+    if (id.endsWith("-pdf")) {
+      if (id.includes("jpg") || id.includes("image")) return ".jpg,.jpeg,.png,.webp";
+      if (id.includes("word")) return ".docx,.doc";
+      if (id.includes("ppt")) return ".pptx,.ppt";
+      if (id.includes("excel")) return ".xlsx,.xls";
+      if (id.includes("html")) return ".html,.htm";
+    }
+    return "*/*";
   };
 
   const handleFilesAdded = (files: File[]) => {

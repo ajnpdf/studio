@@ -4,7 +4,6 @@ import * as pdfjsLib from 'pdfjs-dist';
 import JSZip from 'jszip';
 import pptxgen from 'pptxgenjs';
 import * as XLSX from 'xlsx';
-import { ProgressCallback, ConversionResult } from './pdf-converter';
 
 // Configure PDF.js worker
 if (typeof window !== 'undefined') {
@@ -79,7 +78,6 @@ export class PDFConverter {
       this.updateProgress(progBase, `Analyzing Page ${i}: Executing AI layout detection...`);
       
       const page = await pdf.getPage(i);
-      const viewport = page.getViewport({ scale: 1.0 });
       const textContent = await page.getTextContent();
       
       const slide = pres.addSlide();
@@ -91,7 +89,6 @@ export class PDFConverter {
 
       this.updateProgress(progBase + 5, `Page ${i}: Mapping text regions to slide coordinates...`);
 
-      // Add Title if detected as significant
       if (titleItem && (titleItem as any).transform[0] > 18) {
         slide.addText((titleItem as any).str, {
           x: '5%',
@@ -105,7 +102,6 @@ export class PDFConverter {
         });
       }
 
-      // Collect body text
       let bodyText = textContent.items
         .filter((it: any) => it !== titleItem && it.str.trim().length > 0)
         .map((it: any) => it.str)
@@ -123,7 +119,6 @@ export class PDFConverter {
         });
       }
 
-      // Step 3: Handle Images (Embed placeholder for prototype)
       this.updateProgress(progBase + 10, `Page ${i}: Synchronizing XObject image streams...`);
     }
 
@@ -137,9 +132,6 @@ export class PDFConverter {
     };
   }
 
-  /**
-   * 18. PDF TO EXCEL (Master Specification Implementation)
-   */
   private async toExcel(pdf: any, baseName: string, settings: any): Promise<ConversionResult> {
     this.updateProgress(10, "Initializing Master Grid Alignment Analysis...");
     const wb = XLSX.utils.book_new();
@@ -151,7 +143,6 @@ export class PDFConverter {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
       
-      // Step 1: Method B (Text Alignment Clustering)
       const rows: any[] = [];
       const tolerance = 2;
 
@@ -171,7 +162,6 @@ export class PDFConverter {
         row.items.sort((a: any, b: any) => a.transform[4] - b.transform[4]);
         return row.items.map((it: any) => {
           const val = it.str.trim();
-          // Step 2: Infer data type
           if (!isNaN(val as any) && val !== '') return Number(val);
           return val;
         });
@@ -199,12 +189,8 @@ export class PDFConverter {
     const mimeType = format === 'PNG' ? 'image/png' : format === 'WEBP' ? 'image/webp' : 'image/jpeg';
     const ext = format.toLowerCase();
 
-    this.updateProgress(15, `Targeting ${targetDpi} DPI for high-fidelity rasterization...`);
-
     for (let i = 1; i <= pdf.numPages; i++) {
       const progBase = 15 + Math.round((i / pdf.numPages) * 80);
-      this.updateProgress(progBase, `Rasterizing Page ${i}: Calculating canvas pixel dimensions...`);
-      
       const page = await pdf.getPage(i);
       const scale = targetDpi / 72;
       const viewport = page.getViewport({ scale });
@@ -225,13 +211,10 @@ export class PDFConverter {
   }
 
   private async toWord(pdf: any, baseName: string, settings: any): Promise<ConversionResult> {
-    this.updateProgress(10, "Initializing structural deconstruction...");
     const zip = new JSZip();
     let docXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>`;
 
     for (let i = 1; i <= pdf.numPages; i++) {
-      const progBase = 10 + Math.round((i / pdf.numPages) * 80);
-      this.updateProgress(progBase, `Analyzing Page ${i}: Extracting text operators...`);
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
       
@@ -255,11 +238,8 @@ export class PDFConverter {
       if (i < pdf.numPages) docXml += `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
     }
 
-    docXml += `<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr></w:body></w:document>`;
+    docXml += `</w:body></w:document>`;
     zip.file("word/document.xml", docXml);
-    zip.file("[Content_Types].xml", `<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>`);
-    zip.file("_rels/.rels", `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`);
-
     const blob = await zip.generateAsync({ type: "blob" });
     return { blob, fileName: `${baseName}.docx`, mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
   }

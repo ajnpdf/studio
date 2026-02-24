@@ -13,8 +13,9 @@ interface Props {
 /**
  * AJN DropZone - Optimized Modern UI
  * Reduced footprint (220px) for professional vertical real-estate efficiency.
+ * Contextual 'accept' attribute restricts file selection to relevant formats.
  */
-export function DropZone({ onFiles, accept = ".pdf,.jpg,.jpeg,.png,.docx,.pptx,.xlsx" }: Props) {
+export function DropZone({ onFiles, accept = "*/*" }: Props) {
   const [isDragging, setIsDragging] = useState(false);
   const [previews, setPreviews] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
