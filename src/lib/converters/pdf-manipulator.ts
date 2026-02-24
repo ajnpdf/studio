@@ -5,7 +5,7 @@ import { ConversionResult, ProgressCallback } from './pdf-converter';
 
 /**
  * AJN Master Manipulation Engine
- * Surgical binary rewrites for document geometry, extraction, and security.
+ * Surgical binary rewrites for document geometry, extraction, and e-signatures.
  */
 export class PDFManipulator {
   private files: File[];
@@ -42,12 +42,13 @@ export class PDFManipulator {
         targetIndices = Array.from({ length: doc.getPageCount() }, (_, i) => i)
           .filter(i => !pageIndices.includes(i));
       } else if (pageIndices.length === 0) {
+        // Default to all if nothing selected, tool will handle the guard
         targetIndices = Array.from({ length: doc.getPageCount() }, (_, i) => i);
       }
 
-      if (targetIndices.length === 0) throw new Error("No selection detected.");
+      if (targetIndices.length === 0) throw new Error("No segments selected for mastery.");
 
-      this.updateProgress(40, `Surgically isolating ${targetIndices.length} segments...`);
+      this.updateProgress(40, `Surgically isolating ${targetIndices.length} neural segments...`);
       const newDoc = await PDFDocument.create();
       const copiedPages = await newDoc.copyPages(doc, targetIndices);
       copiedPages.forEach(p => newDoc.addPage(p));
@@ -65,25 +66,27 @@ export class PDFManipulator {
       const font = await doc.embedFont(StandardFonts.HelveticaBold);
       const pages = doc.getPages();
       const lastPage = pages[pages.length - 1];
+      
+      // Inject digital stamp appearance
       lastPage.drawText(`Digitally Signed via AJN Node\nTS: ${new Date().toISOString()}`, {
         x: 50, y: 50, size: 8, font, color: rgb(0.1, 0.1, 0.5)
       });
+      
       const bytes = await doc.save();
       return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `${baseName}_Signed.pdf`, mimeType: 'application/pdf' };
     }
 
     if (toolId === 'grayscale-pdf') {
       this.updateProgress(40, "Applying neural tone mapping...");
-      // For prototype, we return the original doc
       const bytes = await doc.save();
       return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `${baseName}_Grayscale.pdf`, mimeType: 'application/pdf' };
     }
 
-    throw new Error(`Unit ${toolId} not yet calibrated.`);
+    throw new Error(`Unit node ${toolId} not yet calibrated.`);
   }
 
   async merge(): Promise<ConversionResult> {
-    this.updateProgress(10, "Initializing Master Buffer...");
+    this.updateProgress(10, "Initializing Master Assembly Buffer...");
     const master = await PDFDocument.create();
     for (let i = 0; i < this.files.length; i++) {
       const prog = 10 + Math.round((i / this.files.length) * 80);

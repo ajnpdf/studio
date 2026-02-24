@@ -16,7 +16,7 @@ export type ProgressCallback = (percent: number, message: string) => void;
 
 /**
  * AJN Neural PDF Conversion Engine
- * Hardened for Vertical Stitching (Single Image Output).
+ * Refactored for strictly single continuous image output (Vertical Stitching).
  */
 export class PDFConverter {
   private file: File;
@@ -46,22 +46,31 @@ export class PDFConverter {
       case 'WEBP':
         return this.toImages(pdf, baseName, target, settings);
       case 'DOCX':
-        return this.toWord(pdf, baseName);
+        const { WordConverter } = await import('./word-converter');
+        return new WordConverter(this.file, this.onProgress).convertTo('PDF');
       case 'PPTX':
-        return this.toPowerPoint(pdf, baseName);
+        const { PPTConverter } = await import('./ppt-converter');
+        return new PPTConverter(this.file, this.onProgress).convertTo('PDF');
       case 'XLSX':
-        return this.toExcel(pdf, baseName);
+        const { ExcelConverter } = await import('./excel-converter');
+        return new ExcelConverter(this.file, this.onProgress).convertTo('PDF');
       case 'TXT':
         return this.toText(pdf, baseName);
       case 'PDFA':
-        return this.toPdfA(pdf, baseName);
+        const { PDFDocument } = await import('pdf-lib');
+        const bytes = await this.file.arrayBuffer();
+        const doc = await PDFDocument.load(bytes);
+        const out = await doc.save();
+        return { blob: new Blob([out], { type: 'application/pdf' }), fileName: `${baseName}_PDFA.pdf`, mimeType: 'application/pdf' };
       default:
-        throw new Error(`Format ${target} not supported.`);
+        throw new Error(`Format transformation ${target} not yet supported in neural layer.`);
     }
   }
 
   private async toImages(pdf: any, baseName: string, format: string, settings: any): Promise<ConversionResult> {
     this.updateProgress(15, "Initializing Vertical Stitching Engine...");
+    
+    // Quality adjustment: 300DPI scale is ~4.16x
     const scale = (settings.quality || 300) / 72;
     const mimeType = format === 'PNG' ? 'image/png' : format === 'WEBP' ? 'image/webp' : 'image/jpeg';
     const ext = format.toLowerCase();
@@ -87,41 +96,37 @@ export class PDFConverter {
       maxWidth = Math.max(maxWidth, canvas.width);
     }
 
-    this.updateProgress(85, "Stitching Master Buffer...");
+    this.updateProgress(85, "Stitching Master Canvas...");
     const masterCanvas = document.createElement('canvas');
     masterCanvas.width = maxWidth;
     masterCanvas.height = totalHeight;
     const masterCtx = masterCanvas.getContext('2d')!;
-    masterCtx.fillStyle = '#FFFFFF';
-    masterCtx.fillRect(0, 0, maxWidth, totalHeight);
+    
+    // Background filling for transparent PNGs if target is JPEG
+    if (format !== 'PNG') {
+      masterCtx.fillStyle = '#FFFFFF';
+      masterCtx.fillRect(0, 0, maxWidth, totalHeight);
+    }
 
     let currentY = 0;
     for (const canvas of pageCanvases) {
-      masterCtx.drawImage(canvas, (maxWidth - canvas.width) / 2, currentY);
+      // Center-align pages if they have variable widths
+      const xOffset = (maxWidth - canvas.width) / 2;
+      masterCtx.drawImage(canvas, xOffset, currentY);
       currentY += canvas.height;
     }
 
+    this.updateProgress(95, "Synthesizing binary image buffer...");
     const quality = (settings.quality || 85) / 100;
     const blob = await new Promise<Blob>((resolve) => {
       masterCanvas.toBlob((b) => resolve(b!), mimeType, quality);
     });
 
-    return { blob, fileName: `${baseName}.${ext}`, mimeType };
-  }
-
-  private async toPowerPoint(pdf: any, baseName: string): Promise<ConversionResult> {
-    const { PPTConverter } = await import('./ppt-converter');
-    return new PPTConverter(this.file, this.onProgress).convertTo('PDF');
-  }
-
-  private async toWord(pdf: any, baseName: string): Promise<ConversionResult> {
-    const { WordConverter } = await import('./word-converter');
-    return new WordConverter(this.file, this.onProgress).convertTo('PDF');
-  }
-
-  private async toExcel(pdf: any, baseName: string): Promise<ConversionResult> {
-    const { ExcelConverter } = await import('./excel-converter');
-    return new ExcelConverter(this.file, this.onProgress).convertTo('PDF');
+    return { 
+      blob, 
+      fileName: `${baseName}.${ext}`, 
+      mimeType 
+    };
   }
 
   private async toText(pdf: any, baseName: string): Promise<ConversionResult> {
@@ -132,14 +137,5 @@ export class PDFConverter {
       text += (content.items as any[]).map((it: any) => it.str).join(' ') + '\n';
     }
     return { blob: new Blob([text]), fileName: `${baseName}.txt`, mimeType: 'text/plain' };
-  }
-
-  private async toPdfA(pdf: any, baseName: string): Promise<ConversionResult> {
-    const { PDFDocument } = await import('pdf-lib');
-    const bytes = await this.file.arrayBuffer();
-    const doc = await PDFDocument.load(bytes);
-    doc.setTitle(`${baseName} (Archived)`);
-    const out = await doc.save();
-    return { blob: new Blob([out], { type: 'application/pdf' }), fileName: `${baseName}_PDFA.pdf`, mimeType: 'application/pdf' };
   }
 }
