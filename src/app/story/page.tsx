@@ -10,7 +10,7 @@ import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 /**
- * AJN About Us Page - Simple Professional Language
+ * AJN About Us Page - Professional Industrial Standard 2026
  */
 export default function OurStoryPage() {
   const founderImage = PlaceHolderImages.find(img => img.id === 'founder-portrait');
@@ -121,7 +121,7 @@ export default function OurStoryPage() {
         <section className="bg-white/40 backdrop-blur-3xl py-32 border-y border-black/5">
           <div className="max-w-6xl mx-auto px-8">
             <div className="text-center space-y-4 mb-20">
-              <h2 className="text-4xl font-black tracking-tighter uppercase text-slate-950">Our Core Features</h2>
+              <h2 className="text-4xl font-black tracking-tighter uppercase text-slate-950">Core Features</h2>
               <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-[0.4em]">The Standards of Excellence</p>
             </div>
             
@@ -143,6 +143,25 @@ export default function OurStoryPage() {
           </div>
         </section>
 
+        <section className="py-24 max-w-7xl mx-auto px-8 text-center space-y-10">
+          <div className="flex gap-10 justify-center">
+            <div className="text-center space-y-2">
+              <p className="text-4xl md:text-6xl font-black tracking-tighter">2026</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-950/40">ESTABLISHED</p>
+            </div>
+            <div className="h-16 w-px bg-black/5" />
+            <div className="text-center space-y-2">
+              <p className="text-4xl md:text-6xl font-black tracking-tighter">100%</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-950/40">PRIVACY</p>
+            </div>
+            <div className="h-16 w-px bg-black/5" />
+            <div className="text-center space-y-2">
+              <p className="text-4xl md:text-6xl font-black tracking-tighter">30+</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-950/40">TOOLS ACTIVE</p>
+            </div>
+          </div>
+        </section>
+
         <footer className="max-w-6xl mx-auto px-8 border-t border-black/5 pt-20 flex flex-col items-center gap-10">
           <div className="flex gap-12 flex-wrap justify-center">
             {['Blog', 'Privacy', 'Terms', 'Contact'].map((link) => (
@@ -154,10 +173,10 @@ export default function OurStoryPage() {
           
           <div className="flex flex-col items-center gap-4">
             <p className="text-[11px] font-black text-slate-950/20 tracking-[0.5em] uppercase">
-              AJN Core • 2025
+              AJN Core • 2026
             </p>
             <div className="flex items-center gap-2.5 px-5 py-2 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
-              <span className="text-[10px] font-black text-primary uppercase tracking-widest">Made by Indian ❤️</span>
+              <span className="text-[10px] font-black text-primary uppercase tracking-widest">Made in INDIAN❤️</span>
             </div>
           </div>
         </footer>

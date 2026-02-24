@@ -7,8 +7,8 @@ import { ProgressCallback, ConversionResult } from './pdf-converter';
 let ffmpegInstance: FFmpeg | null = null;
 
 /**
- * AJN Neural Video Conversion Engine
- * Powered by FFmpeg.wasm for local, professional-grade processing
+ * AJN Professional Video Conversion Engine
+ * Powered by FFmpeg.wasm for local, industrial-grade processing
  */
 export class VideoConverter {
   private file: File;
@@ -45,7 +45,7 @@ export class VideoConverter {
     const inputName = `input_${this.file.name}`;
     const outputName = `output.${target.toLowerCase()}`;
 
-    this.onProgress?.(5, "Loading video buffer into neural memory...");
+    this.onProgress?.(5, "Loading video buffer into session memory...");
     await ffmpeg.writeFile(inputName, await fetchFile(this.file));
 
     let args: string[] = ['-i', inputName];
@@ -57,7 +57,6 @@ export class VideoConverter {
         mimeType = 'video/x-msvideo';
         break;
       case 'MOV':
-        // Stream copy for instant MOV creation
         args.push('-c:v', 'copy', '-c:a', 'copy', outputName);
         mimeType = 'video/quicktime';
         break;
@@ -74,7 +73,6 @@ export class VideoConverter {
         mimeType = 'video/mp4';
         break;
       case 'GIF':
-        // Optimized two-pass palette generation for high-quality GIFs
         this.onProgress?.(20, "Analyzing color palette...");
         await ffmpeg.exec(['-i', inputName, '-ss', '00:00:00', '-t', '10', '-vf', 'fps=10,scale=480:-1:flags=lanczos,palettegen', 'palette.png']);
         args = ['-i', inputName, '-i', 'palette.png', '-ss', '00:00:00', '-t', '10', '-filter_complex', 'fps=10,scale=480:-1:flags=lanczos[x];[x][1:v]paletteuse', '-loop', '0', outputName];
@@ -93,12 +91,11 @@ export class VideoConverter {
         mimeType = 'audio/aac';
         break;
       default:
-        // Universal fallback to MP4 transcode
         args.push('-c:v', 'libx264', '-c:a', 'aac', outputName);
         mimeType = 'video/mp4';
     }
 
-    this.onProgress?.(30, `Executing Neural Transcode: ${target}...`);
+    this.onProgress?.(30, `Executing Professional Transcode: ${target}...`);
     await ffmpeg.exec(args);
 
     const data = await ffmpeg.readFile(outputName);

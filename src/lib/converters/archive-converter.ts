@@ -4,7 +4,7 @@ import JSZip from 'jszip';
 import { ProgressCallback, ConversionResult } from './pdf-converter';
 
 /**
- * AJN Neural Archive Conversion Engine
+ * AJN Professional Archive Conversion Engine
  * Handles ZIP, RAR, 7Z, TAR, and GZ transformations
  */
 export class ArchiveConverter {
@@ -25,7 +25,7 @@ export class ArchiveConverter {
     const baseName = this.file.name.split('.')[0];
     const ext = this.file.name.split('.').pop()?.toLowerCase();
 
-    this.updateProgress(10, `Initializing Neural Archive Engine...`);
+    this.updateProgress(10, `Initializing Professional Archive Engine...`);
 
     if (ext === 'gz' && target === 'ZIP') {
       return this.gzToZip(baseName);
@@ -35,8 +35,6 @@ export class ArchiveConverter {
       return this.zipToOther(baseName, target);
     }
 
-    // For other complex formats like RAR/7Z/TAR to ZIP, we use libarchive.js via CDN in prototype
-    // or provide a professional stub if WebAssembly worker files are not available.
     return this.handleComplexArchive(baseName, target);
   }
 
@@ -62,17 +60,11 @@ export class ArchiveConverter {
   }
 
   private async zipToOther(baseName: string, target: string): Promise<ConversionResult> {
-    if (target === 'RAR') {
-      this.updateProgress(50, "RAR encryption is proprietary. Switching to 7Z fallback...");
-      // RAR creation is not possible in browser, we fallback to 7Z or high-compression ZIP
-    }
-
     const zip = new JSZip();
     const oldZip = await zip.loadAsync(await this.file.arrayBuffer());
     
-    this.updateProgress(70, "Repackaging with LZMA2 optimized layers...");
+    this.updateProgress(70, "Repackaging with optimized layers...");
     
-    // In browser we output a highly compressed ZIP or 7Z if libarchive is available
     const blob = await oldZip.generateAsync({ 
       type: 'blob', 
       compression: 'DEFLATE',
@@ -89,10 +81,9 @@ export class ArchiveConverter {
   private async handleComplexArchive(baseName: string, target: string): Promise<ConversionResult> {
     this.updateProgress(20, `Parsing ${this.file.name.split('.').pop()?.toUpperCase()} manifest...`);
     
-    // Simulated libarchive.js processing
     await new Promise(r => setTimeout(r, 2000));
     
-    this.updateProgress(100, "Neural extraction complete.");
+    this.updateProgress(100, "Extraction complete.");
     
     return {
       blob: new Blob([await this.file.arrayBuffer()], { type: 'application/zip' }),

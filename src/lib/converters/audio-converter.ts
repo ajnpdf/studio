@@ -7,8 +7,8 @@ import { ProgressCallback, ConversionResult } from './pdf-converter';
 let ffmpegInstance: FFmpeg | null = null;
 
 /**
- * AJN Neural Audio Conversion Engine
- * Powered by FFmpeg.wasm for local, professional-grade processing
+ * AJN Professional Audio Conversion Engine
+ * Powered by FFmpeg.wasm for local, industrial-grade processing
  */
 export class AudioConverter {
   private file: File;
@@ -45,7 +45,7 @@ export class AudioConverter {
     const inputName = `input_${this.file.name}`;
     const outputName = `output.${target.toLowerCase()}`;
 
-    this.onProgress?.(5, "Loading audio buffer into neural memory...");
+    this.onProgress?.(5, "Loading audio buffer into session memory...");
     await ffmpeg.writeFile(inputName, await fetchFile(this.file));
 
     let args: string[] = ['-i', inputName];
@@ -77,7 +77,7 @@ export class AudioConverter {
         mimeType = 'audio/mpeg';
     }
 
-    this.onProgress?.(30, `Executing Neural Transcode: ${target}...`);
+    this.onProgress?.(30, `Executing Professional Transcode: ${target}...`);
     await ffmpeg.exec(args);
 
     const data = await ffmpeg.readFile(outputName);

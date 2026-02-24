@@ -81,7 +81,7 @@ export function DashboardTopBar() {
                     </Avatar>
                     <div className="overflow-hidden">
                       <p className="text-sm font-black truncate uppercase tracking-tighter">{user.displayName || 'User Account'}</p>
-                      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Neural Pro Member</p>
+                      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Advanced Pro Member</p>
                     </div>
                   </div>
                   <DropdownMenuSeparator className="bg-white/5" />

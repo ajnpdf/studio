@@ -1,4 +1,3 @@
-
 'use client';
 
 import { PDFDocument } from 'pdf-lib';
@@ -9,7 +8,7 @@ import { fetchFile, toBlobURL } from '@ffmpeg/util';
 let ffmpegInstance: FFmpeg | null = null;
 
 /**
- * AJN Neural Image Conversion Engine
+ * AJN Professional Image Conversion Engine
  * Implements high-fidelity raster and vector transformations
  */
 export class ImageConverter {
@@ -37,15 +36,9 @@ export class ImageConverter {
     return ffmpeg;
   }
 
-  /**
-   * 10. JPG TO PDF (Master Workflow Implementation)
-   */
   async toMasterPDF(files: File[], settings: any = {}): Promise<ConversionResult> {
     this.updateProgress(5, "Initializing Master PDF Container...");
     const pdfDoc = await PDFDocument.create();
-    const quality = (settings.quality || 85) / 100;
-    const fitMode = settings.fitMode || 'FIT'; // FIT, FILL, STRETCH, ORIGINAL
-    const pageSize = settings.pageSize || 'A4'; // A4: 595x842
     const margins = settings.margins || 40;
 
     for (let i = 0; i < files.length; i++) {
@@ -53,7 +46,6 @@ export class ImageConverter {
       const progBase = 10 + Math.round((i / files.length) * 80);
       this.updateProgress(progBase, `Mastering frame ${i + 1}: ${file.name}...`);
 
-      // STEP 1: Load as ArrayBuffer
       const bytes = await file.arrayBuffer();
       let image;
       
@@ -64,7 +56,6 @@ export class ImageConverter {
         image = await pdfDoc.embedJpg(bytes);
       }
 
-      // STEP 5: Compute transformation matrix
       let pWidth = 595.28;
       let pHeight = 841.89;
       
@@ -75,54 +66,18 @@ export class ImageConverter {
       const page = pdfDoc.addPage([pWidth, pHeight]);
       const { width: pgW, height: pgH } = page.getSize();
 
-      let drawW = image.width;
-      let drawH = image.height;
-      let x = 0;
-      let y = 0;
-
       const availW = pgW - (margins * 2);
       const availH = pgH - (margins * 2);
-
-      this.updateProgress(progBase + 10, `Computing transformation matrix (${fitMode})...`);
-
-      switch (fitMode) {
-        case 'FIT':
-          const scale = Math.min(availW / image.width, availH / image.height);
-          drawW = image.width * scale;
-          drawH = image.height * scale;
-          x = margins + (availW - drawW) / 2;
-          y = margins + (availH - drawH) / 2;
-          break;
-        case 'FILL':
-          const fillScale = Math.max(pgW / image.width, pgH / image.height);
-          drawW = image.width * fillScale;
-          drawH = image.height * fillScale;
-          x = (pgW - drawW) / 2;
-          y = (pgH - drawH) / 2;
-          break;
-        case 'STRETCH':
-          drawW = pgW;
-          drawH = pgH;
-          x = 0;
-          y = 0;
-          break;
-        case 'ORIGINAL':
-          x = margins;
-          y = margins;
-          break;
-      }
+      const scale = Math.min(availW / image.width, availH / image.height);
+      const drawW = image.width * scale;
+      const drawH = image.height * scale;
 
       page.drawImage(image, {
-        x,
-        y,
+        x: margins + (availW - drawW) / 2,
+        y: margins + (availH - drawH) / 2,
         width: drawW,
         height: drawH,
       });
-
-      if (settings.showCaptions) {
-        this.updateProgress(progBase + 12, "Injecting filename caption...");
-        // Drawing text logic would go here
-      }
     }
 
     this.updateProgress(95, "Synchronizing binary buffer...");
@@ -140,14 +95,12 @@ export class ImageConverter {
     const baseName = this.file.name.split('.')[0];
     const ext = this.file.name.split('.').pop()?.toLowerCase();
 
-    this.updateProgress(10, `Initializing Neural Image Engine...`);
+    this.updateProgress(10, `Initializing Professional Image Engine...`);
 
-    // SPECIAL: JPG TO PDF
     if (target === 'PDF' && ['jpg', 'jpeg', 'png', 'webp'].includes(ext!)) {
       return this.toMasterPDF([this.file], settings);
     }
 
-    // Routing Logic
     if (['jpg', 'jpeg', 'png', 'webp', 'avif', 'bmp'].includes(ext!)) {
       return this.handleCommonFormats(target, baseName, settings);
     }
@@ -209,7 +162,7 @@ export class ImageConverter {
       return this.handleCommonFormats(target, baseName, settings);
     }
 
-    this.updateProgress(20, "Initializing FFmpeg neural transcode...");
+    this.updateProgress(20, "Initializing professional transcode...");
     const ffmpeg = await this.getFFmpeg();
     const inputName = 'input.gif';
     const outputName = target === 'MP4' ? 'output.mp4' : 'output.webp';
@@ -237,7 +190,7 @@ export class ImageConverter {
       const url = URL.createObjectURL(file);
       const img = new Image();
       img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-      img.onerror = () => reject(new Error("Failed to load image into neural memory."));
+      img.onerror = () => reject(new Error("Failed to load image into session memory."));
       img.src = url;
     });
   }

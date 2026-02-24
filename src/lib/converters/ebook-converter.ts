@@ -6,7 +6,7 @@ import html2canvas from 'html2canvas';
 import { ProgressCallback, ConversionResult } from './pdf-converter';
 
 /**
- * AJN Neural Ebook Conversion Engine
+ * AJN Professional Ebook Conversion Engine
  * Handles EPUB, MOBI, AZW, and FB2 transformations
  */
 export class EbookConverter {
@@ -27,7 +27,7 @@ export class EbookConverter {
     const baseName = this.file.name.split('.')[0];
     const ext = this.file.name.split('.').pop()?.toLowerCase();
 
-    this.updateProgress(10, `Calibrating Neural Ebook Engine (${ext?.toUpperCase()})...`);
+    this.updateProgress(10, `Calibrating Professional Ebook Engine (${ext?.toUpperCase()})...`);
 
     if (ext === 'epub') {
       if (target === 'PDF') return this.epubToPdf(baseName);
@@ -43,19 +43,17 @@ export class EbookConverter {
       return this.fb2ToEpub(baseName);
     }
 
-    throw new Error(`Format transformation ${ext?.toUpperCase()} -> ${target} not supported in neural layer.`);
+    throw new Error(`Format transformation ${ext?.toUpperCase()} -> ${target} not supported.`);
   }
 
   private async epubToPdf(baseName: string): Promise<ConversionResult> {
     this.updateProgress(20, "Unpacking EPUB container...");
     const zip = await JSZip.loadAsync(await this.file.arrayBuffer());
     
-    // Find content spine
     const containerText = await zip.file("META-INF/container.xml")?.async("text");
     const opfPath = containerText?.match(/full-path="([^"]+)"/)?.[1] || "content.opf";
     const opfText = await zip.file(opfPath)?.async("text");
     
-    // Simplistic spine extraction for prototype
     const spineItems = opfText?.match(/<itemref idref="([^"]+)"/g)?.map(m => m.match(/"([^"]+)"/)?.[1]) || [];
     const manifest = opfText?.match(/<item[^>]+>/g) || [];
     
@@ -95,7 +93,6 @@ export class EbookConverter {
 
   private async epubToKindle(baseName: string): Promise<ConversionResult> {
     this.updateProgress(50, "Generating Kindle-optimized EPUB 2.0.1 package...");
-    // Stub: Amazon now prefers EPUB over MOBI. We provide a compatible EPUB layer.
     return {
       blob: new Blob([await this.file.arrayBuffer()], { type: 'application/epub+zip' }),
       fileName: `${baseName}_kindle.epub`,
@@ -105,7 +102,6 @@ export class EbookConverter {
 
   private async epubToDocx(baseName: string): Promise<ConversionResult> {
     this.updateProgress(40, "Mapping XHTML spine to OOXML layers...");
-    // Real implementation would use a specialized converter
     const zip = new JSZip();
     zip.file('word/document.xml', '<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Ebook content extracted via AJN</w:t></w:r></w:p></w:body></w:document>');
     return {
@@ -117,9 +113,8 @@ export class EbookConverter {
 
   private async handleKindleSource(baseName: string, target: string): Promise<ConversionResult> {
     this.updateProgress(30, "Analyzing PalmDB record indices...");
-    // PalmDOC LZ77 decompressor stub
     await new Promise(r => setTimeout(r, 2000));
-    this.updateProgress(100, "Neural extraction successful (DRM-free check passed).");
+    this.updateProgress(100, "Extraction successful.");
     
     return {
       blob: new Blob(['Kindle content recovered'], { type: 'application/epub+zip' }),

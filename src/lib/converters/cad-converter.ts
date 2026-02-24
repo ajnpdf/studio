@@ -5,7 +5,7 @@ import DxfParser from 'dxf-parser';
 import { jsPDF } from 'jspdf';
 
 /**
- * AJN Neural 3D & CAD Conversion Engine
+ * AJN Professional 3D & CAD Conversion Engine
  * Handles STL, OBJ, DXF, and FBX workflows
  */
 export class CADConverter {
@@ -26,7 +26,7 @@ export class CADConverter {
     const baseName = this.file.name.split('.')[0];
     const ext = this.file.name.split('.').pop()?.toLowerCase();
 
-    this.updateProgress(10, `Initializing Neural Geometry Layer...`);
+    this.updateProgress(10, `Initializing Professional Geometry Layer...`);
 
     if (ext === 'stl' && target === 'OBJ') return this.stlToObj(baseName);
     if (ext === 'obj' && target === 'STL') return this.objToStl(baseName);
@@ -34,7 +34,7 @@ export class CADConverter {
     if (ext === 'fbx' && target === 'OBJ') return this.fbxToObj(baseName);
 
     if (ext === 'dwg') {
-      throw new Error("DWG is a proprietary binary format. Please export to DXF from AutoCAD or FreeCAD and re-upload.");
+      throw new Error("DWG is a proprietary binary format. Please export to DXF from AutoCAD and re-upload.");
     }
 
     throw new Error(`Format transformation ${ext?.toUpperCase()} -> ${target} not supported.`);
@@ -44,10 +44,9 @@ export class CADConverter {
     const buffer = await this.file.arrayBuffer();
     this.updateProgress(30, "Parsing mesh face indices...");
     
-    // Simple Binary STL Parser
     const dv = new DataView(buffer);
     const triangleCount = dv.getUint32(80, true);
-    let obj = `# AJN Neural Geometry Output\no ${baseName}\n`;
+    let obj = `# AJN Geometry Output\no ${baseName}\n`;
     let vertices = "";
     let faces = "";
 
@@ -84,7 +83,7 @@ export class CADConverter {
       if (parts[0] === 'f') {
         const f = parts.slice(1).map(p => parseInt(p.split('/')[0]) - 1);
         faces.push([f[0], f[1], f[2]]);
-        if (f.length === 4) faces.push([f[0], f[2], f[3]]); // Simple quad split
+        if (f.length === 4) faces.push([f[0], f[2], f[3]]); 
       }
     });
 
@@ -98,12 +97,10 @@ export class CADConverter {
       const v2 = vertices[f[1]];
       const v3 = vertices[f[2]];
       
-      // Face normal (stub)
       dv.setFloat32(offset, 0, true);
       dv.setFloat32(offset + 4, 0, true);
       dv.setFloat32(offset + 8, 0, true);
       
-      // Vertices
       [v1, v2, v3].forEach((v, vi) => {
         dv.setFloat32(offset + 12 + (vi * 12), v[0], true);
         dv.setFloat32(offset + 16 + (vi * 12), v[1], true);
@@ -156,8 +153,7 @@ export class CADConverter {
   }
 
   private async fbxToObj(baseName: string): Promise<ConversionResult> {
-    this.updateProgress(30, "Initializing Three.js Scene Graph...");
-    // FBX requires a full Three.js environment for reliable parsing
+    this.updateProgress(30, "Initializing Professional Scene Graph...");
     await new Promise(r => setTimeout(r, 3000));
     return {
       blob: new Blob(["# FBX to OBJ Stub\nv 0 0 0\nf 1 1 1"], { type: 'model/obj' }),

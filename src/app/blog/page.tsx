@@ -12,27 +12,27 @@ import { Badge } from '@/components/ui/badge';
 const posts = [
   {
     id: 1,
-    title: "Introducing AJN: The Future of Browser-Native Engineering",
-    excerpt: "Why we built a Junction Network that runs entirely on WASM and Neural processing layers.",
-    date: "Feb 15, 2025",
+    title: "Introducing AJN: The Future of Browser-Native Processing",
+    excerpt: "Why we built a Junction Network that runs entirely on local high-fidelity processing layers.",
+    date: "Feb 15, 2026",
     author: "Anjan Patel",
-    cat: "Engineering"
+    cat: "Processing"
   },
   {
     id: 2,
     title: "Mastering PDF Security: AES-256 and Redaction",
     excerpt: "A deep dive into how our cryptographic layers protect your sensitive data in real-time.",
-    date: "Feb 12, 2025",
+    date: "Feb 12, 2026",
     author: "AJN Core Team",
     cat: "Security"
   },
   {
     id: 3,
-    title: "The Rise of Neural OCR in Digital Archiving",
-    excerpt: "How AI is changing the landscape of document recognition and layout reconstruction.",
-    date: "Feb 10, 2025",
+    title: "The Rise of OCR in Digital Archiving",
+    excerpt: "How professional tools are changing the landscape of document recognition and layout reconstruction.",
+    date: "Feb 10, 2026",
     author: "Anjan Patel",
-    cat: "Intelligence"
+    cat: "Tools"
   }
 ];
 
@@ -55,7 +55,7 @@ export default function BlogPage() {
       <main className="max-w-6xl mx-auto px-8 py-20 space-y-16 relative z-10">
         <section className="text-center space-y-4">
           <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase">
-            Engineering <span className="text-primary">Insights</span>
+            Product <span className="text-primary">Insights</span>
           </h1>
           <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-[0.4em]">
             Official AJN Product & Technology Updates
@@ -106,7 +106,7 @@ export default function BlogPage() {
 
         <section className="py-20 text-center space-y-4">
           <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.5em]">
-            Made by Indian ❤️
+            Made in INDIAN❤️
           </p>
         </section>
       </main>

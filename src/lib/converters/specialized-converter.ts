@@ -9,7 +9,7 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * Specialized Services Core - Professional Optimization
+ * Specialized Services Core - Professional Optimization 2026
  * Hardened with real OCR, Compression levels, and Fault-Tolerant Translation.
  */
 export class SpecializedConverter {
@@ -107,7 +107,7 @@ export class SpecializedConverter {
   private async runHardenedTranslation(baseName: string, options: any): Promise<ConversionResult> {
     const targetLang = options?.targetLang || 'es';
     const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib');
-    this.updateProgress(5, "Calibrating Translation Cluster...");
+    this.updateProgress(5, "Calibrating Professional Translation Cluster...");
 
     const buf = await this.file.arrayBuffer();
     let doc: any, pdfJs: any;

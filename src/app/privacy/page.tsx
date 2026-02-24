@@ -29,7 +29,7 @@ export default function PrivacyPage() {
             <Shield className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-5xl font-black tracking-tighter uppercase">Privacy Policy</h1>
-          <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-widest">Effective Date: February 15, 2025</p>
+          <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-widest">Effective Date: February 15, 2026</p>
         </section>
 
         <div className="prose prose-slate max-w-none text-slate-950/80 font-medium space-y-8 uppercase tracking-widest text-sm">
@@ -67,7 +67,7 @@ export default function PrivacyPage() {
 
         <footer className="pt-20 pb-10 text-center space-y-4">
           <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.5em]">
-            MADE BY INDIAN ❤️
+            Made in INDIAN❤️
           </p>
         </footer>
       </main>

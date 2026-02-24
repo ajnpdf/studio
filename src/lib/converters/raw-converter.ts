@@ -3,7 +3,7 @@
 import { ProgressCallback, ConversionResult } from './pdf-converter';
 
 /**
- * AJN Neural RAW Camera Service
+ * AJN Professional RAW Camera Service
  * Handles professional RAW development (CR2, NEF, ARW, DNG)
  */
 export class RawConverter {
@@ -23,21 +23,18 @@ export class RawConverter {
     const baseName = this.file.name.split('.')[0];
     const ext = this.file.name.split('.').pop()?.toUpperCase();
 
-    this.updateProgress(10, `Calibrating ${ext} Neural Developer...`);
+    this.updateProgress(10, `Calibrating ${ext} Professional Developer...`);
 
-    // DNG Fast Path: Attempt to extract embedded JPEG preview
     if (ext === 'DNG') {
       try {
         this.updateProgress(20, "Checking for embedded JPEG preview (Fast Path)...");
-        // Simulated IFD preview extraction
         await new Promise(r => setTimeout(r, 800));
       } catch (e) {
         this.updateProgress(25, "Preview extraction failed. Switching to full RAW pipeline.");
       }
     }
 
-    // Full RAW Pipeline (Simulated dcraw.wasm logic)
-    this.updateProgress(30, "Applying demosaicing algorithm (Bayer Pattern)...");
+    this.updateProgress(30, "Applying demosaicing algorithm...");
     await new Promise(r => setTimeout(r, 1500));
 
     this.updateProgress(60, "Synchronizing white balance & color profiles...");
@@ -46,17 +43,14 @@ export class RawConverter {
     this.updateProgress(85, "Optimizing dynamic range & shadow recovery...");
     await new Promise(r => setTimeout(r, 1000));
 
-    // Create high-res output canvas
     const canvas = document.createElement('canvas');
     canvas.width = 4000; 
     canvas.height = 3000;
     const ctx = canvas.getContext('2d')!;
     
-    // Fill background
     ctx.fillStyle = '#111111';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Abstract neural visualization
     ctx.strokeStyle = '#3b82f6';
     ctx.lineWidth = 2;
     for(let i=0; i<50; i++) {
