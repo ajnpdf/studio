@@ -26,7 +26,7 @@ export class SplitConverter {
    * @param options Object containing pageIndices array from the UI selection
    */
   async split(options: any = {}): Promise<ConversionResult> {
-    const { pageIndices = [], filename } = options;
+    const { pageIndices = [] } = options;
     const baseName = this.file.name.split('.')[0];
 
     this.updateProgress(10, "Inhaling source binary structure...");
@@ -41,7 +41,7 @@ export class SplitConverter {
 
     const totalPages = sourceDoc.getPageCount();
     
-    // Default to all pages if none selected (standard split/copy)
+    // Default to all pages if none selected (standard copy)
     const targetIndices = pageIndices.length > 0 ? pageIndices : Array.from({ length: totalPages }, (_, i) => i);
 
     this.updateProgress(30, `Isolating ${targetIndices.length} neural segments...`);
@@ -70,7 +70,7 @@ export class SplitConverter {
 
     return {
       blob: new Blob([pdfBytes], { type: 'application/pdf' }),
-      fileName: `${baseName}_Split_${Date.now()}.pdf`,
+      fileName: `${baseName}_Extracted_${Date.now()}.pdf`,
       mimeType: 'application/pdf'
     };
   }

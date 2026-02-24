@@ -36,6 +36,7 @@ interface Props {
 /**
  * AJN Engineering Workspace
  * Unified real-time environment for binary transformations.
+ * Standardized on Arial Typography.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const unit = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -48,7 +49,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Determine if this tool requires visual inspection (selecting phase)
+  // Tools that require visual page selection
   const isInteractive = ['delete-pages', 'extract-pages', 'split-pdf', 'rotate-pdf', 'organize-pdf'].includes(unit?.id || '');
 
   const getAcceptedExtensions = () => {
@@ -82,7 +83,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
       const loadedPages = [];
       
-      // Load first 50 pages for performance in preview
       const maxPreview = Math.min(pdf.numPages, 100);
       for (let i = 1; i <= maxPreview; i++) {
         const page = await pdf.getPage(i);
@@ -95,7 +95,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       }
       setPages(loadedPages);
     } catch (err) {
-      toast({ title: "Load Error", description: "Failed to parse PDF pages.", variant: "destructive" });
+      toast({ title: "Load Error", description: "Failed to parse document structure.", variant: "destructive" });
       reset();
     }
   };
@@ -170,7 +170,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                         <h3 className="text-xl font-black uppercase tracking-tighter">Visual Inspection</h3>
                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                           {unit?.id === 'delete-pages' ? 'Select pages to remove from buffer' : 
-                           unit?.id === 'split-pdf' ? 'Select pages to extract as new PDF' :
+                           unit?.id === 'split-pdf' ? 'Select pages to extract into new file' :
                            'Mark targets for neural processing'}
                         </p>
                       </div>

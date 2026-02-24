@@ -2,7 +2,7 @@
 
 /**
  * AJN Master Engineering Orchestrator
- * High-fidelity logic routing for 30+ specialized binary service units.
+ * High-fidelity logic routing for specialized binary service units.
  */
 
 class AJNPDFEngine {
@@ -25,7 +25,7 @@ class AJNPDFEngine {
     let result: { blob: Blob; fileName: string; mimeType: string };
 
     try {
-      // 1. INTELLIGENCE LAYER (Explicit Routing)
+      // 1. INTELLIGENCE LAYER
       if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf'].includes(toolId)) {
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
         const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Intelligence", detail: m, pct: p }));
@@ -38,7 +38,7 @@ class AJNPDFEngine {
         const converter = new MergeConverter(files, (p, m) => onProgressCallback({ stage: "Merge", detail: m, pct: p }));
         result = await converter.merge();
       }
-      // 3. SPLIT CORE (Extract selection into single PDF)
+      // 3. SPLIT CORE (Visual Extraction)
       else if (toolId === 'split-pdf') {
         const { SplitConverter } = await import('@/lib/converters/split-converter');
         const converter = new SplitConverter(firstFile, (p, m) => onProgressCallback({ stage: "Split", detail: m, pct: p }));
