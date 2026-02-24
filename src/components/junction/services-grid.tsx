@@ -104,7 +104,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
                     <p className="text-[8px] md:text-[9px] font-bold text-slate-950/40 uppercase tracking-widest line-clamp-2 md:line-clamp-none">{unit.desc}</p>
                   </div>
                   <div className="pt-4 border-t border-black/5 mt-4 md:mt-6 flex items-center justify-between">
-                    <span className="text-[7px] md:text-[8px] font-black text-slate-950/30 uppercase tracking-[0.2em]">{unit.cat}</span>
+                    <span className="text-[7px] md:text-[8px] font-black text-slate-950/30 uppercase tracking-[0.2em]">{unit.cat === 'Intelligence' ? 'Advanced' : unit.cat}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-primary translate-x-2 group-hover/card:translate-x-0 transition-all opacity-0 group-hover/card:opacity-100" />
                   </div>
                 </CardContent>

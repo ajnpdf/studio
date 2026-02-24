@@ -29,7 +29,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 /**
  * All-in-one Junction Network - Landing Hub
- * Standardized on Arial Typography and Professional Language
+ * Standardized on Arial Typography and Simple Professional Language
  */
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);

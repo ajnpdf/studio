@@ -4,10 +4,9 @@ import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 const loadingSteps = [
-  "Inhaling Hub...",
+  "Preparing Buffers...",
   "Calibrating Tools...",
   "Syncing Workspace...",
-  "Preparing Buffers...",
   "Initializing Hub...",
   "Optimizing Output...",
   "Launching AJN..."
@@ -35,8 +34,8 @@ export function PlatformLoader() {
         }
         
         const nextPercent = prev + 1;
-        if (nextPercent % 14 === 0 && textIndex < loadingSteps.length - 1) {
-          setTextIndex(Math.floor(nextPercent / 14));
+        if (nextPercent % 16 === 0 && textIndex < loadingSteps.length - 1) {
+          setTextIndex(Math.floor(nextPercent / 16));
         }
         
         return nextPercent;
