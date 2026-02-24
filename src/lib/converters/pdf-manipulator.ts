@@ -57,6 +57,32 @@ export class PDFManipulator {
     return { blob: zipBlob, fileName: `${baseName}_Split.zip`, mimeType: "application/zip" };
   }
 
+  async removePages(options: any): Promise<ConversionResult> {
+    const indicesToRemove = options.pageIndices || [];
+    this.updateProgress(10, "Inhaling binary for surgical page removal...");
+    const bytes = await this.files[0].arrayBuffer();
+    const sourcePdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
+    const totalPages = sourcePdf.getPageCount();
+    
+    const keepIndices: number[] = [];
+    for (let i = 0; i < totalPages; i++) {
+      if (!indicesToRemove.includes(i)) keepIndices.push(i);
+    }
+
+    this.updateProgress(40, `Constructing new buffer with ${keepIndices.length} pages...`);
+    const outPdf = await PDFDocument.create();
+    const copiedPages = await outPdf.copyPages(sourcePdf, keepIndices);
+    copiedPages.forEach(p => outPdf.addPage(p));
+
+    this.updateProgress(90, "Synchronizing binary stream...");
+    const outBytes = await outPdf.save();
+    return { 
+      blob: new Blob([outBytes], { type: "application/pdf" }), 
+      fileName: `Cleaned_${this.files[0].name}`, 
+      mimeType: "application/pdf" 
+    };
+  }
+
   async crop(cropConfig: any): Promise<ConversionResult> {
     this.updateProgress(10, "Loading PDF for geometric adjustment...");
     const buf = await this.files[0].arrayBuffer();

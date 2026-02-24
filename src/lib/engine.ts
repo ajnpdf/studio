@@ -99,6 +99,7 @@ class AJNPDFEngine {
         else if (toolId === 'pdf-pdfa') result = await manipulator.toPDFA('B');
         else if (toolId === 'unlock-pdf') result = await manipulator.unlock((options as any).password);
         else if (toolId === 'edit-pdf') result = await manipulator.edit(options);
+        else if (toolId === 'delete-pages') result = await manipulator.removePages(options);
         else result = await manipulator.merge();
       }
       
