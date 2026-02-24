@@ -78,7 +78,6 @@ export class PDFConverter {
     let totalHeight = 0;
     let maxWidth = 0;
 
-    // Use pageIndices if provided by the visual selector
     const indices = settings.pageIndices && settings.pageIndices.length > 0 
       ? settings.pageIndices.map((i: number) => i + 1)
       : Array.from({ length: pdf.numPages }, (_, i) => i + 1);

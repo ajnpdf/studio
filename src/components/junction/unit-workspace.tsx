@@ -14,10 +14,8 @@ import {
   XCircle, 
   Trash2, 
   ChevronRight,
-  Scissors,
   Eye,
-  Layers,
-  FileText
+  Layers
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -39,7 +37,7 @@ interface Props {
 /**
  * AJN Engineering Workspace - Universal Visionary Layer
  * Implements real-time page inspection for all tools.
- * Standardized on Arial Typography.
+ * Fixed Next.js Hydration errors by deferring random metrics.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const unit = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -52,8 +50,8 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Tools that require manual selection vs just review
-  const needsManualSelection = ['delete-pages', 'extract-pages', 'split-pdf'].includes(unit?.id || '');
+  // Tools that require surgical selection (start empty)
+  const isSurgicalTool = ['delete-pages', 'extract-pages', 'split-pdf'].includes(unit?.id || '');
 
   const getAcceptedExtensions = () => {
     if (!unit) return ".pdf";
@@ -111,8 +109,8 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             pageIdx: pIdx - 1
           });
 
-          // Default: Select all for review tools, none for surgical tools
-          if (!needsManualSelection) {
+          // Default: Select all for transformation tools (Review mode)
+          if (!isSurgicalTool) {
             initialSelected.add(pageId);
           }
         }
@@ -120,7 +118,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       setPages(allLoadedPages);
       setSelectedPages(initialSelected);
     } catch (err) {
-      toast({ title: "Load Error", description: "Failed to parse document visionary buffer.", variant: "destructive" });
+      toast({ title: "Load Error", description: "Failed to parse visionary buffer.", variant: "destructive" });
       reset();
     }
   };
@@ -133,12 +131,11 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleConfirmedExecution = () => {
-    if (selectedPages.size === 0 && unit?.id !== 'rotate-pdf') {
+    if (selectedPages.size === 0 && isSurgicalTool) {
       toast({ title: "Selection Required", description: "Please select at least one page to process." });
       return;
     }
 
-    // Map selection back to numerical indices if needed by the specific tool
     const indices = Array.from(selectedPages).map(id => parseInt(id.split('-')[1]));
     
     run(sourceFiles, { 
@@ -201,17 +198,17 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                       <div className="space-y-1">
                         <div className="flex items-center gap-3">
                           <Eye className="w-5 h-5 text-primary" />
-                          <h3 className="text-xl font-black uppercase tracking-tighter">Real-Time Visionary Review</h3>
+                          <h3 className="text-xl font-black uppercase tracking-tighter">Visionary Review Layer</h3>
                         </div>
                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                          {needsManualSelection 
+                          {isSurgicalTool 
                             ? 'Select specific pages for surgical processing' 
-                            : 'Reviewing buffer contents before mastery execution'}
+                            : 'Reviewing document visionary contents before execution'}
                         </p>
                       </div>
                       <div className="flex items-center gap-4">
                         <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest">
-                          {selectedPages.size} Target Pages
+                          {selectedPages.size} Target Segments
                         </Badge>
                         <Button 
                           onClick={handleConfirmedExecution} 
@@ -269,7 +266,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           <Layers className="w-6 h-6 text-primary animate-bounce" />
-                          <h3 className="text-xl font-black uppercase tracking-tighter text-slate-950">Executing Binary Logic</h3>
+                          <h3 className="text-xl font-black uppercase tracking-tighter text-slate-950">Executing Binary Synthesis</h3>
                         </div>
                         <span className="text-3xl font-black text-primary tracking-tighter">{Math.round(progress.pct)}%</span>
                       </div>

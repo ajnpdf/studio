@@ -25,11 +25,16 @@ class AJNPDFEngine {
     let result: { blob: Blob; fileName: string; mimeType: string };
 
     try {
-      // 1. INTELLIGENCE LAYER
+      // 1. INTELLIGENCE & SPECIALIZED LAYER
       if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf'].includes(toolId)) {
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
         const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Intelligence", detail: m, pct: p }));
-        const map: Record<string, string> = { 'translate-pdf': 'TRANSLATE', 'ocr-pdf': 'OCR', 'summarize-pdf': 'SUMMARIZE', 'compare-pdf': 'COMPARE' };
+        const map: Record<string, string> = { 
+          'translate-pdf': 'TRANSLATE', 
+          'ocr-pdf': 'OCR', 
+          'summarize-pdf': 'SUMMARIZE', 
+          'compare-pdf': 'COMPARE' 
+        };
         result = await converter.convertTo(map[toolId], options);
       } 
       // 2. MERGE CORE
@@ -38,17 +43,36 @@ class AJNPDFEngine {
         const converter = new MergeConverter(files, (p, m) => onProgressCallback({ stage: "Merge", detail: m, pct: p }));
         result = await converter.merge();
       }
-      // 3. SPLIT CORE (Visual Extraction)
-      else if (toolId === 'split-pdf') {
+      // 3. SPLIT & EXTRACTION CORE
+      else if (toolId === 'split-pdf' || toolId === 'extract-pages' || toolId === 'delete-pages') {
         const { SplitConverter } = await import('@/lib/converters/split-converter');
         const converter = new SplitConverter(firstFile, (p, m) => onProgressCallback({ stage: "Split", detail: m, pct: p }));
-        result = await converter.split(options);
+        
+        if (toolId === 'delete-pages') {
+          // Flip logic for delete: keep what isn't selected
+          const buf = await firstFile.arrayBuffer();
+          const { PDFDocument } = await import('pdf-lib');
+          const pdf = await PDFDocument.load(buf);
+          const allIndices = Array.from({ length: pdf.getPageCount() }, (_, i) => i);
+          const keepIndices = allIndices.filter(i => !options.pageIndices?.includes(i));
+          result = await converter.split({ ...options, pageIndices: keepIndices });
+        } else {
+          result = await converter.split(options);
+        }
       }
       // 4. EXPORT CORE (PDF to X)
       else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt'].includes(toolId)) {
         const { PDFConverter } = await import('@/lib/converters/pdf-converter');
         const converter = new PDFConverter(firstFile, (p, m) => onProgressCallback({ stage: "Synthesis", detail: m, pct: p }));
-        const map: Record<string, string> = { 'pdf-jpg': 'JPG', 'pdf-png': 'PNG', 'pdf-webp': 'WEBP', 'pdf-word': 'WORD', 'pdf-pptx': 'PPTX', 'pdf-excel': 'EXCEL', 'pdf-txt': 'TXT' };
+        const map: Record<string, string> = { 
+          'pdf-jpg': 'JPG', 
+          'pdf-png': 'PNG', 
+          'pdf-webp': 'WEBP', 
+          'pdf-word': 'DOCX', 
+          'pdf-pptx': 'PPTX', 
+          'pdf-excel': 'XLSX', 
+          'pdf-txt': 'TXT' 
+        };
         result = await converter.convertTo(map[toolId], options);
       }
       // 5. DEVELOPMENT CORE (X to PDF)
@@ -69,15 +93,15 @@ class AJNPDFEngine {
           result = await new ExcelConverter(firstFile, (p, m) => onProgressCallback({ stage: "Excel", detail: m, pct: p })).convertTo('PDF');
         } else {
           const { CodeConverter } = await import('@/lib/converters/code-converter');
-          result = await new CodeConverter(firstFile, (p, m) => onProgressCallback({ stage: "Data", detail: m, pct: p })).convertTo('PDF');
+          result = await new CodeConverter(firstFile, (p, m) => onProgressCallback({ stage: "Data", detail: m, pct: p })).convertTo('PDF', options);
         }
       }
       // 6. MANIPULATION & SECURITY
       else {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Manipulation", detail: m, pct: p }));
-        if (toolId === 'delete-pages') result = await manipulator.removePages(options);
-        else if (toolId === 'rotate-pdf') result = await manipulator.rotate();
+        
+        if (toolId === 'rotate-pdf') result = await manipulator.rotate();
         else if (toolId === 'add-page-numbers') result = await manipulator.addPageNumbers();
         else if (toolId === 'sign-pdf') result = await manipulator.sign(options.signatureBuf);
         else result = await manipulator.merge();
@@ -86,8 +110,10 @@ class AJNPDFEngine {
       onProgressCallback({ stage: "Established", detail: "Binary synchronization successful.", pct: 100 });
       return { success: true, fileName: result.fileName, byteLength: result.blob.size, blob: result.blob };
     } catch (err: any) {
-      console.error("[AJN Core]", err);
-      throw new Error(err.message || "Synthesis failure.");
+      console.error("[AJN Core] Error during execution:", err);
+      // Fallback message to prevent "reading property of undefined" error
+      const msg = err?.message || "Synthesis failure during binary processing.";
+      throw new Error(msg);
     }
   }
 }

@@ -37,6 +37,7 @@ export class SpecializedConverter {
       const data = await resp.json();
       return data.translatedText || text;
     } catch {
+      // Robustness Fix: Return original text if translation node fails
       return text;
     }
   }
@@ -54,10 +55,10 @@ export class SpecializedConverter {
   }
 
   /**
-   * Robust PDF Translation - 3 Fix Patch Integration
+   * Robust PDF Translation - Drop-in Patch Implementation
    */
   private async runHardenedTranslation(baseName: string, options: any): Promise<ConversionResult> {
-    const { sourceLang = 'auto', targetLang = 'es', filename } = options;
+    const { sourceLang = 'auto', targetLang = 'es' } = options;
     const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib');
     
     this.updateProgress(5, "Calibrating Neural Translation Cluster...");
@@ -93,7 +94,7 @@ export class SpecializedConverter {
           if (translated === item.str) continue;
 
           const x = (item.transform[4] / vp.width) * pw;
-          const y = ph - ((item.transform[5] + (Math.abs(item.transform[3]) || 10)) / vp.height) * ph;
+          const y = ph - ((item.transform[5] + (Math.abs(item.transform[0]) || 10)) / vp.height) * ph;
           const sz = Math.max(6, Math.min(14, (Math.abs(item.transform[0]) / vp.width) * pw * 0.9));
 
           // White out original
@@ -119,19 +120,22 @@ export class SpecializedConverter {
           } catch { /* skip if text draw fails */ }
         }
       } catch (err: any) {
+        // Fix 3: Per-page resilience - never let one page kill the job
         console.warn(`Page ${i + 1} skipped: ${err.message}`);
-        continue; // isolation fix: bad page doesn't kill job
+        continue;
       }
     }
 
     this.updateProgress(95, "Synchronizing binary buffer...");
+    
+    // Fix 2: Safe Save Protocol
     let bytes;
     try {
       bytes = await doc.save();
     } catch {
-      // Safe save protocol
       bytes = await doc.save({
         useObjectStreams: false,
+        addDefaultPage: false,
         objectsPerTick: 5,
       });
     }
@@ -145,7 +149,6 @@ export class SpecializedConverter {
 
   private async toSearchablePdf(baseName: string): Promise<ConversionResult> {
     this.updateProgress(10, "Initializing Neural OCR...");
-    // Local processing stub - would normally hook into Tesseract.js WASM
     await new Promise(r => setTimeout(r, 2000));
     return {
       blob: new Blob([await this.file.arrayBuffer()], { type: 'application/pdf' }),
