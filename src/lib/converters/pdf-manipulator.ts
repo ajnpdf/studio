@@ -28,18 +28,27 @@ export class PDFManipulator {
     const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
 
     if (toolId === 'rotate-pdf') {
+      this.updateProgress(40, "Correcting geometric orientation...");
       doc.getPages().forEach(p => p.setRotation(degrees((p.getRotation().angle + 90) % 360)));
       const bytes = await doc.save();
       return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `${baseName}_Rotated.pdf`, mimeType: 'application/pdf' };
     }
 
-    if (toolId === 'extract-pages' || toolId === 'split-pdf' || toolId === 'delete-pages') {
+    if (toolId === 'extract-pages' || toolId === 'split-pdf' || toolId === 'delete-pages' || toolId === 'organize-pdf') {
       const { pageIndices = [] } = options;
-      const targetIndices = toolId === 'delete-pages' 
-        ? Array.from({ length: doc.getPageCount() }, (_, i) => i).filter(i => !pageIndices.includes(i))
-        : pageIndices;
+      
+      // Calculate final target sequence based on tool intent
+      let targetIndices = pageIndices;
+      
+      if (toolId === 'delete-pages') {
+        targetIndices = Array.from({ length: doc.getPageCount() }, (_, i) => i)
+          .filter(i => !pageIndices.includes(i));
+      } else if (pageIndices.length === 0) {
+        // Default to all pages if visionary was bypassed or tool is 'organize'
+        targetIndices = Array.from({ length: doc.getPageCount() }, (_, i) => i);
+      }
 
-      if (targetIndices.length === 0) throw new Error("No pages selected for extraction.");
+      if (targetIndices.length === 0) throw new Error("No segments selected for execution.");
 
       this.updateProgress(40, `Surgically isolating ${targetIndices.length} segments...`);
       const newDoc = await PDFDocument.create();
@@ -51,30 +60,36 @@ export class PDFManipulator {
     }
 
     if (toolId === 'sign-pdf') {
-      this.updateProgress(50, "Applying audit trail marker...");
+      this.updateProgress(50, "Injecting digital audit trail marker...");
       const font = await doc.embedFont(StandardFonts.HelveticaBold);
-      const lastPage = doc.getPages()[doc.getPageCount() - 1];
-      lastPage.drawText(`Digitally Signed by AJN Operator\n${new Date().toISOString()}`, {
+      const pages = doc.getPages();
+      const lastPage = pages[pages.length - 1];
+      
+      lastPage.drawText(`Digitally Signed via AJN Neural Buffer\nTS: ${new Date().toISOString()}`, {
         x: 50, y: 50, size: 8, font, color: rgb(0.1, 0.1, 0.5)
       });
+      
       const bytes = await doc.save();
       return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `${baseName}_Signed.pdf`, mimeType: 'application/pdf' };
     }
 
-    throw new Error(`Manipulation tool ${toolId} not supported.`);
+    throw new Error(`Manipulation unit ${toolId} not yet calibrated.`);
   }
 
   async merge(): Promise<ConversionResult> {
-    this.updateProgress(10, "Initializing Master Buffer...");
+    this.updateProgress(10, "Initializing Master Assembly Buffer...");
     const master = await PDFDocument.create();
+    
     for (let i = 0; i < this.files.length; i++) {
       const prog = 10 + Math.round((i / this.files.length) * 80);
-      this.updateProgress(prog, `Merging binary stream: ${this.files[i].name}...`);
+      this.updateProgress(prog, `Syncing binary stream: ${this.files[i].name}...`);
       const fileBytes = await this.files[i].arrayBuffer();
       const pdf = await PDFDocument.load(fileBytes, { ignoreEncryption: true });
       const copied = await master.copyPages(pdf, pdf.getPageIndices());
       copied.forEach(p => master.addPage(p));
     }
+    
+    this.updateProgress(95, "Synchronizing assembly and trailer...");
     const bytes = await master.save();
     return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `Merged_Master_${Date.now()}.pdf`, mimeType: 'application/pdf' };
   }

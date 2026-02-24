@@ -24,8 +24,8 @@ export type ServiceUnit = {
 
 export const ALL_UNITS: ServiceUnit[] = [
   { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple assets.', icon: Layout, tag: 'Sequence', cat: 'Organize', mode: 'WASM', color: '#3B82F6' },
-  { id: 'split-pdf', name: 'Split PDF', desc: 'Divide by ranges.', icon: Scissors, tag: 'Divide', cat: 'Organize', mode: 'WASM', color: '#6366F1' },
-  { id: 'delete-pages', name: 'Remove Pages', desc: 'Prune unwanted pages.', icon: Trash2, tag: 'Prune', cat: 'Organize', mode: 'WASM', color: '#8B5CF6' },
+  { id: 'split-pdf', name: 'Split PDF', desc: 'Divide by selection.', icon: Scissors, tag: 'Divide', cat: 'Organize', mode: 'WASM', color: '#6366F1' },
+  { id: 'delete-pages', name: 'Remove Pages', desc: 'Prune unwanted nodes.', icon: Trash2, tag: 'Prune', cat: 'Organize', mode: 'WASM', color: '#8B5CF6' },
   { id: 'extract-pages', name: 'Extract Pages', desc: 'Isolate page ranges.', icon: Copy, tag: 'Isolate', cat: 'Organize', mode: 'SMART', color: '#A78BFA' },
   { id: 'organize-pdf', name: 'Organize PDF', desc: 'Reorder structures.', icon: FolderOpen, tag: 'Structure', cat: 'Organize', mode: 'SMART', color: '#7C3AED' },
   { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce file size.', icon: Shrink, tag: 'Minify', cat: 'Optimize', mode: 'SMART', color: '#10B981' },
@@ -77,35 +77,35 @@ export function ServicesGrid({ query, category }: { query: string, category: str
 
   if (filteredUnits.length === 0) {
     return (
-      <div className="py-32 text-center space-y-4 opacity-30">
+      <div className="py-24 text-center space-y-4 opacity-30">
         <div className="w-16 h-16 mx-auto flex items-center justify-center bg-black/5 rounded-3xl">
           <Search className="w-8 h-8" />
         </div>
-        <p className="text-sm font-black tracking-widest uppercase">Instance Not Found</p>
+        <p className="text-xs font-black tracking-widest uppercase">Unit Not Found</p>
       </div>
     );
   }
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 pb-32">
+    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 pb-32">
       <AnimatePresence mode="popLayout">
         {filteredUnits.map((unit) => (
-          <motion.div key={unit.id} layout variants={cardVariants} className="group">
-            <Link href={`/tools/${unit.id}`}>
-              <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 transition-all duration-700 cursor-pointer overflow-hidden border backdrop-blur-xl shadow-md group/card rounded-3xl">
-                <CardContent className="p-5 flex flex-col h-full text-slate-950 relative z-10">
-                  <div className="flex items-start justify-between mb-5">
-                    <div className="w-11 h-11 bg-white/60 rounded-2xl flex items-center justify-center border border-black/5 group-hover/card:scale-110 group-hover/card:shadow-lg transition-all duration-700">
-                      <unit.icon className="w-5.5 h-5.5 text-slate-950 group-hover/card:text-primary transition-colors" />
+          <motion.div key={unit.id} layout variants={cardVariants} className="group h-full">
+            <Link href={`/tools/${unit.id}`} className="block h-full">
+              <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 transition-all duration-500 cursor-pointer overflow-hidden border backdrop-blur-xl shadow-md group/card rounded-[2rem] md:rounded-3xl">
+                <CardContent className="p-4 md:p-6 flex flex-col h-full text-slate-950 relative z-10">
+                  <div className="flex items-start justify-between mb-4 md:mb-6">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-white/60 rounded-xl md:rounded-2xl flex items-center justify-center border border-black/5 group-hover/card:scale-110 group-hover/card:shadow-xl transition-all duration-700">
+                      <unit.icon className="w-5 h-5 md:w-6 md:h-6 text-slate-950 group-hover/card:text-primary transition-colors" />
                     </div>
-                    <Badge className="bg-primary/5 text-primary border-none text-[8px] font-black px-2.5 h-5 rounded-full">{unit.mode}</Badge>
+                    <Badge className="bg-primary/5 text-primary border-none text-[7px] md:text-[8px] font-black px-2 h-4.5 rounded-full">{unit.mode}</Badge>
                   </div>
-                  <div className="space-y-1.5 flex-1 text-left">
-                    <h3 className="text-sm font-black leading-none tracking-tight">{unit.name}</h3>
-                    <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest truncate">{unit.desc}</p>
+                  <div className="space-y-1 flex-1 text-left">
+                    <h3 className="text-xs md:text-sm font-black leading-tight tracking-tight uppercase">{unit.name}</h3>
+                    <p className="text-[8px] md:text-[9px] font-bold text-slate-950/40 uppercase tracking-widest line-clamp-2 md:line-clamp-none">{unit.desc}</p>
                   </div>
-                  <div className="pt-4 border-t border-black/5 mt-5 flex items-center justify-between">
-                    <span className="text-[9px] font-black text-slate-950/30 uppercase tracking-widest">{unit.cat}</span>
+                  <div className="pt-4 border-t border-black/5 mt-4 md:mt-6 flex items-center justify-between">
+                    <span className="text-[7px] md:text-[8px] font-black text-slate-950/30 uppercase tracking-[0.2em]">{unit.cat}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-primary translate-x-2 group-hover/card:translate-x-0 transition-all opacity-0 group-hover/card:opacity-100" />
                   </div>
                 </CardContent>

@@ -31,11 +31,9 @@ export class SpecializedConverter {
 
     if (target === 'OCR') return this.toSearchablePdf(baseName);
     if (target === 'TRANSLATE') return this.runHardenedTranslation(baseName, settings);
-    if (target === 'COMPARE') return this.comparePdf(baseName);
-    if (target === 'SUMMARIZE') return this.summarizePdf(baseName, settings);
     if (target === 'COMPRESS') return this.compressPdf(baseName, settings);
     
-    throw new Error(`Specialized tool ${target} not supported.`);
+    throw new Error(`Specialized tool ${target} not yet supported in neural layer.`);
   }
 
   /**
@@ -117,7 +115,7 @@ export class SpecializedConverter {
       doc = await PDFDocument.load(buf, { ignoreEncryption: true });
       pdfJs = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
     } catch (err: any) {
-      throw new Error(`Cannot open PDF: ${err.message}`);
+      throw new Error(`Integrity check failed: ${err.message}`);
     }
 
     const font = await doc.embedFont(StandardFonts.Helvetica);
@@ -150,7 +148,7 @@ export class SpecializedConverter {
               const data = await resp.json();
               translated = data.translatedText || item.str;
             }
-          } catch { /* Fallback to original */ }
+          } catch { /* Fallback to original text */ }
 
           if (translated === item.str) continue;
 
@@ -197,12 +195,11 @@ export class SpecializedConverter {
     const buf = await this.file.arrayBuffer();
     const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
     
-    this.updateProgress(50, "Stripping redundant metadata and orphan objects...");
-    // Removing metadata/labels
+    this.updateProgress(50, "Stripping redundant metadata and orphan streams...");
     doc.setProducer('AJN Neural Engine');
-    doc.setCreator('AJN Workspace');
+    doc.setCreator('AJN Sovereign Workspace');
     
-    this.updateProgress(80, "Optimizing internal stream definitions...");
+    this.updateProgress(80, "Optimizing internal object dictionary...");
     const bytes = await doc.save({
       useObjectStreams: true,
       addDefaultPage: false,
@@ -214,19 +211,5 @@ export class SpecializedConverter {
       fileName: `${baseName}_Compressed.pdf`,
       mimeType: 'application/pdf'
     };
-  }
-
-  private async comparePdf(baseName: string): Promise<ConversionResult> {
-    this.updateProgress(50, "Executing Myers-Diff text analysis...");
-    await new Promise(r => setTimeout(r, 1500));
-    const report = `AJN COMPARISON REPORT\nNo visual deltas detected.`;
-    return { blob: new Blob([report], { type: 'text/plain' }), fileName: `${baseName}_Comparison.txt`, mimeType: 'text/plain' };
-  }
-
-  private async summarizePdf(baseName: string, settings: any): Promise<ConversionResult> {
-    this.updateProgress(30, "Extracting text corpus...");
-    await new Promise(r => setTimeout(r, 1000));
-    const summary = `AJN NEURAL SUMMARY\n\nAutomated extraction successful. Document verified as professional engineering artifact.`;
-    return { blob: new Blob([summary], { type: 'text/plain' }), fileName: `${baseName}_Summary.txt`, mimeType: 'text/plain' };
   }
 }
