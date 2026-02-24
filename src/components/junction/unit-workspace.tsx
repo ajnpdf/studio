@@ -20,6 +20,7 @@ interface Props {
 /**
  * AJN Unit Workspace - Focused Full-Width Layout
  * Redundant sidebars and configuration boxes removed for professional focus.
+ * Hydration-hardened latency generator.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const [latency, setLatency] = useState<string | null>(null);
@@ -209,7 +210,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             </div>
 
             {/* TECHNICAL FOOTER */}
-            <footer className="pt-12 border-t border-black/5 flex flex-wrap items-center justify-center gap-12 opacity-30">
+            <footer className="pt-12 border-t border-black/5 flex wrap items-center justify-center gap-12 opacity-30">
               <div className="flex items-center gap-3">
                 <Info className="w-4 h-4" />
                 <span className="text-[10px] font-black uppercase tracking-[0.2em]">Hardware Acceleration Active</span>

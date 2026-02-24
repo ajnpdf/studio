@@ -51,51 +51,79 @@ export class SpecializedConverter {
     const arrayBuffer = await this.file.arrayBuffer();
     
     // Step 1: Load original PDF to analyze layout
-    const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+    const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
+    const pdfJsDoc = await loadingTask.promise;
+    
     const pdfDoc = await PDFDocument.create();
     const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
     const targetLang = settings.tgtLang || 'Spanish';
     this.updateProgress(30, `Translating Semantic Streams to ${targetLang.toUpperCase()}...`);
     
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
+    for (let i = 1; i <= pdfJsDoc.numPages; i++) {
+      const page = await pdfJsDoc.getPage(i);
       const textContent = await page.getTextContent();
       const viewport = page.getViewport({ scale: 1 });
       const { width, height } = viewport;
 
       const newPage = pdfDoc.addPage([width, height]);
-      const progBase = 30 + Math.round((i / pdf.numPages) * 60);
+      const progBase = 30 + Math.round((i / pdfJsDoc.numPages) * 60);
       this.updateProgress(progBase, `Mapping translated spans: Page ${i}...`);
 
-      // Master Reconstruction Loop
+      // Paragraph Grouping Logic
+      const groups: any[] = [];
+      let currentGroup: any = null;
+
       for (const item of textContent.items as any[]) {
         const text = item.str;
         if (!text.trim()) continue;
 
-        // Neural Translation Simulation: Mapping source to target lang
-        const translatedText = `[${targetLang.substring(0, 2).toUpperCase()}] ${text}`;
-        
-        // Map transform coordinates (index 4 and 5 are X and Y)
         const x = item.transform[4];
         const y = item.transform[5];
-        const fontSize = Math.abs(item.transform[0]); 
+        const fontSize = Math.abs(item.transform[0]);
 
+        if (!currentGroup || Math.abs(currentGroup.y - y) > fontSize * 1.5) {
+          if (currentGroup) groups.push(currentGroup);
+          currentGroup = { text, x, y, fontSize, width: item.width };
+        } else {
+          currentGroup.text += " " + text;
+          currentGroup.width = Math.max(currentGroup.width, (x - currentGroup.x) + item.width);
+        }
+      }
+      if (currentGroup) groups.push(currentGroup);
+
+      // Render Translated Groups
+      for (const group of groups) {
+        // Simulated Neural Translation Call
+        const translatedText = `[${targetLang.substring(0, 2).toUpperCase()}] ${group.text}`;
+        
         try {
+          // Mask original area if not bilingual
+          if (!settings.bilingual) {
+            newPage.drawRectangle({
+              x: group.x,
+              y: group.y,
+              width: group.width,
+              height: group.fontSize * 1.2,
+              color: rgb(1, 1, 1),
+            });
+          }
+
           newPage.drawText(translatedText, {
-            x: x,
-            y: y,
-            size: Math.max(4, fontSize * 0.9), 
+            x: group.x,
+            y: group.y,
+            size: Math.max(4, group.fontSize * 0.9), 
             font: helvetica,
             color: rgb(0, 0, 0),
+            maxWidth: group.width,
           });
         } catch (e) {
-          // Fallback for coordinate errors
+          // Silent fallback for complex coordinate transforms
         }
       }
     }
 
-    this.updateProgress(95, "Synchronizing RTL layout mirroring and finalizing binary...");
+    this.updateProgress(95, "Synchronizing binary buffer and finalizing document trailer...");
     const translatedBytes = await pdfDoc.save();
     
     return {
@@ -126,14 +154,15 @@ export class SpecializedConverter {
     this.updateProgress(10, "Extracting text corpus for neural analysis...");
     
     const arrayBuffer = await this.file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+    const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
+    const pdfJsDoc = await loadingTask.promise;
     let fullText = '';
 
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
+    for (let i = 1; i <= pdfJsDoc.numPages; i++) {
+      const page = await pdfJsDoc.getPage(i);
       const content = await page.getTextContent();
       fullText += content.items.map((it: any) => it.str).join(' ') + '\n';
-      this.updateProgress(10 + Math.round((i / pdf.numPages) * 30), `Ingesting content: Page ${i}...`);
+      this.updateProgress(10 + Math.round((i / pdfJsDoc.numPages) * 30), `Ingesting content: Page ${i}...`);
     }
 
     this.updateProgress(50, "Executing Neural Briefing (AJN Intelligence Layer)...");
@@ -166,7 +195,8 @@ export class SpecializedConverter {
     const pages = pdfDoc.getPages();
     const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-    const pdfJsDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+    const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
+    const pdfJsDoc = await loadingTask.promise;
 
     for (let i = 1; i <= pdfJsDoc.numPages; i++) {
       const progBase = 15 + Math.round((i / pdfJsDoc.numPages) * 80);
