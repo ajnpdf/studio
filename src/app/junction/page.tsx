@@ -46,10 +46,10 @@ export default function JunctionPage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-2">
               <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-slate-950 leading-none">
-                Service <span className="text-primary">Units</span>
+                PDF <span className="text-primary">Tools</span>
               </h1>
               <p className="text-[11px] font-bold text-slate-900/40 uppercase tracking-[0.3em]">
-                Explore the complete high-fidelity system unit library.
+                Explore our complete library of professional document tools.
               </p>
             </div>
 
@@ -59,7 +59,7 @@ export default function JunctionPage() {
                 <Input 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Find unit (e.g. 'OCR', 'Sign')..." 
+                  placeholder="Find tool (e.g. 'OCR', 'Merge')..." 
                   className="h-12 pl-12 bg-white/60 border-black/5 text-sm font-bold focus:ring-primary/20 rounded-2xl shadow-sm text-slate-950"
                 />
               </div>

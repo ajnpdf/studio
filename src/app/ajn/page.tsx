@@ -35,7 +35,7 @@ export default function AJNPage() {
         <div className="flex items-center gap-5">
           <Link href="/junction">
             <Button variant="outline" className="h-9 border-black/10 bg-white/40 hover:bg-primary hover:text-white font-black text-[10px] tracking-widest rounded-xl transition-all gap-2 px-4 shadow-sm text-slate-950">
-              <Workflow className="w-3.5 h-3.5" /> Sector Directory
+              <Workflow className="w-3.5 h-3.5" /> Tool Directory
             </Button>
           </Link>
           <div className="h-6 w-px bg-black/5" />
@@ -61,7 +61,7 @@ export default function AJNPage() {
               <Input 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search unit registries (e.g. 'OCR', 'Merge')..." 
+                placeholder="Search tools (e.g. 'OCR', 'Merge')..." 
                 className="w-full h-16 bg-transparent pl-16 pr-20 text-base font-bold text-slate-950 border-none focus-visible:ring-0 placeholder:text-slate-950/20"
               />
               <div className="absolute right-7 flex items-center gap-2 px-2.5 py-1 bg-black/5 rounded-lg border border-black/5">
@@ -75,7 +75,7 @@ export default function AJNPage() {
         <section className="animate-in fade-in duration-1000 delay-300">
           <div className="flex items-center gap-3 px-8 mb-6">
             <Activity className="w-4 h-4 text-primary animate-pulse" />
-            <span className="text-[11px] font-black text-slate-950/40 uppercase tracking-[0.3em]">Neural Stream Showcase</span>
+            <span className="text-[11px] font-black text-slate-950/40 uppercase tracking-[0.3em]">Featured Tools</span>
           </div>
           <UnitScroller />
         </section>
@@ -83,8 +83,8 @@ export default function AJNPage() {
         <section className="space-y-10 pb-24">
           <div className="flex items-end justify-between px-6 border-b border-black/5 pb-6">
             <div className="space-y-1 text-left">
-              <h2 className="text-3xl font-black tracking-tighter text-slate-950 leading-none">Registry Access</h2>
-              <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.4em]">Global engineering instances ready for execution</p>
+              <h2 className="text-3xl font-black tracking-tighter text-slate-950 leading-none">PDF Tool Library</h2>
+              <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.4em]">Fast and secure document processing ready for use</p>
             </div>
             {searchQuery && (
               <button onClick={() => setSearchQuery('')} className="text-[10px] font-black uppercase text-primary hover:underline underline-offset-4 tracking-widest">
@@ -106,7 +106,7 @@ export default function AJNPage() {
           </div>
           <div className="flex flex-col items-center gap-4">
             <p className="text-[11px] font-black text-slate-950/20 tracking-[0.5em] uppercase">
-              AJN Engineering Core • 2025
+              AJN Core • 2025
             </p>
             <div className="flex items-center gap-2.5 px-4 py-1.5 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
               <span className="text-[9px] font-black text-primary uppercase tracking-widest">Made by Indian ❤️</span>

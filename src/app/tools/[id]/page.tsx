@@ -39,11 +39,11 @@ export default function ToolPage({ params }: Props) {
           <div className="hidden lg:flex items-center gap-4">
             <div className="flex items-center gap-2 px-3 py-1 bg-primary/5 border border-primary/10 rounded-full">
               <Activity className="w-3 h-3 text-primary animate-pulse" />
-              <span className="text-[9px] font-black text-primary uppercase tracking-widest">WASM Node</span>
+              <span className="text-[9px] font-black text-primary uppercase tracking-widest">Active Session</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/5 border border-emerald-500/10 rounded-full">
               <ShieldCheck className="w-3 h-3 text-emerald-600" />
-              <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Buffer Secured</span>
+              <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Secure Buffer</span>
             </div>
           </div>
         </div>
