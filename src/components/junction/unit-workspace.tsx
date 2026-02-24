@@ -18,7 +18,7 @@ interface Props {
 
 /**
  * AJN Unit Workspace - Focused Engineering Hub
- * Hardened to resolve hydration mismatches and routing errors.
+ * Hardened to resolve hydration mismatches.
  * Minimalist professional full-width layout.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {

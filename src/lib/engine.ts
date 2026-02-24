@@ -3,7 +3,7 @@
 /**
  * AJN Master Engineering Orchestrator
  * High-fidelity logic routing for 30+ specialized binary service units.
- * Explicitly hardened to prioritize intelligence layers and resolve routing errors.
+ * Hardened to resolve routing errors and prioritize intelligence layers.
  */
 
 class AJNPDFEngine {
@@ -17,7 +17,7 @@ class AJNPDFEngine {
 
   /**
    * Main tool execution router.
-   * Prioritizes Intelligence and vision tasks to prevent generic routing fallthrough.
+   * Explicitly maps all tool IDs to high-fidelity specialized classes.
    */
   async runTool(toolId: string, inputs: any, options = {}, onProgressCallback: any) {
     await this.init();
@@ -31,7 +31,7 @@ class AJNPDFEngine {
     let result: { blob: Blob; fileName: string; mimeType: string };
 
     try {
-      // 1. INTELLIGENCE & VISION (High Priority Explicit Routing)
+      // 1. INTELLIGENCE & VISION (Explicit Priority)
       if (['summarize-pdf', 'translate-pdf', 'compare-pdf', 'ocr-pdf'].includes(toolId)) {
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
         const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Intelligence", detail: m, pct: p }));

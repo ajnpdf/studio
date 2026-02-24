@@ -40,8 +40,8 @@ export class SpecializedConverter {
   }
 
   /**
-   * Hardened Translation Unit
-   * Uses non-blocking fallback logic to prevent pipeline crashes.
+   * Hardened Translation Unit with Fallback
+   * Wrap every fetch in try/catch to prevent pipeline crashes.
    */
   async translateText(text: string, sourceLang: string, targetLang: string): Promise<string> {
     if (!text.trim() || text.length < 2) return text;
@@ -50,7 +50,7 @@ export class SpecializedConverter {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ q: text, source: sourceLang, target: targetLang, format: 'text' }),
-        // @ts-ignore - Timeout prevents pipeline hangs
+        // @ts-ignore
         signal: AbortSignal.timeout(8000),
       });
       if (!resp.ok) throw new Error(`API Status: ${resp.status}`);
