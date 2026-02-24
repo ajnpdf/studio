@@ -6,7 +6,7 @@ import { ConversionResult, ProgressCallback } from './pdf-converter';
 /**
  * AJN Master Manipulation Engine
  * Precision binary synchronization for document surgery.
- * Hardened for real-time professional use (Merge, Rotate, Reorder, Extract, Sign, Redact, Add Numbers).
+ * Hardened for real-time professional use (Merge, Split, Rotate, Reorder, Extract, Sign, Redact, Add Numbers).
  */
 export class PDFManipulator {
   private files: File[];
@@ -35,7 +35,7 @@ export class PDFManipulator {
       return PDFDocument.load(buf, { ignoreEncryption: true });
     }));
 
-    // If no pageData is provided, generate it automatically
+    // If no pageData is provided, generate it automatically (Extract all pages default)
     if (pageData.length === 0) {
       sourceDocs.forEach((doc, fIdx) => {
         const pageCount = doc.getPageCount();
@@ -45,7 +45,7 @@ export class PDFManipulator {
       });
     }
 
-    this.updateProgress(30, `Executing document process: ${pageData.length} segments...`);
+    this.updateProgress(30, `Executing surgical process: ${pageData.length} segments...`);
     
     for (let i = 0; i < pageData.length; i++) {
       const item = pageData[i];
@@ -99,7 +99,7 @@ export class PDFManipulator {
       masterDoc.addPage(copiedPage);
     }
 
-    this.updateProgress(95, "Finalizing binary buffer and synchronization...");
+    this.updateProgress(95, "Synchronizing binary buffer and finalizing document trailer...");
     
     const pdfBytes = await masterDoc.save({
       useObjectStreams: true,
@@ -108,9 +108,13 @@ export class PDFManipulator {
 
     this.updateProgress(100, "Process completed successfully.");
 
+    let finalFileName = `${baseName}_Processed.pdf`;
+    if (toolId === 'merge-pdf') finalFileName = `Merged_Document_${Date.now()}.pdf`;
+    if (toolId === 'split-pdf') finalFileName = `${baseName}_Extracted.pdf`;
+
     return {
       blob: new Blob([pdfBytes], { type: 'application/pdf' }),
-      fileName: toolId === 'merge-pdf' ? `Merged_Document_${Date.now()}.pdf` : `${baseName}_Processed_${Date.now()}.pdf`,
+      fileName: finalFileName,
       mimeType: 'application/pdf'
     };
   }
