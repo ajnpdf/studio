@@ -97,7 +97,7 @@ export class SpecializedConverter {
   }
 
   private async runHardenedTranslation(baseName: string, options: any): Promise<ConversionResult> {
-    const { targetLang = 'es' } = options;
+    const targetLang = options?.targetLang || 'es';
     const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib');
     this.updateProgress(5, "Calibrating Neural Translation Cluster...");
 
@@ -122,17 +122,22 @@ export class SpecializedConverter {
 
           let translated = item.str;
           try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+            
             const resp = await fetch('https://libretranslate.com/translate', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ q: item.str, source: 'auto', target: targetLang, format: 'text' }),
-              signal: AbortSignal.timeout(8000),
+              signal: controller.signal,
             });
+            clearTimeout(timeoutId);
+            
             if (resp.ok) {
               const data = await resp.json();
               translated = data.translatedText || item.str;
             }
-          } catch { /* Fallback */ }
+          } catch { /* Fallback to original text */ }
 
           if (translated === item.str) continue;
 
@@ -192,7 +197,6 @@ export class SpecializedConverter {
     this.updateProgress(20, "Inhaling corrupted binary stream...");
     const { PDFDocument } = await import('pdf-lib');
     const buf = await this.file.arrayBuffer();
-    // Load with recovery mode
     const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
     const bytes = await doc.save();
     return {

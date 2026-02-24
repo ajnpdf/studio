@@ -1,9 +1,6 @@
 'use client';
 
 import * as pdfjsLib from 'pdfjs-dist';
-import JSZip from 'jszip';
-import pptxgen from 'pptxgenjs';
-import * as XLSX from 'xlsx';
 
 if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
@@ -19,7 +16,7 @@ export type ProgressCallback = (percent: number, message: string) => void;
 
 /**
  * AJN Neural PDF Conversion Engine
- * Hardened for Vertical Stitching (Single JPG Output).
+ * Hardened for Vertical Stitching (Single Image Output).
  */
 export class PDFConverter {
   private file: File;
@@ -58,8 +55,6 @@ export class PDFConverter {
         return this.toText(pdf, baseName);
       case 'PDFA':
         return this.toPdfA(pdf, baseName);
-      case 'GRAYSCALE':
-        return this.toGrayscale(pdf, baseName);
       default:
         throw new Error(`Format ${target} not supported.`);
     }
@@ -115,48 +110,18 @@ export class PDFConverter {
   }
 
   private async toPowerPoint(pdf: any, baseName: string): Promise<ConversionResult> {
-    this.updateProgress(15, "Reconstructing Slide Layers...");
-    const pres = new pptxgen();
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const slide = pres.addSlide();
-      const viewport = page.getViewport({ scale: 2 });
-      const canvas = document.createElement('canvas');
-      canvas.width = viewport.width; canvas.height = viewport.height;
-      await page.render({ canvasContext: canvas.getContext('2d')!, viewport }).promise;
-      slide.addImage({ data: canvas.toDataURL('image/jpeg', 0.9), x: 0, y: 0, w: '100%', h: '100%' });
-      this.updateProgress(15 + Math.round((i / pdf.numPages) * 80), `Finalizing Slide ${i}...`);
-    }
-    const blob = await pres.write({ outputType: 'blob' });
-    return { blob: blob as Blob, fileName: `${baseName}.pptx`, mimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' };
+    const { PPTConverter } = await import('./ppt-converter');
+    return new PPTConverter(this.file, this.onProgress).convertTo('PDF');
   }
 
   private async toWord(pdf: any, baseName: string): Promise<ConversionResult> {
-    const zip = new JSZip();
-    let docXml = `<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>`;
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      const text = (content.items as any[]).map((it: any) => it.str).join(' ');
-      docXml += `<w:p><w:r><w:t>${text}</w:t></w:r></w:p>`;
-    }
-    docXml += `</w:body></w:document>`;
-    zip.file("word/document.xml", docXml);
-    const blob = await zip.generateAsync({ type: "blob" });
-    return { blob, fileName: `${baseName}.docx`, mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
+    const { WordConverter } = await import('./word-converter');
+    return new WordConverter(this.file, this.onProgress).convertTo('PDF');
   }
 
   private async toExcel(pdf: any, baseName: string): Promise<ConversionResult> {
-    const wb = XLSX.utils.book_new();
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      const rows = [(content.items as any[]).map((it: any) => it.str)];
-      const ws = XLSX.utils.aoa_to_sheet(rows);
-      XLSX.utils.book_append_sheet(wb, ws, `Page ${i}`);
-    }
-    const wbOut = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    return { blob: new Blob([wbOut]), fileName: `${baseName}.xlsx`, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' };
+    const { ExcelConverter } = await import('./excel-converter');
+    return new ExcelConverter(this.file, this.onProgress).convertTo('PDF');
   }
 
   private async toText(pdf: any, baseName: string): Promise<ConversionResult> {
@@ -170,22 +135,11 @@ export class PDFConverter {
   }
 
   private async toPdfA(pdf: any, baseName: string): Promise<ConversionResult> {
-    // PDF/A requires specific metadata and color profile embedding (WASM fallback)
     const { PDFDocument } = await import('pdf-lib');
-    const bytes = await fetch(URL.createObjectURL(this.file)).then(res => res.arrayBuffer());
+    const bytes = await this.file.arrayBuffer();
     const doc = await PDFDocument.load(bytes);
     doc.setTitle(`${baseName} (Archived)`);
     const out = await doc.save();
     return { blob: new Blob([out], { type: 'application/pdf' }), fileName: `${baseName}_PDFA.pdf`, mimeType: 'application/pdf' };
-  }
-
-  private async toGrayscale(pdf: any, baseName: string): Promise<ConversionResult> {
-    // Grayscale involves converting the internal color space (SIMD optimized)
-    const { PDFDocument, rgb } = await import('pdf-lib');
-    const bytes = await fetch(URL.createObjectURL(this.file)).then(res => res.arrayBuffer());
-    const doc = await PDFDocument.load(bytes);
-    // Simple metadata-based grayscale flag implementation for prototype
-    const out = await doc.save();
-    return { blob: new Blob([out], { type: 'application/pdf' }), fileName: `${baseName}_Grayscale.pdf`, mimeType: 'application/pdf' };
   }
 }

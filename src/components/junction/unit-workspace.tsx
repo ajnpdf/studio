@@ -87,6 +87,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             pageIdx: pIdx - 1
           });
 
+          // Non-surgical tools select all by default for visionary review
           if (!isSurgicalTool) initialSelected.add(pageId);
         }
       }
@@ -108,7 +109,11 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleConfirmedExecution = () => {
-    const indices = Array.from(selectedPages).map(id => parseInt(id.split('-')[1]) - 1);
+    const indices = Array.from(selectedPages).map(id => {
+      const parts = id.split('-');
+      return parseInt(parts[1]) - 1;
+    });
+    
     if (indices.length === 0 && isSurgicalTool) {
       toast({ title: "Selection Required", description: "Select segments for mastery." });
       return;

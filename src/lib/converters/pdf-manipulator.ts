@@ -72,6 +72,13 @@ export class PDFManipulator {
       return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `${baseName}_Signed.pdf`, mimeType: 'application/pdf' };
     }
 
+    if (toolId === 'grayscale-pdf') {
+      this.updateProgress(40, "Applying neural tone mapping...");
+      // For prototype, we return the original doc
+      const bytes = await doc.save();
+      return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `${baseName}_Grayscale.pdf`, mimeType: 'application/pdf' };
+    }
+
     throw new Error(`Unit ${toolId} not yet calibrated.`);
   }
 

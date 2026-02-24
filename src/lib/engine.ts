@@ -26,7 +26,7 @@ class AJNPDFEngine {
     let result: { blob: Blob; fileName: string; mimeType: string };
 
     try {
-      // 1. INTELLIGENCE & SPECIALIZED LAYER
+      // 1. INTELLIGENCE & VISION LAYER
       if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf', 'compress-pdf', 'repair-pdf'].includes(toolId)) {
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
         const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Intelligence", detail: m, pct: p }));
@@ -41,13 +41,13 @@ class AJNPDFEngine {
         result = await converter.convertTo(map[toolId], options);
       } 
       // 2. SURGICAL MANIPULATION CORE
-      else if (['merge-pdf', 'split-pdf', 'extract-pages', 'delete-pages', 'rotate-pdf', 'sign-pdf', 'organize-pdf', 'protect-pdf', 'unlock-pdf', 'redact-pdf', 'flatten-pdf', 'add-page-numbers'].includes(toolId)) {
+      else if (['merge-pdf', 'split-pdf', 'extract-pages', 'delete-pages', 'rotate-pdf', 'sign-pdf', 'organize-pdf', 'protect-pdf', 'unlock-pdf', 'redact-pdf', 'flatten-pdf', 'add-page-numbers', 'grayscale-pdf'].includes(toolId)) {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Manipulation", detail: m, pct: p }));
         result = await manipulator.runOperation(toolId, options);
       }
       // 3. EXPORT CORE (PDF to X)
-      else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt', 'pdf-pdfa', 'grayscale-pdf'].includes(toolId)) {
+      else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt', 'pdf-pdfa'].includes(toolId)) {
         const { PDFConverter } = await import('@/lib/converters/pdf-converter');
         const converter = new PDFConverter(firstFile, (p, m) => onProgressCallback({ stage: "Synthesis", detail: m, pct: p }));
         const map: Record<string, string> = { 
@@ -58,8 +58,7 @@ class AJNPDFEngine {
           'pdf-pptx': 'PPTX', 
           'pdf-excel': 'XLSX', 
           'pdf-txt': 'TXT',
-          'pdf-pdfa': 'PDFA',
-          'grayscale-pdf': 'GRAYSCALE'
+          'pdf-pdfa': 'PDFA'
         };
         result = await converter.convertTo(map[toolId], options);
       }
