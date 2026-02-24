@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
@@ -31,6 +30,10 @@ const MOCK_DOC: PDFDocument = {
   versions: MOCK_VERSIONS,
 };
 
+/**
+ * AJN Advanced PDF Studio
+ * Professional Real-Time Orchestrator
+ */
 export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
   const [doc, setDoc] = useState<PDFDocument>(MOCK_DOC);
   const [history, setHistory] = useState<PDFDocument[]>([MOCK_DOC]);
@@ -43,7 +46,7 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
   const [isProcessing, setIsProcessing] = useState(false);
   
   const [sigOpen, setSigOpen] = useState(false);
-  const [pendingSigPos, setPendingSigPos] = useState<{x: number, y: number} | null>(null);
+  const [pendingSigPos, setPendingSigPos] = useState<{x: number, y: number, w: number, h: number} | null>(null);
 
   const { toast } = useToast();
 
@@ -100,8 +103,8 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
     setSelectedElementId(element.id);
   };
 
-  const handleRequestSignature = (x: number, y: number) => {
-    setPendingSigPos({ x, y });
+  const handleRequestSignature = (x: number, y: number, w: number, h: number) => {
+    setPendingSigPos({ x, y, w, h });
     setSigOpen(true);
   };
 
@@ -113,8 +116,8 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
       type: 'signature',
       x: pendingSigPos.x,
       y: pendingSigPos.y,
-      width: 200,
-      height: 80,
+      width: pendingSigPos.w,
+      height: pendingSigPos.h,
       signatureData: data,
       signatureType: type,
       opacity: 1,
@@ -128,10 +131,10 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
 
   const handleSave = async () => {
     setIsProcessing(true);
-    toast({ title: "Saving Changes", description: "Serializing modified content streams..." });
+    toast({ title: "Inhaling Changes", description: "Serializing modified binary segments..." });
     await new Promise(r => setTimeout(r, 2000));
     setIsProcessing(false);
-    toast({ title: "Process Successful", description: "Document has been synchronized." });
+    toast({ title: "Process Successful", description: "All-in-one Junction synchronization complete." });
   };
 
   return (
@@ -199,12 +202,24 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
 
       {isProcessing && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
-            <p className="text-sm font-black uppercase tracking-widest text-white">Executing Binary Rewrite...</p>
+          <div className="text-center space-y-6">
+            <div className="relative">
+              <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              </div>
+            </div>
+            <p className="text-sm font-black uppercase tracking-[0.4em] text-white">Executing Binary Rewrite...</p>
           </div>
         </div>
       )}
+
+      {/* FOOTER SYNC */}
+      <footer className="h-10 bg-black/40 border-t border-white/5 flex items-center justify-center shrink-0 z-[60]">
+        <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20">
+          Made by Indian ❤️
+        </p>
+      </footer>
     </div>
   );
 }

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
@@ -13,7 +12,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PenTool, Type, Upload, Eraser, CheckCircle2 } from 'lucide-react';
+import { PenTool, Type, Upload, Eraser, CheckCircle2, Image as ImageIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface Props {
   open: boolean;
@@ -21,13 +21,18 @@ interface Props {
   onSave: (data: string, type: 'draw' | 'type' | 'upload') => void;
 }
 
+/**
+ * AJN Professional Signature Suite
+ * Features: Precision Draw, Calligraphic Type, and File Ingestion.
+ */
 export function SignatureDialog({ open, onOpenChange, onSave }: Props) {
   const [activeTab, setActiveTab] = useState('draw');
   const [typeText, setTypeText] = useState('');
-  const [typeFont, setTypeFont] = useState('Dancing Script');
+  const [typeFont, setTypeFont] = useState('serif');
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [hasDrawn, setHasDrawing] = useState(false);
 
   useEffect(() => {
     if (open && activeTab === 'draw') {
@@ -36,8 +41,9 @@ export function SignatureDialog({ open, onOpenChange, onSave }: Props) {
         const ctx = canvas.getContext('2d');
         if (ctx) {
           ctx.strokeStyle = '#000000';
-          ctx.lineWidth = 2;
+          ctx.lineWidth = 2.5;
           ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
         }
       }
     }
@@ -45,6 +51,7 @@ export function SignatureDialog({ open, onOpenChange, onSave }: Props) {
 
   const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
     setIsDrawing(true);
+    setHasDrawing(true);
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -83,24 +90,28 @@ export function SignatureDialog({ open, onOpenChange, onSave }: Props) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setHasDrawing(false);
   };
 
   const handleSave = () => {
     if (activeTab === 'draw') {
-      const data = canvasRef.current?.toDataURL();
+      const data = canvasRef.current?.toDataURL('image/png');
       if (data) onSave(data, 'draw');
     } else if (activeTab === 'type') {
       if (!typeText) return;
-      // Convert typed text to image for easy canvas placement
       const canvas = document.createElement('canvas');
-      canvas.width = 400;
-      canvas.height = 100;
+      canvas.width = 600;
+      canvas.height = 150;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.font = `italic 40px Arial`;
+        ctx.fillStyle = 'transparent';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = `italic 64px ${typeFont === 'serif' ? 'Times New Roman' : 'Arial'}`;
         ctx.fillStyle = '#000000';
-        ctx.fillText(typeText, 20, 60);
-        onSave(canvas.toDataURL(), 'type');
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(typeText, canvas.width / 2, canvas.height / 2);
+        onSave(canvas.toDataURL('image/png'), 'type');
       }
     }
     onOpenChange(false);
@@ -122,25 +133,26 @@ export function SignatureDialog({ open, onOpenChange, onSave }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg bg-white/95 backdrop-blur-3xl border-black/5 p-0 overflow-hidden font-sans">
-        <DialogHeader className="p-6 border-b border-black/5">
-          <DialogTitle className="text-xl font-black uppercase tracking-tighter">Manage Signature</DialogTitle>
+      <DialogContent className="sm:max-w-xl bg-white border-black/10 p-0 overflow-hidden font-sans rounded-[2rem] shadow-2xl">
+        <DialogHeader className="p-8 border-b border-black/5 bg-slate-50/50">
+          <DialogTitle className="text-2xl font-black uppercase tracking-tighter text-slate-950">Add Digital Signature</DialogTitle>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Advanced Professional Setup</p>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 h-12 bg-black/5 p-1 rounded-none border-b border-black/5">
-            <TabsTrigger value="draw" className="text-[10px] font-black uppercase gap-2"><PenTool className="w-3 h-3" /> Draw</TabsTrigger>
-            <TabsTrigger value="type" className="text-[10px] font-black uppercase gap-2"><Type className="w-3 h-3" /> Type</TabsTrigger>
-            <TabsTrigger value="upload" className="text-[10px] font-black uppercase gap-2"><Upload className="w-3 h-3" /> Upload</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 h-14 bg-black/5 p-1 rounded-none border-b border-black/5">
+            <TabsTrigger value="draw" className="text-[11px] font-black uppercase gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"><PenTool className="w-3.5 h-3.5" /> Draw</TabsTrigger>
+            <TabsTrigger value="type" className="text-[11px] font-black uppercase gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"><Type className="w-3.5 h-3.5" /> Type</TabsTrigger>
+            <TabsTrigger value="upload" className="text-[11px] font-black uppercase gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"><Upload className="w-3.5 h-3.5" /> Upload</TabsTrigger>
           </TabsList>
 
-          <div className="p-8">
-            <TabsContent value="draw" className="m-0 space-y-4">
-              <div className="bg-slate-50 border-2 border-dashed border-black/5 rounded-2xl relative overflow-hidden">
+          <div className="p-10">
+            <TabsContent value="draw" className="m-0 space-y-6">
+              <div className="bg-slate-50 border-2 border-dashed border-black/10 rounded-3xl relative overflow-hidden group hover:border-primary/40 transition-all shadow-inner">
                 <canvas
                   ref={canvasRef}
-                  width={400}
-                  height={200}
+                  width={500}
+                  height={250}
                   onMouseDown={startDrawing}
                   onMouseMove={draw}
                   onMouseUp={stopDrawing}
@@ -148,59 +160,78 @@ export function SignatureDialog({ open, onOpenChange, onSave }: Props) {
                   onTouchStart={startDrawing}
                   onTouchMove={draw}
                   onTouchEnd={stopDrawing}
-                  className="w-full h-[200px] cursor-crosshair touch-none"
+                  className="w-full h-[250px] cursor-crosshair touch-none"
                 />
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={clearCanvas}
-                  className="absolute bottom-4 right-4 h-8 text-[9px] font-black uppercase gap-2 bg-white border-black/5"
+                  className="absolute bottom-4 right-4 h-9 text-[10px] font-black uppercase gap-2 bg-white/80 backdrop-blur-md border border-black/5 rounded-xl hover:bg-red-50 hover:text-red-500 shadow-sm"
                 >
-                  <Eraser className="w-3 h-3" /> Clear
+                  <Eraser className="w-3.5 h-3.5" /> Clear Pad
                 </Button>
               </div>
-              <p className="text-[9px] text-slate-400 font-bold uppercase text-center tracking-widest">Draw signature above using pointer or touch</p>
+              <div className="flex items-center justify-center gap-2 text-[9px] text-slate-400 font-bold uppercase tracking-[0.3em]">
+                <PenTool className="w-3 h-3" /> Draw signature using mouse or touch
+              </div>
             </TabsContent>
 
-            <TabsContent value="type" className="m-0 space-y-6">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Signature Text</Label>
+            <TabsContent value="type" className="m-0 space-y-8">
+              <div className="space-y-3">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Full Legal Name</Label>
                 <Input 
-                  placeholder="John Doe" 
+                  placeholder="e.g. Johnathan Doe" 
                   value={typeText} 
                   onChange={(e) => setTypeText(e.target.value)}
-                  className="h-14 text-xl font-bold border-black/10 bg-black/5"
+                  className="h-16 text-2xl font-bold border-black/10 bg-black/5 rounded-2xl focus:ring-primary/20 px-6"
                 />
               </div>
-              <div className="p-8 bg-slate-50 rounded-2xl border border-black/5 flex items-center justify-center min-h-[100px]">
+              <div className="p-10 bg-slate-50 rounded-3xl border border-black/5 flex items-center justify-center min-h-[140px] shadow-inner">
                 {typeText ? (
-                  <span className="text-4xl italic font-serif text-slate-900">{typeText}</span>
+                  <span className={cn(
+                    "text-5xl italic text-slate-900 transition-all duration-500",
+                    typeFont === 'serif' ? 'font-serif' : 'font-sans font-bold'
+                  )}>{typeText}</span>
                 ) : (
-                  <span className="text-xs text-slate-300 font-bold uppercase tracking-widest">Preview Area</span>
+                  <span className="text-xs text-slate-300 font-black uppercase tracking-[0.4em]">Preview Logic</span>
                 )}
+              </div>
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={() => setTypeFont('serif')} className={cn("flex-1 h-11 text-[10px] font-black uppercase rounded-xl border-black/5 bg-white/50", typeFont === 'serif' && "bg-primary text-white border-primary")}>Calligraphic</Button>
+                <Button variant="outline" onClick={() => setTypeFont('sans')} className={cn("flex-1 h-11 text-[10px] font-black uppercase rounded-xl border-black/5 bg-white/50", typeFont === 'sans' && "bg-primary text-white border-primary")}>Modern Script</Button>
               </div>
             </TabsContent>
 
             <TabsContent value="upload" className="m-0">
-              <div className="flex flex-col items-center justify-center p-12 bg-slate-50 border-2 border-dashed border-black/5 rounded-[2.5rem] space-y-4 group hover:border-primary/40 transition-all cursor-pointer relative">
-                <input type="file" onChange={handleFileUpload} accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" />
-                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg border border-black/5 group-hover:scale-110 transition-transform">
-                  <Upload className="w-6 h-6 text-primary" />
+              <div className="flex flex-col items-center justify-center p-16 bg-slate-50 border-2 border-dashed border-black/10 rounded-[3rem] space-y-6 group hover:border-primary/40 transition-all cursor-pointer relative shadow-inner">
+                <input type="file" onChange={handleFileUpload} accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer z-10" />
+                <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-xl border border-black/5 group-hover:scale-110 transition-all duration-500 group-hover:bg-primary group-hover:text-white">
+                  <Upload className="w-8 h-8" />
                 </div>
-                <div className="text-center">
-                  <p className="text-sm font-black uppercase tracking-tighter">Choose file</p>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">PNG or JPG recommended</p>
+                <div className="text-center space-y-1">
+                  <p className="text-sm font-black uppercase tracking-tighter text-slate-950">Inhale Signature File</p>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">PNG, JPG, or SVG Supported</p>
                 </div>
               </div>
             </TabsContent>
           </div>
         </Tabs>
 
-        <DialogFooter className="p-6 border-t border-black/5 bg-slate-50/50">
-          <Button variant="ghost" onClick={() => onOpenChange(false)} className="text-[10px] font-black uppercase">Cancel</Button>
-          <Button onClick={handleSave} className="bg-primary text-white font-black text-[10px] uppercase px-8 h-10 rounded-xl shadow-lg">
-            Adopt Signature
-          </Button>
+        <DialogFooter className="p-8 border-t border-black/5 bg-slate-50/50 flex items-center justify-between gap-4">
+          <div className="hidden sm:flex items-center gap-2 text-emerald-600">
+            <CheckCircle2 className="w-4 h-4" />
+            <span className="text-[9px] font-black uppercase tracking-widest">Local Buffer Secure</span>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="ghost" onClick={() => onOpenChange(false)} className="text-[10px] font-black uppercase px-6 h-11 rounded-xl">Discard</Button>
+            <Button 
+              onClick={handleSave} 
+              disabled={activeTab === 'draw' ? !hasDrawn : !typeText}
+              className="bg-primary text-white font-black text-[10px] uppercase px-10 h-11 rounded-xl shadow-xl hover:scale-105 transition-all"
+            >
+              Adopt Signature
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

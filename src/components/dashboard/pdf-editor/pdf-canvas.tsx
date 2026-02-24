@@ -1,10 +1,9 @@
-
 "use client";
 
 import { PDFPage, PDFElement, PDFTool } from './types';
 import { cn } from '@/lib/utils';
 import { useState, useRef, useEffect } from 'react';
-import { PenTool, Type, Image as ImageIcon, CheckCircle2, Link as LinkIcon, Trash2, Move, MousePointer2 } from 'lucide-react';
+import { PenTool, Type, Image as ImageIcon, CheckCircle2, Link as LinkIcon, Trash2, Move, MousePointer2, Crosshair } from 'lucide-react';
 
 interface Props {
   page: PDFPage;
@@ -14,14 +13,20 @@ interface Props {
   onSelectElement: (id: string | null) => void;
   onUpdateElement: (el: PDFElement) => void;
   onAddElement: (el: PDFElement) => void;
-  onRequestSignature: (x: number, y: number) => void;
+  onRequestSignature: (x: number, y: number, width: number, height: number) => void;
 }
 
+/**
+ * AJN High-Fidelity PDF Canvas
+ * Professional interaction engine for document manipulation.
+ */
 export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectElement, onUpdateElement, onAddElement, onRequestSignature }: Props) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isDrawingBox, setIsDrawingBox] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [elementStart, setElementStart] = useState({ x: 0, y: 0 });
+  const [boxPreview, setBoxPreview] = useState<{x: number, y: number, w: number, h: number} | null>(null);
 
   const scale = zoom / 100;
   const pageWidth = 595; 
@@ -34,7 +39,9 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
     const y = (e.clientY - rect.top) / scale;
 
     if (activeTool === 'signature') {
-      onRequestSignature(x, y);
+      setIsDrawingBox(true);
+      setDragStart({ x: e.clientX, y: e.clientY });
+      setBoxPreview({ x, y, w: 0, h: 0 });
       return;
     }
 
@@ -86,6 +93,16 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    if (isDrawingBox && boxPreview) {
+      const w = (e.clientX - dragStart.x) / scale;
+      const h = (e.clientY - dragStart.y) / scale;
+      setBoxPreview({ ...boxPreview, w, h });
+      return;
+    }
+
     if (!isDragging || !selectedElementId) return;
     const dx = (e.clientX - dragStart.x) / scale;
     const dy = (e.clientY - dragStart.y) / scale;
@@ -101,6 +118,18 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
   };
 
   const handleMouseUp = () => {
+    if (isDrawingBox && boxPreview) {
+      setIsDrawingBox(false);
+      const x = boxPreview.w < 0 ? boxPreview.x + boxPreview.w : boxPreview.x;
+      const y = boxPreview.h < 0 ? boxPreview.y + boxPreview.h : boxPreview.y;
+      const w = Math.abs(boxPreview.w);
+      const h = Math.abs(boxPreview.h);
+      
+      if (w > 10 && h > 10) {
+        onRequestSignature(x, y, w, h);
+      }
+      setBoxPreview(null);
+    }
     setIsDragging(false);
   };
 
@@ -111,7 +140,10 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
-      className="bg-white rounded-sm shadow-[0_0_100px_rgba(0,0,0,0.5)] relative transition-all duration-300 origin-center mb-24 cursor-crosshair"
+      className={cn(
+        "bg-white rounded-sm shadow-[0_0_100px_rgba(0,0,0,0.5)] relative transition-all duration-300 origin-center mb-24",
+        activeTool === 'signature' ? 'cursor-crosshair' : 'cursor-default'
+      )}
       style={{ 
         width: pageWidth * scale, 
         height: pageHeight * scale,
@@ -130,6 +162,21 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
           <div className="h-4 w-full bg-slate-100 rounded" />
         </div>
       </div>
+
+      {/* DRAW BOX PREVIEW */}
+      {boxPreview && (
+        <div 
+          className="absolute border-2 border-primary bg-primary/5 z-[1000] flex items-center justify-center pointer-events-none"
+          style={{
+            left: boxPreview.w < 0 ? boxPreview.x + boxPreview.w : boxPreview.x,
+            top: boxPreview.h < 0 ? boxPreview.y + boxPreview.h : boxPreview.y,
+            width: Math.abs(boxPreview.w),
+            height: Math.abs(boxPreview.h)
+          }}
+        >
+          <Crosshair className="w-4 h-4 text-primary animate-pulse" />
+        </div>
+      )}
 
       {/* EDITABLE OBJECT MODEL LAYER */}
       <div 
@@ -183,20 +230,19 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
 
             {el.type === 'signature' && !el.signatureData && (
               <div className="w-full h-full flex items-center justify-center border border-dashed border-primary/40 bg-primary/5">
-                <span className="text-[10px] font-black uppercase text-primary/40">Signature Area</span>
+                <span className="text-[10px] font-black uppercase text-primary/40">Defining Area...</span>
               </div>
             )}
 
-            {/* Step 3: Resize/Move Handles */}
             {selectedElementId === el.id && (
               <>
                 <div className="absolute -top-1 -left-1 w-2 h-2 bg-white border-2 border-primary rounded-full cursor-nw-resize" />
                 <div className="absolute -top-1 -right-1 w-2 h-2 bg-white border-2 border-primary rounded-full cursor-ne-resize" />
                 <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-white border-2 border-primary rounded-full cursor-sw-resize" />
                 <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-white border-2 border-primary rounded-full cursor-se-resize" />
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-primary text-white px-2 py-1 rounded shadow-xl whitespace-nowrap">
-                  <Move className="w-3 h-3" />
-                  <span className="text-[8px] font-black uppercase tracking-widest">{el.type} Layer</span>
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-primary text-white px-3 py-1.5 rounded-xl shadow-2xl whitespace-nowrap">
+                  <Move className="w-3.5 h-3.5" />
+                  <span className="text-[9px] font-black uppercase tracking-widest">{el.type} Layer</span>
                 </div>
               </>
             )}

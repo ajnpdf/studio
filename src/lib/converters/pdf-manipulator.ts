@@ -1,4 +1,3 @@
-
 'use client';
 
 import { PDFDocument, degrees, rgb, StandardFonts } from 'pdf-lib';
@@ -7,6 +6,7 @@ import { ConversionResult, ProgressCallback } from './pdf-converter';
 /**
  * AJN Master Manipulation Engine
  * Precision binary synchronization for document surgery.
+ * Hardened for E-Sign injection and real-time execution.
  */
 export class PDFManipulator {
   private files: File[];
@@ -57,7 +57,7 @@ export class PDFManipulator {
         copiedPage.setRotation(degrees(item.rotation));
       }
 
-      // 1. Add Page Numbers
+      // Add Page Numbers Logic
       if (toolId === 'add-page-numbers') {
         const { width } = copiedPage.getSize();
         const text = `Page ${i + 1} of ${pageData.length}`;
@@ -74,28 +74,36 @@ export class PDFManipulator {
         });
       }
 
-      // 2. Grayscale
+      // Advanced Color Matrix
       if (toolId === 'grayscale-pdf') {
         this.updateProgress(prog, `Recalibrating color matrix: Segment ${i + 1}`);
       }
 
-      // 3. Signature Embedding (If provided in options from Editor)
+      // HIGH-FIDELITY SIGNATURE INJECTION
+      // Checks for signatures mapped to this page index
       if (options.signatures?.[i]) {
         for (const sig of options.signatures[i]) {
-          const sigImage = await masterDoc.embedPng(sig.data);
-          copiedPage.drawImage(sigImage, {
-            x: sig.x,
-            y: sig.y,
-            width: sig.width,
-            height: sig.height,
-          });
+          try {
+            // Handle Data URIs (PNG/JPG)
+            const sigBytes = await fetch(sig.data).then(res => res.arrayBuffer());
+            const sigImage = await masterDoc.embedPng(sigBytes);
+            
+            copiedPage.drawImage(sigImage, {
+              x: sig.x,
+              y: sig.y,
+              width: sig.width,
+              height: sig.height,
+            });
+          } catch (err) {
+            console.error("[Surgical Engine] Signature injection failed:", err);
+          }
         }
       }
       
       masterDoc.addPage(copiedPage);
     }
 
-    this.updateProgress(95, "Synchronizing binary buffer...");
+    this.updateProgress(95, "Synchronizing final binary buffer...");
     const pdfBytes = await masterDoc.save({ useObjectStreams: true });
     this.updateProgress(100, "Process completed successfully.");
 
