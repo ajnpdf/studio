@@ -19,7 +19,10 @@ import {
   FileIcon,
   Scissors,
   Settings2,
-  FileText
+  FileText,
+  MousePointer2,
+  ListChecks,
+  Eraser
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -122,6 +125,14 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     }
   };
 
+  const selectAllPages = () => {
+    setSelectedPages(new Set(pages.map(p => p.id)));
+  };
+
+  const deselectAllPages = () => {
+    setSelectedPages(new Set());
+  };
+
   const togglePageSelection = (pageId: string) => {
     const next = new Set(selectedPages);
     if (next.has(pageId)) next.delete(pageId);
@@ -186,14 +197,19 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                 {phase === 'selecting' && (
                   <motion.div key="selecting" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4 bg-white/40 p-6 md:p-8 rounded-[2rem] md:rounded-3xl border border-black/5 shadow-2xl backdrop-blur-3xl">
-                      <div className="space-y-1.5">
+                      <div className="space-y-3">
                         <div className="flex items-center gap-3">
                           <Eye className="w-5 h-5 text-primary" />
                           <h3 className="text-lg md:text-xl font-black uppercase tracking-tighter">Visionary Inspection</h3>
                         </div>
-                        <p className="text-[9px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">
-                          {isSurgicalTool ? 'Visually isolate segments for surgical mastery.' : 'Review document buffer before binary synthesis.'}
-                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          <Button variant="outline" size="sm" onClick={selectAllPages} className="h-8 border-black/5 bg-white/60 text-[9px] font-black uppercase tracking-widest gap-2 rounded-lg">
+                            <ListChecks className="w-3.5 h-3.5" /> Select All
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={deselectAllPages} className="h-8 border-black/5 bg-white/60 text-[9px] font-black uppercase tracking-widest gap-2 rounded-lg">
+                            <Eraser className="w-3.5 h-3.5" /> Clear All
+                          </Button>
+                        </div>
                       </div>
                       <div className="flex items-center gap-3 w-full md:w-auto">
                         <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-4 md:px-6 font-black rounded-xl text-[10px] md:text-xs uppercase tracking-widest flex-1 md:flex-none justify-center">

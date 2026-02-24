@@ -44,7 +44,7 @@ export class PDFManipulator {
         targetIndices = Array.from({ length: doc.getPageCount() }, (_, i) => i)
           .filter(i => !pageIndices.includes(i));
       } else if (pageIndices.length === 0) {
-        // Default to all pages if visionary was bypassed or tool is 'organize'
+        // Default to all pages if visionary was bypassed
         targetIndices = Array.from({ length: doc.getPageCount() }, (_, i) => i);
       }
 
@@ -60,13 +60,14 @@ export class PDFManipulator {
     }
 
     if (toolId === 'sign-pdf') {
-      this.updateProgress(50, "Injecting digital audit trail marker...");
+      this.updateProgress(50, "Injecting high-fidelity signature overlay...");
       const font = await doc.embedFont(StandardFonts.HelveticaBold);
       const pages = doc.getPages();
       const lastPage = pages[pages.length - 1];
       
-      lastPage.drawText(`Digitally Signed via AJN Neural Buffer\nTS: ${new Date().toISOString()}`, {
-        x: 50, y: 50, size: 8, font, color: rgb(0.1, 0.1, 0.5)
+      // Professional Seal Branding
+      lastPage.drawText(`Digitally Signed via AJN Neural Buffer\nTS: ${new Date().toISOString()}\nVerified Node Output`, {
+        x: 50, y: 50, size: 8, font, color: rgb(0.1, 0.1, 0.5), lineHeight: 10
       });
       
       const bytes = await doc.save();

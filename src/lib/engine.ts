@@ -41,12 +41,12 @@ class AJNPDFEngine {
       } 
       // 2. MERGE CORE
       else if (toolId === 'merge-pdf') {
-        const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
-        const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Merge", detail: m, pct: p }));
-        result = await manipulator.merge();
+        const { MergeConverter } = await import('@/lib/converters/merge-converter');
+        const converter = new MergeConverter(files, (p, m) => onProgressCallback({ stage: "Merge", detail: m, pct: p }));
+        result = await converter.merge();
       }
       // 3. SURGICAL MANIPULATION CORE
-      else if (['split-pdf', 'extract-pages', 'delete-pages', 'rotate-pdf', 'sign-pdf'].includes(toolId)) {
+      else if (['split-pdf', 'extract-pages', 'delete-pages', 'rotate-pdf', 'sign-pdf', 'organize-pdf'].includes(toolId)) {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Manipulation", detail: m, pct: p }));
         result = await manipulator.runOperation(toolId, options);
