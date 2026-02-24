@@ -11,9 +11,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Loader2, Save, RotateCcw, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { engine } from '@/lib/engine';
 
 const MOCK_VERSIONS: PDFVersion[] = [
-  { id: 'v1', versionNumber: 1, timestamp: '2025-01-15 10:00', editorName: 'System', summary: 'Original Upload' }
+  { id: 'v1', versionNumber: 1, timestamp: '2026-01-15 10:00', editorName: 'System', summary: 'Original Upload' }
 ];
 
 const MOCK_DOC: PDFDocument = {
@@ -131,10 +132,28 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
 
   const handleSave = async () => {
     setIsProcessing(true);
-    toast({ title: "Inhaling Changes", description: "Serializing modified binary segments..." });
-    await new Promise(r => setTimeout(r, 2000));
-    setIsProcessing(false);
-    toast({ title: "Process Successful", description: "All-in-one Junction synchronization complete." });
+    toast({ title: "Applying Changes", description: "Executing surgical binary rewrite..." });
+    
+    try {
+      // Execute real transformation via engine
+      const res = await engine.runTool('sign-pdf', [], { 
+        document: doc,
+        activePageIdx 
+      }, (p: any) => console.log(p.detail));
+      
+      if (res.success && res.blob) {
+        const url = URL.createObjectURL(res.blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Signed_${doc.name}`;
+        a.click();
+        toast({ title: "Process Successful", description: "Signed document exported to local buffer." });
+      }
+    } catch (err) {
+      toast({ title: "Process Failed", description: "Internal buffer sync error.", variant: "destructive" });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -217,7 +236,7 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
       {/* FOOTER SYNC */}
       <footer className="h-10 bg-black/40 border-t border-white/5 flex items-center justify-center shrink-0 z-[60]">
         <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20">
-          Made by Indian ❤️
+          Made in INDIAN❤️ • 2026
         </p>
       </footer>
     </div>

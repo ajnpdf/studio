@@ -19,16 +19,15 @@ class AJNPDFEngine {
     onProgressCallback({ stage: "Preparing", detail: "Initializing process...", pct: 5 });
 
     const files = Array.isArray(inputs) ? inputs : [inputs];
-    const firstFile = files[0];
-    if (!firstFile) throw new Error("No file selected.");
-
+    
     let result: { blob: Blob; fileName: string; mimeType: string };
 
     try {
       // 1. Advanced Processing
       if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf', 'compress-pdf', 'repair-pdf'].includes(toolId)) {
+        if (!files[0]) throw new Error("No file selected.");
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
-        const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Processing", detail: m, pct: p }));
+        const converter = new SpecializedConverter(files[0], (p, m) => onProgressCallback({ stage: "Processing", detail: m, pct: p }));
         
         const map: Record<string, string> = { 
           'translate-pdf': 'TRANSLATE', 
@@ -48,8 +47,9 @@ class AJNPDFEngine {
       }
       // 3. Export Formats
       else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt', 'pdf-pdfa'].includes(toolId)) {
+        if (!files[0]) throw new Error("No file selected.");
         const { PDFConverter } = await import('@/lib/converters/pdf-converter');
-        const converter = new PDFConverter(firstFile, (p, m) => onProgressCallback({ stage: "Exporting", detail: m, pct: p }));
+        const converter = new PDFConverter(files[0], (p, m) => onProgressCallback({ stage: "Exporting", detail: m, pct: p }));
         
         const map: Record<string, string> = { 
           'pdf-jpg': 'JPG', 
@@ -65,23 +65,24 @@ class AJNPDFEngine {
       }
       // 4. Inbound Conversions
       else if (toolId.endsWith('-pdf')) {
+        if (!files[0]) throw new Error("No file selected.");
         const source = toolId.split('-')[0];
         if (['jpg', 'jpeg', 'png', 'webp'].includes(source!)) {
           const { ImageConverter } = await import('@/lib/converters/image-converter');
-          const converter = new ImageConverter(firstFile, (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p }));
+          const converter = new ImageConverter(files[0], (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p }));
           result = await converter.toMasterPDF(files, options);
         } else if (source === 'word') {
           const { WordConverter } = await import('@/lib/converters/word-converter');
-          result = await new WordConverter(firstFile, (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p })).convertTo('PDF');
+          result = await new WordConverter(files[0], (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p })).convertTo('PDF');
         } else if (source === 'ppt') {
           const { PPTConverter } = await import('@/lib/converters/ppt-converter');
-          result = await new PPTConverter(firstFile, (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p })).convertTo('PDF');
+          result = await new PPTConverter(files[0], (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p })).convertTo('PDF');
         } else if (source === 'excel') {
           const { ExcelConverter } = await import('@/lib/converters/excel-converter');
-          result = await new ExcelConverter(firstFile, (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p })).convertTo('PDF');
+          result = await new ExcelConverter(files[0], (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p })).convertTo('PDF');
         } else {
           const { CodeConverter } = await import('@/lib/converters/code-converter');
-          result = await new CodeConverter(firstFile, (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p })).convertTo('PDF', options);
+          result = await new CodeConverter(files[0], (p, m) => onProgressCallback({ stage: "Converting", detail: m, pct: p })).convertTo('PDF', options);
         }
       } else {
         throw new Error(`Tool ${toolId} is currently offline.`);
