@@ -4,7 +4,7 @@ import { use, useState, useEffect } from 'react';
 import { UnitWorkspace } from '@/components/junction/unit-workspace';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ShieldCheck, Activity, Settings2, History } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Activity, Settings2, History, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { ALL_UNITS } from '@/components/junction/services-grid';
@@ -58,6 +58,11 @@ export default function ToolPage({ params }: Props) {
         </div>
 
         <div className="flex items-center gap-3">
+          <Link href={`/tools/${id}/guide`}>
+            <Button variant="ghost" className="h-9 border-black/5 bg-black/5 hover:bg-primary hover:text-white font-black text-[9px] uppercase tracking-widest rounded-xl transition-all gap-2 px-4">
+              <BookOpen className="w-3.5 h-3.5" /> Technical Briefing
+            </Button>
+          </Link>
           <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-950/40 hover:text-slate-950">
             <History className="w-4 h-4" />
           </Button>
@@ -80,7 +85,7 @@ export default function ToolPage({ params }: Props) {
               </h1>
             </div>
             <p className="text-[10px] text-slate-950/40 font-bold uppercase tracking-[0.3em]">
-              {tool.desc}
+              {tool.desc} • Use for student purpose and business purpose • useful to students and business and more
             </p>
           </div>
           

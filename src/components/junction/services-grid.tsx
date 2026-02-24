@@ -20,38 +20,93 @@ export type ServiceUnit = {
   cat: 'Organize' | 'Optimize' | 'Convert' | 'Edit' | 'Security' | 'Intelligence' | 'Export';
   mode: 'Standard' | 'Advanced';
   color: string;
+  benefits?: string[];
+  instructions?: string[];
+  useCases?: string[];
 };
 
 export const ALL_UNITS: ServiceUnit[] = [
-  { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple documents.', icon: Layout, tag: 'Merge', cat: 'Organize', mode: 'Standard', color: '#3B82F6' },
-  { id: 'split-pdf', name: 'Split PDF', desc: 'Divide files by page range.', icon: Scissors, tag: 'Split', cat: 'Organize', mode: 'Standard', color: '#6366F1' },
-  { id: 'delete-pages', name: 'Remove Pages', desc: 'Delete unwanted pages.', icon: Trash2, tag: 'Remove', cat: 'Organize', mode: 'Standard', color: '#8B5CF6' },
-  { id: 'extract-pages', name: 'Extract Pages', desc: 'Isolate specific pages.', icon: Copy, tag: 'Extract', cat: 'Organize', mode: 'Standard', color: '#A78BFA' },
-  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Reorder document pages.', icon: FolderOpen, tag: 'Organize', cat: 'Organize', mode: 'Standard', color: '#7C3AED' },
-  { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce document file size.', icon: Shrink, tag: 'Compress', cat: 'Optimize', mode: 'Standard', color: '#10B981' },
-  { id: 'repair-pdf', name: 'Repair PDF', desc: 'Fix corrupted PDF files.', icon: Wrench, tag: 'Repair', cat: 'Optimize', mode: 'Standard', color: '#059669' },
-  { id: 'ocr-pdf', name: 'Text Recognition', desc: 'Recognize text in scans.', icon: Search, tag: 'OCR', cat: 'Optimize', mode: 'Advanced', color: '#047857' },
-  { id: 'pdf-pdfa', name: 'PDF to PDF/A', desc: 'Archive compliant docs.', icon: ShieldCheck, tag: 'Archive', cat: 'Optimize', mode: 'Standard', color: '#065F46' },
-  { id: 'grayscale-pdf', name: 'Grayscale PDF', desc: 'Convert to black and white.', icon: Paintbrush, tag: 'Grayscale', cat: 'Optimize', mode: 'Standard', color: '#4B5563' },
-  { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Convert image to PDF.', icon: ImageIcon, tag: 'Convert', cat: 'Convert', mode: 'Standard', color: '#F59E0B' },
-  { id: 'word-pdf', name: 'Word to PDF', desc: 'Convert Word to PDF.', icon: FileText, tag: 'Convert', cat: 'Convert', mode: 'Standard', color: '#D97706' },
-  { id: 'ppt-pdf', name: 'PPT to PDF', desc: 'Convert PowerPoint to PDF.', icon: Presentation, tag: 'Convert', cat: 'Convert', mode: 'Standard', color: '#B45309' },
-  { id: 'excel-pdf', name: 'Excel to PDF', desc: 'Convert Spreadsheet to PDF.', icon: Table, tag: 'Convert', cat: 'Convert', mode: 'Standard', color: '#92400E' },
-  { id: 'html-pdf', name: 'HTML to PDF', desc: 'Convert Web page to PDF.', icon: Globe, tag: 'Convert', cat: 'Convert', mode: 'Standard', color: '#78350F' },
-  { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Convert PDF to images.', icon: ImageIcon, tag: 'Export', cat: 'Export', mode: 'Standard', color: '#EF4444' },
-  { id: 'pdf-word', name: 'PDF to Word', desc: 'Convert PDF to Word doc.', icon: FileText, tag: 'Export', cat: 'Export', mode: 'Standard', color: '#DC2626' },
-  { id: 'pdf-pptx', name: 'PDF to PPTX', desc: 'Convert PDF to slides.', icon: Presentation, tag: 'Export', cat: 'Export', mode: 'Standard', color: '#B91C1C' },
-  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Convert PDF to sheet.', icon: Table, tag: 'Export', cat: 'Export', mode: 'Standard', color: '#991B1C' },
-  { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Correct page orientation.', icon: History, tag: 'Edit', cat: 'Edit', mode: 'Standard', color: '#EC4899' },
-  { id: 'add-page-numbers', name: 'Add Numbers', desc: 'Add numbering to pages.', icon: Hash, tag: 'Edit', cat: 'Edit', mode: 'Standard', color: '#DB2777' },
-  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Modify document content.', icon: MousePointer2, tag: 'Edit', cat: 'Edit', mode: 'Advanced', color: '#BE185D' },
-  { id: 'unlock-pdf', name: 'Unlock PDF', desc: 'Remove document password.', icon: Unlock, tag: 'Security', cat: 'Security', mode: 'Standard', color: '#000000' },
-  { id: 'protect-pdf', name: 'Protect PDF', desc: 'Add password encryption.', icon: Lock, tag: 'Security', cat: 'Security', mode: 'Standard', color: '#111827' },
-  { id: 'sign-pdf', name: 'Sign PDF', desc: 'Add digital signature.', icon: PenTool, tag: 'Security', cat: 'Security', mode: 'Standard', color: '#1F2937' },
-  { id: 'redact-pdf', name: 'Redact PDF', desc: 'Mask sensitive information.', icon: EyeOff, tag: 'Security', cat: 'Security', mode: 'Advanced', color: '#374151' },
-  { id: 'flatten-pdf', name: 'Flatten PDF', desc: 'Merge document layers.', icon: Layers, tag: 'Security', cat: 'Security', mode: 'Standard', color: '#4B5563' },
-  { id: 'translate-pdf', name: 'Translate PDF', desc: 'Document translation.', icon: Globe, tag: 'Translate', cat: 'Intelligence', mode: 'Advanced', color: '#3B82F6' },
-  { id: 'summarize-pdf', name: 'Summarize PDF', desc: 'Generate a brief summary.', icon: FileText, tag: 'Summary', cat: 'Intelligence', mode: 'Advanced', color: '#1D4ED8' },
+  { 
+    id: 'merge-pdf', 
+    name: 'Merge PDF', 
+    desc: 'Combine multiple documents into one.', 
+    icon: Layout, 
+    tag: 'Merge', 
+    cat: 'Organize', 
+    mode: 'Standard', 
+    color: '#3B82F6',
+    benefits: ['Consolidates fragmented records', 'Reduces file management overhead', 'Optimizes document portability'],
+    instructions: ['Inhale source files into the secure buffer.', 'Arrange segments in the desired sequence.', 'Execute the binary merge protocol.'],
+    useCases: ['Student purpose: Merging assignment chapters.', 'Business purpose: Consolidating monthly financial reports.']
+  },
+  { 
+    id: 'split-pdf', 
+    name: 'Split PDF', 
+    desc: 'Divide files by page range or segments.', 
+    icon: Scissors, 
+    tag: 'Split', 
+    cat: 'Organize', 
+    mode: 'Standard', 
+    color: '#6366F1',
+    benefits: ['Extracts critical data points', 'Enables targeted information sharing', 'Decomposes oversized binaries'],
+    instructions: ['Load document into the visual workspace.', 'Select specific page ranges for extraction.', 'Finalize segment isolation.'],
+    useCases: ['Student purpose: Extracting specific textbook chapters.', 'Business purpose: Isolating individual invoices from a batch run.']
+  },
+  { 
+    id: 'compress-pdf', 
+    name: 'Compress PDF', 
+    desc: 'Reduce document size while preserving quality.', 
+    icon: Shrink, 
+    tag: 'Compress', 
+    cat: 'Optimize', 
+    mode: 'Standard', 
+    color: '#10B981',
+    benefits: ['Minimizes storage infrastructure costs', 'Bypasses email attachment limits', 'Accelerates web-based document loading'],
+    instructions: ['Select the target document.', 'Define the required reduction level (MB/KB).', 'Execute surgical stream deflation.'],
+    useCases: ['Student purpose: Uploading compressed portfolios to portals.', 'Business purpose: Optimizing archival document storage.']
+  },
+  { 
+    id: 'ocr-pdf', 
+    name: 'Text Recognition', 
+    desc: 'Convert scanned images to searchable PDF.', 
+    icon: Search, 
+    tag: 'OCR', 
+    cat: 'Optimize', 
+    mode: 'Advanced', 
+    color: '#047857',
+    benefits: ['Enables text searching in legacy scans', 'Supports automated data indexing', 'Improves document accessibility'],
+    instructions: ['Inhale the raster image or scanned PDF.', 'Choose the target recognition language.', 'Run the character identification protocol.'],
+    useCases: ['Student purpose: Converting handwritten notes to text.', 'Business purpose: Digitizing physical contracts for searchable archives.']
+  },
+  { 
+    id: 'sign-pdf', 
+    name: 'Sign PDF', 
+    desc: 'Add professional digital signatures.', 
+    icon: PenTool, 
+    tag: 'Sign', 
+    cat: 'Security', 
+    mode: 'Standard', 
+    color: '#1F2937',
+    benefits: ['Executes legally binding authorizations', 'Operates entirely in local secure buffer', 'Eliminates physical printing costs'],
+    instructions: ['Load document segment into editor.', 'Draw, type, or upload your signature asset.', 'Place signature box and commit to binary.'],
+    useCases: ['Student purpose: Signing internship applications.', 'Business purpose: Authorizing commercial vendor agreements.']
+  },
+  { 
+    id: 'word-pdf', 
+    name: 'Word to PDF', 
+    desc: 'High-fidelity DOCX to PDF conversion.', 
+    icon: FileText, 
+    tag: 'Convert', 
+    cat: 'Convert', 
+    mode: 'Standard', 
+    color: '#D97706',
+    benefits: ['Preserves complex document layouts', 'Ensures universal platform compatibility', 'Locks content against accidental edits'],
+    instructions: ['Browse and select Word-compatible files.', 'Verify page layout in the visionary preview.', 'Launch the OOXML-to-PDF transformation.'],
+    useCases: ['Student purpose: Converting essays for submission.', 'Business purpose: Preparing professional proposals for clients.']
+  },
+  { id: 'repair-pdf', name: 'Repair PDF', desc: 'Fix corrupted PDF file structures.', icon: Wrench, tag: 'Repair', cat: 'Optimize', mode: 'Standard', color: '#059669', benefits: ['Restores access to damaged binaries', 'Corrects invalid cross-reference tables', 'Recovers lost page objects'], instructions: ['Upload the corrupted PDF asset.', 'Select the recovery protocol level.', 'Execute structural reconstruction.'], useCases: ['Business purpose: Recovering corrupted archive data.', 'Useful to students and business and more.'] },
+  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Modify existing document layers.', icon: MousePointer2, tag: 'Edit', cat: 'Edit', mode: 'Advanced', color: '#BE185D', benefits: ['Direct layer manipulation', 'Real-time text and image injection', 'Professional markup tools'], instructions: ['Open document in advanced editor.', 'Select object or add new text/image layer.', 'Commit surgical changes to binary.'], useCases: ['Useful for student purpose and business purpose.', 'Advanced professional setup in real time.'] },
+  { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Convert PDF segments to images.', icon: ImageIcon, tag: 'Export', cat: 'Export', mode: 'Standard', color: '#EF4444', benefits: ['Enables social media document sharing', 'Creates lightweight presentation assets', 'Universal image compatibility'], instructions: ['Load target PDF document.', 'Select specific pages or full range.', 'Export to high-fidelity JPEG matrix.'], useCases: ['Student purpose: Sharing infographics.', 'Business purpose: Extracting slide frames for social channels.'] },
 ];
 
 const containerVariants = {
