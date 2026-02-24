@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -22,13 +22,16 @@ import {
   ExternalLink,
   ChevronRight,
   Sparkles,
-  MousePointer2
+  MousePointer2,
+  Lock,
+  Search,
+  Wand2
 } from 'lucide-react';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 /**
- * AJN Master Landing Page - Integrated Single-Page Experience
+ * AJN Master Landing Page - Integrated Single-Page Hub
  * Industrial Standard: Arial Typography
  */
 export default function LandingPage() {
@@ -91,24 +94,31 @@ export default function LandingPage() {
               <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-slate-950 leading-[0.85] uppercase">
                 All-in-one <br /> Junction <span className="text-primary">Network</span>
               </h1>
-              <div className="flex items-center justify-center gap-6">
-                <span className="w-12 h-px bg-slate-950/10"></span>
-                <p className="text-slate-950/60 text-[10px] md:text-[12px] font-black tracking-[0.4em] uppercase">
-                  Every File. One Smart Network.
-                </p>
-                <span className="w-12 h-px bg-slate-950/10"></span>
+              <div className="flex flex-col items-center justify-center gap-4">
+                <div className="flex items-center justify-center gap-6">
+                  <span className="w-12 h-px bg-slate-950/10"></span>
+                  <p className="text-slate-950/60 text-[10px] md:text-[12px] font-black tracking-[0.4em] uppercase">
+                    Every File. One Smart Network.
+                  </p>
+                  <span className="w-12 h-px bg-slate-950/10"></span>
+                </div>
+                <div className="px-6 py-2 bg-primary/5 border border-primary/10 rounded-full animate-in fade-in zoom-in duration-1000 delay-500">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary">
+                    Only this site provides PDF tools and services conversion in real time free
+                  </p>
+                </div>
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-4">
               <Link href="/ajn">
                 <Button className="h-16 px-12 bg-primary text-white hover:bg-primary/90 font-black text-xs rounded-2xl transition-all gap-4 shadow-2xl hover:scale-105 uppercase tracking-widest">
-                  Discover Core <ArrowRight className="w-4 h-4" />
+                  Start Engineering <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
               <Link href="/junction">
                 <Button variant="outline" className="h-16 px-12 border-slate-950/10 bg-white/40 backdrop-blur-xl text-slate-950 font-black text-xs rounded-2xl transition-all gap-4 shadow-xl hover:bg-white/60 uppercase tracking-widest">
-                  <Layers className="w-4.5 h-4.5 text-primary" /> Access Junction
+                  <Layers className="w-4.5 h-4.5 text-primary" /> View All Units
                 </Button>
               </Link>
             </div>
@@ -118,8 +128,8 @@ export default function LandingPage() {
         {/* FEATURES SECTION */}
         <section id="features" className="py-32 px-6 max-w-7xl mx-auto space-y-16">
           <div className="text-center space-y-4">
-            <h2 className="text-4xl font-black uppercase tracking-tighter">Engineering <span className="text-primary">Units</span></h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Hardware-accelerated processing in your local sandbox</p>
+            <h2 className="text-4xl font-black uppercase tracking-tighter">Engineering <span className="text-primary">Pillars</span></h2>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">The Architecture of Excellence</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -141,36 +151,62 @@ export default function LandingPage() {
 
         {/* SOLUTIONS SECTION */}
         <section id="solutions" className="py-32 bg-white/20 border-y border-black/5">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12">
-            <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-12 rounded-[3rem] space-y-8 shadow-2xl">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center"><User className="w-6 h-6 text-primary" /></div>
-                <h3 className="text-3xl font-black uppercase tracking-tighter">For Individuals</h3>
-              </div>
-              <ul className="space-y-4">
-                {['Universal PDF Merging', 'Neural OCR Extraction', 'Visual Split & Extract', 'Smart File Compression'].map(item => (
-                  <li key={item} className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-slate-950/60">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500" /> {item}
-                  </li>
-                ))}
-              </ul>
-              <Button variant="outline" className="w-full h-14 border-black/10 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl">Start Individual Node</Button>
-            </Card>
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center space-y-4 mb-16">
+              <h2 className="text-4xl font-black uppercase tracking-tighter">Workflow <span className="text-primary">Mastery</span></h2>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Specialized solutions for individuals and enterprises</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              {/* INDIVIDUALS */}
+              <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-12 rounded-[3rem] space-y-8 shadow-2xl hover:border-primary/30 transition-all">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center"><User className="w-6 h-6 text-primary" /></div>
+                  <h3 className="text-3xl font-black uppercase tracking-tighter">For Individuals</h3>
+                </div>
+                <ul className="space-y-4">
+                  {[
+                    'Universal PDF Merging', 
+                    'Neural OCR Extraction', 
+                    'Visual Split & Extract', 
+                    'Smart File Compression'
+                  ].map(item => (
+                    <li key={item} className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-slate-950/60">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500" /> {item}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/ajn" className="block">
+                  <Button variant="outline" className="w-full h-14 border-black/10 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl">Start Individual Node</Button>
+                </Link>
+              </Card>
 
-            <Card className="bg-primary text-white border-none p-12 rounded-[3rem] space-y-8 shadow-2xl">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center"><Globe className="w-6 h-6 text-white" /></div>
-                <h3 className="text-3xl font-black uppercase tracking-tighter">For Business</h3>
-              </div>
-              <ul className="space-y-4">
-                {['High-Concurrency Batching', 'Team Workflow Sync', 'API Management Portal', 'Audit Trail & Compliance'].map(item => (
-                  <li key={item} className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-white/60">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" /> {item}
-                  </li>
-                ))}
-              </ul>
-              <Button className="w-full h-14 bg-white text-primary hover:bg-white/90 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl">Provision Team Space</Button>
-            </Card>
+              {/* BUSINESS */}
+              <Card className="bg-primary text-white border-none p-12 rounded-[3rem] space-y-8 shadow-2xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-700">
+                  <Globe className="w-64 h-64" />
+                </div>
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center"><Globe className="w-6 h-6 text-white" /></div>
+                  <h3 className="text-3xl font-black uppercase tracking-tighter">For Business</h3>
+                </div>
+                <ul className="space-y-4 relative z-10">
+                  {[
+                    'High-Concurrency Batching', 
+                    'Team Workflow Sync', 
+                    'API Management Portal', 
+                    'Audit Trail & Compliance'
+                  ].map(item => (
+                    <li key={item} className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-white/60">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" /> {item}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/login" className="block relative z-10">
+                  <Button className="w-full h-14 bg-white text-primary hover:bg-white/90 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl">Provision Team Space</Button>
+                </Link>
+              </Card>
+            </div>
           </div>
         </section>
 
@@ -178,7 +214,7 @@ export default function LandingPage() {
         <section id="pricing" className="py-32 px-6 max-w-5xl mx-auto text-center space-y-16">
           <div className="space-y-4">
             <h2 className="text-4xl font-black uppercase tracking-tighter">Transparent <span className="text-primary">Metering</span></h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Scale your processing requirements as needed</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Scalable engineering tiers for everyone</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -187,7 +223,7 @@ export default function LandingPage() {
                 <Badge className="bg-slate-950 text-white font-black text-[8px] uppercase px-3 h-5 tracking-widest">Free Node</Badge>
                 <h4 className="text-4xl font-black">$0<span className="text-sm opacity-40">/mo</span></h4>
               </div>
-              <p className="text-xs font-bold text-slate-950/40 uppercase leading-relaxed">Perfect for standard document management and individual engineering.</p>
+              <p className="text-xs font-bold text-slate-950/40 uppercase leading-relaxed">Permanent access to real-time PDF tools and professional conversions.</p>
               <div className="h-px bg-black/5" />
               <ul className="space-y-4">
                 {['50MB Max File Size', '10 Daily Tasks', 'WASM Local Engine', 'Standard PDF Tools'].map(f => (
@@ -233,8 +269,8 @@ export default function LandingPage() {
                     data-ai-hint="founder portrait"
                   />
                   <div className="absolute bottom-8 left-8 right-8 p-6 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-white/60 shadow-2xl">
-                    <p className="text-xl font-black tracking-tighter">Anjan Patel</p>
-                    <p className="text-[9px] font-black text-primary uppercase tracking-widest mt-0.5">Founder & CEO</p>
+                    <p className="text-xl font-black tracking-tighter uppercase">Anjan Patel</p>
+                    <p className="text-[9px] font-black text-primary uppercase tracking-widest mt-0.5">Architect of AJN</p>
                   </div>
                 </div>
               </motion.div>
@@ -244,7 +280,7 @@ export default function LandingPage() {
                   <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Our Story</span>
                   <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.85] uppercase">Mastering the <br /><span className="text-primary">Browser Buffer</span></h2>
                 </div>
-                <div className="prose prose-slate max-w-none text-slate-950/70 font-medium space-y-6 leading-relaxed text-lg">
+                <div className="prose prose-slate max-w-none text-slate-950/70 font-medium space-y-6 leading-relaxed text-lg uppercase tracking-widest">
                   <p>"AJN was born from a singular vision: To dismantle the barriers between complex file engineering and the everyday professional."</p>
                   <p>"We've built a Junction Network that runs entirely on local WASM and Neural processing layers. Your data should never have to leave your node to achieve professional mastery."</p>
                   <p className="font-bold text-slate-950 italic">— Anjan Patel</p>
@@ -275,7 +311,7 @@ export default function LandingPage() {
               <h2 className="text-4xl font-black uppercase tracking-tighter">Neural <span className="text-primary">Insights</span></h2>
               <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Official technological stream</p>
             </div>
-            <Button variant="ghost" className="font-black text-[10px] uppercase tracking-widest gap-2">View All Posts <ArrowRight className="w-3 h-3" /></Button>
+            <Button variant="ghost" className="font-black text-[10px] uppercase tracking-widest gap-2">View All Briefings <ArrowRight className="w-3 h-3" /></Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

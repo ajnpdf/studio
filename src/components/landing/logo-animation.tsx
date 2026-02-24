@@ -29,15 +29,9 @@ export function LogoAnimation({ className, showGlow = true }: { className?: stri
           </linearGradient>
         </defs>
 
-        {/* AJN Paths with Staggered Smart Animation */}
         <g className="logo-paths">
-          {/* A */}
           <path d="M20 100 L55 20 L90 100" className="logo-path" />
-          
-          {/* J */}
           <path d="M140 20 L140 80 Q140 105 115 100" className="logo-path delay-stagger-1" />
-          
-          {/* N */}
           <path d="M190 100 L190 20 L250 100 L250 20" className="logo-path delay-stagger-2" />
         </g>
       </svg>
@@ -49,12 +43,8 @@ export function LogoAnimation({ className, showGlow = true }: { className?: stri
           stroke-width: 6;
           stroke-linecap: round;
           stroke-linejoin: round;
-          
-          /* Dash settings for draw animation */
           stroke-dasharray: 400;
           stroke-dashoffset: 400;
-          
-          /* Smart glow & animation pipeline - Navy Blue variant */
           filter: drop-shadow(0 0 6px rgba(30, 58, 138, 0.35));
           animation: 
             draw 1.6s ease forwards,
