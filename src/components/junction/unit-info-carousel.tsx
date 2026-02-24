@@ -33,14 +33,14 @@ const defaultCards: InfoCard[] = [
     step: "Step 1"
   },
   {
-    title: "Smart Configuration",
+    title: "Configuration",
     desc: "Adjust parameters to achieve the precise output fidelity required.",
     icon: Wand2,
     color: "text-purple-600",
     step: "Step 2"
   },
   {
-    title: "Mastery Execution",
+    title: "Process Execution",
     desc: "The system executes high-concurrency logic to finalize the transformation.",
     icon: Sparkles,
     color: "text-amber-600",
@@ -48,7 +48,7 @@ const defaultCards: InfoCard[] = [
   },
   {
     title: "Secure Export",
-    desc: "Retrieve your mastered files immediately. No persistent data is retained.",
+    desc: "Retrieve your processed files immediately. No persistent data is retained.",
     icon: CheckCircle2,
     color: "text-emerald-600",
     step: "Step 4"
@@ -57,7 +57,6 @@ const defaultCards: InfoCard[] = [
 
 /**
  * AJN Unit Info Carousel - High-Fidelity Guidance
- * Implements a swipeable card deck for professional instructions.
  */
 export function UnitInfoCarousel({ unitName }: { unitName?: string }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ 

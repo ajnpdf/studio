@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
-import { Upload, X, FileIcon, ShieldCheck, Zap, Activity } from 'lucide-react';
+import { Upload, X, FileIcon, ShieldCheck, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -12,7 +12,7 @@ interface Props {
 
 /**
  * AJN DropZone - Optimized Modern UI
- * Reduced footprint (220px) for professional vertical real-estate efficiency.
+ * Professional language refactor.
  */
 export function DropZone({ onFiles, accept = "*/*" }: Props) {
   const [isDragging, setIsDragging] = useState(false);
@@ -87,14 +87,14 @@ export function DropZone({ onFiles, accept = "*/*" }: Props) {
         </motion.div>
         
         <div className="mt-6 space-y-2 text-center relative z-10 px-8">
-          <h3 className="text-xl font-black tracking-tighter text-slate-950 uppercase leading-none">Drop assets for mastery</h3>
-          <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-[0.4em]">Secure local engineering buffer</p>
+          <h3 className="text-xl font-black tracking-tighter text-slate-950 uppercase leading-none">Drop assets for processing</h3>
+          <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-[0.4em]">Secure local processing buffer</p>
         </div>
 
         <div className="absolute bottom-6 flex items-center gap-4 opacity-20 group-hover:opacity-40 transition-opacity">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-3 h-3" />
-            <span className="text-[8px] font-black uppercase tracking-widest">WASM Pipeline</span>
+            <span className="text-[8px] font-black uppercase tracking-widest">Local Pipeline</span>
           </div>
           <div className="w-1 h-1 rounded-full bg-slate-950" />
           <div className="flex items-center gap-2">

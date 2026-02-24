@@ -17,8 +17,6 @@ import {
   ShieldCheck, 
   Activity, 
   Globe, 
-  ChevronRight,
-  Sparkles,
   Layout,
   Scissors,
   Search,
@@ -186,7 +184,7 @@ export default function LandingPage() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              {/* INDIVIDUALS & STUDENTS */}
+              {/* FOR INDIVIDUALS */}
               <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-12 rounded-[3.5rem] space-y-10 shadow-2xl hover:border-primary/30 transition-all">
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center"><User className="w-7 h-7 text-primary" /></div>
@@ -209,7 +207,7 @@ export default function LandingPage() {
                 </Link>
               </Card>
 
-              {/* BUSINESS */}
+              {/* FOR BUSINESS */}
               <Card className="bg-primary text-white border-none p-12 rounded-[3.5rem] space-y-10 shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-700">
                   <Globe className="w-64 h-64" />

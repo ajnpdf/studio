@@ -18,7 +18,7 @@ import { ServicesGrid } from '@/components/junction/services-grid';
 import { UnitScroller } from '@/components/junction/unit-scroller';
 
 /**
- * AJN Hub Page - Proper Case Typography & Optimized Layout
+ * AJN Hub Page - Simple Professional Language
  */
 export default function AJNPage() {
   const [searchQuery, setSearchQuery] = useState('');

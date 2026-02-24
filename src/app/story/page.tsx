@@ -1,18 +1,16 @@
-
 "use client";
 
 import { motion } from 'framer-motion';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Zap, ShieldCheck, Cpu, Globe, CheckCircle2, Activity } from 'lucide-react';
+import { ArrowLeft, Zap, ShieldCheck, Globe, Activity } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 /**
- * AJN About Us Page - Professional Mastery Design
- * Refined layout with reduced photo footprint and real-time motion.
+ * AJN About Us Page - Simple Professional Language
  */
 export default function OurStoryPage() {
   const founderImage = PlaceHolderImages.find(img => img.id === 'founder-portrait');
@@ -42,19 +40,19 @@ export default function OurStoryPage() {
           >
             <div className="flex items-center justify-center gap-4">
               <div className="w-12 h-px bg-primary/20" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Master Mission</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Our Mission</span>
               <div className="w-12 h-px bg-primary/20" />
             </div>
             <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.85] text-slate-950">
-              Every File. One Smart <span className="text-primary">Network.</span>
+              Every File. One Simple <span className="text-primary">Network.</span>
             </h1>
             <p className="text-lg md:text-xl font-medium text-slate-950/60 max-w-2xl mx-auto leading-relaxed">
-              AJN (All-in-one Junction Network) is building the world's most advanced browser-native engineering environment for digital assets.
+              AJN (All-in-one Junction Network) provides professional browser-native tools for all your digital document needs.
             </p>
           </motion.div>
         </section>
 
-        {/* Meet the Founder - Professional Compact Layout */}
+        {/* Meet the Founder */}
         <section className="max-w-6xl mx-auto px-8 mb-40">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
             <motion.div 
@@ -77,7 +75,7 @@ export default function OurStoryPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xl font-black text-slate-950 tracking-tighter">Anjan Patel</p>
-                      <p className="text-[9px] font-black text-primary uppercase tracking-widest mt-0.5">Founder & CEO</p>
+                      <p className="text-[9px] font-black text-primary uppercase tracking-widest mt-0.5">Founder</p>
                     </div>
                     <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20">
                       <Activity className="w-4 h-4 text-primary animate-pulse" />
@@ -85,9 +83,6 @@ export default function OurStoryPage() {
                   </div>
                 </div>
               </div>
-              
-              {/* Decorative background element */}
-              <div className="absolute -z-10 -bottom-6 -right-6 w-full h-full border-2 border-dashed border-primary/20 rounded-[3rem]" />
             </motion.div>
 
             <motion.div 
@@ -97,17 +92,17 @@ export default function OurStoryPage() {
               className="lg:col-span-7 space-y-8"
             >
               <h2 className="text-4xl md:text-5xl font-black tracking-tighter leading-none text-slate-950">
-                A Vision for Real-Time <span className="text-primary">Mastery</span>
+                A Vision for Real-Time <span className="text-primary">Simplicity</span>
               </h2>
               <div className="prose prose-slate max-w-none text-slate-950/70 font-medium space-y-6 leading-relaxed text-base md:text-lg">
                 <p>
-                  "Our journey started with a singular, powerful ambition: To dismantle the barriers between complex file engineering and the everyday professional."
+                  "Our journey started with a singular, powerful ambition: To simplify complex file processing for every professional."
                 </p>
                 <p>
-                  "AJN was designed to solve this by bringing high-concurrency WASM (WebAssembly) and Neural Intelligence directly into your local browser buffer. We believe your data should never leave your node."
+                  "AJN was designed to solve this by bringing professional tools directly into your local browser. We believe your data should never leave your possession."
                 </p>
                 <p className="font-bold text-slate-950 italic">
-                  — Anjan Patel, Founder & CEO
+                  — Anjan Patel, Founder
                 </p>
               </div>
               <div className="flex gap-4 pt-4">
@@ -115,13 +110,7 @@ export default function OurStoryPage() {
                   <div className="w-12 h-12 bg-white/60 backdrop-blur-xl rounded-2xl border border-black/5 flex items-center justify-center shadow-xl">
                     <Globe className="w-5 h-5 text-primary" />
                   </div>
-                  <span className="text-[8px] font-black text-slate-950/40 uppercase tracking-widest">Global Ops</span>
-                </div>
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 bg-white/60 backdrop-blur-xl rounded-2xl border border-black/5 flex items-center justify-center shadow-xl">
-                    <Cpu className="w-5 h-5 text-primary" />
-                  </div>
-                  <span className="text-[8px] font-black text-slate-950/40 uppercase tracking-widest">Neural v2.5</span>
+                  <span className="text-[8px] font-black text-slate-950/40 uppercase tracking-widest">Global Access</span>
                 </div>
               </div>
             </motion.div>
@@ -132,15 +121,15 @@ export default function OurStoryPage() {
         <section className="bg-white/40 backdrop-blur-3xl py-32 border-y border-black/5">
           <div className="max-w-6xl mx-auto px-8">
             <div className="text-center space-y-4 mb-20">
-              <h2 className="text-4xl font-black tracking-tighter uppercase text-slate-950">Our Engineering Pillars</h2>
-              <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-[0.4em]">The Architecture of Excellence</p>
+              <h2 className="text-4xl font-black tracking-tighter uppercase text-slate-950">Our Core Features</h2>
+              <p className="text-[10px] font-black text-slate-950/40 uppercase tracking-[0.4em]">The Standards of Excellence</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
               {[
-                { icon: Zap, title: "Velocity", desc: "Hardware-accelerated processing in your local browser sandbox." },
-                { icon: ShieldCheck, title: "Sovereignty", desc: "No permanent storage. Your data remains yours, always." },
-                { icon: Activity, title: "Intelligence", desc: "Integrating neural layers for smart layout and logic analysis." }
+                { icon: Zap, title: "Fast Processing", desc: "Optimized local execution in your secure browser buffer." },
+                { icon: ShieldCheck, title: "Privacy", desc: "No permanent storage. Your data remains yours, always." },
+                { icon: Activity, title: "Advanced Tools", desc: "Professional tools for document analysis and transformation." }
               ].map((item, i) => (
                 <div key={i} className="p-10 bg-white/60 rounded-[3rem] border border-black/5 shadow-xl space-y-6 hover:border-primary/20 transition-all group">
                   <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -165,14 +154,11 @@ export default function OurStoryPage() {
           
           <div className="flex flex-col items-center gap-4">
             <p className="text-[11px] font-black text-slate-950/20 tracking-[0.5em] uppercase">
-              AJN Engineering Core • 2025
+              AJN Core • 2025
             </p>
             <div className="flex items-center gap-2.5 px-5 py-2 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
               <span className="text-[10px] font-black text-primary uppercase tracking-widest">Made by Indian ❤️</span>
             </div>
-            <p className="text-[9px] font-bold text-slate-950/30 uppercase tracking-widest">
-              Contact: anjanpatel325@gmail.com
-            </p>
           </div>
         </footer>
       </main>

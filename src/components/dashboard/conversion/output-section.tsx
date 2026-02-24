@@ -17,7 +17,7 @@ interface Props {
 
 /**
  * AJN Compact Output Sector
- * Professional Proper Case cards with high-fidelity stats.
+ * Professional language refactor.
  */
 export function OutputSection({ jobs, onPreview, onClear }: Props) {
   const handleDownload = (job: OutputBuffer) => {
@@ -38,7 +38,7 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
   const handleShare = async (job: OutputBuffer) => {
     toast({
       title: "Generating Access",
-      description: "Provisioning HMAC-signed URL...",
+      description: "Provisioning access link...",
     });
     await new Promise(r => setTimeout(r, 1000));
     navigator.clipboard.writeText(`https://ajn.io/sh/${job.id}`);
@@ -56,7 +56,7 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
           </div>
           <h3 className="text-xs font-black text-emerald-600">
-            Mastered Buffer ({jobs.length})
+            Processed Buffer ({jobs.length})
           </h3>
         </div>
         <button onClick={onClear} className="text-[10px] font-black text-red-500 hover:text-red-600 transition-colors flex items-center gap-2">
@@ -84,7 +84,7 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="text-sm font-black truncate text-slate-950">{job.fileName}</h4>
-                        <Badge className="bg-emerald-500 text-white border-none text-[8px] font-black px-2 h-4.5 rounded-full">Mastered</Badge>
+                        <Badge className="bg-emerald-500 text-white border-none text-[8px] font-black px-2 h-4.5 rounded-full">Processed</Badge>
                       </div>
                       <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">
                         {job.sizeFormatted} • Verified Secure

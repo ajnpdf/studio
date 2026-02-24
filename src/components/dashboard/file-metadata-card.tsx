@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -7,14 +6,8 @@ import {
   FileIcon, 
   Shield, 
   CheckCircle2, 
-  Wand2, 
   X, 
   Loader2, 
-  Info,
-  Layers,
-  Clock,
-  Maximize,
-  ArrowRight,
   Sparkles
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
@@ -143,12 +136,6 @@ export function FileMetadataCard({ file, onRemove, viewMode }: Props) {
                     <p className="text-sm font-bold">{file.metadata.pages} Pages</p>
                   </div>
                 )}
-                {file.metadata.duration && (
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Duration</p>
-                    <p className="text-sm font-bold">{file.metadata.duration}</p>
-                  </div>
-                )}
               </div>
             )}
 
@@ -158,7 +145,7 @@ export function FileMetadataCard({ file, onRemove, viewMode }: Props) {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-primary" />
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">AI Smart Recommendations</h4>
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Recommended Tools</h4>
                   </div>
                 </div>
 

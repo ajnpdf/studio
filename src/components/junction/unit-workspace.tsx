@@ -305,7 +305,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                 )}
                 
                 {phase === 'running' && (
-                  <motion.div key="running" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="max-w-3xl mx-auto w-full pt-12">
+                  <motion.div key="running" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="max-w-3xl auto w-full pt-12">
                     <Card className="p-8 md:p-12 bg-white/60 border-2 border-black/5 rounded-[3rem] space-y-10 shadow-2xl backdrop-blur-3xl">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4 text-primary">
