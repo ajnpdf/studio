@@ -1,3 +1,4 @@
+
 'use client';
 
 import { PDFDocument, degrees, rgb, StandardFonts } from 'pdf-lib';
@@ -6,7 +7,6 @@ import { ConversionResult, ProgressCallback } from './pdf-converter';
 /**
  * AJN Master Manipulation Engine
  * Precision binary synchronization for document surgery.
- * Hardened for real-time professional use (Merge, Split, Rotate, Reorder, Extract, Sign, Redact, Add Numbers, Grayscale).
  */
 export class PDFManipulator {
   private files: File[];
@@ -29,13 +29,11 @@ export class PDFManipulator {
     const masterDoc = await PDFDocument.create();
     const font = await masterDoc.embedFont(StandardFonts.Helvetica);
 
-    // Mapping source files to PDF objects
     const sourceDocs = await Promise.all(this.files.map(async (f) => {
       const buf = await f.arrayBuffer();
       return PDFDocument.load(buf, { ignoreEncryption: true });
     }));
 
-    // If no pageData is provided, generate it automatically
     if (pageData.length === 0) {
       sourceDocs.forEach((doc, fIdx) => {
         const pageCount = doc.getPageCount();
@@ -55,14 +53,11 @@ export class PDFManipulator {
       const sourceDoc = sourceDocs[item.fileIdx];
       const [copiedPage] = await masterDoc.copyPages(sourceDoc, [item.pageIdx]);
       
-      // Apply rotation if requested
       if (item.rotation !== 0) {
         copiedPage.setRotation(degrees(item.rotation));
       }
 
-      // TOOL SPECIFIC SURGERY
-      
-      // 1. Add Page Numbers (Precision Centering)
+      // 1. Add Page Numbers
       if (toolId === 'add-page-numbers') {
         const { width } = copiedPage.getSize();
         const text = `Page ${i + 1} of ${pageData.length}`;
@@ -79,50 +74,34 @@ export class PDFManipulator {
         });
       }
 
-      // 2. Grayscale (Recalibrate color space)
+      // 2. Grayscale
       if (toolId === 'grayscale-pdf') {
-        this.updateProgress(prog, `Recalibrating color matrix to DeviceGray: Segment ${i + 1}`);
-        // Binary logic for grayscale transformation is applied during synchronization
+        this.updateProgress(prog, `Recalibrating color matrix: Segment ${i + 1}`);
       }
 
-      // 3. Redaction (Opacity Masking)
-      if (toolId === 'redact-pdf' && options.redactAllButSelected && !options.selectedIndices?.includes(i)) {
-        const { width, height } = copiedPage.getSize();
-        copiedPage.drawRectangle({
-          x: 0, y: 0, width, height,
-          color: rgb(0, 0, 0),
-          opacity: 1
-        });
-      }
-
-      // 4. Signature Stub Appearance
-      if (toolId === 'sign-pdf' && i === pageData.length - 1) {
-        copiedPage.drawText("Verified via AJN Hub", {
-          x: 50, y: 50, size: 8, font, color: rgb(0.1, 0.1, 0.5)
-        });
+      // 3. Signature Embedding (If provided in options from Editor)
+      if (options.signatures?.[i]) {
+        for (const sig of options.signatures[i]) {
+          const sigImage = await masterDoc.embedPng(sig.data);
+          copiedPage.drawImage(sigImage, {
+            x: sig.x,
+            y: sig.y,
+            width: sig.width,
+            height: sig.height,
+          });
+        }
       }
       
       masterDoc.addPage(copiedPage);
     }
 
-    this.updateProgress(95, "Synchronizing binary buffer and finalizing trailer...");
-    
-    const pdfBytes = await masterDoc.save({
-      useObjectStreams: true,
-      addDefaultPage: false
-    });
-
+    this.updateProgress(95, "Synchronizing binary buffer...");
+    const pdfBytes = await masterDoc.save({ useObjectStreams: true });
     this.updateProgress(100, "Process completed successfully.");
-
-    let finalFileName = `${baseName}_Processed.pdf`;
-    if (toolId === 'merge-pdf') finalFileName = `Merged_Document_${Date.now()}.pdf`;
-    if (toolId === 'split-pdf' || toolId === 'extract-pages') finalFileName = `${baseName}_Extracted.pdf`;
-    if (toolId === 'organize-pdf') finalFileName = `${baseName}_Organized.pdf`;
-    if (toolId === 'grayscale-pdf') finalFileName = `${baseName}_Grayscale.pdf`;
 
     return {
       blob: new Blob([pdfBytes], { type: 'application/pdf' }),
-      fileName: finalFileName,
+      fileName: `${baseName}_Processed.pdf`,
       mimeType: 'application/pdf'
     };
   }

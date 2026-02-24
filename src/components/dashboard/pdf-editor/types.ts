@@ -42,7 +42,7 @@ export interface PDFElement {
   
   // Signature specific
   signatureType?: 'draw' | 'type' | 'upload';
-  signatureData?: string;
+  signatureData?: string; // Data URI or path
   
   // Form field specific
   fieldType?: 'text' | 'checkbox' | 'radio' | 'dropdown';

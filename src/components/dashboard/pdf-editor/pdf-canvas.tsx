@@ -14,9 +14,10 @@ interface Props {
   onSelectElement: (id: string | null) => void;
   onUpdateElement: (el: PDFElement) => void;
   onAddElement: (el: PDFElement) => void;
+  onRequestSignature: (x: number, y: number) => void;
 }
 
-export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectElement, onUpdateElement, onAddElement }: Props) {
+export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectElement, onUpdateElement, onAddElement, onRequestSignature }: Props) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -27,12 +28,17 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
   const pageHeight = 842;
 
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
-    if (activeTool !== 'select') {
-      const rect = canvasRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      const x = (e.clientX - rect.left) / scale;
-      const y = (e.clientY - rect.top) / scale;
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = (e.clientX - rect.left) / scale;
+    const y = (e.clientY - rect.top) / scale;
 
+    if (activeTool === 'signature') {
+      onRequestSignature(x, y);
+      return;
+    }
+
+    if (activeTool !== 'select') {
       const baseEl: Partial<PDFElement> = {
         id: Math.random().toString(36).substr(2, 9),
         x,
@@ -167,9 +173,17 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
               <div className="w-full h-full" style={{ backgroundColor: el.color }} />
             )}
 
-            {el.type === 'signature' && (
+            {el.type === 'signature' && el.signatureData && (
+              <img 
+                src={el.signatureData} 
+                className="w-full h-full object-contain pointer-events-none" 
+                alt="Signature"
+              />
+            )}
+
+            {el.type === 'signature' && !el.signatureData && (
               <div className="w-full h-full flex items-center justify-center border border-dashed border-primary/40 bg-primary/5">
-                <span className="text-2xl italic font-serif" style={{ color: el.color }}>{el.content}</span>
+                <span className="text-[10px] font-black uppercase text-primary/40">Signature Area</span>
               </div>
             )}
 

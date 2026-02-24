@@ -6,6 +6,7 @@ import { PDFToolbar } from './pdf-toolbar';
 import { PDFThumbnailStrip } from './pdf-thumbnail-strip';
 import { PDFCanvas } from './pdf-canvas';
 import { PDFPropertiesPanel } from './pdf-properties-panel';
+import { SignatureDialog } from './signature-dialog';
 import { PDFDocument, PDFPage, PDFTool, PDFElement, PDFVersion } from './types';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
@@ -40,12 +41,15 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [zoom, setZoom] = useState(100);
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  const [sigOpen, setSigOpen] = useState(false);
+  const [pendingSigPos, setPendingSigPos] = useState<{x: number, y: number} | null>(null);
+
   const { toast } = useToast();
 
   const activePage = doc.pages[activePageIdx];
   const selectedElement = activePage.elements.find(el => el.id === selectedElementId) || null;
 
-  // Step 4: Maintain undo/redo command stack (50 operations)
   const pushToHistory = useCallback((newDoc: PDFDocument) => {
     const newHistory = history.slice(0, historyIndex + 1);
     newHistory.push(newDoc);
@@ -96,18 +100,42 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
     setSelectedElementId(element.id);
   };
 
+  const handleRequestSignature = (x: number, y: number) => {
+    setPendingSigPos({ x, y });
+    setSigOpen(true);
+  };
+
+  const handleAdoptSignature = (data: string, type: 'draw' | 'type' | 'upload') => {
+    if (!pendingSigPos) return;
+    
+    const newSig: PDFElement = {
+      id: Math.random().toString(36).substr(2, 9),
+      type: 'signature',
+      x: pendingSigPos.x,
+      y: pendingSigPos.y,
+      width: 200,
+      height: 80,
+      signatureData: data,
+      signatureType: type,
+      opacity: 1,
+      zIndex: activePage.elements.length,
+    };
+
+    handleAddElement(newSig);
+    setPendingSigPos(null);
+    setActiveTool('select');
+  };
+
   const handleSave = async () => {
     setIsProcessing(true);
     toast({ title: "Saving Changes", description: "Serializing modified content streams..." });
-    // Step 5: On save logic simulation
     await new Promise(r => setTimeout(r, 2000));
     setIsProcessing(false);
-    toast({ title: "Mastery Complete", description: "PDF has been updated incrementally." });
+    toast({ title: "Process Successful", description: "Document has been synchronized." });
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-[#0a0e1f]">
-      {/* TOP TOOLBAR */}
+    <div className="flex flex-col h-full overflow-hidden bg-[#0a0e1f] font-sans">
       <PDFToolbar 
         activeTool={activeTool} 
         setActiveTool={setActiveTool}
@@ -124,7 +152,6 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
       />
 
       <div className="flex flex-1 min-h-0 overflow-hidden relative">
-        {/* LEFT THUMBNAILS */}
         <PDFThumbnailStrip 
           pages={doc.pages} 
           activeIdx={activePageIdx} 
@@ -132,7 +159,6 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
           onReorder={() => {}}
         />
 
-        {/* MAIN CANVAS */}
         <div className="flex-1 bg-[#0a0e1f] overflow-auto flex justify-center p-12 scrollbar-hide relative">
           <PDFCanvas 
             page={activePage} 
@@ -142,10 +168,10 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
             onSelectElement={setSelectedElementId}
             onUpdateElement={handleUpdateElement}
             onAddElement={handleAddElement}
+            onRequestSignature={handleRequestSignature}
           />
         </div>
 
-        {/* RIGHT PROPERTIES */}
         <PDFPropertiesPanel 
           element={selectedElement}
           onUpdate={handleUpdateElement}
@@ -164,6 +190,12 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
           }}
         />
       </div>
+
+      <SignatureDialog 
+        open={sigOpen} 
+        onOpenChange={setSigOpen} 
+        onSave={handleAdoptSignature} 
+      />
 
       {isProcessing && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center">
