@@ -20,9 +20,9 @@ export function AIThinking() {
       </div>
 
       <div className="space-y-2">
-        <h4 className="text-lg font-black tracking-tight text-gradient">AI is thinking...</h4>
+        <h4 className="text-lg font-black tracking-tight text-gradient">Processing...</h4>
         <p className="text-xs text-muted-foreground max-w-[200px] leading-relaxed font-medium uppercase tracking-widest">
-          Contextualizing document structure and identifying semantic patterns
+          Analyzing document structure and identifying patterns
         </p>
       </div>
 

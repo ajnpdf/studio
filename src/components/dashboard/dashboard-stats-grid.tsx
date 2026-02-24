@@ -7,7 +7,7 @@ const stats = [
   { label: 'Session Files', value: '0', icon: FileIcon, color: 'text-blue-400', bg: 'bg-blue-400/10' },
   { label: 'Network Load', value: 'Optimal', icon: Activity, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
   { label: 'Transformations', value: '0', icon: Repeat, color: 'text-purple-400', bg: 'bg-purple-400/10' },
-  { label: 'AI Credits', value: '10', icon: BrainCircuit, color: 'text-primary', bg: 'bg-primary/10' },
+  { label: 'Credits', value: '10', icon: BrainCircuit, color: 'text-primary', bg: 'bg-primary/10' },
 ];
 
 export function DashboardStatsGrid() {

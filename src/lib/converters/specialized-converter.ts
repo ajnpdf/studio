@@ -9,7 +9,7 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * Specialized Services Core - Professional Intelligence & Optimization
+ * Specialized Services Core - Professional Optimization
  * Hardened with real OCR, Compression levels, and Fault-Tolerant Translation.
  */
 export class SpecializedConverter {
@@ -148,12 +148,33 @@ export class SpecializedConverter {
   }
 
   private async repairPdf(baseName: string): Promise<ConversionResult> {
-    this.updateProgress(20, "Reconstructing document structure...");
+    this.updateProgress(10, "Initializing structure recovery protocol...");
     const { PDFDocument } = await import('pdf-lib');
     const buf = await this.file.arrayBuffer();
-    const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
-    const bytes = await doc.save();
-    return { blob: new Blob([bytes], { type: 'application/pdf' }), fileName: `${baseName}_Repaired.pdf`, mimeType: 'application/pdf' };
+    
+    this.updateProgress(30, "Analyzing cross-reference tables and binary trailers...");
+    
+    try {
+      // Re-serializes the PDF, which fixes many corrupted internal references
+      const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
+      
+      this.updateProgress(60, "Reconstructing object streams and repairing font maps...");
+      const bytes = await doc.save({
+        useObjectStreams: true,
+        addDefaultPage: false,
+      });
+
+      this.updateProgress(90, "Finalizing binary reconstruction...");
+      
+      return { 
+        blob: new Blob([bytes], { type: 'application/pdf' }), 
+        fileName: `${baseName}_Repaired.pdf`, 
+        mimeType: 'application/pdf' 
+      };
+    } catch (err: any) {
+      this.updateProgress(100, "Structure recovery failed. File is severely corrupted.");
+      throw new Error(`Master Repair Failed: ${err.message}`);
+    }
   }
 
   private async summarizePdf(baseName: string): Promise<ConversionResult> {

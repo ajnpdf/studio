@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -80,7 +79,7 @@ export function UploadManager() {
       await new Promise(r => setTimeout(r, 100));
     }
 
-    // 2. Neural Scanning
+    // 2. System Scanning
     setFiles(prev => prev.map(f => f.id === id ? { ...f, state: 'scanning' } : f));
     await new Promise(r => setTimeout(r, 800));
 
@@ -116,7 +115,7 @@ export function UploadManager() {
       <div className="flex flex-wrap gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl">
         <div className="flex items-center gap-2">
           <Activity className="w-4 h-4 text-white" />
-          <span className="text-[10px] font-black uppercase text-white/60">Local Neural Processing Active</span>
+          <span className="text-[10px] font-black uppercase text-white/60">Local Fast Processing Active</span>
         </div>
         <div className="flex items-center gap-2">
           <Shield className="w-4 h-4 text-white" />

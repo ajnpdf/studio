@@ -29,11 +29,11 @@ export function SponsoredUnit() {
               <Zap className="w-3.5 h-3.5 text-primary" />
             </div>
             <p className="text-[10px] font-black uppercase tracking-tighter text-slate-950">
-              Neural Optimization
+              Fast Optimization
             </p>
           </div>
           <p className="text-[9px] font-bold text-slate-950/40 uppercase leading-tight tracking-wide">
-            Accelerate your engineering workflow with AJN Pro mastery.
+            Accelerate your workflow with AJN Pro mastery.
           </p>
         </div>
 

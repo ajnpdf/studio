@@ -41,10 +41,10 @@ export function AIToolsContainer() {
           )}
           <div className="space-y-0.5">
             <h1 className="text-sm font-black tracking-tighter uppercase">
-              {selectedTool ? selectedTool.title : 'AI Tools Suite'}
+              {selectedTool ? selectedTool.title : 'Advanced Tools Suite'}
             </h1>
             <p className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase flex items-center gap-1.5">
-              <Sparkles className="w-3 h-3 text-primary" /> Intelligence Layer
+              <Sparkles className="w-3 h-3 text-primary" /> System Layer
             </p>
           </div>
         </div>
@@ -65,9 +65,9 @@ export function AIToolsContainer() {
           {!selectedTool ? (
             <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
               <section className="text-center space-y-3">
-                <h2 className="text-4xl font-black tracking-tighter">Cognitive File Mastery</h2>
+                <h2 className="text-4xl font-black tracking-tighter">Professional File Processing</h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto font-medium">
-                  Go beyond conversion. Understand content, extract insights, and generate professional deliverables with SUFW's integrated intelligence models.
+                  Go beyond conversion. Understand content, extract insights, and generate professional deliverables with integrated processing models.
                 </p>
               </section>
               <AIGrid onSelect={setSelectedTool} />
@@ -82,7 +82,7 @@ export function AIToolsContainer() {
                     <p className="text-xs text-muted-foreground">Your files are processed securely and never used for training models without permission.</p>
                   </div>
                 </div>
-                <Button variant="outline" className="border-primary/20 text-primary font-bold text-xs">VIEW AI TERMS</Button>
+                <Button variant="outline" className="border-primary/20 text-primary font-bold text-xs">VIEW TERMS</Button>
               </section>
             </div>
           ) : (
