@@ -6,13 +6,14 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { ProgressCallback, ConversionResult } from './pdf-converter';
 import { runFileIntelligence } from '@/ai/flows/file-intelligence';
 
+// Configure PDF.js worker
 if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 }
 
 /**
  * AJN Specialized Services Core - Master Vision & Intelligence Engine
- * Handles OCR, Redaction, Translation, Comparison, and Summarization.
+ * Handles OCR, Translation, Comparison, and Summarization.
  */
 export class SpecializedConverter {
   private file: File;
@@ -50,7 +51,7 @@ export class SpecializedConverter {
     const arrayBuffer = await this.file.arrayBuffer();
     
     // Step 1: Load original PDF to analyze layout
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
     const pdfDoc = await PDFDocument.create();
     const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
@@ -78,13 +79,13 @@ export class SpecializedConverter {
         // Map transform coordinates (index 4 and 5 are X and Y)
         const x = item.transform[4];
         const y = item.transform[5];
-        const fontSize = Math.abs(item.transform[0]); // Font size is usually the scale factor
+        const fontSize = Math.abs(item.transform[0]); 
 
         try {
           newPage.drawText(translatedText, {
             x: x,
             y: y,
-            size: Math.max(4, fontSize * 0.9), // Adjusted for typical language expansion
+            size: Math.max(4, fontSize * 0.9), 
             font: helvetica,
             color: rgb(0, 0, 0),
           });
@@ -104,9 +105,6 @@ export class SpecializedConverter {
     };
   }
 
-  /**
-   * TOOL 29: COMPARE PDF (Myers Diff + Visual Diff)
-   */
   async comparePdf(baseName: string, settings: any): Promise<ConversionResult> {
     this.updateProgress(10, "Initializing dual-buffer alignment and sim-score matching...");
     await new Promise(r => setTimeout(r, 1500));
@@ -124,14 +122,11 @@ export class SpecializedConverter {
     };
   }
 
-  /**
-   * TOOL 31: SUMMARIZE PDF (Neural Briefing)
-   */
   private async summarizePdf(baseName: string, settings: any): Promise<ConversionResult> {
     this.updateProgress(10, "Extracting text corpus for neural analysis...");
     
     const arrayBuffer = await this.file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
     let fullText = '';
 
     for (let i = 1; i <= pdf.numPages; i++) {
@@ -167,14 +162,15 @@ export class SpecializedConverter {
   private async toSearchablePdf(baseName: string): Promise<ConversionResult> {
     this.updateProgress(10, "Parsing document tree for classification...");
     const arrayBuffer = await this.file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     const pdfDoc = await PDFDocument.load(arrayBuffer);
     const pages = pdfDoc.getPages();
     const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const progBase = 15 + Math.round((i / pdf.numPages) * 80);
-      const page = await pdf.getPage(i);
+    const pdfJsDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+
+    for (let i = 1; i <= pdfJsDoc.numPages; i++) {
+      const progBase = 15 + Math.round((i / pdfJsDoc.numPages) * 80);
+      const page = await pdfJsDoc.getPage(i);
       
       this.updateProgress(progBase, `Rendering Page ${i} to 300 DPI buffer...`);
       const viewport = page.getViewport({ scale: 2.5 });

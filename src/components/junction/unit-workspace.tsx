@@ -19,16 +19,15 @@ interface Props {
 
 /**
  * AJN Unit Workspace - Focused Full-Width Layout
- * Sidebars and configuration boxes removed for professional engineering focus.
+ * Redundant sidebars and configuration boxes removed for professional focus.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
-  const [config] = useState<any>({});
   const [latency, setLatency] = useState<string | null>(null);
   const unit = ALL_UNITS.find(u => u.id === initialUnitId);
   const { phase, progress, logs, result, run, reset } = useAJNTool(initialUnitId || 'merge-pdf');
 
   useEffect(() => {
-    // FIX: Generate random values only on client to prevent hydration mismatch
+    // Generate random values only on client to prevent hydration mismatch
     setLatency((Math.random() * 50 + 10).toFixed(0));
   }, []);
 
@@ -53,7 +52,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleFilesAdded = (files: File[]) => {
-    run(files, config);
+    run(files, {});
   };
 
   const handleDownload = () => {
@@ -102,7 +101,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/40 border border-black/5 rounded-2xl shadow-sm">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span className="text-[10px] font-black text-slate-950/60 uppercase tracking-widest">End-to-End Secure</span>
+                  <span className="text-[10px] font-black text-slate-950/60 uppercase tracking-widest">End-To-End Secure</span>
                 </div>
               </div>
             </header>
