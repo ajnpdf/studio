@@ -13,12 +13,10 @@ import {
   Activity, 
   XCircle, 
   Trash2, 
-  Eye, 
-  Layers,
   ChevronRight
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { ALL_UNITS } from './services-grid';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
@@ -41,7 +39,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [sourceFiles, setSourceFiles] = useState<File[]>([]);
   const [pages, setPages] = useState<{ id: number, url: string }[]>([]);
   const [selectedPages, setSelectedPages] = useState<Set<number>>(new Set());
-  const [isLoadingPages, setIsLoadingPages] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
@@ -73,7 +70,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const loadPdfPages = async (file: File) => {
-    setIsLoadingPages(true);
     setPhase('selecting' as any);
     try {
       const arrayBuffer = await file.arrayBuffer();
@@ -91,8 +87,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       setPages(loadedPages);
     } catch (err) {
       toast({ title: "Load Error", description: "Failed to parse PDF pages.", variant: "destructive" });
-    } finally {
-      setIsLoadingPages(false);
     }
   };
 

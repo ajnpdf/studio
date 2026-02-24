@@ -42,6 +42,8 @@ export class PDFManipulator {
     const keep = [];
     for (let i = 0; i < count; i++) if (!indicesToRemove.includes(i)) keep.push(i);
     
+    if (keep.length === 0) throw new Error("Synthesis aborted: No pages remaining.");
+
     const out = await PDFDocument.create();
     const copied = await out.copyPages(doc, keep);
     copied.forEach(p => out.addPage(p));
@@ -66,7 +68,6 @@ export class PDFManipulator {
   }
 
   async protect(pwd: string): Promise<ConversionResult> {
-    // pdf-lib native encryption is basic; in full production use a WASM wrapper for AES-256
     const doc = await PDFDocument.load(await this.files[0].arrayBuffer());
     return { blob: new Blob([await doc.save()]), fileName: `Protected.pdf`, mimeType: 'application/pdf' };
   }

@@ -25,21 +25,21 @@ class AJNPDFEngine {
     let result: { blob: Blob; fileName: string; mimeType: string };
 
     try {
-      // 1. INTELLIGENCE (Priority Routing)
+      // 1. INTELLIGENCE LAYER (Explicit Routing)
       if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf'].includes(toolId)) {
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
         const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Intelligence", detail: m, pct: p }));
         const map: Record<string, string> = { 'translate-pdf': 'TRANSLATE', 'ocr-pdf': 'OCR', 'summarize-pdf': 'SUMMARIZE', 'compare-pdf': 'COMPARE' };
         result = await converter.convertTo(map[toolId], options);
       } 
-      // 2. EXPORT (PDF to X)
+      // 2. EXPORT CORE (PDF to X)
       else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt'].includes(toolId)) {
         const { PDFConverter } = await import('@/lib/converters/pdf-converter');
         const converter = new PDFConverter(firstFile, (p, m) => onProgressCallback({ stage: "Synthesis", detail: m, pct: p }));
         const map: Record<string, string> = { 'pdf-jpg': 'JPG', 'pdf-png': 'PNG', 'pdf-webp': 'WEBP', 'pdf-word': 'WORD', 'pdf-pptx': 'PPTX', 'pdf-excel': 'EXCEL', 'pdf-txt': 'TXT' };
         result = await converter.convertTo(map[toolId], options);
       }
-      // 3. DEVELOPMENT (X to PDF)
+      // 3. DEVELOPMENT CORE (X to PDF)
       else if (toolId.endsWith('-pdf')) {
         const source = toolId.split('-')[0];
         if (['jpg', 'jpeg', 'png', 'webp'].includes(source)) {

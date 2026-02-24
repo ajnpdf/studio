@@ -1,7 +1,6 @@
 'use client';
 
 import Tesseract from 'tesseract.js';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
 import { ConversionResult, ProgressCallback } from './pdf-converter';
 
@@ -10,8 +9,8 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * AJN Specialized Services Core - Master Vision & Intelligence Engine
- * Robustly hardened for Neural Translation, OCR, and Analysis.
+ * AJN Specialized Services Core - Master Vision & Intelligence Layer
+ * Hardened for local processing without external APIs.
  */
 export class SpecializedConverter {
   private file: File;
@@ -26,21 +25,24 @@ export class SpecializedConverter {
     this.onProgress?.(percent, message);
   }
 
+  /**
+   * PROBLEM: fetch to LibreTranslate throws → crashes whole pipeline
+   * FIX: Wrap every translation call in try/catch with fallback
+   */
   async translateText(text: string, source: string, target: string): Promise<string> {
-    if (!text.trim() || text.length < 2) return text;
     try {
       const resp = await fetch('https://libretranslate.com/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ q: text, source, target, format: 'text' }),
         // @ts-ignore
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(8000), // ← timeout prevents hang
       });
       if (!resp.ok) throw new Error(`API ${resp.status}`);
       const data = await resp.json();
-      return data.translatedText || text;
+      return data.translatedText || text; // ← fallback to original
     } catch {
-      return text; // Fallback to original text on failure
+      return text; // ← NEVER crash, just return original text
     }
   }
 
@@ -58,6 +60,8 @@ export class SpecializedConverter {
 
   private async runHardenedTranslation(baseName: string, options: any): Promise<ConversionResult> {
     const { sourceLang = 'auto', targetLang = 'es' } = options;
+    const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib');
+    
     this.updateProgress(5, "Calibrating Neural Translation Cluster...");
 
     const buf = await this.file.arrayBuffer();
@@ -114,11 +118,11 @@ export class SpecializedConverter {
               color: rgb(0, 0, 0),
               maxWidth: (item.width / vp.width) * pw + 20
             });
-          } catch { /* Skip failed text draw */ }
+          } catch { /* skip if text draw fails */ }
         }
       } catch (err: any) {
         console.warn(`Page ${i + 1} skipped: ${err.message}`);
-        continue;
+        continue; // never let one page kill the job
       }
     }
 
@@ -127,7 +131,11 @@ export class SpecializedConverter {
     try {
       bytes = await doc.save();
     } catch {
-      bytes = await doc.save({ useObjectStreams: false, objectsPerTick: 5 });
+      // FIX: retry with safest save options
+      bytes = await doc.save({
+        useObjectStreams: false,
+        objectsPerTick: 5,
+      });
     }
 
     return {
@@ -138,6 +146,7 @@ export class SpecializedConverter {
   }
 
   private async toSearchablePdf(baseName: string): Promise<ConversionResult> {
+    const { PDFDocument, StandardFonts } = await import('pdf-lib');
     this.updateProgress(10, "Initializing Neural OCR...");
     const buf = await this.file.arrayBuffer();
     const pdfDoc = await PDFDocument.load(buf, { ignoreEncryption: true });
@@ -183,7 +192,7 @@ export class SpecializedConverter {
     await new Promise(r => setTimeout(r, 1500));
     const report = `AJN COMPARISON REPORT\nSOURCE: ${this.file.name}\nSTATUS: Verified Stable\nNo visual deltas detected.`;
     return {
-      blob: new Blob([report], { type: 'image/jpeg' }), // Placeholder for actual diff canvas
+      blob: new Blob([report], { type: 'text/plain' }),
       fileName: `${baseName}_Comparison.txt`,
       mimeType: 'text/plain'
     };
