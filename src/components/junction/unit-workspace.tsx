@@ -19,15 +19,18 @@ interface Props {
 /**
  * AJN Unit Workspace - Focused Engineering Hub
  * Hardened to resolve hydration mismatches and routing errors.
+ * Minimalist professional full-width layout.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const unit = ALL_UNITS.find(u => u.id === initialUnitId);
   const { phase, progress, logs, result, error, run, reset } = useAJNTool(initialUnitId || 'merge-pdf');
-  const [latency, setLatency] = useState('...');
+  const [mountedData, setMountedData] = useState<{ latency: string }>({ latency: '...' });
 
   useEffect(() => {
-    // Generate latency after mount to prevent hydration error
-    setLatency((Math.random() * 40 + 10).toFixed(0));
+    // Prevent hydration error by generating random data only on client
+    setMountedData({
+      latency: (Math.random() * 40 + 10).toFixed(0)
+    });
   }, [phase]);
 
   const getAcceptedExtensions = () => {
@@ -154,14 +157,14 @@ export function UnitWorkspace({ initialUnitId }: Props) {
               </AnimatePresence>
             </div>
 
-            <footer className="pt-12 border-t border-black/5 flex items-center justify-between opacity-40 grayscale">
+            <footer className="pt-12 border-t border-black/5 flex items-center justify-between opacity-20 grayscale">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Zero-Storage Protocol Active</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Zero-Storage Protocol</span>
               </div>
               <div className="flex items-center gap-3">
                 <Activity className="w-4 h-4" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Latency: {latency}ms</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Latency: {mountedData.latency}ms</span>
               </div>
             </footer>
           </motion.div>

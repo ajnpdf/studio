@@ -3,7 +3,7 @@
 /**
  * AJN Master Engineering Orchestrator
  * High-fidelity logic routing for 30+ specialized binary service units.
- * Hardened to resolve Intelligence Layer routing errors.
+ * Explicitly hardened to prioritize intelligence layers and resolve routing errors.
  */
 
 class AJNPDFEngine {
@@ -17,7 +17,7 @@ class AJNPDFEngine {
 
   /**
    * Main tool execution router.
-   * Explicit mapping ensures correct routing for intelligence units.
+   * Prioritizes Intelligence and vision tasks to prevent generic routing fallthrough.
    */
   async runTool(toolId: string, inputs: any, options = {}, onProgressCallback: any) {
     await this.init();
@@ -31,13 +31,11 @@ class AJNPDFEngine {
     let result: { blob: Blob; fileName: string; mimeType: string };
 
     try {
-      // 1. INTELLIGENCE & VISION (Priority Mapping)
-      const intelligenceIds = ['summarize-pdf', 'translate-pdf', 'compare-pdf', 'ocr-pdf'];
-      if (intelligenceIds.includes(toolId)) {
+      // 1. INTELLIGENCE & VISION (High Priority Explicit Routing)
+      if (['summarize-pdf', 'translate-pdf', 'compare-pdf', 'ocr-pdf'].includes(toolId)) {
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
         const converter = new SpecializedConverter(firstFile, (p, m) => onProgressCallback({ stage: "Intelligence", detail: m, pct: p }));
         
-        // Map UI IDs to specialized method targets
         let target = 'SUMMARIZE';
         if (toolId === 'translate-pdf') target = 'TRANSLATE';
         else if (toolId === 'ocr-pdf') target = 'OCR';
@@ -46,7 +44,7 @@ class AJNPDFEngine {
         result = await converter.convertTo(target, options);
       } 
       
-      // 2. EXPORT SPECIALISTS
+      // 2. EXPORT SPECIALISTS (PDF to X)
       else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt'].includes(toolId)) {
         const targetMap: Record<string, string> = {
           'pdf-jpg': 'JPG', 'pdf-png': 'PNG', 'pdf-webp': 'WEBP',
@@ -58,7 +56,7 @@ class AJNPDFEngine {
         result = await converter.convertTo(target, options);
       }
 
-      // 3. X-TO-PDF (Development Mastery)
+      // 3. DEVELOPMENT MASTERY (X to PDF)
       else if (toolId.endsWith('-pdf')) {
         const source = toolId.split('-')[0];
         if (['jpg', 'jpeg', 'png', 'webp'].includes(source)) {

@@ -6,14 +6,13 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { ProgressCallback, ConversionResult } from './pdf-converter';
 import { runFileIntelligence } from '@/ai/flows/file-intelligence';
 
-// Configure PDF.js worker
 if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 }
 
 /**
  * AJN Specialized Services Core - Master Vision & Intelligence Engine
- * Hardened for robust Translation, OCR, and Analysis.
+ * Robustly hardened for Neural Translation, OCR, and Analysis.
  */
 export class SpecializedConverter {
   private file: File;
@@ -42,10 +41,10 @@ export class SpecializedConverter {
 
   /**
    * Hardened Translation Unit
-   * NEVER crashes the pipeline; falls back to original text on API failure or timeout.
+   * Uses non-blocking fallback logic to prevent pipeline crashes.
    */
   async translateText(text: string, sourceLang: string, targetLang: string): Promise<string> {
-    if (!text.trim()) return text;
+    if (!text.trim() || text.length < 2) return text;
     try {
       const resp = await fetch('https://libretranslate.com/translate', {
         method: 'POST',
@@ -58,7 +57,7 @@ export class SpecializedConverter {
       const data = await resp.json();
       return data.translatedText || text;
     } catch (err) {
-      // Return original text rather than failing the whole document
+      // Robust Fallback: Return original text rather than failing the whole document
       return text;
     }
   }
@@ -99,6 +98,7 @@ export class SpecializedConverter {
         const y = item.transform[5];
         const fontSize = Math.abs(item.transform[0]);
 
+        // Group text by Y proximity to preserve paragraphs
         if (!currentGroup || Math.abs(currentGroup.y - y) > fontSize * 1.5) {
           if (currentGroup) groups.push(currentGroup);
           currentGroup = { text, x, y, fontSize, width: item.width };
@@ -110,11 +110,10 @@ export class SpecializedConverter {
       if (currentGroup) groups.push(currentGroup);
 
       for (const group of groups) {
-        // Execute robust translation with fallback
         const translatedText = await this.translateText(group.text, sourceLang, targetLang);
         
         try {
-          // Mask original content
+          // Mask original with white rectangle
           newPage.drawRectangle({
             x: group.x - 2,
             y: group.y - 2,
@@ -130,7 +129,7 @@ export class SpecializedConverter {
             size: Math.max(4, group.fontSize * 0.9), 
             font: helvetica,
             color: rgb(0, 0, 0),
-            maxWidth: group.width + 10,
+            maxWidth: width - group.x - 20,
           });
         } catch (e) {}
       }
