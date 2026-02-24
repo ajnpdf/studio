@@ -35,17 +35,18 @@
   body {
     margin: 0;
     min-height: 100vh;
+    /* FIXED BACKGROUND PROTOCOL */
     background: linear-gradient(175deg, rgba(225, 185, 250, 1) 0%, rgba(184, 225, 252, 1) 100%);
     background-attachment: fixed;
     position: relative;
     @apply text-slate-950 antialiased selection:bg-primary/10 selection:text-primary overflow-x-hidden;
-    /* UNIVERSAL TYPOGRAPHY STANDARD */
-    font-family: Arial, Helvetica, sans-serif;
+    /* UNIVERSAL TYPOGRAPHY STANDARD - ARIAL */
+    font-family: Arial, Helvetica, sans-serif !important;
   }
 
   body::before {
     content: "";
-    position: fixed; /* Ensures background glow stays in place during scroll */
+    position: fixed; 
     width: 1200px;
     height: 1200px;
     border-radius: 50%;

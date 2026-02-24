@@ -10,6 +10,10 @@ interface Props {
   accept?: string;
 }
 
+/**
+ * AJN DropZone - Optimized Modern UI
+ * Reduced footprint (220px) for professional vertical real-estate efficiency.
+ */
 export function DropZone({ onFiles, accept = ".pdf,.jpg,.jpeg,.png,.docx,.pptx,.xlsx" }: Props) {
   const [isDragging, setIsDragging] = useState(false);
   const [previews, setPreviews] = useState<File[]>([]);
