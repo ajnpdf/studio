@@ -24,7 +24,7 @@ class AJNPDFEngine {
 
     try {
       // 1. Advanced Processing
-      if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf', 'compress-pdf'].includes(toolId)) {
+      if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf', 'compress-pdf', 'repair-pdf'].includes(toolId)) {
         if (!files[0]) throw new Error("No file selected.");
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
         const converter = new SpecializedConverter(files[0], (p, m) => onProgressCallback({ stage: "Processing", detail: m, pct: p }));
@@ -34,12 +34,13 @@ class AJNPDFEngine {
           'ocr-pdf': 'OCR', 
           'summarize-pdf': 'SUMMARIZE', 
           'compare-pdf': 'COMPARE',
-          'compress-pdf': 'COMPRESS'
+          'compress-pdf': 'COMPRESS',
+          'repair-pdf': 'REPAIR'
         };
         result = await converter.convertTo(map[toolId] || 'OCR', options);
       } 
       // 2. Document Surgical Units
-      else if (['merge-pdf', 'split-pdf', 'extract-pages', 'delete-pages', 'rotate-pdf', 'sign-pdf', 'organize-pdf', 'protect-pdf', 'unlock-pdf', 'redact-pdf', 'flatten-pdf', 'add-page-numbers', 'grayscale-pdf'].includes(toolId)) {
+      else if (['merge-pdf', 'split-pdf', 'extract-pages', 'delete-pages', 'rotate-pdf', 'sign-pdf', 'organize-pdf', 'protect-pdf', 'unlock-pdf', 'redact-pdf', 'flatten-pdf', 'add-page-numbers', 'grayscale-pdf', 'watermark-pdf'].includes(toolId)) {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Processing", detail: m, pct: p }));
         result = await manipulator.runOperation(toolId, options);
