@@ -20,7 +20,9 @@ import {
   Settings2,
   Zap,
   Lock,
-  History
+  History,
+  Shrink,
+  Info
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -32,6 +34,7 @@ import { cn } from '@/lib/utils';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
 import { engine } from '@/lib/engine';
 
 if (typeof window !== 'undefined') {
@@ -53,7 +56,7 @@ interface Props {
 
 /**
  * AJN Tools Workspace - Professional Industrial Setup 2026
- * Hardened for Word to PDF real-time execution with visionary page management.
+ * Hardened for real-time execution with advanced compression and page management.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const tool = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -65,29 +68,33 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [isInitializing, setIsInitializing] = useState(false);
   
   const [config, setConfig] = useState({
-    quality: 90,
-    strongCompression: false,
+    quality: 50, // Default 50% for compression
+    strongCompression: true,
+    targetSize: '',
+    targetUnit: 'KB',
     ocrLanguage: 'eng',
     splitMode: 'range',
-    splitInterval: 1,
     optimizationLevel: 'balanced'
   });
 
   const isWordTool = tool?.id === 'word-pdf';
+  const isCompressTool = tool?.id === 'compress-pdf';
 
   const getAcceptString = () => {
     if (isWordTool) return ".doc,.docx,.odt,.rtf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     if (tool?.id === 'excel-pdf') return ".xls,.xlsx,.csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     if (tool?.id === 'ppt-pdf') return ".ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation";
     if (tool?.id === 'jpg-pdf') return "image/jpeg,image/jpg";
+    if (isCompressTool) return "application/pdf";
     return "*/*";
   };
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
     
-    // Visionary Logic: If PDF or Word, load all pages for visual control in real-time
-    if (files.some(f => f.type === 'application/pdf') || isWordTool) {
+    if (isCompressTool) {
+      setPhase('selecting'); // Move to config phase for compression
+    } else if (files.some(f => f.type === 'application/pdf') || isWordTool) {
       await loadDocumentPages(files, isWordTool);
     } else {
       run(files, config);
@@ -104,7 +111,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       for (let fIdx = 0; fIdx < files.length; fIdx++) {
         let file = files[fIdx];
         
-        // If it's a Word file, do a pre-flight conversion to PDF for preview
         if (convertFromWord) {
           const preRes = await engine.runTool('word-pdf', [file], config, () => {});
           if (preRes.success && preRes.blob) {
@@ -143,33 +149,19 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       setSelectedPages(initialSelected);
     } catch (err) {
       console.error(err);
-      toast({ title: "Error", description: "Could not load document pages for preview.", variant: "destructive" });
+      toast({ title: "Error", description: "Could not load document segments for preview.", variant: "destructive" });
       reset();
     } finally {
       setIsInitializing(false);
     }
   };
 
-  const movePage = (idx: number, dir: 'up' | 'down') => {
-    const nextIdx = dir === 'up' ? idx - 1 : idx + 1;
-    if (nextIdx < 0 || nextIdx >= pages.length) return;
-    const newPages = [...pages];
-    [newPages[idx], newPages[nextIdx]] = [newPages[nextIdx], newPages[idx]];
-    setPages(newPages);
-  };
-
-  const rotatePage = (id: string) => {
-    setPages(prev => prev.map(p => p.id === id ? { ...p, rotation: (p.rotation + 90) % 360 } : p));
-  };
-
-  const togglePageSelection = (pageId: string) => {
-    const next = new Set(selectedPages);
-    if (next.has(pageId)) next.delete(pageId);
-    else next.add(pageId);
-    setSelectedPages(next);
-  };
-
   const handleConfirmedExecution = () => {
+    if (isCompressTool) {
+      run(sourceFiles, config);
+      return;
+    }
+
     const pageData = pages
       .filter(p => selectedPages.has(p.id))
       .map(p => ({
@@ -179,7 +171,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       }));
 
     if (pageData.length === 0) {
-      toast({ title: "Selection Required", description: "Select at least one page to process." });
+      toast({ title: "Selection Required", description: "Select at least one segment to process." });
       return;
     }
 
@@ -193,7 +185,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     a.href = url; 
     a.download = result.fileName; 
     a.click();
-    toast({ title: "Export Complete", description: "File successfully retrieved." });
+    toast({ title: "Export Complete", description: "Asset successfully retrieved." });
   };
 
   return (
@@ -219,134 +211,227 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   {isInitializing ? (
                     <div className="py-32 text-center space-y-6 opacity-40">
                       <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
-                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950">Preparing Document Buffer...</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950">Preparing Buffer...</p>
                     </div>
                   ) : (
                     <div className="flex flex-col xl:flex-row gap-8">
                       <div className="flex-1 space-y-6">
-                        <div className="bg-white/60 p-6 rounded-3xl border border-black/5 shadow-2xl backdrop-blur-3xl flex flex-col md:flex-row md:items-center justify-between gap-6">
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-3 text-primary">
-                              <Eye className="w-5 h-5" />
-                              <h3 className="text-lg font-black uppercase tracking-tighter text-slate-950">Visionary Preview</h3>
-                            </div>
-                            <div className="flex gap-2">
-                              <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set(pages.map(p => p.id)))} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><ListChecks className="w-3 h-3" /> Select All</Button>
-                              <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set())} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><Eraser className="w-3 h-3" /> Deselect</Button>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-3">
-                            <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest">
-                              {selectedPages.size} Segments Active
-                            </Badge>
-                            <Button onClick={handleConfirmedExecution} className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl hover:scale-105 transition-all">
-                              Finalize Conversion <ChevronRight className="ml-2 w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-                          {pages.map((page, idx) => {
-                            const isSelected = selectedPages.has(page.id);
-                            return (
-                              <div key={page.id} className="space-y-2 group">
-                                <div 
-                                  onClick={() => togglePageSelection(page.id)} 
-                                  className={cn(
-                                    "relative aspect-[1/1.414] rounded-2xl border-4 transition-all cursor-pointer overflow-hidden shadow-lg",
-                                    isSelected ? "border-primary bg-primary/10 scale-[1.03] z-10" : "border-black/5 opacity-60"
-                                  )}
-                                >
-                                  <img 
-                                    src={page.url} 
-                                    alt={`Page ${page.pageIdx + 1}`} 
-                                    className={cn("w-full h-full object-cover transition-all duration-500", isSelected ? "opacity-100" : "opacity-40")} 
-                                    style={{ transform: `rotate(${page.rotation}deg)` }}
-                                  />
-                                  <div className="absolute top-3 left-3 bg-black/60 text-white text-[8px] font-black px-2 py-1 rounded-md backdrop-blur-md uppercase shadow-lg">#{idx + 1}</div>
-                                  {isSelected ? (
-                                    <div className="absolute inset-0 flex items-center justify-center bg-primary/10">
-                                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shadow-xl border-2 border-white/20"><CheckCircle2 className="w-6 h-6" /></div>
-                                    </div>
-                                  ) : (
-                                    <div className="absolute inset-0 flex items-center justify-center bg-red-500/20">
-                                      <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white shadow-xl border-2 border-white/20"><XCircle className="w-6 h-6" /></div>
-                                    </div>
-                                  )}
+                        {isCompressTool ? (
+                          <div className="space-y-8">
+                            <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10">
+                              <div className="flex items-center gap-4 text-primary">
+                                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-sm">
+                                  <Shrink className="w-7 h-7" />
                                 </div>
-                                <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <Button size="icon" variant="outline" title="Move Up" onClick={(e) => { e.stopPropagation(); movePage(idx, 'up'); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><ArrowLeft className="w-3.5 h-3.5" /></Button>
-                                  <Button size="icon" variant="outline" title="Rotate" onClick={(e) => { e.stopPropagation(); rotatePage(page.id); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><RotateCw className="w-3.5 h-3.5" /></Button>
-                                  <Button size="icon" variant="outline" title="Move Down" onClick={(e) => { e.stopPropagation(); movePage(idx, 'down'); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><ArrowRight className="w-3.5 h-3.5" /></Button>
+                                <div>
+                                  <h3 className="text-3xl font-black uppercase tracking-tighter text-slate-950">Advanced Compression</h3>
+                                  <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">Configure target reduction fidelity</p>
                                 </div>
                               </div>
-                            );
-                          })}
-                        </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                <div className="space-y-6">
+                                  <div className="space-y-3">
+                                    <Label className="text-[11px] font-black uppercase tracking-widest text-primary flex justify-between">
+                                      <span>Target Reduction %</span>
+                                      <span className="text-slate-950">{config.quality}%</span>
+                                    </Label>
+                                    <Slider 
+                                      value={[config.quality]} 
+                                      onValueChange={([v]) => setConfig({...config, quality: v})} 
+                                      max={90} 
+                                      min={10}
+                                      step={5} 
+                                    />
+                                    <div className="flex justify-between text-[8px] font-black text-muted-foreground uppercase tracking-widest pt-1">
+                                      <span>Light</span>
+                                      <span>Standard</span>
+                                      <span>Extreme</span>
+                                    </div>
+                                  </div>
+
+                                  <div className="space-y-3">
+                                    <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Target Size Reduction (Optional)</Label>
+                                    <div className="flex gap-3">
+                                      <Input 
+                                        type="number" 
+                                        placeholder="e.g. 500" 
+                                        value={config.targetSize}
+                                        onChange={(e) => setConfig({...config, targetSize: e.target.value})}
+                                        className="h-12 bg-black/5 border-none rounded-2xl font-bold text-lg px-6 focus:ring-primary/20" 
+                                      />
+                                      <select 
+                                        value={config.targetUnit}
+                                        onChange={(e) => setConfig({...config, targetUnit: e.target.value})}
+                                        className="h-12 bg-black/5 border-none rounded-2xl font-black text-[10px] uppercase px-4"
+                                      >
+                                        <option value="KB">KB</option>
+                                        <option value="MB">MB</option>
+                                      </select>
+                                    </div>
+                                    <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-widest italic ml-2">Specify exactly how much space to recover</p>
+                                  </div>
+                                </div>
+
+                                <div className="space-y-6">
+                                  <div className="p-6 bg-primary/5 border border-primary/10 rounded-3xl space-y-4">
+                                    <div className="flex items-center justify-between">
+                                      <div className="space-y-0.5">
+                                        <p className="text-xs font-black uppercase text-slate-950">Strong Compression</p>
+                                        <p className="text-[9px] text-slate-950/40 font-bold uppercase">Aggressive Binary Deflation</p>
+                                      </div>
+                                      <Switch 
+                                        checked={config.strongCompression} 
+                                        onCheckedChange={(v) => setConfig({...config, strongCompression: v})} 
+                                      />
+                                    </div>
+                                    <div className="h-px bg-primary/10" />
+                                    <div className="flex items-center gap-3">
+                                      <Zap className="w-4 h-4 text-primary animate-pulse" />
+                                      <p className="text-[10px] font-bold text-slate-950/60 uppercase leading-relaxed">
+                                        Optimization Level: <span className="text-primary">{config.optimizationLevel.toUpperCase()}</span>
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-start gap-3 p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
+                                    <Info className="w-4 h-4 text-emerald-600 mt-0.5" />
+                                    <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-wide leading-relaxed">
+                                      Professional algorithms ensure text and vector fidelity are preserved during the deflation process.
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="pt-6 border-t border-black/5 flex flex-col sm:flex-row items-center justify-between gap-6">
+                                <div className="text-center sm:text-left">
+                                  <p className="text-[10px] font-black uppercase text-primary tracking-widest">Selected Files</p>
+                                  <p className="text-sm font-bold text-slate-950">{sourceFiles.length} Document(s) Detected</p>
+                                </div>
+                                <Button onClick={handleConfirmedExecution} className="h-16 px-16 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-3xl shadow-2xl hover:scale-105 transition-all gap-3">
+                                  START COMPRESSION <ArrowRight className="w-5 h-5" />
+                                </Button>
+                              </div>
+                            </section>
+                          </div>
+                        ) : (
+                          <div className="space-y-6">
+                            <div className="bg-white/60 p-6 rounded-3xl border border-black/5 shadow-2xl backdrop-blur-3xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+                              <div className="space-y-3">
+                                <div className="flex items-center gap-3 text-primary">
+                                  <Eye className="w-5 h-5" />
+                                  <h3 className="text-lg font-black uppercase tracking-tighter text-slate-950">Fidelity Preview</h3>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set(pages.map(p => p.id)))} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><ListChecks className="w-3 h-3" /> Select All</Button>
+                                  <Button variant="outline" size="sm" onClick={() => setSelectedPages(new Set())} className="h-8 text-[9px] font-black uppercase gap-2 bg-white/50 border-black/5"><Eraser className="w-3 h-3" /> Deselect</Button>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-3">
+                                <Badge className="bg-primary/10 text-primary border-primary/20 h-10 px-6 font-black rounded-xl text-xs uppercase tracking-widest">
+                                  {selectedPages.size} Segments Active
+                                </Badge>
+                                <Button onClick={handleConfirmedExecution} className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl hover:scale-105 transition-all">
+                                  Finalize Process <ChevronRight className="ml-2 w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                              {pages.map((page, idx) => {
+                                const isSelected = selectedPages.has(page.id);
+                                return (
+                                  <div key={page.id} className="space-y-2 group">
+                                    <div 
+                                      onClick={() => togglePageSelection(page.id)} 
+                                      className={cn(
+                                        "relative aspect-[1/1.414] rounded-2xl border-4 transition-all cursor-pointer overflow-hidden shadow-lg",
+                                        isSelected ? "border-primary bg-primary/10 scale-[1.03] z-10" : "border-black/5 opacity-60"
+                                      )}
+                                    >
+                                      <img 
+                                        src={page.url} 
+                                        alt={`Page ${page.pageIdx + 1}`} 
+                                        className={cn("w-full h-full object-cover transition-all duration-500", isSelected ? "opacity-100" : "opacity-40")} 
+                                        style={{ transform: `rotate(${page.rotation}deg)` }}
+                                      />
+                                      <div className="absolute top-3 left-3 bg-black/60 text-white text-[8px] font-black px-2 py-1 rounded-md backdrop-blur-md uppercase shadow-lg">#{idx + 1}</div>
+                                      {isSelected ? (
+                                        <div className="absolute inset-0 flex items-center justify-center bg-primary/10">
+                                          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shadow-xl border-2 border-white/20"><CheckCircle2 className="w-6 h-6" /></div>
+                                        </div>
+                                      ) : (
+                                        <div className="absolute inset-0 flex items-center justify-center bg-red-500/20">
+                                          <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white shadow-xl border-2 border-white/20"><XCircle className="w-6 h-6" /></div>
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <Button size="icon" variant="outline" title="Move Up" onClick={(e) => { e.stopPropagation(); movePage(idx, 'up'); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><ArrowLeft className="w-3.5 h-3.5" /></Button>
+                                      <Button size="icon" variant="outline" title="Rotate" onClick={(e) => { e.stopPropagation(); rotatePage(page.id); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><RotateCw className="w-3.5 h-3.5" /></Button>
+                                      <Button size="icon" variant="outline" title="Move Down" onClick={(e) => { e.stopPropagation(); movePage(idx, 'down'); }} className="h-7 w-7 rounded-lg bg-white/50 border-black/5"><ArrowRight className="w-3.5 h-3.5" /></Button>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
 
-                      <aside className="w-full xl:w-80 space-y-6 shrink-0">
-                        <Card className="p-6 bg-white/60 border border-black/5 rounded-3xl shadow-xl backdrop-blur-3xl space-y-8">
-                          <div className="flex items-center gap-3 text-primary border-b border-black/5 pb-4">
-                            <Settings2 className="w-5 h-5" />
-                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-950">Unit Configuration</h3>
-                          </div>
-
-                          <div className="space-y-6">
-                            <div className="space-y-3">
-                              <Label className="text-[10px] font-black uppercase text-slate-950/40 tracking-widest">Output Fidelity</Label>
-                              <div className="flex justify-between items-center px-1">
-                                <span className="text-xs font-bold text-slate-950">{config.quality}%</span>
-                              </div>
-                              <Slider 
-                                value={[config.quality]} 
-                                onValueChange={([v]) => setConfig({...config, quality: v})} 
-                                max={100} 
-                                step={1} 
-                              />
+                      {!isCompressTool && (
+                        <aside className="w-full xl:w-80 space-y-6 shrink-0">
+                          <Card className="p-6 bg-white/60 border border-black/5 rounded-3xl shadow-xl backdrop-blur-3xl space-y-8">
+                            <div className="flex items-center gap-3 text-primary border-b border-black/5 pb-4">
+                              <Settings2 className="w-5 h-5" />
+                              <h3 className="text-sm font-black uppercase tracking-widest text-slate-950">Unit Configuration</h3>
                             </div>
 
-                            <div className="space-y-3">
-                              <Label className="text-[10px] font-black uppercase text-slate-950/40 tracking-widest">Optimization Strategy</Label>
-                              <select 
-                                value={config.optimizationLevel} 
-                                onChange={(e) => setConfig({...config, optimizationLevel: e.target.value})}
-                                className="w-full h-10 bg-black/5 border-none rounded-xl font-bold text-xs uppercase text-slate-950 px-3"
-                              >
-                                <option value="balanced">Balanced</option>
-                                <option value="performance">Fast Processing</option>
-                                <option value="high">High Accuracy</option>
-                              </select>
-                            </div>
+                            <div className="space-y-6">
+                              <div className="space-y-3">
+                                <Label className="text-[10px] font-black uppercase text-slate-950/40 tracking-widest">Output Fidelity</Label>
+                                <div className="flex justify-between items-center px-1">
+                                  <span className="text-xs font-bold text-slate-950">{config.quality}%</span>
+                                </div>
+                                <Slider 
+                                  value={[config.quality]} 
+                                  onValueChange={([v]) => setConfig({...config, quality: v})} 
+                                  max={100} 
+                                  step={1} 
+                                />
+                              </div>
 
-                            <div className="flex items-center justify-between p-4 bg-black/5 rounded-2xl group transition-all hover:bg-black/10">
-                              <div className="space-y-0.5">
-                                <p className="text-[10px] font-black uppercase text-slate-950">Binary Compression</p>
-                                <p className="text-[8px] text-slate-950/40 font-bold uppercase">Reduce footprint</p>
+                              <div className="space-y-3">
+                                <Label className="text-[10px] font-black uppercase text-slate-950/40 tracking-widest">Optimization Strategy</Label>
+                                <select 
+                                  value={config.optimizationLevel} 
+                                  onChange={(e) => setConfig({...config, optimizationLevel: e.target.value})}
+                                  className="w-full h-10 bg-black/5 border-none rounded-xl font-bold text-xs uppercase text-slate-950 px-3"
+                                >
+                                  <option value="balanced">Balanced</option>
+                                  <option value="performance">Fast Processing</option>
+                                  <option value="high">High Accuracy</option>
+                                </select>
                               </div>
-                              <Switch 
-                                checked={config.strongCompression} 
-                                onCheckedChange={(v) => setConfig({...config, strongCompression: v})} 
-                              />
-                            </div>
 
-                            <div className="pt-4 border-t border-black/5 space-y-4">
-                              <p className="text-[8px] font-bold text-slate-950/40 uppercase tracking-widest text-center">
-                                Use for student purpose and business purpose • useful to students and business and more
-                              </p>
-                              <div className="flex items-center gap-3 text-emerald-600">
-                                <Lock className="w-3.5 h-3.5" />
-                                <span className="text-[9px] font-black uppercase tracking-widest">Secure Local Execution</span>
-                              </div>
-                              <div className="flex items-center gap-3 text-slate-950/40">
-                                <History className="w-3.5 h-3.5" />
-                                <span className="text-[9px] font-black uppercase tracking-widest">Wipe Cache on Exit</span>
+                              <div className="pt-4 border-t border-black/5 space-y-4">
+                                <p className="text-[8px] font-bold text-slate-950/40 uppercase tracking-widest text-center">
+                                  Use for student purpose and business purpose • useful to students and business and more
+                                </p>
+                                <div className="flex items-center gap-3 text-emerald-600">
+                                  <Lock className="w-3.5 h-3.5" />
+                                  <span className="text-[9px] font-black uppercase tracking-widest">Secure Local Execution</span>
+                                </div>
+                                <div className="flex items-center gap-3 text-slate-950/40">
+                                  <History className="w-3.5 h-3.5" />
+                                  <span className="text-[9px] font-black uppercase tracking-widest">Wipe Cache on Exit</span>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </Card>
-                      </aside>
+                          </Card>
+                        </aside>
+                      )}
                     </div>
                   )}
                 </motion.div>
@@ -376,14 +461,14 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     <div className="flex flex-col items-center space-y-6">
                       <div className="w-20 h-20 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center border-2 border-emerald-500/20 shadow-lg"><CheckCircle2 className="w-10 h-10 text-emerald-600" /></div>
                       <div className="space-y-2">
-                        <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] px-4 h-6 rounded-full uppercase tracking-widest mb-2 shadow-sm">Conversion Successful</Badge>
+                        <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] px-4 h-6 rounded-full uppercase tracking-widest mb-2 shadow-sm">Process Successful</Badge>
                         <h3 className="text-2xl md:text-3xl font-black tracking-tighter uppercase truncate max-w-md mx-auto text-slate-950">{result.fileName}</h3>
                         <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">Ready for Retrieval</p>
                       </div>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       <Button onClick={handleDownload} className="h-16 px-12 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 shadow-2xl transition-all hover:scale-105">
-                        <Download className="w-5 h-5" /> Download PDF
+                        <Download className="w-5 h-5" /> Download Result
                       </Button>
                       <Button variant="outline" onClick={reset} className="h-16 px-10 border-black/10 bg-white font-black text-sm uppercase tracking-widest rounded-2xl gap-4 hover:bg-black/5 transition-all text-slate-950">
                         <RefreshCw className="w-5 h-5" /> New Batch
