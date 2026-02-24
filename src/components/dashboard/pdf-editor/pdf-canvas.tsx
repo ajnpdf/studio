@@ -62,7 +62,7 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
           type: 'text',
           content: 'New Text Layer',
           fontSize: 14,
-          fontFamily: 'Inter',
+          fontFamily: 'Arial',
           color: '#000000',
         });
       } else if (activeTool === 'shape') {

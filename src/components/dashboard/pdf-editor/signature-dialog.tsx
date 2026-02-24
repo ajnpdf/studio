@@ -12,7 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PenTool, Type, Upload, Eraser, CheckCircle2, Image as ImageIcon } from 'lucide-react';
+import { PenTool, Type, Upload, Eraser, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -104,7 +104,7 @@ export function SignatureDialog({ open, onOpenChange, onSave }: Props) {
       canvas.height = 150;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.fillStyle = 'transparent';
+        ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.font = `italic 64px ${typeFont === 'serif' ? 'Times New Roman' : 'Arial'}`;
         ctx.fillStyle = '#000000';
@@ -226,7 +226,7 @@ export function SignatureDialog({ open, onOpenChange, onSave }: Props) {
             <Button variant="ghost" onClick={() => onOpenChange(false)} className="text-[10px] font-black uppercase px-6 h-11 rounded-xl">Discard</Button>
             <Button 
               onClick={handleSave} 
-              disabled={activeTab === 'draw' ? !hasDrawn : !typeText}
+              disabled={activeTab === 'draw' ? !hasDrawn : !typeText && activeTab !== 'upload'}
               className="bg-primary text-white font-black text-[10px] uppercase px-10 h-11 rounded-xl shadow-xl hover:scale-105 transition-all"
             >
               Adopt Signature
