@@ -39,6 +39,7 @@ interface Props {
 /**
  * AJN Unit Workspace - Master Engineering Hub
  * Hardened for Visual Page Removal and Arial Typography Standards.
+ * Hydration-secure: Deferred latency and random session data.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const unit = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -184,7 +185,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   <motion.div key="selecting" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                     <div className="flex items-center justify-between px-4">
                       <div className="space-y-1">
-                        <h3 className="text-xl font-black uppercase tracking-tighter">Visual Inspection</h3>
+                        <h3 className="text-xl font-black uppercase tracking-tighter text-slate-950">Visual Inspection</h3>
                         <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-widest">Select pages to purge from document</p>
                       </div>
                       <div className="flex items-center gap-4">
