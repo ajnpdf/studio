@@ -17,16 +17,12 @@ import {
   ShieldCheck, 
   Activity, 
   Globe, 
-  Calendar, 
   ChevronRight,
   Sparkles,
   Layout,
   Scissors,
   Search,
   Shrink,
-  Lock,
-  PenTool,
-  EyeOff,
   MousePointer2,
   FileText
 } from 'lucide-react';
@@ -44,11 +40,9 @@ export default function LandingPage() {
     { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple documents.', icon: Layout, color: 'text-blue-500' },
     { id: 'split-pdf', name: 'Split PDF', desc: 'Divide files by page range.', icon: Scissors, color: 'text-indigo-500' },
     { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce document size.', icon: Shrink, color: 'text-emerald-500' },
-    { id: 'ocr-pdf', name: 'PDF OCR', desc: 'Recognize text in scans.', icon: Search, color: 'text-orange-500' },
+    { id: 'ocr-pdf', name: 'Text Recognition', desc: 'Recognize text in scans.', icon: Search, color: 'text-orange-500' },
     { id: 'edit-pdf', name: 'Edit PDF', desc: 'Modify existing content.', icon: MousePointer2, color: 'text-pink-500' },
-    { id: 'sign-pdf', name: 'Sign PDF', desc: 'Add digital signatures.', icon: PenTool, color: 'text-slate-900' },
-    { id: 'redact-pdf', name: 'Redact PDF', desc: 'Hide sensitive data.', icon: EyeOff, color: 'text-red-500' },
-    { id: 'protect-pdf', name: 'Protect PDF', desc: 'Encrypt your files.', icon: Lock, color: 'text-purple-500' },
+    { id: 'sign-pdf', name: 'Sign PDF', desc: 'Add digital signatures.', icon: FileText, color: 'text-slate-900' },
   ];
 
   useEffect(() => {
@@ -68,7 +62,7 @@ export default function LandingPage() {
           </Link>
           
           <nav className="hidden lg:flex items-center gap-10">
-            {['Tools', 'Features', 'Solutions', 'Pricing', 'Story', 'Blog'].map((item) => (
+            {['Tools', 'Features', 'Solutions', 'Story', 'News'].map((item) => (
               <a 
                 key={item} 
                 href={`#${item.toLowerCase()}`} 
@@ -108,7 +102,7 @@ export default function LandingPage() {
                 </div>
                 <div className="px-6 py-2 bg-primary/5 border border-primary/10 rounded-full shadow-sm">
                   <p className="text-[10px] font-black uppercase tracking-widest text-primary">
-                    Only this site provides professional PDF tools and real-time services free
+                    Only this site provides professional PDF tools and real-time conversion free
                   </p>
                 </div>
               </div>
@@ -152,7 +146,7 @@ export default function LandingPage() {
           <div className="text-center pt-8">
             <Link href="/junction">
               <Button variant="ghost" className="font-black text-[10px] uppercase tracking-widest gap-3 text-primary hover:bg-primary/5 rounded-xl px-8 h-12">
-                <Layers className="w-4 h-4" /> View All 30+ Tools
+                <Layers className="w-4 h-4" /> View All Tools
               </Button>
             </Link>
           </div>
@@ -168,8 +162,8 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { icon: Zap, title: "Fast Processing", desc: "Optimized local execution for instant document transformations." },
-              { icon: ShieldCheck, title: "Secure Privacy", desc: "No storage. Your files are processed entirely in your browser memory." },
-              { icon: Activity, title: "Advanced Tools", desc: "Integrated tools for layout detection and accurate text extraction." }
+              { icon: ShieldCheck, title: "Secure Privacy", desc: "Your files are processed entirely in your browser memory." },
+              { icon: Activity, title: "Advanced Tools", desc: "Integrated tools for accurate text extraction and document editing." }
             ].map((f, i) => (
               <Card key={i} className="bg-white/40 backdrop-blur-xl border-black/5 p-10 rounded-[3rem] space-y-6 hover:border-primary/20 transition-all shadow-2xl group">
                 <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -187,11 +181,11 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center space-y-4 mb-16">
               <h2 className="text-4xl font-black uppercase tracking-tighter">Workflow <span className="text-primary">Solutions</span></h2>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Professional tools for individuals and teams</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Professional tools for students, individuals and teams</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              {/* INDIVIDUALS */}
+              {/* INDIVIDUALS & STUDENTS */}
               <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-12 rounded-[3.5rem] space-y-10 shadow-2xl hover:border-primary/30 transition-all">
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center"><User className="w-7 h-7 text-primary" /></div>
@@ -235,50 +229,10 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/login" className="block relative z-10 pt-4">
+                <Link href="/ajn" className="block relative z-10 pt-4">
                   <Button className="w-full h-16 bg-white text-primary hover:bg-white/90 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl">Start for Business</Button>
                 </Link>
               </Card>
-            </div>
-          </div>
-        </section>
-
-        {/* PRICING SECTION */}
-        <section id="pricing" className="py-24 px-6 max-w-5xl mx-auto text-center space-y-16">
-          <div className="space-y-4">
-            <h2 className="text-4xl font-black uppercase tracking-tighter">Simple <span className="text-primary">Pricing</span></h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Scalable plans for everyone</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="p-12 bg-white/40 border border-black/5 rounded-[3.5rem] space-y-8 text-left shadow-xl transition-all hover:scale-[1.02]">
-              <div className="space-y-2">
-                <Badge className="bg-slate-950 text-white font-black text-[8px] uppercase px-3 h-5 tracking-widest">Free Plan</Badge>
-                <h4 className="text-4xl font-black">$0<span className="text-sm opacity-40">/mo</span></h4>
-              </div>
-              <p className="text-xs font-bold text-slate-950/40 uppercase leading-relaxed">Access to all standard PDF tools and conversions.</p>
-              <div className="h-px bg-black/5" />
-              <ul className="space-y-4">
-                {['50MB Max File Size', '10 Daily Tasks', 'Local Processing', 'Standard PDF Tools'].map(f => (
-                  <li key={f} className="text-[10px] font-black uppercase tracking-widest flex items-center gap-3"><ChevronRight className="w-3 h-3 text-primary" /> {f}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="p-12 bg-white border-4 border-primary rounded-[3.5rem] space-y-8 text-left shadow-2xl relative transition-all hover:scale-[1.02]">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white text-[8px] font-black uppercase px-4 h-8 flex items-center rounded-full tracking-[0.2em] shadow-lg">Most Popular</div>
-              <div className="space-y-2">
-                <Badge className="bg-primary text-white font-black text-[8px] uppercase px-3 h-5 tracking-widest">Pro Plan</Badge>
-                <h4 className="text-4xl font-black text-primary">$12<span className="text-sm opacity-40 text-slate-950">/mo</span></h4>
-              </div>
-              <p className="text-xs font-bold text-slate-950/40 uppercase leading-relaxed">Advanced features for professional users.</p>
-              <div className="h-px bg-black/5" />
-              <ul className="space-y-4">
-                {['2GB Max File Size', 'Unlimited Tasks', 'Priority Support', 'Batch Processing'].map(f => (
-                  <li key={f} className="text-[10px] font-black uppercase tracking-widest flex items-center gap-3 text-primary"><Sparkles className="w-3.5 h-3.5" /> {f}</li>
-                ))}
-              </ul>
-              <Button className="w-full h-14 bg-primary text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl">Upgrade Now</Button>
             </div>
           </div>
         </section>
@@ -296,10 +250,10 @@ export default function LandingPage() {
                 <div className="relative aspect-square max-w-[450px] mx-auto rounded-[4rem] overflow-hidden shadow-2xl border-8 border-white/60 group">
                   <Image 
                     src={founderImage?.imageUrl || "https://picsum.photos/seed/anjan/600/600"} 
-                    alt="Anjan Patel" 
+                    alt="Founder" 
                     fill 
                     className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                    data-ai-hint="founder portrait"
+                    data-ai-hint="portrait"
                   />
                   <div className="absolute bottom-8 left-8 right-8 p-6 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-white/60 shadow-2xl">
                     <p className="text-xl font-black tracking-tighter uppercase">Anjan Patel</p>
@@ -337,8 +291,8 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* BLOG SECTION */}
-        <section id="blog" className="py-24 px-6 max-w-7xl mx-auto space-y-16">
+        {/* NEWS SECTION */}
+        <section id="news" className="py-24 px-6 max-w-7xl mx-auto space-y-16">
           <div className="flex items-end justify-between border-b border-black/5 pb-8">
             <div className="space-y-2">
               <h2 className="text-4xl font-black uppercase tracking-tighter">Latest <span className="text-primary">News</span></h2>

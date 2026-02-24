@@ -18,41 +18,40 @@ export type ServiceUnit = {
   icon: any;
   tag: string;
   cat: 'Organize' | 'Optimize' | 'Convert' | 'Edit' | 'Security' | 'Intelligence' | 'Export';
-  mode: 'WASM' | 'SMART' | 'AI';
+  mode: 'Standard' | 'Advanced';
   color: string;
 };
 
 export const ALL_UNITS: ServiceUnit[] = [
-  { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple assets.', icon: Layout, tag: 'Sequence', cat: 'Organize', mode: 'WASM', color: '#3B82F6' },
-  { id: 'split-pdf', name: 'Split PDF', desc: 'Divide by selection.', icon: Scissors, tag: 'Divide', cat: 'Organize', mode: 'WASM', color: '#6366F1' },
-  { id: 'delete-pages', name: 'Remove Pages', desc: 'Prune unwanted nodes.', icon: Trash2, tag: 'Prune', cat: 'Organize', mode: 'WASM', color: '#8B5CF6' },
-  { id: 'extract-pages', name: 'Extract Pages', desc: 'Isolate page ranges.', icon: Copy, tag: 'Isolate', cat: 'Organize', mode: 'SMART', color: '#A78BFA' },
-  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Reorder structures.', icon: FolderOpen, tag: 'Structure', cat: 'Organize', mode: 'SMART', color: '#7C3AED' },
-  { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce file size.', icon: Shrink, tag: 'Minify', cat: 'Optimize', mode: 'SMART', color: '#10B981' },
-  { id: 'repair-pdf', name: 'Repair PDF', desc: 'Recover corrupted files.', icon: Wrench, tag: 'Recovery', cat: 'Optimize', mode: 'AI', color: '#059669' },
-  { id: 'ocr-pdf', name: 'OCR PDF', desc: 'Text recognition.', icon: Search, tag: 'Vision', cat: 'Optimize', mode: 'AI', color: '#047857' },
-  { id: 'pdf-pdfa', name: 'PDF to PDF/A', desc: 'ISO compliance.', icon: ShieldCheck, tag: 'Archive', cat: 'Optimize', mode: 'WASM', color: '#065F46' },
-  { id: 'grayscale-pdf', name: 'Grayscale PDF', desc: 'Black & white.', icon: Paintbrush, tag: 'Tone', cat: 'Optimize', mode: 'WASM', color: '#4B5563' },
-  { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Image to PDF.', icon: ImageIcon, tag: 'Imagery', cat: 'Convert', mode: 'WASM', color: '#F59E0B' },
-  { id: 'word-pdf', name: 'Word to PDF', desc: 'Doc to PDF.', icon: FileText, tag: 'Office', cat: 'Convert', mode: 'WASM', color: '#D97706' },
-  { id: 'ppt-pdf', name: 'PPT to PDF', desc: 'Slides to PDF.', icon: Presentation, tag: 'Slides', cat: 'Convert', mode: 'SMART', color: '#B45309' },
-  { id: 'excel-pdf', name: 'Excel to PDF', desc: 'Data to PDF.', icon: Table, tag: 'Data', cat: 'Convert', mode: 'SMART', color: '#92400E' },
-  { id: 'html-pdf', name: 'HTML to PDF', desc: 'Web to PDF.', icon: Globe, tag: 'Web', cat: 'Convert', mode: 'SMART', color: '#78350F' },
-  { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'PDF to images.', icon: ImageIcon, tag: 'Raster', cat: 'Export', mode: 'WASM', color: '#EF4444' },
-  { id: 'pdf-word', name: 'PDF to Word', desc: 'PDF to Doc.', icon: FileText, tag: 'Doc', cat: 'Export', mode: 'WASM', color: '#DC2626' },
-  { id: 'pdf-pptx', name: 'PDF to PPTX', desc: 'PDF to slides.', icon: Presentation, tag: 'Slides', cat: 'Export', mode: 'AI', color: '#B91C1C' },
-  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'PDF to sheet.', icon: Table, tag: 'Grid', cat: 'Export', mode: 'AI', color: '#991B1C' },
-  { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Correct orientation.', icon: History, tag: 'Geometry', cat: 'Edit', mode: 'WASM', color: '#EC4899' },
-  { id: 'add-page-numbers', name: 'Add Numbers', desc: 'Page numbering.', icon: Hash, tag: 'Indexing', cat: 'Edit', mode: 'WASM', color: '#DB2777' },
-  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Modify content.', icon: MousePointer2, tag: 'Mastery', cat: 'Edit', mode: 'SMART', color: '#BE185D' },
-  { id: 'unlock-pdf', name: 'Unlock PDF', desc: 'Remove password.', icon: Unlock, tag: 'Decrypt', cat: 'Security', mode: 'WASM', color: '#000000' },
-  { id: 'protect-pdf', name: 'Protect PDF', desc: 'Add encryption.', icon: Lock, tag: 'Encrypt', cat: 'Security', mode: 'WASM', color: '#111827' },
-  { id: 'sign-pdf', name: 'Sign PDF', desc: 'E-signature.', icon: PenTool, tag: 'E-Sign', cat: 'Security', mode: 'SMART', color: '#1F2937' },
-  { id: 'redact-pdf', name: 'Redact PDF', desc: 'Mask sensitive data.', icon: EyeOff, tag: 'Purge', cat: 'Security', mode: 'AI', color: '#374151' },
-  { id: 'flatten-pdf', name: 'Flatten PDF', desc: 'Bake layers.', icon: Layers, tag: 'Static', cat: 'Security', mode: 'WASM', color: '#4B5563' },
-  { id: 'translate-pdf', name: 'Translate PDF', desc: 'Language mapping.', icon: Globe, tag: 'Smart', cat: 'Intelligence', mode: 'AI', color: '#3B82F6' },
-  { id: 'compare-pdf', name: 'Compare PDF', desc: 'Analyze changes.', icon: GitCompare, tag: 'Diff', cat: 'Intelligence', mode: 'AI', color: '#2563EB' },
-  { id: 'summarize-pdf', name: 'Summarize PDF', desc: 'Neural summary.', icon: FileText, tag: 'Extract', cat: 'Intelligence', mode: 'AI', color: '#1D4ED8' },
+  { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple documents.', icon: Layout, tag: 'Merge', cat: 'Organize', mode: 'Standard', color: '#3B82F6' },
+  { id: 'split-pdf', name: 'Split PDF', desc: 'Divide files by page range.', icon: Scissors, tag: 'Split', cat: 'Organize', mode: 'Standard', color: '#6366F1' },
+  { id: 'delete-pages', name: 'Remove Pages', desc: 'Delete unwanted pages.', icon: Trash2, tag: 'Remove', cat: 'Organize', mode: 'Standard', color: '#8B5CF6' },
+  { id: 'extract-pages', name: 'Extract Pages', desc: 'Isolate specific pages.', icon: Copy, tag: 'Extract', cat: 'Organize', mode: 'Standard', color: '#A78BFA' },
+  { id: 'organize-pdf', name: 'Organize PDF', desc: 'Reorder document pages.', icon: FolderOpen, tag: 'Organize', cat: 'Organize', mode: 'Standard', color: '#7C3AED' },
+  { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce document file size.', icon: Shrink, tag: 'Compress', cat: 'Optimize', mode: 'Standard', color: '#10B981' },
+  { id: 'repair-pdf', name: 'Repair PDF', desc: 'Fix corrupted PDF files.', icon: Wrench, tag: 'Repair', cat: 'Optimize', mode: 'Standard', color: '#059669' },
+  { id: 'ocr-pdf', name: 'Text Recognition', desc: 'Recognize text in scans.', icon: Search, tag: 'OCR', cat: 'Optimize', mode: 'Advanced', color: '#047857' },
+  { id: 'pdf-pdfa', name: 'PDF to PDF/A', desc: 'Archive compliant docs.', icon: ShieldCheck, tag: 'Archive', cat: 'Optimize', mode: 'Standard', color: '#065F46' },
+  { id: 'grayscale-pdf', name: 'Grayscale PDF', desc: 'Convert to black and white.', icon: Paintbrush, tag: 'Grayscale', cat: 'Optimize', mode: 'Standard', color: '#4B5563' },
+  { id: 'jpg-pdf', name: 'JPG to PDF', desc: 'Convert image to PDF.', icon: ImageIcon, tag: 'Convert', cat: 'Convert', mode: 'Standard', color: '#F59E0B' },
+  { id: 'word-pdf', name: 'Word to PDF', desc: 'Convert Word to PDF.', icon: FileText, tag: 'Convert', cat: 'Convert', mode: 'Standard', color: '#D97706' },
+  { id: 'ppt-pdf', name: 'PPT to PDF', desc: 'Convert PowerPoint to PDF.', icon: Presentation, tag: 'Convert', cat: 'Convert', mode: 'Standard', color: '#B45309' },
+  { id: 'excel-pdf', name: 'Excel to PDF', desc: 'Convert Spreadsheet to PDF.', icon: Table, tag: 'Convert', cat: 'Convert', mode: 'Standard', color: '#92400E' },
+  { id: 'html-pdf', name: 'HTML to PDF', desc: 'Convert Web page to PDF.', icon: Globe, tag: 'Convert', cat: 'Convert', mode: 'Standard', color: '#78350F' },
+  { id: 'pdf-jpg', name: 'PDF to JPG', desc: 'Convert PDF to images.', icon: ImageIcon, tag: 'Export', cat: 'Export', mode: 'Standard', color: '#EF4444' },
+  { id: 'pdf-word', name: 'PDF to Word', desc: 'Convert PDF to Word doc.', icon: FileText, tag: 'Export', cat: 'Export', mode: 'Standard', color: '#DC2626' },
+  { id: 'pdf-pptx', name: 'PDF to PPTX', desc: 'Convert PDF to slides.', icon: Presentation, tag: 'Export', cat: 'Export', mode: 'Standard', color: '#B91C1C' },
+  { id: 'pdf-excel', name: 'PDF to Excel', desc: 'Convert PDF to sheet.', icon: Table, tag: 'Export', cat: 'Export', mode: 'Standard', color: '#991B1C' },
+  { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Correct page orientation.', icon: History, tag: 'Edit', cat: 'Edit', mode: 'Standard', color: '#EC4899' },
+  { id: 'add-page-numbers', name: 'Add Numbers', desc: 'Add numbering to pages.', icon: Hash, tag: 'Edit', cat: 'Edit', mode: 'Standard', color: '#DB2777' },
+  { id: 'edit-pdf', name: 'Edit PDF', desc: 'Modify document content.', icon: MousePointer2, tag: 'Edit', cat: 'Edit', mode: 'Advanced', color: '#BE185D' },
+  { id: 'unlock-pdf', name: 'Unlock PDF', desc: 'Remove document password.', icon: Unlock, tag: 'Security', cat: 'Security', mode: 'Standard', color: '#000000' },
+  { id: 'protect-pdf', name: 'Protect PDF', desc: 'Add password encryption.', icon: Lock, tag: 'Security', cat: 'Security', mode: 'Standard', color: '#111827' },
+  { id: 'sign-pdf', name: 'Sign PDF', desc: 'Add digital signature.', icon: PenTool, tag: 'Security', cat: 'Security', mode: 'Standard', color: '#1F2937' },
+  { id: 'redact-pdf', name: 'Redact PDF', desc: 'Mask sensitive information.', icon: EyeOff, tag: 'Security', cat: 'Security', mode: 'Advanced', color: '#374151' },
+  { id: 'flatten-pdf', name: 'Flatten PDF', desc: 'Merge document layers.', icon: Layers, tag: 'Security', cat: 'Security', mode: 'Standard', color: '#4B5563' },
+  { id: 'translate-pdf', name: 'Translate PDF', desc: 'Document translation.', icon: Globe, tag: 'Translate', cat: 'Intelligence', mode: 'Advanced', color: '#3B82F6' },
+  { id: 'summarize-pdf', name: 'Summarize PDF', desc: 'Generate a brief summary.', icon: FileText, tag: 'Summary', cat: 'Intelligence', mode: 'Advanced', color: '#1D4ED8' },
 ];
 
 const containerVariants = {
@@ -81,7 +80,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
         <div className="w-16 h-16 mx-auto flex items-center justify-center bg-black/5 rounded-3xl">
           <Search className="w-8 h-8" />
         </div>
-        <p className="text-xs font-black tracking-widest uppercase">Unit Not Found</p>
+        <p className="text-xs font-black tracking-widest uppercase">Tool Not Found</p>
       </div>
     );
   }

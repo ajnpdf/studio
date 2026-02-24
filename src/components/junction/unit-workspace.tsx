@@ -9,7 +9,6 @@ import {
   RefreshCw, 
   CheckCircle2, 
   XCircle, 
-  Trash2, 
   ChevronRight,
   Eye,
   ListChecks,
@@ -113,7 +112,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       setSelectedPages(initialSelected);
     } catch (err) {
       console.error(err);
-      toast({ title: "Processing Error", description: "Could not load document pages.", variant: "destructive" });
+      toast({ title: "Error", description: "Could not load document pages.", variant: "destructive" });
       reset();
     } finally {
       setIsInitializing(false);
@@ -184,11 +183,11 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <h2 className="text-xl md:text-3xl font-black tracking-tighter uppercase leading-none">{tool?.name || "Processing Tool"}</h2>
-                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[8px] font-black h-5 uppercase tracking-widest">PRO</Badge>
+                    <h2 className="text-xl md:text-3xl font-black tracking-tighter uppercase leading-none">{tool?.name || "File Tool"}</h2>
+                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[8px] font-black h-5 uppercase tracking-widest">FREE</Badge>
                   </div>
                   <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em] flex items-center gap-2">
-                    Professional Document Tool
+                    Professional Processing
                   </p>
                 </div>
               </div>
@@ -207,7 +206,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     {isInitializing ? (
                       <div className="py-32 text-center space-y-6 opacity-40">
                         <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
-                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950">Loading document...</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950">Preparing document...</p>
                       </div>
                     ) : (
                       <>
@@ -229,7 +228,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                 {isSurgicalTool ? selectedPages.size : pages.length} Selected
                               </Badge>
                               <Button onClick={handleConfirmedExecution} className="h-12 px-10 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl transition-all">
-                                Continue <ChevronRight className="ml-2 w-4 h-4" />
+                                Process Document <ChevronRight className="ml-2 w-4 h-4" />
                               </Button>
                             </div>
                           </div>
@@ -238,7 +237,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                             <div className="w-full lg:w-80 bg-white/60 p-6 rounded-3xl border border-black/5 shadow-2xl backdrop-blur-3xl space-y-4">
                               <div className="flex items-center gap-2 text-primary">
                                 <Settings2 className="w-4 h-4" />
-                                <h4 className="text-[10px] font-black uppercase tracking-widest">Tool Settings</h4>
+                                <h4 className="text-[10px] font-black uppercase tracking-widest">Settings</h4>
                               </div>
                               {isSplitTool && (
                                 <div className="space-y-3">
@@ -260,9 +259,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                     <button onClick={() => setCompressionLevel('basic')} className={cn("flex-1 h-8 rounded-lg text-[9px] font-black uppercase border transition-all", compressionLevel === 'basic' ? "bg-primary text-white" : "bg-black/5 border-black/5")}>Basic</button>
                                     <button onClick={() => setCompressionLevel('strong')} className={cn("flex-1 h-8 rounded-lg text-[9px] font-black uppercase border transition-all", compressionLevel === 'strong' ? "bg-primary text-white" : "bg-black/5 border-black/5")}>Strong</button>
                                   </div>
-                                  <p className="text-[8px] font-bold text-slate-950/40 uppercase leading-relaxed">
-                                    {compressionLevel === 'basic' ? "Good quality, small size." : "Strong optimization, smallest size."}
-                                  </p>
                                 </div>
                               )}
                             </div>
@@ -353,7 +349,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   <motion.div key="error" initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="max-w-2xl mx-auto w-full pt-12">
                     <Card className="p-16 bg-red-50 border-2 border-red-100 rounded-[3rem] text-center space-y-8 shadow-2xl">
                       <div className="w-16 h-16 bg-red-100 rounded-[2rem] flex items-center justify-center mx-auto"><XCircle className="w-8 h-8 text-red-600" /></div>
-                      <h3 className="text-2xl font-black text-red-900 uppercase tracking-tighter leading-tight">{error || "Processing Error."}</h3>
+                      <h3 className="text-2xl font-black text-red-900 uppercase tracking-tighter leading-tight">{error || "Processing error."}</h3>
                       <div className="flex flex-col gap-3">
                         <Button onClick={handleConfirmedExecution} variant="outline" className="h-14 rounded-2xl font-black text-xs uppercase tracking-widest border-red-200 bg-white hover:bg-red-50 text-red-900">Retry</Button>
                         <Button onClick={reset} variant="ghost" className="h-10 font-bold uppercase text-[10px] text-red-400">Cancel</Button>
