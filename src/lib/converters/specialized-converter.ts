@@ -57,7 +57,7 @@ export class SpecializedConverter {
    * Robust PDF Translation - 3 Fix Patch Integration
    */
   private async runHardenedTranslation(baseName: string, options: any): Promise<ConversionResult> {
-    const { sourceLang = 'auto', targetLang = 'es' } = options;
+    const { sourceLang = 'auto', targetLang = 'es', filename } = options;
     const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib');
     
     this.updateProgress(5, "Calibrating Neural Translation Cluster...");
@@ -124,7 +124,7 @@ export class SpecializedConverter {
       }
     }
 
-    this.progress.emit?.(95, "Synchronizing binary buffer...");
+    this.updateProgress(95, "Synchronizing binary buffer...");
     let bytes;
     try {
       bytes = await doc.save();
@@ -144,9 +144,8 @@ export class SpecializedConverter {
   }
 
   private async toSearchablePdf(baseName: string): Promise<ConversionResult> {
-    const { PDFDocument, StandardFonts } = await import('pdf-lib');
     this.updateProgress(10, "Initializing Neural OCR...");
-    // Simulated high-fidelity logic
+    // Local processing stub - would normally hook into Tesseract.js WASM
     await new Promise(r => setTimeout(r, 2000));
     return {
       blob: new Blob([await this.file.arrayBuffer()], { type: 'application/pdf' }),
