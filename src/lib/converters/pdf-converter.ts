@@ -1,4 +1,4 @@
-'use client';
+'use server';
 
 import * as pdfjsLib from 'pdfjs-dist';
 import JSZip from 'jszip';
@@ -50,13 +50,13 @@ export class PDFConverter {
         return this.toImages(pdf, baseName, target, settings);
       case 'DOCX':
       case 'WORD':
-        return this.toWord(pdf, baseName, settings);
+        return this.toWord(pdf, baseName);
       case 'PPTX':
       case 'POWERPOINT':
-        return this.toPowerPoint(pdf, baseName, settings);
+        return this.toPowerPoint(pdf, baseName);
       case 'XLSX':
       case 'EXCEL':
-        return this.toExcel(pdf, baseName, settings);
+        return this.toExcel(pdf, baseName);
       case 'TXT':
         return this.toText(pdf, baseName);
       default:
@@ -118,7 +118,7 @@ export class PDFConverter {
     return { blob, fileName: `${baseName}.${ext}`, mimeType };
   }
 
-  private async toPowerPoint(pdf: any, baseName: string, settings: any): Promise<ConversionResult> {
+  private async toPowerPoint(pdf: any, baseName: string): Promise<ConversionResult> {
     this.updateProgress(10, "Initializing Presentation Reconstruction...");
     const pres = new pptxgen();
     for (let i = 1; i <= pdf.numPages; i++) {
@@ -135,13 +135,13 @@ export class PDFConverter {
     return { blob: blob as Blob, fileName: `${baseName}.pptx`, mimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' };
   }
 
-  private async toWord(pdf: any, baseName: string, settings: any): Promise<ConversionResult> {
+  private async toWord(pdf: any, baseName: string): Promise<ConversionResult> {
     const zip = new JSZip();
     let docXml = `<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>`;
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
-      const text = content.items.map((it: any) => it.str).join(' ');
+      const text = (content.items as any[]).map((it: any) => it.str).join(' ');
       docXml += `<w:p><w:r><w:t>${text}</w:t></w:r></w:p>`;
     }
     docXml += `</w:body></w:document>`;
@@ -150,12 +150,12 @@ export class PDFConverter {
     return { blob, fileName: `${baseName}.docx`, mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
   }
 
-  private async toExcel(pdf: any, baseName: string, settings: any): Promise<ConversionResult> {
+  private async toExcel(pdf: any, baseName: string): Promise<ConversionResult> {
     const wb = XLSX.utils.book_new();
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
-      const rows = [content.items.map((it: any) => it.str)];
+      const rows = [(content.items as any[]).map((it: any) => it.str)];
       const ws = XLSX.utils.aoa_to_sheet(rows);
       XLSX.utils.book_append_sheet(wb, ws, `Page ${i}`);
     }
@@ -168,7 +168,7 @@ export class PDFConverter {
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
-      text += content.items.map((it: any) => it.str).join(' ') + '\n';
+      text += (content.items as any[]).map((it: any) => it.str).join(' ') + '\n';
     }
     return { blob: new Blob([text]), fileName: `${baseName}.txt`, mimeType: 'text/plain' };
   }
