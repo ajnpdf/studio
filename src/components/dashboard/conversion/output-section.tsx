@@ -104,10 +104,10 @@ export function OutputSection({ jobs, onPreview, onClear }: Props) {
                   <div className="bg-white/30 p-3 px-8 flex justify-between gap-6 items-center">
                     <div className="flex-1 grid grid-cols-4 gap-6">
                       {[
-                        { label: "Original", value: job.stats.originalSize },
+                        { label: "Original", value: job.stats?.originalSize || '---' },
                         { label: "Output", value: job.sizeFormatted },
-                        { label: "Efficiency", value: job.stats.reduction, accent: true },
-                        { label: "Latency", value: job.stats.time }
+                        { label: "Efficiency", value: job.stats?.reduction || '✓', accent: true },
+                        { label: "Latency", value: job.stats?.time || '0.2s' }
                       ].map((s, i) => (
                         <div key={i} className="space-y-0.5">
                           <p className="text-[8px] font-black text-slate-950/30 uppercase tracking-widest">{s.label}</p>

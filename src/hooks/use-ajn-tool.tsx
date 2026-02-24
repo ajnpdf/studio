@@ -14,6 +14,7 @@ export interface LogEntry extends ProgressState {
 
 /**
  * AJN Tool Life-cycle Hook
+ * Manages idle, running, done, and error phases for any registry unit.
  */
 export function useAJNTool(toolId: string) {
   const [phase, setPhase] = useState<"idle" | "running" | "done" | "error">("idle");
@@ -24,7 +25,6 @@ export function useAJNTool(toolId: string) {
   const abortRef = useRef(false);
 
   const onProgress = useCallback((p: ProgressState) => {
-    if (abortRef.current) return;
     setProgress(p);
     setLogs(prev => [...prev.slice(-49), { ...p, ts: Date.now() }]);
   }, []);

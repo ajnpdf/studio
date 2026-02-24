@@ -10,6 +10,7 @@ import { NightSky } from '@/components/dashboard/night-sky';
 
 /**
  * AJN Landing Page - Modern Professional
+ * Arial Typography Optimized
  */
 export default function LandingPage() {
   return (
@@ -84,7 +85,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      {/* Founder Recognition - Name Removed */}
+      {/* Founder Recognition - Premium Standard */}
       <div className="absolute top-10 right-10 flex flex-col items-end gap-1 text-right opacity-40 group hover:opacity-100 transition-opacity">
         <span className="text-[9px] font-black uppercase tracking-[0.3em]">Founder & CEO</span>
       </div>
