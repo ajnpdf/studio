@@ -97,23 +97,23 @@ export class SpecializedConverter {
         const translatedText = `[${targetLang.substring(0, 2).toUpperCase()}] ${group.text}`;
         
         try {
-          if (!settings.bilingual) {
-            newPage.drawRectangle({
-              x: group.x,
-              y: group.y,
-              width: group.width,
-              height: group.fontSize * 1.2,
-              color: rgb(1, 1, 1),
-            });
-          }
+          // Mask original
+          newPage.drawRectangle({
+            x: group.x - 2,
+            y: group.y - 2,
+            width: group.width + 4,
+            height: group.fontSize * 1.4,
+            color: rgb(1, 1, 1),
+          });
 
+          // Draw translation
           newPage.drawText(translatedText, {
             x: group.x,
             y: group.y,
-            size: Math.max(4, group.fontSize * 0.9), 
+            size: Math.max(4, group.fontSize * 0.95), 
             font: helvetica,
             color: rgb(0, 0, 0),
-            maxWidth: group.width,
+            maxWidth: group.width + 10,
           });
         } catch (e) {
           // Silent fallback for complex coordinate transforms

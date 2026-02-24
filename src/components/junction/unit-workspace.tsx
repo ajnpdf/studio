@@ -4,13 +4,12 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DropZone } from '@/components/dashboard/conversion/drop-zone';
 import { useAJNTool, ProgressBar, LogStream } from '@/hooks/use-ajn-tool';
-import { Cpu, Zap, Download, RefreshCw, CheckCircle2, ShieldCheck, Activity, Info } from 'lucide-react';
+import { Cpu, Download, RefreshCw, CheckCircle2, ShieldCheck, Activity, XCircle, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ALL_UNITS } from './services-grid';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
-import { UnitInfoCarousel } from './unit-info-carousel';
 
 interface Props {
   defaultCategory: string;
@@ -18,30 +17,23 @@ interface Props {
 }
 
 /**
- * AJN Unit Workspace - Focused Full-Width Layout
- * Redundant sidebars and configuration boxes removed for professional focus.
- * Hydration-hardened latency generator.
+ * AJN Unit Workspace - Focused Engineering Hub
+ * High-fidelity, distraction-free environment for master binary transformations.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
-  const [latency, setLatency] = useState<string | null>(null);
   const unit = ALL_UNITS.find(u => u.id === initialUnitId);
-  const { phase, progress, logs, result, run, reset } = useAJNTool(initialUnitId || 'merge-pdf');
-
-  useEffect(() => {
-    // Generate random values only on client to prevent hydration mismatch
-    setLatency((Math.random() * 50 + 10).toFixed(0));
-  }, []);
+  const { phase, progress, logs, result, error, run, reset } = useAJNTool(initialUnitId || 'merge-pdf');
 
   const getAcceptedExtensions = () => {
     if (!unit) return ".pdf";
     const id = unit.id;
-    // PDF Source Tools: ONLY allow PDF selection
+    // PDF Source Tools
     if (id.startsWith("pdf-") || id === "merge-pdf" || id === "split-pdf" || id === "rotate-pdf" || 
         id === "compress-pdf" || id === "redact-pdf" || id === "protect-pdf" || id === "sign-pdf" || 
         id === "summarize-pdf" || id === "translate-pdf" || id === "ocr-pdf") {
       return ".pdf";
     }
-    // PDF Creation Tools: ONLY allow source format selection
+    // PDF Creation Tools
     if (id.endsWith("-pdf")) {
       if (id.includes("jpg") || id.includes("image")) return ".jpg,.jpeg,.png,.webp";
       if (id.includes("word")) return ".docx,.doc";
@@ -53,7 +45,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleFilesAdded = (files: File[]) => {
-    run(files, {});
+    run(files, { 
+      quality: 90,
+      targetFormat: unit?.id.split('-').pop()?.toUpperCase() || 'PDF'
+    });
   };
 
   const handleDownload = () => {
@@ -78,7 +73,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
           <motion.div 
             initial={{ opacity: 0, y: 20 }} 
             animate={{ opacity: 1, y: 0 }} 
-            className="p-6 md:p-12 space-y-10 max-w-5xl mx-auto pb-32"
+            className="p-6 md:p-12 space-y-10 max-w-4xl mx-auto pb-32"
           >
             {/* HERO IDENTITY */}
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4">
@@ -116,10 +111,8 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.98 }}
-                    className="space-y-10"
                   >
                     <DropZone onFiles={handleFilesAdded} accept={getAcceptedExtensions()} />
-                    <UnitInfoCarousel unitName={unit?.name} />
                   </motion.div>
                 )}
                 
@@ -196,11 +189,11 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   <motion.div key="error" initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
                     <Card className="p-12 bg-red-50 border-2 border-red-100 rounded-[4rem] text-center space-y-8 shadow-2xl">
                       <div className="w-20 h-20 bg-red-100 rounded-[2rem] flex items-center justify-center mx-auto border-2 border-red-200">
-                        <Zap className="w-10 h-10 text-red-600" />
+                        <XCircle className="w-10 h-10 text-red-600" />
                       </div>
                       <div className="space-y-2">
                         <h3 className="text-3xl font-black text-red-900 uppercase tracking-tighter">Pipeline Interrupted</h3>
-                        <p className="text-sm text-red-700 font-bold uppercase tracking-widest opacity-70">Unrecoverable binary synthesis error</p>
+                        <p className="text-sm text-red-700 font-bold uppercase tracking-widest opacity-70">{error || "Unrecoverable binary synthesis error"}</p>
                       </div>
                       <Button onClick={reset} variant="destructive" className="h-14 px-12 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl">Restart Neural Session</Button>
                     </Card>
@@ -208,24 +201,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                 )}
               </AnimatePresence>
             </div>
-
-            {/* TECHNICAL FOOTER */}
-            <footer className="pt-12 border-t border-black/5 flex wrap items-center justify-center gap-12 opacity-30">
-              <div className="flex items-center gap-3">
-                <Info className="w-4 h-4" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Hardware Acceleration Active</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Zap className="w-4 h-4" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Zero-Storage Protocol</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Activity className="w-4 h-4" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">
-                  Latency: {latency ? `${latency}ms` : 'Calculating...'}
-                </span>
-              </div>
-            </footer>
           </motion.div>
         </div>
       </main>

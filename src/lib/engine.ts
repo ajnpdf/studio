@@ -111,18 +111,9 @@ class AJNPDFEngine {
         result = await converter.convertTo(target, options);
       }
       
-      // 5. UNIVERSAL RECOVERY FALLBACK (Ensuring valid binary always)
+      // 5. FINAL VERIFICATION (Catch Unknowns)
       else {
-        onProgressCallback({ stage: "Deconstructing", detail: "Executing universal binary synthesis...", pct: 40 });
-        const { PDFDocument } = await import('pdf-lib');
-        const pdfDoc = await PDFDocument.create();
-        pdfDoc.addPage();
-        const bytes = await pdfDoc.save();
-        result = {
-          blob: new Blob([bytes], { type: 'application/pdf' }),
-          fileName: `Mastered_Output_${Date.now()}.pdf`,
-          mimeType: 'application/pdf'
-        };
+        throw new Error(`Tool sequence [${toolId}] is not mapped in current neural registry.`);
       }
 
       // Verification Step
