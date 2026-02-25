@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -20,7 +19,9 @@ import {
   Lock,
   Eye,
   EyeOff,
-  RotateCw
+  RotateCw,
+  RefreshCcw,
+  Trash2
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -143,6 +144,13 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     toast({ title: "Asset Retrieved", description: "Binary exported to local filesystem." });
   };
 
+  const handleReupload = () => {
+    setSourceFiles([]);
+    setPages([]);
+    setSelectedPages(new Set());
+    reset();
+  };
+
   return (
     <div className="flex h-full bg-transparent overflow-hidden relative text-slate-950 font-sans">
       <main className="flex-1 flex flex-col min-w-0 relative h-full">
@@ -166,7 +174,19 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   ) : (
                     <div className="flex flex-col gap-8">
                       {/* CONFIGURATION PANELS */}
-                      <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10 max-w-4xl mx-auto w-full">
+                      <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10 max-w-4xl mx-auto w-full relative">
+                        
+                        {/* REUPLOAD BUTTON */}
+                        <div className="absolute top-8 right-10">
+                          <Button 
+                            variant="ghost" 
+                            onClick={handleReupload}
+                            className="h-9 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all gap-2 rounded-xl"
+                          >
+                            <RefreshCcw className="w-3.5 h-3.5" /> Reupload Segment
+                          </Button>
+                        </div>
+
                         <div className="flex items-center gap-4 text-primary border-b border-black/5 pb-6">
                           <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-sm">
                             <Settings2 className="w-7 h-7" />
@@ -297,7 +317,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                       <Link href="/dashboard/pdf-editor">
                         <Button variant="outline" className="h-16 px-12 border-primary/20 bg-white text-primary font-black text-sm uppercase tracking-widest rounded-2xl gap-4 shadow-xl hover:scale-105 transition-all"><Edit3 className="w-5 h-5" /> Open in Editor</Button>
                       </Link>
-                      <Button variant="ghost" onClick={reset} className="h-16 px-8 text-slate-950/40 font-black text-xs uppercase tracking-widest">New interaction</Button>
+                      <Button variant="ghost" onClick={handleReupload} className="h-16 px-8 text-slate-950/40 font-black text-xs uppercase tracking-widest">New interaction</Button>
                     </div>
                   </Card>
                 </motion.div>

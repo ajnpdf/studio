@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { ServicesGrid } from '@/components/junction/services-grid';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Search, SlidersHorizontal, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Search, SlidersHorizontal, ShieldCheck, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { Input } from '@/components/ui/input';
+import { toast } from '@/hooks/use-toast';
 
 /**
  * AJN Junction Page - Professional Industrial Library 2026
@@ -15,6 +16,15 @@ import { Input } from '@/components/ui/input';
 export default function JunctionPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('All');
+
+  const handleResetSession = () => {
+    setSearchQuery('');
+    setActiveTab('All');
+    toast({
+      title: "Junction Reset",
+      description: "Local cache purged. Neural layers ready for new ingestion.",
+    });
+  };
 
   return (
     <div className="h-screen text-slate-900 selection:bg-primary/10 relative font-body flex flex-col overflow-hidden bg-transparent">
@@ -26,6 +36,13 @@ export default function JunctionPage() {
         </Link>
         
         <div className="flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            onClick={handleResetSession}
+            className="h-8 md:h-10 gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-primary transition-all rounded-xl"
+          >
+            <RefreshCcw className="w-3.5 h-3.5" /> Reset Junction
+          </Button>
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-xl border border-black/5 shadow-sm">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
             <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">System Stable</span>

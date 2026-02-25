@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { PDFEditor } from '@/components/dashboard/pdf-editor/pdf-editor';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Upload, ShieldCheck, Activity, Loader2, FileText } from 'lucide-react';
+import { ArrowLeft, Upload, ShieldCheck, Activity, Loader2, FileText, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
 import { LogoAnimation } from '@/components/landing/logo-animation';
 import { DropZone } from '@/components/dashboard/conversion/drop-zone';
@@ -25,6 +25,11 @@ export default function EditPDFPage() {
     }
   };
 
+  const handleReupload = () => {
+    setSelectedFile(null);
+    setPhase('upload');
+  };
+
   return (
     <div className="h-screen flex flex-col overflow-hidden font-body bg-slate-100">
       <NightSky />
@@ -41,11 +46,22 @@ export default function EditPDFPage() {
           </div>
         </div>
 
-        <Link href="/ajn">
-          <Button variant="ghost" className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest gap-2">
-            <ArrowLeft className="w-3.5 h-3.5" /> Sector Exit
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          {phase === 'edit' && (
+            <Button 
+              variant="ghost" 
+              onClick={handleReupload}
+              className="h-9 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-all gap-2"
+            >
+              <RefreshCcw className="w-3.5 h-3.5" /> New Ingestion
+            </Button>
+          )}
+          <Link href="/ajn">
+            <Button variant="ghost" className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest gap-2">
+              <ArrowLeft className="w-3.5 h-3.5" /> Sector Exit
+            </Button>
+          </Link>
+        </div>
       </header>
 
       <main className="flex-1 relative overflow-hidden flex flex-col items-center justify-center">
