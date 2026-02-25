@@ -13,7 +13,10 @@ import {
   Palette,
   Layers,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Type,
+  MoveVertical,
+  ArrowRightLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -28,6 +31,8 @@ interface Props {
   onUpdate: (el: PDFElement) => void;
   onDelete: () => void;
 }
+
+const FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48, 64, 72];
 
 export function PDFPropertiesPanel({ element, onUpdate, onDelete }: Props) {
   if (!element) return null;
@@ -70,12 +75,55 @@ export function PDFPropertiesPanel({ element, onUpdate, onDelete }: Props) {
                 ))}
               </div>
             </div>
-            <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Size & Style</Label>
-              <Slider value={[element.fontSize || 16]} min={8} max={120} onValueChange={([v]) => handleFieldChange('fontSize', v)} />
+
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Font Size</Label>
+                <span className="text-xs font-black text-primary">{element.fontSize}pt</span>
+              </div>
               <div className="flex gap-2">
-                <Button variant="outline" className={cn("flex-1 h-9", element.bold && "bg-primary text-white border-primary")} onClick={() => handleFieldChange('bold', !element.bold)}><Bold className="w-3.5 h-3.5" /></Button>
-                <Button variant="outline" className={cn("flex-1 h-9", element.italic && "bg-primary text-white border-primary")} onClick={() => handleFieldChange('italic', !element.italic)}><Italic className="w-3.5 h-3.5" /></Button>
+                <Select 
+                  value={element.fontSize?.toString()} 
+                  onValueChange={(v) => handleFieldChange('fontSize', parseInt(v))}
+                >
+                  <SelectTrigger className="h-10 w-20 text-xs font-bold bg-slate-50 border-black/5 rounded-xl">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {FONT_SIZES.map(s => <SelectItem key={s} value={s.toString()}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <div className="flex-1 pt-4">
+                  <Slider value={[element.fontSize || 16]} min={6} max={144} onValueChange={([v]) => handleFieldChange('fontSize', v)} />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[9px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5">
+                  <MoveVertical className="w-3 h-3" /> Leading
+                </Label>
+                <Slider value={[element.lineHeight || 1.2]} min={0.8} max={3} step={0.1} onValueChange={([v]) => handleFieldChange('lineHeight', v)} />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[9px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5">
+                  <ArrowRightLeft className="w-3 h-3" /> Tracking
+                </Label>
+                <Slider value={[element.letterSpacing || 0]} min={-2} max={10} step={0.5} onValueChange={([v]) => handleFieldChange('letterSpacing', v)} />
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button variant="outline" className={cn("flex-1 h-9", element.bold && "bg-primary text-white border-primary")} onClick={() => handleFieldChange('bold', !element.bold)}><Bold className="w-3.5 h-3.5" /></Button>
+              <Button variant="outline" className={cn("flex-1 h-9", element.italic && "bg-primary text-white border-primary")} onClick={() => handleFieldChange('italic', !element.italic)}><Italic className="w-3.5 h-3.5" /></Button>
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Color</Label>
+              <div className="flex gap-3">
+                <input type="color" value={element.color || '#000000'} onChange={(e) => handleFieldChange('color', e.target.value)} className="w-full h-10 rounded-xl border-none cursor-pointer p-0 overflow-hidden" />
+                <Input value={element.color} onChange={(e) => handleFieldChange('color', e.target.value)} className="h-10 text-[10px] font-mono uppercase bg-slate-50 border-black/5" />
               </div>
             </div>
           </div>

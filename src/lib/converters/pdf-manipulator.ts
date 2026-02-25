@@ -92,7 +92,11 @@ export class PDFManipulator {
             } else if (el.type === 'text' && el.content) {
               copiedPage.drawText(el.content, { 
                 x: el.x, y: copiedPage.getHeight() - el.y - (el.fontSize || 12),
-                size: el.fontSize || 12, font: standardFont, color: hexToRgb(el.color || '#000000') 
+                size: el.fontSize || 12, 
+                font: standardFont, 
+                color: hexToRgb(el.color || '#000000'),
+                lineHeight: el.lineHeight ? (el.fontSize || 12) * el.lineHeight : undefined,
+                characterSpacing: el.letterSpacing || 0
               });
             } else if (el.type === 'shape') {
               const color = hexToRgb(el.color || '#000000');
@@ -101,6 +105,10 @@ export class PDFManipulator {
               else if (el.shapeType === 'circle') copiedPage.drawEllipse({ x: el.x + el.width/2, y: yFlipped + el.height/2, xRadius: el.width/2, yRadius: el.height/2, borderColor: color, color: fill, borderWidth: el.strokeWidth });
             } else if (el.type === 'whiteout') {
               copiedPage.drawRectangle({ x: el.x, y: yFlipped, width: el.width, height: el.height, color: hexToRgb(el.color || '#FFFFFF') });
+            } else if (el.type === 'image' && el.content) {
+              const imgBytes = await fetch(el.content).then(res => res.arrayBuffer());
+              const img = el.content.includes('png') ? await masterDoc.embedPng(imgBytes) : await masterDoc.embedJpg(imgBytes);
+              copiedPage.drawImage(img, { x: el.x, y: yFlipped, width: el.width, height: el.height });
             }
           } catch (err) {
             console.warn("[Manipulator] Layer sync warning:", err);

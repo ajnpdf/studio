@@ -83,6 +83,8 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
         content: 'Edit text...',
         fontSize: 16,
         fontFamily: 'Arial',
+        lineHeight: 1.2,
+        letterSpacing: 0,
         color: '#000000',
         zIndex: page.elements.length,
         textAlign: 'left'
@@ -295,6 +297,8 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
                 style={{ 
                   fontSize: el.fontSize, 
                   fontFamily: el.fontFamily, 
+                  lineHeight: el.lineHeight,
+                  letterSpacing: el.letterSpacing ? `${el.letterSpacing}px` : 'normal',
                   color: el.color,
                   fontWeight: el.bold ? 'bold' : 'normal',
                   fontStyle: el.italic ? 'italic' : 'normal',

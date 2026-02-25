@@ -33,6 +33,8 @@ export interface PDFElement {
   content?: string;
   fontSize?: number;
   fontFamily?: string;
+  lineHeight?: number;
+  letterSpacing?: number;
   color?: string; // Text or Stroke color
   fillColor?: string;
   strokeWidth?: number;
