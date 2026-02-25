@@ -27,7 +27,7 @@ class AJNPDFEngine {
       if (['translate-pdf', 'ocr-pdf', 'summarize-pdf', 'compare-pdf', 'compress-pdf', 'repair-pdf'].includes(toolId)) {
         if (!files[0]) throw new Error("No file selected.");
         const { SpecializedConverter } = await import('@/lib/converters/specialized-converter');
-        const converter = new SpecializedConverter(files[0], (p, m) => onProgressCallback({ stage: "Processing", detail: m, pct: p }));
+        const converter = new SpecializedConverter(files, (p, m) => onProgressCallback({ stage: "Processing", detail: m, pct: p }));
         
         const map: Record<string, string> = { 
           'translate-pdf': 'TRANSLATE', 
