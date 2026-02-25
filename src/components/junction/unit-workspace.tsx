@@ -75,7 +75,26 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const isDirectConvert = ['word-pdf', 'jpg-pdf', 'ppt-pdf', 'excel-pdf', 'pdf-word'].includes(tool?.id || '');
   const isRotateTool = tool?.id === 'rotate-pdf';
 
+  // Determine accept mime based on tool
+  const getAcceptMime = () => {
+    if (initialUnitId === 'word-pdf') return ".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    if (initialUnitId === 'ppt-pdf') return ".ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation";
+    if (initialUnitId === 'excel-pdf') return ".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    if (initialUnitId === 'jpg-pdf') return "image/jpeg,image/png,image/webp";
+    return "application/pdf";
+  };
+
   const handleFilesAdded = async (files: File[]) => {
+    // Industrial Validation: Merge & Split require 2+ files
+    if ((initialUnitId === 'merge-pdf' || initialUnitId === 'split-pdf') && files.length < 2) {
+      toast({ 
+        title: "Protocol Violation", 
+        description: `The ${tool?.name} unit requires a minimum of 2 PDF segments to establish a sequence.`, 
+        variant: "destructive" 
+      });
+      return;
+    }
+
     setSourceFiles(files);
     
     if (isCompressTool || isDirectConvert || isRotateTool) {
@@ -160,7 +179,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             <AnimatePresence mode="wait">
               {phase === 'idle' && (
                 <motion.div key="idle" className="space-y-8">
-                  <DropZone onFiles={handleFilesAdded} />
+                  <DropZone onFiles={handleFilesAdded} accept={getAcceptMime()} />
                 </motion.div>
               )}
 
@@ -251,8 +270,8 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                         </div>
                       </section>
 
-                      {/* PAGE SELECTION GRID */}
-                      {pages.length > 0 && (
+                      {/* ASSET PREVIEW GRID (PDFs OR IMAGES) */}
+                      {pages.length > 0 ? (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 pb-20">
                           {pages.map((page, idx) => (
                             <Card key={page.id} onClick={() => {
@@ -267,6 +286,22 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                   <div className="bg-primary text-white rounded-full p-2 shadow-2xl animate-in zoom-in-50 duration-300"><CheckCircle2 className="w-5 h-5" /></div>
                                 </div>
                               )}
+                            </Card>
+                          ))}
+                        </div>
+                      ) : sourceFiles.length > 0 && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 pb-20">
+                          {sourceFiles.map((file, idx) => (
+                            <Card key={idx} className="relative aspect-[1/1.414] rounded-xl border-4 border-black/5 overflow-hidden bg-white/40 backdrop-blur-xl">
+                              {file.type.startsWith('image/') ? (
+                                <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center">
+                                  <FileText className="w-8 h-8 text-primary/40 mb-2" />
+                                  <p className="text-[8px] font-black uppercase text-slate-950/40 truncate w-full px-2">{file.name}</p>
+                                </div>
+                              )}
+                              <div className="absolute top-2 left-2 bg-black/60 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase backdrop-blur-md">FILE {idx + 1}</div>
                             </Card>
                           ))}
                         </div>
