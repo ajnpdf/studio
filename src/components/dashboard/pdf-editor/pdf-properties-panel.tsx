@@ -16,7 +16,8 @@ import {
   ChevronDown,
   Type,
   MoveVertical,
-  ArrowRightLeft
+  ArrowRightLeft,
+  Maximize2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';

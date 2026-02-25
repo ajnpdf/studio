@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -104,7 +105,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
           const viewport = page.getViewport({ scale: 0.5 });
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d')!;
-          canvas.width = viewport.width; canvas.height = viewport.height;
+          canvas.height = viewport.height; canvas.width = viewport.width;
           await page.render({ canvasContext: ctx, viewport }).promise;
           const pageId = `${fIdx}-${pIdx}-${Math.random().toString(36).substr(2, 4)}`;
           allLoadedPages.push({ id: pageId, url: canvas.toDataURL('image/jpeg', 0.75), fileIdx: fIdx, pageIdx: pIdx - 1, rotation: 0 });
