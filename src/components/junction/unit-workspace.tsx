@@ -19,7 +19,8 @@ import {
   Hash,
   Lock,
   Eye,
-  EyeOff
+  EyeOff,
+  RotateCw
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -58,7 +59,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [pages, setPages] = useState<PageNode[]>([]);
   const [selectedPages, setSelectedPages] = useState<Set<string>>(new Set());
   const [isInitializing, setIsInitializing] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   
   const [config, setConfig] = useState({
     quality: 50,
@@ -71,13 +71,13 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   });
 
   const isCompressTool = tool?.id === 'compress-pdf';
-  const isSecurityTool = tool?.id === 'protect-pdf';
   const isDirectConvert = ['word-pdf', 'jpg-pdf', 'ppt-pdf', 'excel-pdf', 'pdf-word'].includes(tool?.id || '');
+  const isRotateTool = tool?.id === 'rotate-pdf';
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
     
-    if (isCompressTool || isDirectConvert || isSecurityTool) {
+    if (isCompressTool || isDirectConvert || isRotateTool) {
       setPhase('selecting'); 
     } 
     else if (files.some(f => f.type === 'application/pdf')) {
@@ -123,12 +123,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleConfirmedExecution = () => {
-    if (isSecurityTool && !config.password) {
-      toast({ title: "Security Alert", description: "Please set a master password to protect this file.", variant: "destructive" });
-      return;
-    }
-    
-    if (isCompressTool || isDirectConvert || isSecurityTool) {
+    if (isCompressTool || isDirectConvert || isRotateTool) {
       run(sourceFiles, config);
       return;
     }
@@ -204,27 +199,13 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                 </div>
                               </>
                             )}
-                            {isSecurityTool && (
+                            {isRotateTool && (
                               <div className="space-y-4">
-                                <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Set Master Password</Label>
-                                <div className="relative">
-                                  <Input 
-                                    type={showPassword ? "text" : "password"} 
-                                    placeholder="••••••••" 
-                                    value={config.password} 
-                                    onChange={(e) => setConfig({...config, password: e.target.value})}
-                                    className="h-14 bg-black/5 border-none rounded-2xl font-bold pr-14 text-lg"
-                                  />
-                                  <button 
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
-                                  >
-                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                  </button>
+                                <div className="flex items-center gap-3 p-4 bg-amber-500/5 border border-amber-500/10 rounded-2xl text-amber-600">
+                                  <RotateCw className="w-5 h-5" />
+                                  <span className="text-[9px] font-black uppercase tracking-widest">Global Rotation Mode</span>
                                 </div>
-                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                  <Lock className="w-3 h-3" /> ENCRYPTION: AES-256 BIT ARCHITECTURE
-                                </p>
+                                <p className="text-[10px] font-bold text-slate-950/40 uppercase leading-relaxed tracking-widest">All segments will be rotated 90° clockwise per execution cycle.</p>
                               </div>
                             )}
                             {isDirectConvert && (

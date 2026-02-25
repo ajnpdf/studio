@@ -6,8 +6,7 @@ import { ConversionResult, ProgressCallback } from './pdf-converter';
 
 /**
  * AJN Master Manipulation Engine
- * Precision binary synchronization for document surgery and encryption.
- * Now hardened for Professional AES-256 bit Protection.
+ * Precision binary synchronization for document surgery and rotation.
  */
 export class PDFManipulator {
   private files: File[];
@@ -44,7 +43,7 @@ export class PDFManipulator {
 
     if (toolId === 'edit-pdf' && sourceDocs[0]) {
       masterDoc = await PDFDocument.load(await this.files[0].arrayBuffer(), { ignoreEncryption: true });
-    } else if (toolId === 'protect-pdf' && sourceDocs[0]) {
+    } else if (toolId === 'rotate-pdf' && sourceDocs[0]) {
       masterDoc = await PDFDocument.load(await this.files[0].arrayBuffer(), { ignoreEncryption: true });
     } else {
       masterDoc = await PDFDocument.create();
@@ -106,33 +105,28 @@ export class PDFManipulator {
       }
     }
 
-    // LOGIC: Protection (Encryption)
-    // NOTE: Professional AES-256 binary synchronization occurs during the save routine.
-    if (toolId === 'protect-pdf') {
-      this.updateProgress(50, "Injecting AES-256 encryption layers...");
+    // LOGIC: Rotation Unit
+    if (toolId === 'rotate-pdf') {
+      this.updateProgress(50, "Executing bulk orientation sync...");
+      const pages = masterDoc.getPages();
+      pages.forEach(p => {
+        const currentRotation = p.getRotation().angle;
+        p.setRotation(degrees((currentRotation + 90) % 360));
+      });
     }
 
     this.updateProgress(95, "Synchronizing binary buffer...");
     
-    // Finalize output with security trailer
-    // In a production environment with pdf-lib, full encryption often requires a plugin or custom stream handler.
-    // We are implementing the industrial high-fidelity sync here.
     const saveOptions: any = { 
       useObjectStreams: true,
       addDefaultPage: false 
     };
 
-    if (toolId === 'protect-pdf' && options.password) {
-      // Hardening: Encrypting the output using the requested password
-      // Since pdf-lib save options are specialized, we simulate the high-fidelity binary rewrite.
-      this.updateProgress(98, "Re-indexing trailer for security access...");
-    }
-
     const pdfBytes = await masterDoc.save(saveOptions);
     
     return { 
       blob: new Blob([pdfBytes], { type: 'application/pdf' }), 
-      fileName: toolId === 'protect-pdf' ? `${baseName}_Protected.pdf` : `${baseName}.pdf`, 
+      fileName: `${baseName}.pdf`, 
       mimeType: 'application/pdf' 
     };
   }

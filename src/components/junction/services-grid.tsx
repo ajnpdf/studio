@@ -23,7 +23,8 @@ import {
   GitCompare,
   RotateCw,
   Hash,
-  Globe
+  Globe,
+  RotateCcw
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -139,14 +140,14 @@ export const ALL_UNITS: ServiceUnit[] = [
     color: '#1F2937'
   },
   {
-    id: 'protect-pdf',
-    name: 'Protect PDF',
-    desc: 'Protect PDF files with a password. Encrypt PDF documents to prevent unauthorized access.',
-    icon: Lock,
-    tag: 'Secure',
-    cat: 'Security',
-    mode: 'Advanced',
-    color: '#ef4444'
+    id: 'rotate-pdf',
+    name: 'Rotate PDF',
+    desc: 'Rotate your PDFs the way you need them. You can even rotate multiple PDFs at once!',
+    icon: RotateCw,
+    tag: 'Rotate',
+    cat: 'Organize',
+    mode: 'Standard',
+    color: '#f59e0b'
   }
 ];
 
