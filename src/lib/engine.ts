@@ -1,9 +1,9 @@
-
 'use client';
 
 /**
  * AJN Master Processing Engine
- * Optimized for major professional tools.
+ * Hardened for 2026 Professional Industrial Standards.
+ * Handles 9 Major Units with high-fidelity routing.
  */
 
 class AJNPDFEngine {
@@ -12,7 +12,7 @@ class AJNPDFEngine {
   async init() {
     if (this.initialized) return;
     this.initialized = true;
-    console.log('[AJN Core] System synchronized.');
+    console.log('[AJN Core] High-fidelity system synchronized.');
   }
 
   async runTool(toolId: string, inputs: any, options = {}, onProgressCallback: any) {

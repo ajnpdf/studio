@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
@@ -18,7 +17,8 @@ import {
   ZoomIn,
   ArrowRight,
   Eye,
-  X
+  X,
+  FileText
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -125,7 +125,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             initialSelected.add(pageId);
           }
         } else if (isDirectConvert && (file.type.startsWith('image/') || file.name.match(/\.(docx|pptx|xlsx)$/i))) {
-          // Placeholder preview for non-pdf office docs
           const pageId = `seg-${fIdx}-${Date.now()}`;
           allLoadedPages.push({ 
             id: pageId, 
@@ -170,8 +169,8 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     reset();
   };
 
-  // Capitalized variable for ToolIcon to resolve JSX parsing error
-  const ToolIcon = tool?.icon;
+  // Capitalized component variable to resolve JSX parsing error
+  const ToolIcon = tool?.icon || FileText;
 
   return (
     <div className="flex h-full bg-transparent overflow-hidden relative text-slate-950 font-sans">
@@ -210,7 +209,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
                           <div className="flex items-center gap-4 text-primary border-b border-black/5 pb-6">
                             <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20">
-                              {ToolIcon && <ToolIcon className="w-7 h-7" />}
+                              <ToolIcon className="w-7 h-7" />
                             </div>
                             <div>
                               <h3 className="text-3xl font-black uppercase tracking-tighter text-slate-950">{tool?.name}</h3>

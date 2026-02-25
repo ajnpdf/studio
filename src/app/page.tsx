@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -31,6 +30,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 /**
  * All-in-one Junction Network - Landing Hub 2026
+ * Strictly synchronized with the 9 Major Professional Units.
  */
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
@@ -125,7 +125,7 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {popularTools.map((tool) => (
-              <Link key={tool.id} href={`/tools/${tool.id}`}>
+              <Link key={tool.id} href={tool.id === 'edit-pdf' ? '/tools/edit-pdf' : `/tools/${tool.id}`}>
                 <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 transition-all duration-500 cursor-pointer overflow-hidden border backdrop-blur-xl shadow-md group rounded-[2rem]">
                   <CardContent className="p-4 md:p-6 flex flex-col items-center text-center space-y-4">
                     <div className="w-12 h-12 bg-white/60 rounded-2xl flex items-center justify-center border border-black/5 group-hover:scale-110 transition-all">

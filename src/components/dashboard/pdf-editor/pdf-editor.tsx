@@ -8,10 +8,12 @@ import { PDFThumbnailStrip } from './pdf-thumbnail-strip';
 import { SignatureDialog } from './signature-dialog';
 import { PDFDocument, PDFPage, PDFTool, PDFElement, PDFVersion } from './types';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X, Eye } from 'lucide-react';
 import { engine } from '@/lib/engine';
 import * as pdfjsLib from 'pdfjs-dist';
 import { cn } from '@/lib/utils';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
@@ -36,6 +38,7 @@ export function PDFEditor({ file }: Props) {
   const [isParsing, setIsParsing] = useState(false);
   const [sigOpen, setSigOpen] = useState(false);
   const [pendingSigPos, setPendingSigPos] = useState<{x: number, y: number, w: number, h: number} | null>(null);
+  const [previewPage, setPreviewPage] = useState<PDFPage | null>(null);
 
   const { toast } = useToast();
 
@@ -107,14 +110,12 @@ export function PDFEditor({ file }: Props) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.getAttribute('contenteditable') === 'true') return;
-      
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectedElementId) {
           const newDoc = { ...doc, pages: doc.pages.map(p => ({ ...p, elements: p.elements.filter(el => el.id !== selectedElementId) })) };
           pushToHistory(newDoc); setSelectedElementId(null);
         }
       }
-      
       if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); }
       if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); }
     };
@@ -183,7 +184,13 @@ export function PDFEditor({ file }: Props) {
                 activePageIdx === idx ? "ring-8 ring-primary/10 scale-[1.01]" : "opacity-90"
               )} 
               onMouseEnter={() => setActivePageIdx(idx)}
+              onClick={() => setActivePageIdx(idx)}
             >
+              <div className="absolute top-4 right-4 z-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button variant="outline" size="icon" onClick={() => setPreviewPage(page)} className="h-8 w-8 bg-white/80 backdrop-blur shadow-sm rounded-full">
+                  <Eye className="w-4 h-4" />
+                </Button>
+              </div>
               <PDFCanvas 
                 page={page} 
                 zoom={zoom} 
@@ -215,6 +222,25 @@ export function PDFEditor({ file }: Props) {
           />
         </div>
       </div>
+
+      <Dialog open={!!previewPage} onOpenChange={() => setPreviewPage(null)}>
+        <DialogContent className="max-w-4xl w-full h-[90vh] bg-white border-none p-0 overflow-hidden font-sans rounded-[3rem] shadow-2xl">
+          <DialogHeader className="p-8 border-b border-black/5 flex items-center justify-between shrink-0">
+            <DialogTitle className="text-2xl font-black uppercase tracking-tighter">Segment Audit</DialogTitle>
+            <Button variant="ghost" size="icon" onClick={() => setPreviewPage(null)} className="h-10 w-10 text-slate-400 hover:text-slate-900">
+              <X className="w-6 h-6" />
+            </Button>
+          </DialogHeader>
+          <div className="flex-1 bg-slate-50 p-12 overflow-y-auto flex items-center justify-center">
+            {previewPage && (
+              <div className="relative shadow-2xl bg-white border border-black/5 origin-center transition-transform duration-500" style={{ transform: `rotate(${previewPage.rotation}deg)` }}>
+                <img src={previewPage.previewUrl} className="max-w-full max-h-full object-contain" alt="" />
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <SignatureDialog 
         open={sigOpen} 
         onOpenChange={setSigOpen} 
