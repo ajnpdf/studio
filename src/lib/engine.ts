@@ -29,8 +29,8 @@ class AJNPDFEngine {
         const converter = new SpecializedConverter(files, (p, m) => onProgressCallback({ stage: "Optimizing", detail: m, pct: p }));
         result = await converter.convertTo('COMPRESS', options);
       } 
-      // 2. Surgical Binary Units (Merge, Split, Edit, Sign)
-      else if (['merge-pdf', 'split-pdf', 'edit-pdf', 'sign-pdf'].includes(toolId)) {
+      // 2. Surgical Binary Units (Merge, Split, Edit, Sign, Protect)
+      else if (['merge-pdf', 'split-pdf', 'edit-pdf', 'sign-pdf', 'protect-pdf'].includes(toolId)) {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Processing", detail: m, pct: p }));
         result = await manipulator.runOperation(toolId, options);

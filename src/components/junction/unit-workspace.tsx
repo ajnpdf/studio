@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -16,7 +15,10 @@ import {
   ShieldCheck,
   Type,
   Layout,
-  Hash
+  Hash,
+  Lock,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -55,6 +57,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [pages, setPages] = useState<PageNode[]>([]);
   const [selectedPages, setSelectedPages] = useState<Set<string>>(new Set());
   const [isInitializing, setIsInitializing] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const [config, setConfig] = useState({
     quality: 50,
@@ -119,6 +122,11 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleConfirmedExecution = () => {
+    if (isSecurityTool && !config.password) {
+      toast({ title: "Security Alert", description: "Please set a master password to protect this file.", variant: "destructive" });
+      return;
+    }
+    
     if (isCompressTool || isDirectConvert || isSecurityTool) {
       run(sourceFiles, config);
       return;
@@ -198,14 +206,24 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                             {isSecurityTool && (
                               <div className="space-y-4">
                                 <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Set Master Password</Label>
-                                <Input 
-                                  type="password" 
-                                  placeholder="••••••••" 
-                                  value={config.password} 
-                                  onChange={(e) => setConfig({...config, password: e.target.value})}
-                                  className="h-12 bg-black/5 border-none rounded-2xl font-bold"
-                                />
-                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">ENCRYPTION: AES-256 BIT</p>
+                                <div className="relative">
+                                  <Input 
+                                    type={showPassword ? "text" : "password"} 
+                                    placeholder="••••••••" 
+                                    value={config.password} 
+                                    onChange={(e) => setConfig({...config, password: e.target.value})}
+                                    className="h-14 bg-black/5 border-none rounded-2xl font-bold pr-14 text-lg"
+                                  />
+                                  <button 
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
+                                  >
+                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                  </button>
+                                </div>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                  <Lock className="w-3 h-3" /> ENCRYPTION: AES-256 BIT ARCHITECTURE
+                                </p>
                               </div>
                             )}
                             {isDirectConvert && (

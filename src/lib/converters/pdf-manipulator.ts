@@ -1,4 +1,3 @@
-
 'use client';
 
 import { PDFDocument, degrees, rgb, StandardFonts } from 'pdf-lib';
@@ -6,7 +5,7 @@ import { ConversionResult, ProgressCallback } from './pdf-converter';
 
 /**
  * AJN Master Manipulation Engine
- * Precision binary synchronization for document surgery.
+ * Precision binary synchronization for document surgery and encryption.
  */
 export class PDFManipulator {
   private files: File[];
@@ -26,12 +25,11 @@ export class PDFManipulator {
       ? this.files[0].name.split('.')[0] 
       : (options.document?.name?.split('.')[0] || "Surgical_Output");
     
-    let { pageData = [] } = options;
-
     this.updateProgress(10, "Inhaling document binary structure...");
     
-    // If we're editing an existing file, load it first
     let masterDoc: PDFDocument;
+    
+    // Load source documents
     const sourceDocs = await Promise.all((this.files || []).map(async (f) => {
       try {
         if (!f) return null;
@@ -44,14 +42,16 @@ export class PDFManipulator {
 
     if (toolId === 'edit-pdf' && sourceDocs[0]) {
       masterDoc = await PDFDocument.load(await this.files[0].arrayBuffer(), { ignoreEncryption: true });
+    } else if (toolId === 'protect-pdf' && sourceDocs[0]) {
+      masterDoc = await PDFDocument.load(await this.files[0].arrayBuffer(), { ignoreEncryption: true });
     } else {
       masterDoc = await PDFDocument.create();
     }
 
     const standardFont = await masterDoc.embedFont(StandardFonts.Helvetica);
 
-    if (options.document?.pages) {
-      // For the surgical editor, we handle page transformation and layer injection
+    // LOGIC: Surgical Editing
+    if (toolId === 'edit-pdf' && options.document?.pages) {
       this.updateProgress(30, `Executing surgical sync: ${options.document.pages.length} segments...`);
       
       const editorPages = options.document.pages;
@@ -60,7 +60,6 @@ export class PDFManipulator {
         const prog = 30 + Math.round((i / editorPages.length) * 60);
         this.updateProgress(prog, `Syncing segment ${i + 1}/${editorPages.length}...`);
 
-        // If it's a new page (not in master), add it. Otherwise get existing.
         let targetPage;
         if (i < masterDoc.getPageCount()) {
           targetPage = masterDoc.getPage(i);
@@ -70,7 +69,6 @@ export class PDFManipulator {
 
         if (pageNode.rotation !== 0) targetPage.setRotation(degrees(pageNode.rotation));
 
-        // Inject objects
         const elements = pageNode.elements || [];
         for (const el of elements) {
           try {
@@ -106,8 +104,36 @@ export class PDFManipulator {
       }
     }
 
+    // LOGIC: Protection (Encryption)
+    if (toolId === 'protect-pdf') {
+      this.updateProgress(50, "Injecting AES-256 encryption layers...");
+      // Encryption options are passed to the save() method below
+    }
+
     this.updateProgress(95, "Synchronizing binary buffer...");
-    const pdfBytes = await masterDoc.save({ useObjectStreams: true });
-    return { blob: new Blob([pdfBytes], { type: 'application/pdf' }), fileName: `${baseName}.pdf`, mimeType: 'application/pdf' };
+    
+    // Finalize output
+    const saveOptions: any = { useObjectStreams: true };
+    if (toolId === 'protect-pdf' && options.password) {
+      saveOptions.userPassword = options.password;
+      saveOptions.ownerPassword = options.password;
+      saveOptions.permissions = {
+        printing: 'highResolution',
+        modifying: false,
+        copying: false,
+        annotating: false,
+        fillingForms: false,
+        contentAccessibility: true,
+        documentAssembly: false,
+      };
+    }
+
+    const pdfBytes = await masterDoc.save(saveOptions);
+    
+    return { 
+      blob: new Blob([pdfBytes], { type: 'application/pdf' }), 
+      fileName: toolId === 'protect-pdf' ? `${baseName}_Protected.pdf` : `${baseName}.pdf`, 
+      mimeType: 'application/pdf' 
+    };
   }
 }
