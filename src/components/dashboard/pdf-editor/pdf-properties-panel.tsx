@@ -51,7 +51,7 @@ export function PDFPropertiesPanel({ element, onUpdate, onDelete }: Props) {
         </div>
         <div className="space-y-2">
           <h4 className="text-[11px] font-black uppercase tracking-[0.2em]">Layer Properties</h4>
-          <p className="text-[10px] font-medium leading-relaxed">Select any object on the canvas to edit its neural attributes and metadata.</p>
+          <p className="text-[10px] font-medium leading-relaxed">Select any object on the canvas to edit its professional attributes and metadata.</p>
         </div>
       </aside>
     );
@@ -74,7 +74,7 @@ export function PDFPropertiesPanel({ element, onUpdate, onDelete }: Props) {
       </div>
 
       <div className="p-6 space-y-10">
-        {/* Transform Group */}
+        {/* Geometry Group */}
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <Label className="text-[9px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
@@ -144,7 +144,7 @@ export function PDFPropertiesPanel({ element, onUpdate, onDelete }: Props) {
             
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-[8px] text-muted-foreground uppercase font-bold">Font Neural Profile</Label>
+                <Label className="text-[8px] text-muted-foreground uppercase font-bold">Font Profile</Label>
                 <Select value={element.fontFamily} onValueChange={(v) => handleFieldChange('fontFamily', v)}>
                   <SelectTrigger className="h-10 bg-white/5 border-white/10 text-xs font-bold">
                     <SelectValue />
@@ -193,28 +193,6 @@ export function PDFPropertiesPanel({ element, onUpdate, onDelete }: Props) {
           </section>
         )}
 
-        {element.type === 'signature' && (
-          <section className="space-y-6 animate-in slide-in-from-right-2">
-            <Label className="text-[9px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
-              <CheckCircle2 className="w-3.5 h-3.5" /> E-Sign Profile
-            </Label>
-            <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-widest">Audit Trail Log</span>
-                <Switch defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-widest">Timestamp Overlay</span>
-                <Switch defaultChecked />
-              </div>
-              <Separator className="bg-primary/10" />
-              <Button className="w-full bg-white text-black hover:bg-white/90 font-black text-[9px] uppercase h-10 gap-2">
-                <RotateCw className="w-3 h-3" /> Re-Draw Signature
-              </Button>
-            </div>
-          </section>
-        )}
-
         {/* Universal Appearance */}
         <section className="space-y-6">
           <Label className="text-[9px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
@@ -235,7 +213,7 @@ export function PDFPropertiesPanel({ element, onUpdate, onDelete }: Props) {
             </div>
             
             <div className="space-y-3">
-              <Label className="text-[8px] text-muted-foreground uppercase font-black">Neural Color Mapping</Label>
+              <Label className="text-[8px] text-muted-foreground uppercase font-black">Color Mapping</Label>
               <div className="flex flex-wrap gap-2">
                 {['#000000', '#ffffff', '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#000080'].map(color => (
                   <button
@@ -256,17 +234,17 @@ export function PDFPropertiesPanel({ element, onUpdate, onDelete }: Props) {
         <section className="space-y-4 pt-4 border-t border-white/5">
           <div className="flex items-center gap-3 text-muted-foreground/40">
             <Lock className="w-3.5 h-3.5" />
-            <span className="text-[9px] font-black uppercase tracking-tighter">Object Locked by Owner</span>
+            <span className="text-[9px] font-black uppercase tracking-tighter">Object Locked by Session</span>
           </div>
           <div className="flex items-center gap-3 text-muted-foreground/40">
             <Eye className="w-3.5 h-3.5" />
-            <span className="text-[9px] font-black uppercase tracking-tighter">Visible to All Workspace Nodes</span>
+            <span className="text-[9px] font-black uppercase tracking-tighter">Visible to Platform Units</span>
           </div>
         </section>
       </div>
 
       <div className="mt-auto p-6 border-t border-white/5 bg-background/20">
-        <Button className="w-full h-12 bg-white/5 hover:bg-red-500/10 text-red-400 border border-white/10 font-black text-[10px] uppercase tracking-widest gap-2 transition-all">
+        <Button className="w-full h-12 bg-white/5 hover:bg-red-500/10 text-red-400 border border-white/10 font-black text-[10px] uppercase tracking-widest gap-2 transition-all" onClick={onDelete}>
           <Trash2 className="w-4 h-4" /> Purge from Canvas
         </Button>
       </div>

@@ -35,10 +35,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Merge', 
     cat: 'Organize', 
     mode: 'Standard', 
-    color: '#3B82F6',
-    benefits: ['Universal segment combining', 'Logic-based page ordering', 'Industrial speed'],
-    instructions: ['Inhale source PDFs', 'Adjust visionary grid', 'Execute merge'],
-    useCases: ['Academic report assembly', 'Business document consolidation']
+    color: '#3B82F6'
   },
   { 
     id: 'split-pdf', 
