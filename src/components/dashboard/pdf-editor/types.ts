@@ -13,15 +13,16 @@ export type PDFTool =
   | 'signature'
   | 'form-field'
   | 'link'
-  | 'redact';
+  | 'redact'
+  | 'whiteout';
 
 /**
- * AJN PDF Element Schema
- * Defines editable object properties for the surgical layer.
+ * AJN PDF Element Schema - Industrial 2026
+ * Defines editable object properties for high-performance surgical layers.
  */
 export interface PDFElement {
   id: string;
-  type: 'text' | 'image' | 'shape' | 'signature' | 'form-field' | 'link' | 'markup' | 'path';
+  type: 'text' | 'image' | 'shape' | 'signature' | 'form-field' | 'link' | 'whiteout' | 'path';
   x: number;
   y: number;
   width: number;
@@ -37,20 +38,21 @@ export interface PDFElement {
   rotation?: number;
   zIndex: number;
   
-  // Path objects
-  pathData?: string;
-  strokeWidth?: number;
-  
   // Signature specific
   signatureType?: 'draw' | 'type' | 'upload';
   signatureData?: string; 
   
   // Form field specific
   fieldType?: 'text' | 'checkbox' | 'radio' | 'dropdown';
+  fieldPlaceholder?: string;
   isRequired?: boolean;
   
   // Link specific
   url?: string;
+
+  // Path data for drawing
+  pathData?: string;
+  strokeWidth?: number;
 }
 
 export interface PDFPage {
@@ -59,8 +61,7 @@ export interface PDFPage {
   rotation: number;
   elements: PDFElement[];
   isScanned?: boolean;
-  ocrEnabled?: boolean;
-  previewUrl?: string; // High-fidelity raster preview of the original PDF page
+  previewUrl?: string; 
 }
 
 export interface PDFVersion {

@@ -4,7 +4,7 @@
 import { PDFPage, PDFElement, PDFTool } from './types';
 import { cn } from '@/lib/utils';
 import { useState, useRef } from 'react';
-import { PenTool, Type, Image as ImageIcon, CheckCircle2, Link as LinkIcon, Trash2, Move, MousePointer2, Crosshair, Plus } from 'lucide-react';
+import { Type, Image as ImageIcon, Link as LinkIcon, Move, Crosshair, MousePointer2, Eraser, CheckSquare } from 'lucide-react';
 
 interface Props {
   page: PDFPage;
@@ -18,9 +18,8 @@ interface Props {
 }
 
 /**
- * AJN High-Fidelity PDF Canvas
- * Professional interaction engine for document manipulation.
- * Supports real-time text, image, and signature injection over actual PDF data.
+ * AJN High-Performance Surgical Canvas
+ * Enhanced for real-time Form Injection, Whiteout, and Link Anchoring.
  */
 export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectElement, onUpdateElement, onAddElement, onRequestSignature }: Props) {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -41,43 +40,29 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
     const x = (e.clientX - rect.left) / scale;
     const y = (e.clientY - rect.top) / scale;
 
-    if (activeTool === 'signature' || activeTool === 'insert-image') {
+    const toolNeedsBox = ['signature', 'insert-image', 'link', 'form-field', 'whiteout'].includes(activeTool);
+
+    if (toolNeedsBox) {
       setIsDrawingBox(true);
       setDragStart({ x: e.clientX, y: e.clientY });
       setBoxPreview({ x, y, w: 0, h: 0 });
       return;
     }
 
-    if (activeTool !== 'select') {
-      const baseEl: Partial<PDFElement> = {
-        id: Math.random().toString(36).substr(2, 9),
+    if (activeTool === 'add-text') {
+      onAddElement({
+        id: `text-${Date.now()}`,
+        type: 'text',
         x,
         y,
-        width: 150,
+        width: 180,
         height: 40,
-        opacity: 1,
+        content: 'Type something...',
+        fontSize: 14,
+        fontFamily: 'Arial',
+        color: '#000000',
         zIndex: page.elements.length,
-      };
-
-      if (activeTool === 'add-text') {
-        onAddElement({
-          ...(baseEl as PDFElement),
-          type: 'text',
-          content: 'New Text Layer',
-          fontSize: 14,
-          fontFamily: 'Arial',
-          color: '#000000',
-        });
-      } else if (activeTool === 'shape') {
-        onAddElement({
-          ...(baseEl as PDFElement),
-          type: 'shape',
-          width: 100,
-          height: 100,
-          color: '#3b82f6',
-          opacity: 0.5,
-        });
-      }
+      });
       return;
     }
 
@@ -128,12 +113,18 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
       const w = Math.abs(boxPreview.w);
       const h = Math.abs(boxPreview.h);
       
-      if (w > 10 && h > 10) {
-        if (activeTool === 'signature') {
-          onRequestSignature(x, y, w, h);
-        } else if (activeTool === 'insert-image') {
+      if (w > 5 && h > 5) {
+        const id = `${activeTool}-${Date.now()}`;
+        if (activeTool === 'signature') onRequestSignature(x, y, w, h);
+        else if (activeTool === 'insert-image') {
           setPendingImageArea({ x, y, w, h });
           fileInputRef.current?.click();
+        } else if (activeTool === 'link') {
+          onAddElement({ id, type: 'link', x, y, width: w, height: h, url: 'https://', zIndex: 100 });
+        } else if (activeTool === 'form-field') {
+          onAddElement({ id, type: 'form-field', x, y, width: w, height: h, fieldType: 'text', zIndex: 100 });
+        } else if (activeTool === 'whiteout') {
+          onAddElement({ id, type: 'whiteout', x, y, width: w, height: h, color: '#FFFFFF', zIndex: 100 });
         }
       }
       setBoxPreview(null);
@@ -150,14 +141,13 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
       reader.onload = (ev) => {
         if (ev.target?.result) {
           onAddElement({
-            id: Math.random().toString(36).substr(2, 9),
+            id: `img-${Date.now()}`,
             type: 'image',
             x: pendingImageArea.x,
             y: pendingImageArea.y,
             width: pendingImageArea.w,
             height: pendingImageArea.h,
             content: ev.target.result as string,
-            opacity: 1,
             zIndex: page.elements.length,
           });
         }
@@ -175,57 +165,53 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       className={cn(
-        "bg-white rounded-sm shadow-[0_0_100px_rgba(0,0,0,0.5)] relative transition-all duration-300 origin-center",
-        (activeTool === 'signature' || activeTool === 'insert-image') ? 'cursor-crosshair' : 'cursor-default'
+        "bg-white rounded-sm shadow-[0_0_100px_rgba(0,0,0,0.35)] relative transition-shadow duration-500 origin-center select-none overflow-hidden",
+        activeTool !== 'select' && 'cursor-crosshair'
       )}
-      style={{ 
-        width: pageWidth * scale, 
-        height: pageHeight * scale,
-        transform: `rotate(${page.rotation}deg)`
-      }}
+      style={{ width: pageWidth * scale, height: pageHeight * scale }}
     >
       <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageFileSelect} />
 
-      {/* PDF ACTUAL CONTENT LAYER */}
+      {/* RASTERIZED PDF SOURCE LAYER */}
       {page.previewUrl && (
-        <div className="absolute inset-0 select-none pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none">
           <img 
             src={page.previewUrl} 
-            className="w-full h-full object-contain" 
-            alt={`Page ${page.pageNumber}`} 
+            className="w-full h-full object-contain pointer-events-none" 
+            alt={`Buffer ${page.pageNumber}`} 
           />
         </div>
       )}
 
-      {/* DRAW BOX PREVIEW */}
+      {/* ACTIVE BOX PREVIEW */}
       {boxPreview && (
         <div 
-          className="absolute border-2 border-primary bg-primary/5 z-[1000] flex items-center justify-center pointer-events-none"
+          className="absolute border-2 border-primary bg-primary/10 z-[1000] pointer-events-none flex items-center justify-center"
           style={{
-            left: boxPreview.w < 0 ? boxPreview.x + boxPreview.w : boxPreview.x,
-            top: boxPreview.h < 0 ? boxPreview.y + boxPreview.h : boxPreview.y,
-            width: Math.abs(boxPreview.w),
-            height: Math.abs(boxPreview.h)
+            left: (boxPreview.w < 0 ? boxPreview.x + boxPreview.w : boxPreview.x) * scale,
+            top: (boxPreview.h < 0 ? boxPreview.y + boxPreview.h : boxPreview.y) * scale,
+            width: Math.abs(boxPreview.w) * scale,
+            height: Math.abs(boxPreview.h) * scale
           }}
         >
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-1">
             <Crosshair className="w-4 h-4 text-primary animate-pulse" />
-            <span className="text-[8px] font-black uppercase text-primary bg-white/80 px-1 rounded">Define Area</span>
+            <span className="text-[8px] font-black uppercase text-primary bg-white/90 px-1 rounded">Mapping</span>
           </div>
         </div>
       )}
 
-      {/* EDITABLE OBJECT MODEL LAYER */}
+      {/* INTERACTIVE OBJECT MODEL LAYER */}
       <div 
-        className="absolute inset-0 pointer-events-auto overflow-hidden"
+        className="absolute inset-0 pointer-events-auto"
         style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: pageWidth, height: pageHeight }}
       >
         {page.elements.sort((a, b) => a.zIndex - b.zIndex).map(el => (
           <div
             key={el.id}
             className={cn(
-              "absolute cursor-move group transition-all select-none",
-              selectedElementId === el.id ? "ring-2 ring-primary ring-offset-2 ring-offset-white shadow-2xl z-[999]" : "hover:ring-1 hover:ring-primary/40"
+              "absolute group transition-all cursor-move",
+              selectedElementId === el.id ? "ring-2 ring-primary shadow-2xl z-[999] bg-primary/5" : "hover:ring-1 hover:ring-primary/40"
             )}
             style={{
               left: el.x,
@@ -240,7 +226,7 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
           >
             {el.type === 'text' && (
               <div 
-                className="w-full h-full flex items-center p-2 outline-none font-medium whitespace-pre-wrap leading-tight"
+                className="w-full h-full flex items-center p-2 outline-none font-medium whitespace-pre-wrap leading-tight overflow-hidden"
                 contentEditable={selectedElementId === el.id}
                 onBlur={(e) => onUpdateElement({ ...el, content: e.currentTarget.innerText })}
                 suppressContentEditableWarning
@@ -256,8 +242,21 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
               </div>
             )}
 
-            {el.type === 'shape' && (
-              <div className="w-full h-full" style={{ backgroundColor: el.color }} />
+            {el.type === 'whiteout' && (
+              <div className="w-full h-full shadow-inner" style={{ backgroundColor: el.color || '#FFFFFF' }} />
+            )}
+
+            {el.type === 'link' && (
+              <div className="w-full h-full border border-blue-500/40 bg-blue-500/10 flex items-center justify-center">
+                <LinkIcon className="w-4 h-4 text-blue-500 opacity-40" />
+              </div>
+            )}
+
+            {el.type === 'form-field' && (
+              <div className="w-full h-full border-2 border-indigo-500/40 bg-indigo-500/5 flex items-center px-2">
+                <CheckSquare className="w-3 h-3 text-indigo-500 opacity-40 mr-2" />
+                <span className="text-[10px] font-black uppercase text-indigo-500/40 truncate">Interactive Field</span>
+              </div>
             )}
 
             {el.type === 'image' && el.content && (
@@ -265,30 +264,14 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
             )}
 
             {el.type === 'signature' && el.signatureData && (
-              <img 
-                src={el.signatureData} 
-                className="w-full h-full object-contain pointer-events-none" 
-                alt="Signature"
-              />
-            )}
-
-            {el.type === 'signature' && !el.signatureData && (
-              <div className="w-full h-full flex items-center justify-center border border-dashed border-primary/40 bg-primary/5">
-                <span className="text-[10px] font-black uppercase text-primary/40">Defining Area...</span>
-              </div>
+              <img src={el.signatureData} className="w-full h-full object-contain pointer-events-none" alt="" />
             )}
 
             {selectedElementId === el.id && (
-              <>
-                <div className="absolute -top-1 -left-1 w-2 h-2 bg-white border-2 border-primary rounded-full cursor-nw-resize" />
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-white border-2 border-primary rounded-full cursor-ne-resize" />
-                <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-white border-2 border-primary rounded-full cursor-sw-resize" />
-                <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-white border-2 border-primary rounded-full cursor-se-resize" />
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-primary text-white px-3 py-1.5 rounded-xl shadow-2xl whitespace-nowrap">
-                  <Move className="w-3.5 h-3.5" />
-                  <span className="text-[9px] font-black uppercase tracking-widest">{el.type} Layer</span>
-                </div>
-              </>
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-primary text-white px-3 py-1.5 rounded-xl shadow-2xl whitespace-nowrap animate-in slide-in-from-bottom-2">
+                <Move className="w-3.5 h-3.5" />
+                <span className="text-[9px] font-black uppercase tracking-widest">{el.type} Unit</span>
+              </div>
             )}
           </div>
         ))}

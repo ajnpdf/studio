@@ -14,7 +14,6 @@ import { engine } from '@/lib/engine';
 import * as pdfjsLib from 'pdfjs-dist';
 import { cn } from '@/lib/utils';
 
-// Configure PDF.js Worker
 if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 }
@@ -25,25 +24,19 @@ interface Props {
 }
 
 const MOCK_VERSIONS: PDFVersion[] = [
-  { id: 'v1', versionNumber: 1, timestamp: '2026-01-15 10:00', editorName: 'System', summary: 'Original Upload' }
+  { id: 'v1', versionNumber: 1, timestamp: '2026-01-15 10:00', editorName: 'System', summary: 'Original Ingestion' }
 ];
 
 /**
- * AJN Advanced Surgical PDF Studio
- * Professional Real-Time Orchestrator modeled after Sejda UI.
+ * AJN Advanced Surgical PDF Studio - Performance Edition 2026
+ * Professional Real-Time Orchestrator with Multi-PDF Assembly.
  */
 export function PDFEditor({ initialFileId, file }: Props) {
   const [doc, setDoc] = useState<PDFDocument>({
     id: 'doc-initial',
-    name: file?.name || 'Surgical_Document.pdf',
-    totalPages: 1,
-    pages: [{
-      id: 'page-1',
-      pageNumber: 1,
-      rotation: 0,
-      elements: [],
-      isScanned: false,
-    }],
+    name: file?.name || 'Surgical_Asset.pdf',
+    totalPages: 0,
+    pages: [],
     versions: MOCK_VERSIONS,
   });
 
@@ -63,64 +56,85 @@ export function PDFEditor({ initialFileId, file }: Props) {
   const { toast } = useToast();
 
   /**
-   * Real-time PDF Parser
-   * Ingests binary file and generates page preview layers.
+   * Performance-Optimized PDF Parser
+   * Renders document segments into high-fidelity raster layers.
    */
-  const loadPDF = useCallback(async (pdfFile: File) => {
+  const parsePDFFile = async (pdfFile: File): Promise<PDFPage[]> => {
+    const arrayBuffer = await pdfFile.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+    const parsedPages: PDFPage[] = [];
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale: 1.5 });
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d')!;
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      await page.render({ canvasContext: context, viewport }).promise;
+      const previewUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+      parsedPages.push({
+        id: `page-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 4)}`,
+        pageNumber: i,
+        rotation: 0,
+        elements: [],
+        previewUrl,
+      });
+    }
+    return parsedPages;
+  };
+
+  const handleInitialize = useCallback(async (initialFile: File) => {
     setIsParsing(true);
     try {
-      const arrayBuffer = await pdfFile.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
-      const parsedPages: PDFPage[] = [];
-
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: 1.5 }); // High-quality rasterization
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d')!;
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-        await page.render({ canvasContext: context, viewport }).promise;
-        const previewUrl = canvas.toDataURL('image/jpeg', 0.8);
-
-        parsedPages.push({
-          id: `page-${i}-${Math.random().toString(36).substr(2, 4)}`,
-          pageNumber: i,
-          rotation: 0,
-          elements: [],
-          previewUrl,
-        });
-      }
-
+      const newPages = await parsePDFFile(initialFile);
       const initialDoc: PDFDocument = {
         id: `doc-${Date.now()}`,
-        name: pdfFile.name,
-        totalPages: pdf.numPages,
-        pages: parsedPages,
+        name: initialFile.name,
+        totalPages: newPages.length,
+        pages: newPages,
         versions: MOCK_VERSIONS,
       };
-
       setDoc(initialDoc);
       setHistory([initialDoc]);
       setHistoryIndex(0);
     } catch (err) {
-      console.error("[Surgical Editor] Load failure:", err);
-      toast({ 
-        title: "Kernel Error", 
-        description: "Document binary structure is corrupted.", 
-        variant: "destructive" 
-      });
+      toast({ title: "Kernel Error", description: "Binary structure ingestion failed.", variant: "destructive" });
     } finally {
       setIsParsing(false);
     }
   }, [toast]);
 
   useEffect(() => {
-    if (file) {
-      loadPDF(file);
+    if (file) handleInitialize(file);
+  }, [file, handleInitialize]);
+
+  /**
+   * Assembly Protocol: Add new PDF segments to current session
+   */
+  const handleAddFiles = async (files: File[]) => {
+    setIsParsing(true);
+    try {
+      let combinedPages = [...doc.pages];
+      for (const f of files) {
+        const parsed = await parsePDFFile(f);
+        combinedPages = [...combinedPages, ...parsed];
+      }
+      const newDoc = { 
+        ...doc, 
+        pages: combinedPages, 
+        totalPages: combinedPages.length 
+      };
+      pushToHistory(newDoc);
+      toast({ title: "Segments Appended", description: `${files.length} document(s) synchronized with current session.` });
+    } catch (err) {
+      toast({ title: "Assembly Error", description: "Could not append segments.", variant: "destructive" });
+    } finally {
+      setIsParsing(false);
     }
-  }, [file, loadPDF]);
+  };
 
   const pushToHistory = useCallback((newDoc: PDFDocument) => {
     const newHistory = history.slice(0, historyIndex + 1);
@@ -172,35 +186,9 @@ export function PDFEditor({ initialFileId, file }: Props) {
     setSelectedElementId(element.id);
   };
 
-  const handleRequestSignature = (x: number, y: number, w: number, h: number) => {
-    setPendingSigPos({ x, y, w, h });
-    setSigOpen(true);
-  };
-
-  const handleAdoptSignature = (data: string, type: 'draw' | 'type' | 'upload') => {
-    if (!pendingSigPos) return;
-    
-    const newSig: PDFElement = {
-      id: Math.random().toString(36).substr(2, 9),
-      type: 'signature',
-      x: pendingSigPos.x,
-      y: pendingSigPos.y,
-      width: pendingSigPos.w,
-      height: pendingSigPos.h,
-      signatureData: data,
-      signatureType: type,
-      opacity: 1,
-      zIndex: 100,
-    };
-
-    handleAddElement(newSig, activePageIdx);
-    setPendingSigPos(null);
-    setActiveTool('select');
-  };
-
   const handleSave = async () => {
     setIsProcessing(true);
-    toast({ title: "Applying Changes", description: "Executing surgical binary rewrite..." });
+    toast({ title: "Finalizing Protocol", description: "Synchronizing binary layers..." });
     
     try {
       const inputFiles = file ? [file] : [];
@@ -209,10 +197,10 @@ export function PDFEditor({ initialFileId, file }: Props) {
         const url = URL.createObjectURL(res.blob);
         const a = document.createElement('a');
         a.href = url; a.download = `Surgical_${doc.name}`; a.click();
-        toast({ title: "Process Successful", description: "Changes committed to local buffer." });
+        toast({ title: "Mastery Complete", description: "Asset retrieved from session buffer." });
       }
     } catch (err) {
-      toast({ title: "Process Failed", description: "Internal buffer sync error.", variant: "destructive" });
+      toast({ title: "Execution Failed", description: "Kernel sync error.", variant: "destructive" });
     } finally {
       setIsProcessing(false);
     }
@@ -220,11 +208,11 @@ export function PDFEditor({ initialFileId, file }: Props) {
 
   if (isParsing) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center space-y-6 bg-slate-100">
+      <div className="flex-1 flex flex-col items-center justify-center space-y-6 bg-slate-100 h-full w-full">
         <Loader2 className="w-16 h-16 text-primary animate-spin" />
         <div className="text-center space-y-2">
-          <h2 className="text-2xl font-black uppercase tracking-tighter">Initializing Surgical Engine</h2>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] animate-pulse">Decomposing binary segments for {file?.name}</p>
+          <h2 className="text-2xl font-black uppercase tracking-tighter">Synchronizing Surgical Environment</h2>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] animate-pulse">Decomposing Binary Segments</p>
         </div>
       </div>
     );
@@ -252,30 +240,43 @@ export function PDFEditor({ initialFileId, file }: Props) {
           pages={doc.pages} 
           activeIdx={activePageIdx} 
           onSelect={setActivePageIdx} 
+          onAdd={handleAddFiles}
           onReorder={() => {}} 
         />
 
-        <main className="flex-1 overflow-y-auto scrollbar-hide p-8 flex flex-col items-center gap-12 bg-slate-200/50">
-          {doc.pages.map((page, idx) => (
-            <div key={page.id} className={cn("relative shadow-2xl transition-all", activePageIdx === idx ? "ring-4 ring-primary/20 scale-[1.01]" : "opacity-80 scale-[0.98]")}>
-              <PDFCanvas 
-                page={page} 
-                zoom={zoom}
-                activeTool={activeTool}
-                selectedElementId={selectedElementId}
-                onSelectElement={setSelectedElementId}
-                onUpdateElement={(el) => handleUpdateElement(el, idx)}
-                onAddElement={(el) => handleAddElement(el, idx)}
-                onRequestSignature={handleRequestSignature}
-              />
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur px-3 py-1 rounded-full text-[9px] font-black text-slate-400 uppercase tracking-widest border border-black/5">
-                Segment {idx + 1}
+        <main className="flex-1 overflow-y-auto scrollbar-hide p-12 flex flex-col items-center gap-16 bg-slate-200/50 relative">
+          <div className="flex flex-col gap-16 pb-32">
+            {doc.pages.map((page, idx) => (
+              <div 
+                key={page.id} 
+                className={cn(
+                  "relative shadow-[0_30px_100px_rgba(0,0,0,0.2)] transition-all duration-500", 
+                  activePageIdx === idx ? "ring-8 ring-primary/10 scale-[1.01]" : "opacity-90 scale-[0.99]"
+                )}
+                onMouseEnter={() => setActivePageIdx(idx)}
+              >
+                <PDFCanvas 
+                  page={page} 
+                  zoom={zoom}
+                  activeTool={activeTool}
+                  selectedElementId={selectedElementId}
+                  onSelectElement={setSelectedElementId}
+                  onUpdateElement={(el) => handleUpdateElement(el, idx)}
+                  onAddElement={(el) => handleAddElement(el, idx)}
+                  onRequestSignature={(x, y, w, h) => {
+                    setPendingSigPos({ x, y, w, h });
+                    setSigOpen(true);
+                  }}
+                />
+                <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-white px-4 py-1.5 rounded-full text-[10px] font-black text-slate-400 uppercase tracking-widest border border-black/5 shadow-sm">
+                  Segment {idx + 1} of {doc.totalPages}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </main>
 
-        <div className="absolute right-0 top-0 bottom-0 pointer-events-none">
+        <div className="absolute right-0 top-0 bottom-0 pointer-events-none z-40">
            <div className="pointer-events-auto h-full">
               <PDFPropertiesPanel 
                 element={doc.pages.flatMap(p => p.elements).find(el => el.id === selectedElementId) || null}
@@ -300,19 +301,40 @@ export function PDFEditor({ initialFileId, file }: Props) {
         </div>
       </div>
 
-      <SignatureDialog open={sigOpen} onOpenChange={setSigOpen} onSave={handleAdoptSignature} />
+      <SignatureDialog open={sigOpen} onOpenChange={setSigOpen} onSave={(data, type) => {
+        if (!pendingSigPos) return;
+        const newSig: PDFElement = {
+          id: `sig-${Date.now()}`,
+          type: 'signature',
+          x: pendingSigPos.x,
+          y: pendingSigPos.y,
+          width: pendingSigPos.w,
+          height: pendingSigPos.h,
+          signatureData: data,
+          signatureType: type,
+          zIndex: 100,
+        };
+        handleAddElement(newSig, activePageIdx);
+        setPendingSigPos(null);
+        setActiveTool('select');
+      }} />
 
       {isProcessing && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center">
-          <div className="text-center space-y-6">
-            <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto" />
-            <p className="text-sm font-black uppercase tracking-[0.4em] text-white">Finalizing Binary Sync...</p>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[999] flex items-center justify-center">
+          <div className="text-center space-y-8 animate-in zoom-in-95">
+            <div className="relative">
+              <Loader2 className="w-24 h-24 text-primary animate-spin mx-auto opacity-20" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <CheckCircle2 className="w-8 h-8 text-primary animate-pulse" />
+              </div>
+            </div>
+            <p className="text-lg font-black uppercase tracking-[0.5em] text-white">Finalizing Local Sync</p>
           </div>
         </div>
       )}
 
-      <footer className="h-10 bg-white border-t border-black/5 flex items-center justify-center shrink-0 z-[60]">
-        <p className="text-[9px] font-black uppercase tracking-[0.5em] text-slate-400">
+      <footer className="h-12 bg-white border-t border-black/5 flex items-center justify-center shrink-0 z-[60] relative">
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-400">
           AJN Core • 2026 • Made in INDIAN<span className="animate-heart-beat ml-1">❤️</span>
         </p>
       </footer>
