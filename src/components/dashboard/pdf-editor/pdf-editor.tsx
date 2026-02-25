@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { PDFToolbar } from './pdf-toolbar';
 import { PDFCanvas } from './pdf-canvas';
 import { PDFPropertiesPanel } from './pdf-properties-panel';
@@ -10,31 +10,35 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { engine } from '@/lib/engine';
 
+interface Props {
+  initialFileId: string | null;
+  file?: File | null;
+}
+
 const MOCK_VERSIONS: PDFVersion[] = [
   { id: 'v1', versionNumber: 1, timestamp: '2026-01-15 10:00', editorName: 'System', summary: 'Original Upload' }
 ];
-
-const MOCK_DOC: PDFDocument = {
-  id: 'doc-1',
-  name: 'Project_Proposal_Final.pdf',
-  totalPages: 3,
-  pages: Array.from({ length: 3 }, (_, i) => ({
-    id: `page-${i + 1}`,
-    pageNumber: i + 1,
-    rotation: 0,
-    elements: [],
-    isScanned: false,
-  })),
-  versions: MOCK_VERSIONS,
-};
 
 /**
  * AJN Advanced Surgical PDF Studio
  * Professional Real-Time Orchestrator modeled after Sejda UI.
  */
-export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
-  const [doc, setDoc] = useState<PDFDocument>(MOCK_DOC);
-  const [history, setHistory] = useState<PDFDocument[]>([MOCK_DOC]);
+export function PDFEditor({ initialFileId, file }: Props) {
+  const [doc, setDoc] = useState<PDFDocument>({
+    id: 'doc-initial',
+    name: file?.name || 'Surgical_Document.pdf',
+    totalPages: 1,
+    pages: [{
+      id: 'page-1',
+      pageNumber: 1,
+      rotation: 0,
+      elements: [],
+      isScanned: false,
+    }],
+    versions: MOCK_VERSIONS,
+  });
+
+  const [history, setHistory] = useState<PDFDocument[]>([doc]);
   const [historyIndex, setHistoryIndex] = useState(0);
   
   const [activeTool, setActiveTool] = useState<PDFTool>('select');
@@ -115,10 +119,9 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
       signatureData: data,
       signatureType: type,
       opacity: 1,
-      zIndex: 100, // Top level
+      zIndex: 100,
     };
 
-    // Add to first visible page for now in demo
     handleAddElement(newSig, 0);
     setPendingSigPos(null);
     setActiveTool('select');
@@ -129,7 +132,8 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
     toast({ title: "Applying Changes", description: "Executing surgical binary rewrite..." });
     
     try {
-      const res = await engine.runTool('sign-pdf', [], { document: doc }, (p: any) => console.log(p.detail));
+      const inputFiles = file ? [file] : [];
+      const res = await engine.runTool('sign-pdf', inputFiles, { document: doc }, (p: any) => console.log(p.detail));
       if (res.success && res.blob) {
         const url = URL.createObjectURL(res.blob);
         const a = document.createElement('a');
@@ -144,7 +148,7 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-slate-100 font-sans">
+    <div className="flex flex-col h-full overflow-hidden bg-slate-100 font-sans w-full">
       <PDFToolbar 
         activeTool={activeTool} 
         setActiveTool={setActiveTool}
@@ -181,7 +185,6 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
           ))}
         </main>
 
-        {/* Global Properties - Only if something is selected */}
         <div className="absolute right-0 top-0 bottom-0 pointer-events-none">
            <div className="pointer-events-auto h-full">
               <PDFPropertiesPanel 
