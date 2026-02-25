@@ -1,14 +1,22 @@
+
 "use client";
 
 import { useState, useCallback, useEffect } from 'react';
 import { PDFToolbar } from './pdf-toolbar';
 import { PDFCanvas } from './pdf-canvas';
 import { PDFPropertiesPanel } from './pdf-properties-panel';
+import { PDFThumbnailStrip } from './pdf-thumbnail-strip';
 import { SignatureDialog } from './signature-dialog';
 import { PDFDocument, PDFPage, PDFTool, PDFElement, PDFVersion } from './types';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { engine } from '@/lib/engine';
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Configure PDF.js Worker
+if (typeof window !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+}
 
 interface Props {
   initialFileId: string | null;
@@ -40,16 +48,78 @@ export function PDFEditor({ initialFileId, file }: Props) {
 
   const [history, setHistory] = useState<PDFDocument[]>([doc]);
   const [historyIndex, setHistoryIndex] = useState(0);
+  const [activePageIdx, setActivePageIdx] = useState(0);
   
   const [activeTool, setActiveTool] = useState<PDFTool>('select');
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [zoom, setZoom] = useState(100);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isParsing, setIsParsing] = useState(false);
   
   const [sigOpen, setSigOpen] = useState(false);
   const [pendingSigPos, setPendingSigPos] = useState<{x: number, y: number, w: number, h: number} | null>(null);
 
   const { toast } = useToast();
+
+  /**
+   * Real-time PDF Parser
+   * Ingests binary file and generates page preview layers.
+   */
+  const loadPDF = useCallback(async (pdfFile: File) => {
+    setIsParsing(true);
+    try {
+      const arrayBuffer = await pdfFile.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+      const parsedPages: PDFPage[] = [];
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 1.5 }); // High-quality rasterization
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d')!;
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        await page.render({ canvasContext: context, viewport }).promise;
+        const previewUrl = canvas.toDataURL('image/jpeg', 0.8);
+
+        parsedPages.push({
+          id: `page-${i}-${Math.random().toString(36).substr(2, 4)}`,
+          pageNumber: i,
+          rotation: 0,
+          elements: [],
+          previewUrl,
+        });
+      }
+
+      const initialDoc: PDFDocument = {
+        id: `doc-${Date.now()}`,
+        name: pdfFile.name,
+        totalPages: pdf.numPages,
+        pages: parsedPages,
+        versions: MOCK_VERSIONS,
+      };
+
+      setDoc(initialDoc);
+      setHistory([initialDoc]);
+      setHistoryIndex(0);
+    } catch (err) {
+      console.error("[Surgical Editor] Load failure:", err);
+      toast({ 
+        title: "Kernel Error", 
+        description: "Document binary structure is corrupted.", 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsParsing(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    if (file) {
+      loadPDF(file);
+    }
+  }, [file, loadPDF]);
 
   const pushToHistory = useCallback((newDoc: PDFDocument) => {
     const newHistory = history.slice(0, historyIndex + 1);
@@ -122,7 +192,7 @@ export function PDFEditor({ initialFileId, file }: Props) {
       zIndex: 100,
     };
 
-    handleAddElement(newSig, 0);
+    handleAddElement(newSig, activePageIdx);
     setPendingSigPos(null);
     setActiveTool('select');
   };
@@ -147,6 +217,18 @@ export function PDFEditor({ initialFileId, file }: Props) {
     }
   };
 
+  if (isParsing) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center space-y-6 bg-slate-100">
+        <Loader2 className="w-16 h-16 text-primary animate-spin" />
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-black uppercase tracking-tighter">Initializing Surgical Engine</h2>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] animate-pulse">Decomposing binary segments for {file?.name}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full overflow-hidden bg-slate-100 font-sans w-full">
       <PDFToolbar 
@@ -165,9 +247,16 @@ export function PDFEditor({ initialFileId, file }: Props) {
       />
 
       <div className="flex-1 flex overflow-hidden relative">
+        <PDFThumbnailStrip 
+          pages={doc.pages} 
+          activeIdx={activePageIdx} 
+          onSelect={setActivePageIdx} 
+          onReorder={() => {}} 
+        />
+
         <main className="flex-1 overflow-y-auto scrollbar-hide p-8 flex flex-col items-center gap-12 bg-slate-200/50">
           {doc.pages.map((page, idx) => (
-            <div key={page.id} className="relative shadow-2xl">
+            <div key={page.id} className={cn("relative shadow-2xl transition-all", activePageIdx === idx ? "ring-4 ring-primary/20 scale-[1.01]" : "opacity-80 scale-[0.98]")}>
               <PDFCanvas 
                 page={page} 
                 zoom={zoom}
@@ -216,7 +305,7 @@ export function PDFEditor({ initialFileId, file }: Props) {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center">
           <div className="text-center space-y-6">
             <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto" />
-            <p className="text-sm font-black uppercase tracking-[0.4em] text-white">Surgical Transformation Active...</p>
+            <p className="text-sm font-black uppercase tracking-[0.4em] text-white">Finalizing Binary Sync...</p>
           </div>
         </div>
       )}

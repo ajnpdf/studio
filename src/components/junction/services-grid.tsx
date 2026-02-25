@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo } from 'react';
@@ -38,11 +39,15 @@ export type ServiceUnit = {
   cat: 'Organize' | 'Optimize' | 'Convert' | 'Edit' | 'Security' | 'Export';
   mode: 'Standard' | 'Advanced';
   color: string;
+  benefits?: string[];
+  instructions?: string[];
+  useCases?: string[];
 };
 
 /**
  * AJN Major 10 Registry
- * Curated for Industrial Dominance
+ * High-Fidelity Industrial Standards for 2026.
+ * Descriptions are synchronized verbatim with provided specifications.
  */
 export const ALL_UNITS: ServiceUnit[] = [
   { 
@@ -53,7 +58,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Merge', 
     cat: 'Organize', 
     mode: 'Standard', 
-    color: '#3B82F6'
+    color: '#3B82F6',
+    benefits: ['Lossless page stitching', 'Multi-document synchronization', 'Custom segment ordering'],
+    instructions: ['Inhale source binaries into the buffer', 'Sequence segments via the visionary grid', 'Execute master merge'],
+    useCases: ['Academic portfolio assembly', 'Commercial report aggregation', 'Legal document bundling']
   },
   { 
     id: 'split-pdf', 
@@ -63,7 +71,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Split', 
     cat: 'Organize', 
     mode: 'Standard', 
-    color: '#6366F1'
+    color: '#6366F1',
+    benefits: ['Surgical page extraction', 'Batch decomposition', 'Segment isolation'],
+    instructions: ['Select specific pages for extraction', 'Set interval parameters', 'Execute split protocol'],
+    useCases: ['Invoicing extraction', 'Chapter separation', 'Privacy redaction via exclusion']
   },
   { 
     id: 'compress-pdf', 
@@ -73,7 +84,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Compress', 
     cat: 'Optimize', 
     mode: 'Standard', 
-    color: '#10B981'
+    color: '#10B981',
+    benefits: ['Optimized binary weight', 'High-fidelity raster preserving', 'Email-ready outputs'],
+    instructions: ['Ingest document into the optimizer', 'Adjust fidelity index', 'Execute compression'],
+    useCases: ['Email attachment preparation', 'Cloud storage optimization', 'Mobile bandwidth reduction']
   },
   { 
     id: 'pdf-word', 
@@ -83,7 +97,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Word', 
     cat: 'Export', 
     mode: 'Standard', 
-    color: '#3B82F6'
+    color: '#3B82F6',
+    benefits: ['High-accuracy layout mapping', 'Editable text layers', 'OOXML standard compliance'],
+    instructions: ['Ingest PDF source', 'Map semantic layers', 'Export to DOCX'],
+    useCases: ['Contract editing', 'Legacy document recovery', 'Academic text extraction']
   },
   { 
     id: 'word-pdf', 
@@ -93,7 +110,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'PDF', 
     cat: 'Convert', 
     mode: 'Standard', 
-    color: '#2563EB'
+    color: '#2563EB',
+    benefits: ['Universal readability', 'Preserved formatting', 'Embedded font layers'],
+    instructions: ['Load OOXML document', 'Verify layout integrity', 'Execute conversion'],
+    useCases: ['Official document delivery', 'E-book publishing', 'Cross-platform distribution']
   },
   { 
     id: 'jpg-pdf', 
@@ -103,17 +123,23 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'PDF', 
     cat: 'Convert', 
     mode: 'Standard', 
-    color: '#4F46E5'
+    color: '#4F46E5',
+    benefits: ['Image-to-document synthesis', 'Margin configuration', 'Batch frame stitching'],
+    instructions: ['Inhale JPG frames', 'Configure layout matrix', 'Execute raster-to-pdf'],
+    useCases: ['ID document scanning', 'Portfolio generation', 'Digital archiving']
   },
   { 
     id: 'ppt-pdf', 
-    name: 'PPT to PDF', 
+    name: 'PowerPoint to PDF', 
     desc: 'Make PPT and PPTX slideshows easy to view by converting them to PDF.', 
     icon: Presentation, 
     tag: 'PDF', 
     cat: 'Convert', 
     mode: 'Standard', 
-    color: '#D97706'
+    color: '#D97706',
+    benefits: ['Slide-to-page mapping', 'Visual effect preservation', 'Universal presentation access'],
+    instructions: ['Load presentation file', 'Calibrate slide dimensions', 'Execute PDF assembly'],
+    useCases: ['Handout distribution', 'Slide deck archiving', 'Academic presentation sharing']
   },
   { 
     id: 'excel-pdf', 
@@ -123,7 +149,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'PDF', 
     cat: 'Convert', 
     mode: 'Standard', 
-    color: '#059669'
+    color: '#059669',
+    benefits: ['Grid-to-layout rendering', 'Paging automation', 'Cell semantic mapping'],
+    instructions: ['Load worksheet data', 'Calculate print area bounds', 'Execute grid-to-pdf'],
+    useCases: ['Financial reporting', 'Data snapshotting', 'Invoice generation']
   },
   { 
     id: 'sign-pdf', 
@@ -133,7 +162,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Sign', 
     cat: 'Security', 
     mode: 'Standard', 
-    color: '#1F2937'
+    color: '#1F2937',
+    benefits: ['Digital signature injection', 'Multi-party request flows', 'AcroForm compliance'],
+    instructions: ['Identify signature areas', 'Place digital layers', 'Commit binary changes'],
+    useCases: ['Legal contract signing', 'Internal HR approval', 'B2B agreement execution']
   },
   {
     id: 'protect-pdf',
@@ -143,7 +175,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Secure',
     cat: 'Security',
     mode: 'Advanced',
-    color: '#ef4444'
+    color: '#ef4444',
+    benefits: ['256-bit AES encryption', 'Owner/User password lock', 'Permission restriction'],
+    instructions: ['Enter secure password', 'Set permission flags', 'Execute encryption'],
+    useCases: ['Sensitive financial delivery', 'Confidential project sharing', 'Private data storage']
   }
 ];
 
@@ -159,7 +194,6 @@ const cardVariants = {
 
 export function ServicesGrid({ query, category }: { query: string, category: string }) {
   const filteredUnits = useMemo(() => {
-    // Note: 'edit-pdf' is removed from grid as it is now a FAB
     return ALL_UNITS.filter(unit => {
       const matchesSearch = unit.name.toLowerCase().includes(query.toLowerCase()) || 
                            unit.desc.toLowerCase().includes(query.toLowerCase());

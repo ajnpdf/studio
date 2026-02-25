@@ -1,8 +1,9 @@
+
 "use client";
 
 import { PDFPage, PDFElement, PDFTool } from './types';
 import { cn } from '@/lib/utils';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { PenTool, Type, Image as ImageIcon, CheckCircle2, Link as LinkIcon, Trash2, Move, MousePointer2, Crosshair, Plus } from 'lucide-react';
 
 interface Props {
@@ -19,7 +20,7 @@ interface Props {
 /**
  * AJN High-Fidelity PDF Canvas
  * Professional interaction engine for document manipulation.
- * Supports real-time text, image, and signature injection.
+ * Supports real-time text, image, and signature injection over actual PDF data.
  */
 export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectElement, onUpdateElement, onAddElement, onRequestSignature }: Props) {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -174,7 +175,7 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       className={cn(
-        "bg-white rounded-sm shadow-[0_0_100px_rgba(0,0,0,0.5)] relative transition-all duration-300 origin-center mb-24",
+        "bg-white rounded-sm shadow-[0_0_100px_rgba(0,0,0,0.5)] relative transition-all duration-300 origin-center",
         (activeTool === 'signature' || activeTool === 'insert-image') ? 'cursor-crosshair' : 'cursor-default'
       )}
       style={{ 
@@ -185,18 +186,16 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
     >
       <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageFileSelect} />
 
-      {/* PDF STATIC CONTENT EMULATION */}
-      <div className="absolute inset-0 p-16 flex flex-col gap-8 pointer-events-none select-none overflow-hidden opacity-20">
-        <div className="flex items-center justify-between border-b-2 border-slate-200 pb-8">
-          <div className="w-32 h-8 bg-slate-200 rounded" />
-          <div className="w-24 h-4 bg-slate-100 rounded" />
+      {/* PDF ACTUAL CONTENT LAYER */}
+      {page.previewUrl && (
+        <div className="absolute inset-0 select-none pointer-events-none">
+          <img 
+            src={page.previewUrl} 
+            className="w-full h-full object-contain" 
+            alt={`Page ${page.pageNumber}`} 
+          />
         </div>
-        <div className="space-y-4">
-          <div className="h-6 w-3/4 bg-slate-200 rounded" />
-          <div className="h-4 w-full bg-slate-100 rounded" />
-          <div className="h-4 w-full bg-slate-100 rounded" />
-        </div>
-      </div>
+      )}
 
       {/* DRAW BOX PREVIEW */}
       {boxPreview && (

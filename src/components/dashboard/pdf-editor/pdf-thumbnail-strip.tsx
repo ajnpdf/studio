@@ -1,3 +1,4 @@
+
 "use client";
 
 import { PDFPage } from './types';
@@ -15,8 +16,8 @@ interface Props {
 
 export function PDFThumbnailStrip({ pages, activeIdx, onSelect, onReorder }: Props) {
   return (
-    <aside className="w-[220px] h-full border-r border-white/5 bg-background/20 backdrop-blur-xl flex flex-col shrink-0 z-30">
-      <div className="p-4 border-b border-white/5 flex items-center justify-between">
+    <aside className="w-[220px] h-full border-r border-black/5 bg-white/40 backdrop-blur-xl flex flex-col shrink-0 z-30">
+      <div className="p-4 border-b border-black/5 flex items-center justify-between">
         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Explorer ({pages.length})</h3>
         <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary/10">
           <Plus className="w-4 h-4" />
@@ -41,21 +42,23 @@ export function PDFThumbnailStrip({ pages, activeIdx, onSelect, onReorder }: Pro
                   ? "border-primary ring-4 ring-primary/10 scale-[1.02]" 
                   : "border-white/5 grayscale-[0.5] opacity-60 hover:border-white/20 hover:grayscale-0 hover:opacity-100"
               )}>
-                {/* MOCK PAGE PREVIEW */}
-                <div 
-                  className="w-full h-full p-4 flex flex-col gap-2 origin-center transition-transform"
-                  style={{ transform: `rotate(${page.rotation}deg)` }}
-                >
-                  <div className="h-2 w-1/2 bg-gray-100 rounded" />
-                  <div className="space-y-1">
-                    <div className="h-1 w-full bg-gray-50 rounded" />
-                    <div className="h-1 w-full bg-gray-50 rounded" />
-                    <div className="h-1 w-3/4 bg-gray-50 rounded" />
+                {/* PDF PAGE PREVIEW */}
+                {page.previewUrl ? (
+                  <img 
+                    src={page.previewUrl} 
+                    className="w-full h-full object-cover transition-transform" 
+                    style={{ transform: `rotate(${page.rotation}deg)` }}
+                    alt="" 
+                  />
+                ) : (
+                  <div className="w-full h-full p-4 flex flex-col gap-2 origin-center transition-transform" style={{ transform: `rotate(${page.rotation}deg)` }}>
+                    <div className="h-2 w-1/2 bg-gray-100 rounded" />
+                    <div className="space-y-1">
+                      <div className="h-1 w-full bg-gray-50 rounded" />
+                      <div className="h-1 w-full bg-gray-50 rounded" />
+                    </div>
                   </div>
-                  <div className="mt-auto h-8 w-full bg-gray-50 rounded-lg flex items-center justify-center">
-                    <div className="w-1/2 h-1 bg-gray-100 rounded" />
-                  </div>
-                </div>
+                )}
 
                 {/* Page Number Overlay */}
                 <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur text-[9px] font-black text-white rounded border border-white/10 shadow-xl">

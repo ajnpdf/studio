@@ -16,7 +16,8 @@ export type PDFTool =
   | 'redact';
 
 /**
- * Step 1: Editable object model schema
+ * AJN PDF Element Schema
+ * Defines editable object properties for the surgical layer.
  */
 export interface PDFElement {
   id: string;
@@ -36,13 +37,13 @@ export interface PDFElement {
   rotation?: number;
   zIndex: number;
   
-  // Path objects: bezier data
+  // Path objects
   pathData?: string;
   strokeWidth?: number;
   
   // Signature specific
   signatureType?: 'draw' | 'type' | 'upload';
-  signatureData?: string; // Data URI or path
+  signatureData?: string; 
   
   // Form field specific
   fieldType?: 'text' | 'checkbox' | 'radio' | 'dropdown';
@@ -59,6 +60,7 @@ export interface PDFPage {
   elements: PDFElement[];
   isScanned?: boolean;
   ocrEnabled?: boolean;
+  previewUrl?: string; // High-fidelity raster preview of the original PDF page
 }
 
 export interface PDFVersion {

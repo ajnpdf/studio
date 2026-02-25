@@ -1,3 +1,4 @@
+
 'use client';
 
 import { PDFDocument, degrees, rgb, StandardFonts } from 'pdf-lib';
@@ -12,7 +13,7 @@ export class PDFManipulator {
   private onProgress?: ProgressCallback;
 
   constructor(files: File | File[], onProgress?: ProgressCallback) {
-    this.files = Array.isArray(files) ? files : [files];
+    this.files = Array.isArray(files) ? files : (files ? [files] : []);
     this.onProgress = onProgress;
   }
 
@@ -21,9 +22,10 @@ export class PDFManipulator {
   }
 
   async runOperation(toolId: string, options: any = {}): Promise<ConversionResult> {
-    // Robust name handling for empty file scenarios
-    const firstFile = (this.files && this.files.length > 0) ? this.files[0] : null;
-    const baseName = firstFile?.name?.split('.')[0] || options.document?.name?.split('.')[0] || "Surgical_Output";
+    // Defensive name handling for empty file scenarios
+    const baseName = (this.files && this.files[0]) 
+      ? this.files[0].name.split('.')[0] 
+      : (options.document?.name?.split('.')[0] || "Surgical_Output");
     
     let { pageData = [] } = options;
 
@@ -37,19 +39,26 @@ export class PDFManipulator {
         const buf = await f.arrayBuffer();
         return await PDFDocument.load(buf, { ignoreEncryption: true });
       } catch (e) {
+        console.error("[Manipulator] Source doc load failed:", e);
         return null;
       }
     }));
 
-    // If no page instructions, map entire source
-    if (pageData.length === 0 && sourceDocs.length > 0) {
-      sourceDocs.forEach((doc, fIdx) => {
-        if (!doc) return;
-        const pageCount = doc.getPageCount();
-        for (let pIdx = 0; pIdx < pageCount; pIdx++) {
-          pageData.push({ fileIdx: fIdx, pageIdx: pIdx, rotation: 0 });
-        }
-      });
+    // If no page instructions provided, map the entire first source document by default
+    if (pageData.length === 0 && sourceDocs.length > 0 && sourceDocs[0]) {
+      const pageCount = sourceDocs[0].getPageCount();
+      for (let pIdx = 0; pIdx < pageCount; pIdx++) {
+        pageData.push({ fileIdx: 0, pageIdx: pIdx, rotation: 0 });
+      }
+    }
+
+    // If we're editing an existing structure from the UI editor
+    if (options.document?.pages) {
+      pageData = options.document.pages.map((p: any, idx: number) => ({
+        fileIdx: (this.files.length > 0) ? 0 : -1,
+        pageIdx: idx,
+        rotation: p.rotation || 0
+      }));
     }
 
     this.updateProgress(30, `Executing process: ${pageData.length} segments...`);
@@ -62,7 +71,11 @@ export class PDFManipulator {
       let copiedPage;
       if (item.fileIdx !== -1 && sourceDocs[item.fileIdx]) {
         const sourceDoc = sourceDocs[item.fileIdx]!;
-        [copiedPage] = await masterDoc.copyPages(sourceDoc, [item.pageIdx]);
+        if (item.pageIdx < sourceDoc.getPageCount()) {
+          [copiedPage] = await masterDoc.copyPages(sourceDoc, [item.pageIdx]);
+        } else {
+          copiedPage = masterDoc.addPage([595.28, 841.89]);
+        }
       } else {
         copiedPage = masterDoc.addPage([595.28, 841.89]);
       }
@@ -88,7 +101,7 @@ export class PDFManipulator {
               });
             }
           } catch (err) {
-            console.warn("Layer sync warning:", err);
+            console.warn("[Manipulator] Layer sync warning:", err);
           }
         }
       }
@@ -96,10 +109,16 @@ export class PDFManipulator {
       masterDoc.addPage(copiedPage);
     }
 
-    if (masterDoc.getPageCount() === 0) masterDoc.addPage();
+    if (masterDoc.getPageCount() === 0) {
+      masterDoc.addPage([595.28, 841.89]);
+    }
 
     this.updateProgress(95, "Synchronizing binary buffer...");
     const pdfBytes = await masterDoc.save({ useObjectStreams: true });
-    return { blob: new Blob([pdfBytes], { type: 'application/pdf' }), fileName: `${baseName}.pdf`, mimeType: 'application/pdf' };
+    return { 
+      blob: new Blob([pdfBytes], { type: 'application/pdf' }), 
+      fileName: `${baseName}.pdf`, 
+      mimeType: 'application/pdf' 
+    };
   }
 }
