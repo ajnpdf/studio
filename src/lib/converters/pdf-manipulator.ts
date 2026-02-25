@@ -21,12 +21,13 @@ export class PDFManipulator {
   }
 
   async runOperation(toolId: string, options: any = {}): Promise<ConversionResult> {
+    // Robust name handling for empty file scenarios
     const firstFile = (this.files && this.files.length > 0) ? this.files[0] : null;
-    const baseName = firstFile ? firstFile.name.split('.')[0] : (options.document?.name?.split('.')[0] || "Document");
+    const baseName = firstFile?.name?.split('.')[0] || options.document?.name?.split('.')[0] || "Surgical_Output";
     
     let { pageData = [] } = options;
 
-    this.updateProgress(10, "Inhaling binary structure...");
+    this.updateProgress(10, "Inhaling document binary structure...");
     const masterDoc = await PDFDocument.create();
     const font = await masterDoc.embedFont(StandardFonts.Helvetica);
 
@@ -40,6 +41,7 @@ export class PDFManipulator {
       }
     }));
 
+    // If no page instructions, map entire source
     if (pageData.length === 0 && sourceDocs.length > 0) {
       sourceDocs.forEach((doc, fIdx) => {
         if (!doc) return;
@@ -67,6 +69,7 @@ export class PDFManipulator {
       
       if (item.rotation !== 0) copiedPage.setRotation(degrees(item.rotation));
 
+      // Layer Injection (Elements from Editor)
       if (options.document?.pages?.[i]) {
         const elements = options.document.pages[i].elements;
         for (const el of elements) {
@@ -76,9 +79,17 @@ export class PDFManipulator {
               const sigImage = await masterDoc.embedPng(sigBytes);
               copiedPage.drawImage(sigImage, { x: el.x, y: el.y, width: el.width, height: el.height });
             } else if (el.type === 'text' && el.content) {
-              copiedPage.drawText(el.content, { x: el.x, y: el.y, size: el.fontSize || 12, font, color: rgb(0, 0, 0) });
+              copiedPage.drawText(el.content, { 
+                x: el.x, 
+                y: copiedPage.getHeight() - el.y - (el.fontSize || 12), 
+                size: el.fontSize || 12, 
+                font, 
+                color: rgb(0, 0, 0) 
+              });
             }
-          } catch {}
+          } catch (err) {
+            console.warn("Layer sync warning:", err);
+          }
         }
       }
       
@@ -87,13 +98,8 @@ export class PDFManipulator {
 
     if (masterDoc.getPageCount() === 0) masterDoc.addPage();
 
-    if (toolId === 'protect-pdf' && options.password) {
-      this.updateProgress(90, "Enforcing 256-bit encryption layer...");
-      // In proto, we finalize but standard pdf-lib encryption is premium/limited.
-    }
-
     this.updateProgress(95, "Synchronizing binary buffer...");
     const pdfBytes = await masterDoc.save({ useObjectStreams: true });
-    return { blob: new Blob([pdfBytes], { type: 'application/pdf' }), fileName: `${baseName}_Processed.pdf`, mimeType: 'application/pdf' };
+    return { blob: new Blob([pdfBytes], { type: 'application/pdf' }), fileName: `${baseName}.pdf`, mimeType: 'application/pdf' };
   }
 }

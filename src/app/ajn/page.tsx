@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { ServicesGrid } from '@/components/junction/services-grid';
 import { UnitScroller } from '@/components/junction/unit-scroller';
+import { FABEdit } from '@/components/ui/fab-edit';
 
 /**
  * AJN Hub Page - Professional Industrial Layout 2026
@@ -26,6 +27,7 @@ export default function AJNPage() {
   return (
     <div className="min-h-screen w-full text-slate-950 relative font-body flex flex-col bg-transparent overflow-y-auto scrollbar-hide">
       <NightSky />
+      <FABEdit />
       
       <header className="fixed top-0 left-0 right-0 h-16 glass-header z-[60] px-8 flex items-center justify-between">
         <Link href="/" className="flex items-center group">
@@ -83,7 +85,7 @@ export default function AJNPage() {
         <section className="space-y-10 pb-24">
           <div className="flex items-end justify-between px-6 border-b border-black/5 pb-6">
             <div className="space-y-1 text-left">
-              <h2 className="text-3xl font-black tracking-tighter text-slate-950 leading-none">Document Tool Library</h2>
+              <h2 className="text-3xl font-black tracking-tighter text-slate-950 leading-none">Professional Tool Library</h2>
               <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.4em]">Fast and secure document processing for global professional networks</p>
             </div>
             {searchQuery && (

@@ -14,7 +14,16 @@ import {
   FileCode,
   ImageIcon,
   Presentation,
-  Table
+  Table,
+  Lock,
+  Unlock,
+  Archive,
+  Wrench,
+  Scan,
+  GitCompare,
+  RotateCw,
+  Hash,
+  Globe
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -33,7 +42,7 @@ export type ServiceUnit = {
 
 /**
  * AJN Major 10 Registry
- * Verified Verbatim Descriptions
+ * Curated for Industrial Dominance
  */
 export const ALL_UNITS: ServiceUnit[] = [
   { 
@@ -117,16 +126,6 @@ export const ALL_UNITS: ServiceUnit[] = [
     color: '#059669'
   },
   { 
-    id: 'edit-pdf', 
-    name: 'Edit PDF', 
-    desc: 'Add text, images, shapes or freehand annotations to a PDF document. Edit the size, font, and color of the added content.', 
-    icon: MousePointer2, 
-    tag: 'Edit', 
-    cat: 'Edit', 
-    mode: 'Advanced', 
-    color: '#BE185D'
-  },
-  { 
     id: 'sign-pdf', 
     name: 'Sign PDF', 
     desc: 'Sign yourself or request electronic signatures from others.', 
@@ -135,6 +134,16 @@ export const ALL_UNITS: ServiceUnit[] = [
     cat: 'Security', 
     mode: 'Standard', 
     color: '#1F2937'
+  },
+  {
+    id: 'protect-pdf',
+    name: 'Protect PDF',
+    desc: 'Protect PDF files with a password. Encrypt PDF documents to prevent unauthorized access.',
+    icon: Lock,
+    tag: 'Secure',
+    cat: 'Security',
+    mode: 'Advanced',
+    color: '#ef4444'
   }
 ];
 
@@ -150,6 +159,7 @@ const cardVariants = {
 
 export function ServicesGrid({ query, category }: { query: string, category: string }) {
   const filteredUnits = useMemo(() => {
+    // Note: 'edit-pdf' is removed from grid as it is now a FAB
     return ALL_UNITS.filter(unit => {
       const matchesSearch = unit.name.toLowerCase().includes(query.toLowerCase()) || 
                            unit.desc.toLowerCase().includes(query.toLowerCase());

@@ -1,16 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { PDFToolbar } from './pdf-toolbar';
-import { PDFThumbnailStrip } from './pdf-thumbnail-strip';
 import { PDFCanvas } from './pdf-canvas';
 import { PDFPropertiesPanel } from './pdf-properties-panel';
 import { SignatureDialog } from './signature-dialog';
 import { PDFDocument, PDFPage, PDFTool, PDFElement, PDFVersion } from './types';
 import { useToast } from '@/hooks/use-toast';
-import { Badge } from '@/components/ui/badge';
-import { Sparkles, Loader2, Save, RotateCcw, RotateCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { engine } from '@/lib/engine';
 
 const MOCK_VERSIONS: PDFVersion[] = [
@@ -20,27 +17,26 @@ const MOCK_VERSIONS: PDFVersion[] = [
 const MOCK_DOC: PDFDocument = {
   id: 'doc-1',
   name: 'Project_Proposal_Final.pdf',
-  totalPages: 5,
-  pages: Array.from({ length: 5 }, (_, i) => ({
+  totalPages: 3,
+  pages: Array.from({ length: 3 }, (_, i) => ({
     id: `page-${i + 1}`,
     pageNumber: i + 1,
     rotation: 0,
     elements: [],
-    isScanned: i === 0,
+    isScanned: false,
   })),
   versions: MOCK_VERSIONS,
 };
 
 /**
- * AJN Advanced PDF Studio
- * Professional Real-Time Orchestrator
+ * AJN Advanced Surgical PDF Studio
+ * Professional Real-Time Orchestrator modeled after Sejda UI.
  */
 export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
   const [doc, setDoc] = useState<PDFDocument>(MOCK_DOC);
   const [history, setHistory] = useState<PDFDocument[]>([MOCK_DOC]);
   const [historyIndex, setHistoryIndex] = useState(0);
   
-  const [activePageIdx, setActivePageIdx] = useState(0);
   const [activeTool, setActiveTool] = useState<PDFTool>('select');
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [zoom, setZoom] = useState(100);
@@ -50,9 +46,6 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
   const [pendingSigPos, setPendingSigPos] = useState<{x: number, y: number, w: number, h: number} | null>(null);
 
   const { toast } = useToast();
-
-  const activePage = doc.pages[activePageIdx];
-  const selectedElement = activePage.elements.find(el => el.id === selectedElementId) || null;
 
   const pushToHistory = useCallback((newDoc: PDFDocument) => {
     const newHistory = history.slice(0, historyIndex + 1);
@@ -79,11 +72,11 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
     }
   };
 
-  const handleUpdateElement = (updatedElement: PDFElement) => {
+  const handleUpdateElement = (updatedElement: PDFElement, pageIdx: number) => {
     const newDoc = {
       ...doc,
       pages: doc.pages.map((p, idx) => 
-        idx === activePageIdx 
+        idx === pageIdx 
           ? { ...p, elements: p.elements.map(el => el.id === updatedElement.id ? updatedElement : el) }
           : p
       )
@@ -91,11 +84,11 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
     pushToHistory(newDoc);
   };
 
-  const handleAddElement = (element: PDFElement) => {
+  const handleAddElement = (element: PDFElement, pageIdx: number) => {
     const newDoc = {
       ...doc,
       pages: doc.pages.map((p, idx) => 
-        idx === activePageIdx 
+        idx === pageIdx 
           ? { ...p, elements: [...p.elements, { ...element, zIndex: p.elements.length }] }
           : p
       )
@@ -122,10 +115,11 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
       signatureData: data,
       signatureType: type,
       opacity: 1,
-      zIndex: activePage.elements.length,
+      zIndex: 100, // Top level
     };
 
-    handleAddElement(newSig);
+    // Add to first visible page for now in demo
+    handleAddElement(newSig, 0);
     setPendingSigPos(null);
     setActiveTool('select');
   };
@@ -135,19 +129,12 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
     toast({ title: "Applying Changes", description: "Executing surgical binary rewrite..." });
     
     try {
-      // Execute real transformation via engine
-      const res = await engine.runTool('sign-pdf', [], { 
-        document: doc,
-        activePageIdx 
-      }, (p: any) => console.log(p.detail));
-      
+      const res = await engine.runTool('sign-pdf', [], { document: doc }, (p: any) => console.log(p.detail));
       if (res.success && res.blob) {
         const url = URL.createObjectURL(res.blob);
         const a = document.createElement('a');
-        a.href = url;
-        a.download = `Signed_${doc.name}`;
-        a.click();
-        toast({ title: "Process Successful", description: "Signed document exported to local buffer." });
+        a.href = url; a.download = `Surgical_${doc.name}`; a.click();
+        toast({ title: "Process Successful", description: "Changes committed to local buffer." });
       }
     } catch (err) {
       toast({ title: "Process Failed", description: "Internal buffer sync error.", variant: "destructive" });
@@ -157,7 +144,7 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-[#0a0e1f] font-sans">
+    <div className="flex flex-col h-full overflow-hidden bg-slate-100 font-sans">
       <PDFToolbar 
         activeTool={activeTool} 
         setActiveTool={setActiveTool}
@@ -173,70 +160,67 @@ export function PDFEditor({ initialFileId }: { initialFileId: string | null }) {
         onSave={handleSave}
       />
 
-      <div className="flex flex-1 min-h-0 overflow-hidden relative">
-        <PDFThumbnailStrip 
-          pages={doc.pages} 
-          activeIdx={activePageIdx} 
-          onSelect={setActivePageIdx}
-          onReorder={() => {}}
-        />
+      <div className="flex-1 flex overflow-hidden relative">
+        <main className="flex-1 overflow-y-auto scrollbar-hide p-8 flex flex-col items-center gap-12 bg-slate-200/50">
+          {doc.pages.map((page, idx) => (
+            <div key={page.id} className="relative shadow-2xl">
+              <PDFCanvas 
+                page={page} 
+                zoom={zoom}
+                activeTool={activeTool}
+                selectedElementId={selectedElementId}
+                onSelectElement={setSelectedElementId}
+                onUpdateElement={(el) => handleUpdateElement(el, idx)}
+                onAddElement={(el) => handleAddElement(el, idx)}
+                onRequestSignature={handleRequestSignature}
+              />
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur px-3 py-1 rounded-full text-[9px] font-black text-slate-400 uppercase tracking-widest border border-black/5">
+                Segment {idx + 1}
+              </div>
+            </div>
+          ))}
+        </main>
 
-        <div className="flex-1 bg-[#0a0e1f] overflow-auto flex justify-center p-12 scrollbar-hide relative">
-          <PDFCanvas 
-            page={activePage} 
-            zoom={zoom}
-            activeTool={activeTool}
-            selectedElementId={selectedElementId}
-            onSelectElement={setSelectedElementId}
-            onUpdateElement={handleUpdateElement}
-            onAddElement={handleAddElement}
-            onRequestSignature={handleRequestSignature}
-          />
+        {/* Global Properties - Only if something is selected */}
+        <div className="absolute right-0 top-0 bottom-0 pointer-events-none">
+           <div className="pointer-events-auto h-full">
+              <PDFPropertiesPanel 
+                element={doc.pages.flatMap(p => p.elements).find(el => el.id === selectedElementId) || null}
+                onUpdate={(el) => {
+                  const pIdx = doc.pages.findIndex(p => p.elements.some(e => e.id === el.id));
+                  if (pIdx !== -1) handleUpdateElement(el, pIdx);
+                }}
+                onDelete={() => {
+                  if (!selectedElementId) return;
+                  const newDoc = {
+                    ...doc,
+                    pages: doc.pages.map(p => ({
+                      ...p,
+                      elements: p.elements.filter(e => e.id !== selectedElementId)
+                    }))
+                  };
+                  pushToHistory(newDoc);
+                  setSelectedElementId(null);
+                }}
+              />
+           </div>
         </div>
-
-        <PDFPropertiesPanel 
-          element={selectedElement}
-          onUpdate={handleUpdateElement}
-          onDelete={() => {
-            if (!selectedElementId) return;
-            const newDoc = {
-              ...doc,
-              pages: doc.pages.map((p, idx) => 
-                idx === activePageIdx 
-                  ? { ...p, elements: p.elements.filter(el => el.id !== selectedElementId) }
-                  : p
-              )
-            };
-            pushToHistory(newDoc);
-            setSelectedElementId(null);
-          }}
-        />
       </div>
 
-      <SignatureDialog 
-        open={sigOpen} 
-        onOpenChange={setSigOpen} 
-        onSave={handleAdoptSignature} 
-      />
+      <SignatureDialog open={sigOpen} onOpenChange={setSigOpen} onSave={handleAdoptSignature} />
 
       {isProcessing && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center">
           <div className="text-center space-y-6">
-            <div className="relative">
-              <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              </div>
-            </div>
-            <p className="text-sm font-black uppercase tracking-[0.4em] text-white">Executing Binary Rewrite...</p>
+            <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto" />
+            <p className="text-sm font-black uppercase tracking-[0.4em] text-white">Surgical Transformation Active...</p>
           </div>
         </div>
       )}
 
-      {/* FOOTER SYNC */}
-      <footer className="h-10 bg-black/40 border-t border-white/5 flex items-center justify-center shrink-0 z-[60]">
-        <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20">
-          Made in INDIAN❤️ • 2026
+      <footer className="h-10 bg-white border-t border-black/5 flex items-center justify-center shrink-0 z-[60]">
+        <p className="text-[9px] font-black uppercase tracking-[0.5em] text-slate-400">
+          AJN Core • 2026 • Made in INDIAN<span className="animate-heart-beat ml-1">❤️</span>
         </p>
       </footer>
     </div>
