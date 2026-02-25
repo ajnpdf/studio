@@ -169,12 +169,11 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     reset();
   };
 
-  // Capitalized component variable to resolve JSX parsing error
   const ToolIcon = tool?.icon || FileText;
 
   return (
     <div className="flex h-full bg-transparent overflow-hidden relative text-slate-950 font-sans">
-      <main className="flex-1 flex flex-col min-w-0 relative h-full">
+      <main className="flex-1 flex flex-col min-0 relative h-full">
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 md:p-10 space-y-10 max-w-7xl mx-auto pb-32">
             
@@ -195,7 +194,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   ) : (
                     <div className="flex flex-col gap-12">
                       <div className="space-y-12">
-                        {/* CONFIGURATION PANEL */}
                         <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10 max-w-4xl mx-auto w-full relative">
                           <div className="absolute top-8 right-10 flex gap-3">
                             <Button 
@@ -264,7 +262,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                           </div>
                         </section>
 
-                        {/* VISIONARY HUB */}
                         <div className="space-y-6">
                           <div className="flex items-center justify-between px-2">
                             <div className="flex items-center gap-3">
@@ -301,7 +298,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                             ))}
                           </div>
 
-                          {/* EXECUTE PROTOCOL BAR */}
                           <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-6 animate-in slide-in-from-bottom-10 duration-700">
                             <Button 
                               onClick={handleConfirmedExecution} 
@@ -353,7 +349,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
         </div>
       </main>
 
-      {/* FULL-VIEW INSPECTION DIALOG */}
       <Dialog open={!!previewPage} onOpenChange={() => setPreviewPage(null)}>
         <DialogContent className="max-w-4xl w-full h-[90vh] bg-white border-none p-0 overflow-hidden font-sans rounded-[3rem] shadow-2xl">
           <DialogHeader className="p-8 border-b border-black/5 flex items-center justify-between shrink-0">
