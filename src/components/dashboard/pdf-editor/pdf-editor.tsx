@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useCallback, useEffect } from 'react';
@@ -9,7 +8,7 @@ import { PDFThumbnailStrip } from './pdf-thumbnail-strip';
 import { SignatureDialog } from './signature-dialog';
 import { PDFDocument, PDFPage, PDFTool, PDFElement, PDFVersion } from './types';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, CheckCircle2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { engine } from '@/lib/engine';
 import * as pdfjsLib from 'pdfjs-dist';
 import { cn } from '@/lib/utils';
@@ -75,42 +74,11 @@ export function PDFEditor({ file }: Props) {
 
   useEffect(() => { if (file) handleInitialize(file); }, [file, handleInitialize]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.getAttribute('contenteditable') === 'true') return;
-      
-      const el = doc.pages.flatMap(p => p.elements).find(item => item.id === selectedElementId);
-      
-      if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (selectedElementId) {
-          const newDoc = { ...doc, pages: doc.pages.map(p => ({ ...p, elements: p.elements.filter(el => el.id !== selectedElementId) })) };
-          pushToHistory(newDoc); setSelectedElementId(null);
-        }
-      }
-      
-      if (el && selectedElementId) {
-        const step = e.shiftKey ? 10 : 1;
-        if (e.key === 'ArrowUp') handleUpdateElement({ ...el, y: el.y - step }, activePageIdx);
-        if (e.key === 'ArrowDown') handleUpdateElement({ ...el, y: el.y + step }, activePageIdx);
-        if (e.key === 'ArrowLeft') handleUpdateElement({ ...el, x: el.x - step }, activePageIdx);
-        if (e.key === 'ArrowRight') handleUpdateElement({ ...el, x: el.x + step }, activePageIdx);
-      }
-
-      if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); }
-      if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [doc, selectedElementId, activePageIdx]);
-
   const pushToHistory = useCallback((newDoc: PDFDocument) => {
     const newHistory = history.slice(0, historyIndex + 1);
     newHistory.push(newDoc); if (newHistory.length > 50) newHistory.shift();
     setHistory(newHistory); setHistoryIndex(newHistory.length - 1); setDoc(newDoc);
   }, [history, historyIndex]);
-
-  const undo = () => { if (historyIndex > 0) { setHistoryIndex(historyIndex - 1); setDoc(history[historyIndex - 1]); } };
-  const redo = () => { if (historyIndex < history.length - 1) { setHistoryIndex(historyIndex + 1); setDoc(history[historyIndex + 1]); } };
 
   const handleUpdateElement = (updatedElement: PDFElement, pageIdx: number) => {
     const newDoc = { ...doc, pages: doc.pages.map((p, idx) => idx === pageIdx ? { ...p, elements: p.elements.map(el => el.id === updatedElement.id ? updatedElement : el) } : p) };
@@ -132,6 +100,27 @@ export function PDFEditor({ file }: Props) {
     };
     pushToHistory(newDoc);
   };
+
+  const undo = () => { if (historyIndex > 0) { setHistoryIndex(historyIndex - 1); setDoc(history[historyIndex - 1]); } };
+  const redo = () => { if (historyIndex < history.length - 1) { setHistoryIndex(historyIndex + 1); setDoc(history[historyIndex + 1]); } };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.getAttribute('contenteditable') === 'true') return;
+      
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (selectedElementId) {
+          const newDoc = { ...doc, pages: doc.pages.map(p => ({ ...p, elements: p.elements.filter(el => el.id !== selectedElementId) })) };
+          pushToHistory(newDoc); setSelectedElementId(null);
+        }
+      }
+      
+      if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); }
+      if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [doc, selectedElementId, historyIndex, history, pushToHistory]);
 
   const handleSave = async () => {
     setIsProcessing(true);

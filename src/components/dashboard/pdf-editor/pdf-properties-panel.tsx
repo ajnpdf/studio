@@ -1,4 +1,3 @@
-
 "use client";
 
 import { PDFElement } from './types';
@@ -177,10 +176,10 @@ export function PDFPropertiesPanel({ element, onUpdate, onDelete }: Props) {
             <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Depth Management</h4>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" className="h-11 gap-2 text-[9px] font-black uppercase tracking-widest rounded-2xl border-black/5 bg-white shadow-sm" onClick={() => handleFieldChange('zIndex', element.zIndex + 1)}>
+            <Button variant="outline" className="h-11 gap-2 text-[9px] font-black uppercase tracking-widest rounded-2xl border-black/5 bg-white shadow-sm" onClick={() => handleFieldChange('zIndex', (element.zIndex || 0) + 1)}>
               <ChevronUp className="w-3.5 h-3.5" /> Forward
             </Button>
-            <Button variant="outline" className="h-11 gap-2 text-[9px] font-black uppercase tracking-widest rounded-2xl border-black/5 bg-white shadow-sm" onClick={() => handleFieldChange('zIndex', Math.max(0, element.zIndex - 1))}>
+            <Button variant="outline" className="h-11 gap-2 text-[9px] font-black uppercase tracking-widest rounded-2xl border-black/5 bg-white shadow-sm" onClick={() => handleFieldChange('zIndex', Math.max(0, (element.zIndex || 0) - 1))}>
               <ChevronDown className="w-3.5 h-3.5" /> Backward
             </Button>
           </div>

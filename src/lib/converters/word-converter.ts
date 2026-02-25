@@ -24,7 +24,7 @@ export class WordConverter {
     this.onProgress?.(percent, message);
   }
 
-  async convertTo(targetFormat: string): Promise<ConversionResult> {
+  async convertTo(targetFormat: string, settings: any = {}): Promise<ConversionResult> {
     const arrayBuffer = await this.file.arrayBuffer();
     const baseName = this.file.name.split('.')[0];
     const target = targetFormat.toUpperCase();
@@ -51,16 +51,19 @@ export class WordConverter {
   }
 
   /**
-   * 11. WORD TO PDF (Master Specification Implementation)
+   * WORD TO PDF (Master Specification Implementation)
    */
   private async toMasterPDF(buffer: ArrayBuffer, baseName: string): Promise<ConversionResult> {
-    // STEP 1: Unzip container
+    // STEP 1: Unzip container with validation
     this.updateProgress(10, "Unzipping OOXML container (.docx)...");
-    const zip = await JSZip.loadAsync(buffer);
+    try {
+      await JSZip.loadAsync(buffer);
+    } catch (e) {
+      throw new Error("Invalid .docx binary. The file may be corrupted or is a legacy .doc file renamed to .docx. Please provide a valid OOXML document.");
+    }
 
     // STEP 2: Parse XML parts
     this.updateProgress(20, "Parsing word/document.xml and style definitions...");
-    // Mammoth handles the mapping of document.xml and styles.xml internally for high-fidelity HTML conversion
     
     // STEP 3: Resolve style inheritance
     this.updateProgress(30, "Resolving style inheritance chain and theme mapping...");
@@ -68,7 +71,7 @@ export class WordConverter {
     // STEP 4: Load embedded images
     this.updateProgress(40, "Loading embedded assets from word/media/...");
     
-    // STEP 5: Layout Engine (Executing multi-stage line-breaking and text flow)
+    // STEP 5: Layout Engine
     this.updateProgress(50, "Executing Layout Engine: Measuring glyph advance widths...");
     const { value: html } = await mammoth.convertToHtml({ arrayBuffer: buffer });
     
@@ -91,7 +94,7 @@ export class WordConverter {
           <head>
             <style>
               body { 
-                font-family: 'Inter', Arial, sans-serif; 
+                font-family: Arial, Helvetica, sans-serif; 
                 margin: 48px; 
                 line-height: 1.5; 
                 color: black; 
@@ -103,7 +106,6 @@ export class WordConverter {
               table { border-collapse: collapse; width: 100%; margin: 24px 0; border: 1px solid #000; }
               th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
               img { max-width: 100%; height: auto; border-radius: 4px; }
-              .page-break { page-break-after: always; }
             </style>
           </head>
           <body>${html}</body>
@@ -175,7 +177,7 @@ export class WordConverter {
 
   private async toHtml(buffer: ArrayBuffer, baseName: string): Promise<ConversionResult> {
     const { value: htmlBody } = await mammoth.convertToHtml({ arrayBuffer: buffer });
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:sans-serif;padding:40px;line-height:1.6;}</style></head><body>${htmlBody}</body></html>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;padding:40px;line-height:1.6;}</style></head><body>${htmlBody}</body></html>`;
     return { blob: new Blob([html], { type: 'text/html' }), fileName: `${baseName}.html`, mimeType: 'text/html' };
   }
 
