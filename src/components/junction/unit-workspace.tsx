@@ -23,7 +23,11 @@ import {
   RotateCcw,
   RefreshCcw,
   Trash2,
-  ArrowRight
+  ArrowRight,
+  Maximize2,
+  ZoomIn,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -36,6 +40,7 @@ import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
@@ -54,6 +59,10 @@ interface Props {
   initialUnitId?: string;
 }
 
+/**
+ * AJN Unit Workspace - Professional Industrial Standard 2026
+ * Featuring the "Visionary" High-Fidelity Segment Gallery.
+ */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const tool = ALL_UNITS.find(u => u.id === initialUnitId);
   const { phase, progress, logs, result, error, run, reset, setPhase } = useAJNTool(initialUnitId || 'merge-pdf');
@@ -62,6 +71,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [pages, setPages] = useState<PageNode[]>([]);
   const [selectedPages, setSelectedPages] = useState<Set<string>>(new Set());
   const [isInitializing, setIsInitializing] = useState(false);
+  const [previewPage, setPreviewPage] = useState<PageNode | null>(null);
   
   const [config, setConfig] = useState({
     quality: 50,
@@ -78,7 +88,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const isDirectConvert = ['word-pdf', 'jpg-pdf', 'ppt-pdf', 'excel-pdf', 'pdf-word'].includes(tool?.id || '');
   const isRotateTool = tool?.id === 'rotate-pdf';
 
-  // Determine accept mime based on tool
   const getAcceptMime = () => {
     if (initialUnitId === 'word-pdf') return ".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     if (initialUnitId === 'ppt-pdf') return ".ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation";
@@ -88,7 +97,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleFilesAdded = async (files: File[]) => {
-    // Industrial Validation: Merge & Split require 2+ files
     if ((initialUnitId === 'merge-pdf' || initialUnitId === 'split-pdf') && files.length < 2) {
       toast({ 
         title: "Protocol Violation", 
@@ -100,12 +108,15 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
     setSourceFiles(files);
     
-    if (isCompressTool || isDirectConvert || isRotateTool) {
+    if (isCompressTool || isDirectConvert) {
       setPhase('selecting'); 
     } 
-    else if (files.some(f => f.type === 'application/pdf')) {
+    else if (files.every(f => f.type === 'application/pdf')) {
       await loadDocumentPages(files);
     } 
+    else if (isRotateTool) {
+      await loadDocumentPages(files);
+    }
     else {
       run(files, config);
     }
@@ -125,13 +136,20 @@ export function UnitWorkspace({ initialUnitId }: Props) {
         const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
         for (let pIdx = 1; pIdx <= pdf.numPages; pIdx++) {
           const page = await pdf.getPage(pIdx);
-          const viewport = page.getViewport({ scale: 0.5 });
+          // High-fidelity scale for visionary preview
+          const viewport = page.getViewport({ scale: 1.0 });
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d')!;
           canvas.height = viewport.height; canvas.width = viewport.width;
           await page.render({ canvasContext: ctx, viewport }).promise;
           const pageId = `${fIdx}-${pIdx}-${Math.random().toString(36).substr(2, 4)}`;
-          allLoadedPages.push({ id: pageId, url: canvas.toDataURL('image/jpeg', 0.75), fileIdx: fIdx, pageIdx: pIdx - 1, rotation: 0 });
+          allLoadedPages.push({ 
+            id: pageId, 
+            url: canvas.toDataURL('image/jpeg', 0.85), 
+            fileIdx: fIdx, 
+            pageIdx: pIdx - 1, 
+            rotation: 0 
+          });
           initialSelected.add(pageId);
         }
       }
@@ -146,7 +164,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleConfirmedExecution = () => {
-    if (isCompressTool || isDirectConvert || isRotateTool) {
+    if (isCompressTool || isDirectConvert) {
       run(sourceFiles, config);
       return;
     }
@@ -173,6 +191,20 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     reset();
   };
 
+  const togglePageSelection = (id: string) => {
+    const next = new Set(selectedPages);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    setSelectedPages(next);
+  };
+
+  const rotateAllSelected = (dir: 'left' | 'right') => {
+    setPages(prev => prev.map(p => {
+      if (!selectedPages.has(p.id)) return p;
+      const change = dir === 'right' ? 90 : -90;
+      return { ...p, rotation: (p.rotation + change + 360) % 360 };
+    }));
+  };
+
   return (
     <div className="flex h-full bg-transparent overflow-hidden relative text-slate-950 font-sans">
       <main className="flex-1 flex flex-col min-w-0 relative h-full">
@@ -187,25 +219,23 @@ export function UnitWorkspace({ initialUnitId }: Props) {
               )}
 
               {phase === 'selecting' && (
-                <motion.div key="selecting" className="space-y-8 animate-in fade-in duration-500">
+                <motion.div key="selecting" className="space-y-12 animate-in fade-in duration-500">
                   {isInitializing ? (
                     <div className="py-32 text-center opacity-40">
                       <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
                       <p className="text-[10px] font-black uppercase tracking-widest">Calibrating Buffers...</p>
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-8">
-                      {/* CONFIGURATION PANELS */}
+                    <div className="flex flex-col gap-12">
+                      {/* CONFIGURATION PANEL */}
                       <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10 max-w-4xl mx-auto w-full relative">
-                        
-                        {/* REUPLOAD BUTTON */}
-                        <div className="absolute top-8 right-10">
+                        <div className="absolute top-8 right-10 flex gap-3">
                           <Button 
-                            variant="ghost" 
+                            variant="outline" 
                             onClick={handleReupload}
-                            className="h-9 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all gap-2 rounded-xl"
+                            className="h-10 px-5 text-[10px] font-black uppercase tracking-widest text-slate-400 border-black/5 hover:text-red-500 hover:bg-red-50 transition-all gap-2 rounded-xl"
                           >
-                            <RefreshCcw className="w-3.5 h-3.5" /> Reupload Segment
+                            <RefreshCcw className="w-3.5 h-3.5" /> Reupload
                           </Button>
                         </div>
 
@@ -243,30 +273,30 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                             )}
                             {isRotateTool && (
                               <div className="space-y-6">
-                                <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Rotation Direction</Label>
+                                <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Master Orientation Sync</Label>
                                 <div className="grid grid-cols-2 gap-4">
                                   <button 
-                                    onClick={() => setConfig({...config, direction: 'left'})}
-                                    className={cn(
-                                      "flex flex-col items-center justify-center p-6 rounded-3xl border-2 transition-all gap-3 group",
-                                      config.direction === 'left' ? "border-primary bg-primary/10" : "border-black/5 bg-black/5 hover:border-primary/20"
-                                    )}
+                                    onClick={() => {
+                                      setConfig({...config, direction: 'left'});
+                                      rotateAllSelected('left');
+                                    }}
+                                    className="flex flex-col items-center justify-center p-6 rounded-3xl border-2 transition-all gap-3 bg-black/5 border-black/5 hover:border-primary/20 group"
                                   >
-                                    <RotateCcw className={cn("w-8 h-8", config.direction === 'left' ? "text-primary" : "text-slate-400 group-hover:text-primary")} />
-                                    <span className={cn("text-[10px] font-black uppercase tracking-widest", config.direction === 'left' ? "text-primary" : "text-slate-400")}>Left Rotate</span>
+                                    <RotateCcw className="w-8 h-8 text-slate-400 group-hover:text-primary transition-colors" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Rotate Left</span>
                                   </button>
                                   <button 
-                                    onClick={() => setConfig({...config, direction: 'right'})}
-                                    className={cn(
-                                      "flex flex-col items-center justify-center p-6 rounded-3xl border-2 transition-all gap-3 group",
-                                      config.direction === 'right' ? "border-primary bg-primary/10" : "border-black/5 bg-black/5 hover:border-primary/20"
-                                    )}
+                                    onClick={() => {
+                                      setConfig({...config, direction: 'right'});
+                                      rotateAllSelected('right');
+                                    }}
+                                    className="flex flex-col items-center justify-center p-6 rounded-3xl border-2 transition-all gap-3 bg-black/5 border-black/5 hover:border-primary/20 group"
                                   >
-                                    <RotateCw className={cn("w-8 h-8", config.direction === 'right' ? "text-primary" : "text-slate-400 group-hover:text-primary")} />
-                                    <span className={cn("text-[10px] font-black uppercase tracking-widest", config.direction === 'right' ? "text-primary" : "text-slate-400")}>Right Rotate</span>
+                                    <RotateCw className="w-8 h-8 text-slate-400 group-hover:text-primary transition-colors" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Rotate Right</span>
                                   </button>
                                 </div>
-                                <p className="text-[10px] font-bold text-slate-950/40 uppercase leading-relaxed tracking-widest">Selected segments will be rotated 90° {config.direction === 'left' ? 'counter-clockwise' : 'clockwise'} per cycle.</p>
+                                <p className="text-[10px] font-bold text-slate-950/40 uppercase leading-relaxed tracking-widest">Applying directional logic to all visionary segments.</p>
                               </div>
                             )}
                             {isDirectConvert && (
@@ -281,63 +311,118 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                           </div>
 
                           <div className="space-y-6">
-                            <div className="p-8 bg-primary/5 border border-primary/10 rounded-[2rem] space-y-4">
+                            <div className="p-8 bg-primary/5 border border-primary/10 rounded-[2rem] space-y-4 shadow-inner">
                               <div className="flex items-center gap-3 text-primary">
                                 <ShieldCheck className="w-5 h-5" />
-                                <p className="text-xs font-black uppercase tracking-widest">Local Buffer Secure</p>
+                                <p className="text-xs font-black uppercase tracking-widest">Secure Session</p>
                               </div>
-                              <p className="text-[9px] font-bold uppercase leading-relaxed text-slate-950/60">System executes high-fidelity binary reconstruction. No data leaves your browser sandbox.</p>
+                              <p className="text-[9px] font-bold uppercase leading-relaxed text-slate-950/60">Your document is contained within a secure local buffer. Transformations occur in real-time without cloud persistence.</p>
                             </div>
                           </div>
                         </div>
                       </section>
 
-                      {/* ASSET PREVIEW GRID (PDFs OR IMAGES) */}
-                      {pages.length > 0 ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 pb-20">
-                          {pages.map((page, idx) => (
-                            <Card key={page.id} onClick={() => {
-                              const next = new Set(selectedPages);
-                              if (next.has(page.id)) next.delete(page.id); else next.add(page.id);
-                              setSelectedPages(next);
-                            }} className={cn("relative aspect-[1/1.414] rounded-xl border-4 transition-all cursor-pointer overflow-hidden group", selectedPages.has(page.id) ? "border-primary scale-[1.02] shadow-2xl" : "border-black/5 opacity-40 grayscale hover:opacity-60")}>
-                              <img src={page.url} alt="" className="w-full h-full object-cover" />
-                              <div className="absolute top-2 left-2 bg-black/60 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase backdrop-blur-md">#{idx + 1}</div>
-                              {selectedPages.has(page.id) && (
-                                <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
-                                  <div className="bg-primary text-white rounded-full p-2 shadow-2xl animate-in zoom-in-50 duration-300"><CheckCircle2 className="w-5 h-5" /></div>
-                                </div>
-                              )}
-                            </Card>
-                          ))}
+                      {/* VISIONARY SEGMENT GRID */}
+                      <div className="space-y-6">
+                        <div className="flex items-center justify-between px-2">
+                          <div className="flex items-center gap-3">
+                            <Eye className="w-4 h-4 text-primary" />
+                            <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-950/40">Visionary Preview Hub</h4>
+                          </div>
+                          <div className="flex gap-4">
+                            <Button variant="ghost" className="h-8 text-[9px] font-black uppercase text-primary hover:bg-primary/5" onClick={() => setSelectedPages(new Set(pages.map(p => p.id)))}>Select All</Button>
+                            <Button variant="ghost" className="h-8 text-[9px] font-black uppercase text-slate-400 hover:bg-black/5" onClick={() => setSelectedPages(new Set())}>Clear Selection</Button>
+                          </div>
                         </div>
-                      ) : sourceFiles.length > 0 && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 pb-20">
-                          {sourceFiles.map((file, idx) => (
-                            <Card key={idx} className="relative aspect-[1/1.414] rounded-xl border-4 border-black/5 overflow-hidden bg-white/40 backdrop-blur-xl">
-                              {file.type.startsWith('image/') ? (
-                                <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center">
-                                  <FileText className="w-8 h-8 text-primary/40 mb-2" />
-                                  <p className="text-[8px] font-black uppercase text-slate-950/40 truncate w-full px-2">{file.name}</p>
-                                </div>
-                              )}
-                              <div className="absolute top-2 left-2 bg-black/60 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase backdrop-blur-md">FILE {idx + 1}</div>
-                            </Card>
-                          ))}
-                        </div>
-                      )}
 
-                      {/* FIXED GLOBAL ACTION BAR */}
-                      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-6 animate-in slide-in-from-bottom-10 duration-700">
-                        <Button 
-                          onClick={handleConfirmedExecution} 
-                          disabled={(pages.length > 0 && selectedPages.size === 0) || (sourceFiles.length === 0)}
-                          className="w-full h-16 bg-primary text-white font-black text-sm uppercase tracking-widest rounded-full shadow-[0_20px_50px_rgba(30,58,138,0.4)] hover:scale-105 transition-all gap-4 border-2 border-white/20"
-                        >
-                          <Zap className="w-5 h-5" /> EXECUTE PROCESS
-                        </Button>
+                        {pages.length > 0 ? (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8 pb-32">
+                            {pages.map((page, idx) => (
+                              <div key={page.id} className="space-y-3">
+                                <Card 
+                                  onClick={() => togglePageSelection(page.id)} 
+                                  className={cn(
+                                    "relative aspect-[1/1.414] rounded-[2rem] border-4 transition-all duration-500 cursor-pointer overflow-hidden group shadow-xl", 
+                                    selectedPages.has(page.id) ? "border-primary scale-[1.02]" : "border-transparent opacity-40 grayscale hover:opacity-60"
+                                  )}
+                                >
+                                  <div 
+                                    className="w-full h-full transition-transform duration-500"
+                                    style={{ transform: `rotate(${page.rotation}deg)` }}
+                                  >
+                                    <img src={page.url} alt="" className="w-full h-full object-cover" />
+                                  </div>
+
+                                  <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-white text-[9px] font-black px-2 py-1 rounded-lg uppercase shadow-2xl">
+                                    Segment #{idx + 1}
+                                  </div>
+
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setPreviewPage(page);
+                                    }}
+                                    className="absolute bottom-4 right-4 w-10 h-10 bg-white/80 backdrop-blur-md rounded-xl flex items-center justify-center text-slate-950 opacity-0 group-hover:opacity-100 transition-opacity shadow-2xl hover:bg-primary hover:text-white"
+                                  >
+                                    <Maximize2 className="w-4 h-4" />
+                                  </button>
+
+                                  {selectedPages.has(page.id) && (
+                                    <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
+                                  )}
+                                </Card>
+                                <div className="flex items-center justify-center gap-2">
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setPages(prev => prev.map(p => p.id === page.id ? { ...p, rotation: (p.rotation - 90 + 360) % 360 } : p));
+                                    }}
+                                    className="p-2 hover:bg-black/5 rounded-lg text-slate-400 hover:text-primary transition-all"
+                                  >
+                                    <RotateCcw className="w-3.5 h-3.5" />
+                                  </button>
+                                  <span className="text-[10px] font-black text-slate-950/20 uppercase tracking-widest">{page.rotation}°</span>
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setPages(prev => prev.map(p => p.id === page.id ? { ...p, rotation: (p.rotation + 90) % 360 } : p));
+                                    }}
+                                    className="p-2 hover:bg-black/5 rounded-lg text-slate-400 hover:text-primary transition-all"
+                                  >
+                                    <RotateCw className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : sourceFiles.length > 0 && (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-6 pb-20">
+                            {sourceFiles.map((file, idx) => (
+                              <Card key={idx} className="relative aspect-[1/1.414] rounded-2xl border-4 border-black/5 overflow-hidden bg-white/40 backdrop-blur-xl shadow-lg">
+                                {file.type.startsWith('image/') ? (
+                                  <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center">
+                                    <FileText className="w-10 h-10 text-primary/20 mb-2" />
+                                    <p className="text-[9px] font-black uppercase text-slate-950/40 truncate w-full px-4">{file.name}</p>
+                                  </div>
+                                )}
+                                <div className="absolute top-3 left-3 bg-black/60 text-white text-[8px] font-black px-2 py-1 rounded-lg uppercase backdrop-blur-md">File {idx + 1}</div>
+                              </Card>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* GLOBAL EXECUTION BAR */}
+                        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-6 animate-in slide-in-from-bottom-10 duration-700">
+                          <Button 
+                            onClick={handleConfirmedExecution} 
+                            disabled={(pages.length > 0 && selectedPages.size === 0) || (sourceFiles.length === 0)}
+                            className="w-full h-16 bg-primary text-white font-black text-sm uppercase tracking-widest rounded-full shadow-[0_30px_60px_rgba(30,58,138,0.4)] hover:scale-105 transition-all gap-4 border-2 border-white/20"
+                          >
+                            <Zap className="w-5 h-5" /> EXECUTE PROCESS
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -350,7 +435,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4 text-primary">
                         <Loader2 className="w-8 h-8 animate-spin" />
-                        <h3 className="text-xl font-black uppercase tracking-tighter">Executing Process...</h3>
+                        <h3 className="text-xl font-black uppercase tracking-tighter">Synchronizing Binaries...</h3>
                       </div>
                       <span className="text-3xl font-black text-primary tabular-nums">{Math.round(progress.pct)}%</span>
                     </div>
@@ -383,6 +468,57 @@ export function UnitWorkspace({ initialUnitId }: Props) {
           </motion.div>
         </div>
       </main>
+
+      {/* FULL VISIONARY PREVIEW MODAL */}
+      <Dialog open={!!previewPage} onOpenChange={() => setPreviewPage(null)}>
+        <DialogContent className="max-w-[95vw] w-full h-[90vh] bg-white/95 backdrop-blur-3xl border-none p-0 flex flex-col overflow-hidden rounded-[3rem] shadow-2xl">
+          <header className="h-20 border-b border-black/5 flex items-center justify-between px-10 shrink-0 bg-white/40">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                <ZoomIn className="w-5 h-5 text-primary" />
+              </div>
+              <h2 className="text-xl font-black uppercase tracking-tighter">Visionary Inspection</h2>
+            </div>
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="ghost" 
+                onClick={() => {
+                  if (previewPage) {
+                    setPages(prev => prev.map(p => p.id === previewPage.id ? { ...p, rotation: (p.rotation - 90 + 360) % 360 } : p));
+                    setPreviewPage({ ...previewPage, rotation: (previewPage.rotation - 90 + 360) % 360 });
+                  }
+                }}
+                className="h-10 px-4 text-[10px] font-black uppercase gap-2"
+              >
+                <RotateCcw className="w-4 h-4" /> Left
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => {
+                  if (previewPage) {
+                    setPages(prev => prev.map(p => p.id === previewPage.id ? { ...p, rotation: (p.rotation + 90) % 360 } : p));
+                    setPreviewPage({ ...previewPage, rotation: (previewPage.rotation + 90) % 360 });
+                  }
+                }}
+                className="h-10 px-4 text-[10px] font-black uppercase gap-2"
+              >
+                <RotateCw className="w-4 h-4" /> Right
+              </Button>
+              <div className="h-8 w-px bg-black/5 mx-2" />
+              <Button onClick={() => setPreviewPage(null)} className="h-10 px-8 bg-slate-900 text-white font-black text-[10px] uppercase rounded-xl">Exit View</Button>
+            </div>
+          </header>
+          <div className="flex-1 overflow-hidden bg-black/5 flex items-center justify-center p-12">
+            <div 
+              className="h-full shadow-2xl transition-transform duration-500"
+              style={{ transform: `rotate(${previewPage?.rotation || 0}deg)` }}
+            >
+              <img src={previewPage?.url} alt="" className="h-full w-auto object-contain rounded-sm border border-black/5" />
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <footer className="fixed bottom-0 left-0 right-0 h-12 bg-white/40 backdrop-blur-md border-t border-black/5 flex items-center justify-center z-[100]">
         <p className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.5em]">AJN Core • 2026 • Made in INDIAN<span className="animate-heart-beat ml-1">❤️</span></p>
       </footer>
