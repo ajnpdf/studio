@@ -3,12 +3,18 @@
 import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Layout, Scissors, Shrink, FileText, MousePointer2, 
-  PenTool, Lock, Wrench, Search, GitCompare,
-  ArrowRight, Archive, Scan, Layers, Type, RotateCw, 
-  Trash2, Copy, Hash, Unlock, GitBranch, Globe, 
-  FolderOpen, Presentation, ShieldCheck, History,
-  Paintbrush, Table, FileCode, Plus, ListChecks
+  Layout, 
+  Scissors, 
+  Shrink, 
+  FileText, 
+  MousePointer2, 
+  PenTool, 
+  Search,
+  ArrowRight, 
+  FileCode,
+  ImageIcon,
+  Presentation,
+  Table
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -20,11 +26,15 @@ export type ServiceUnit = {
   desc: string;
   icon: any;
   tag: string;
-  cat: 'Organize' | 'Optimize' | 'Convert' | 'Edit' | 'Security' | 'Export' | 'Intelligence';
+  cat: 'Organize' | 'Optimize' | 'Convert' | 'Edit' | 'Security' | 'Export';
   mode: 'Standard' | 'Advanced';
   color: string;
 };
 
+/**
+ * AJN Major 10 Registry
+ * Verified Verbatim Descriptions
+ */
 export const ALL_UNITS: ServiceUnit[] = [
   { 
     id: 'merge-pdf', 
@@ -57,14 +67,54 @@ export const ALL_UNITS: ServiceUnit[] = [
     color: '#10B981'
   },
   { 
-    id: 'repair-pdf', 
-    name: 'Repair PDF', 
-    desc: 'Repair a damaged PDF and recover data from corrupt PDF. Fix PDF files with our Repair tool.', 
-    icon: Wrench, 
-    tag: 'Repair', 
-    cat: 'Optimize', 
-    mode: 'Advanced', 
-    color: '#B91C1C'
+    id: 'pdf-word', 
+    name: 'PDF to Word', 
+    desc: 'Easily convert your PDF files into easy to edit DOC and DOCX documents. The converted WORD document is almost 100% accurate.', 
+    icon: FileText, 
+    tag: 'Word', 
+    cat: 'Export', 
+    mode: 'Standard', 
+    color: '#3B82F6'
+  },
+  { 
+    id: 'word-pdf', 
+    name: 'Word to PDF', 
+    desc: 'Make DOC and DOCX files easy to read by converting them to PDF.', 
+    icon: FileCode, 
+    tag: 'PDF', 
+    cat: 'Convert', 
+    mode: 'Standard', 
+    color: '#2563EB'
+  },
+  { 
+    id: 'jpg-pdf', 
+    name: 'JPG to PDF', 
+    desc: 'Convert JPG images to PDF in seconds. Easily adjust orientation and margins.', 
+    icon: ImageIcon, 
+    tag: 'PDF', 
+    cat: 'Convert', 
+    mode: 'Standard', 
+    color: '#4F46E5'
+  },
+  { 
+    id: 'ppt-pdf', 
+    name: 'PPT to PDF', 
+    desc: 'Make PPT and PPTX slideshows easy to view by converting them to PDF.', 
+    icon: Presentation, 
+    tag: 'PDF', 
+    cat: 'Convert', 
+    mode: 'Standard', 
+    color: '#D97706'
+  },
+  { 
+    id: 'excel-pdf', 
+    name: 'Excel to PDF', 
+    desc: 'Make EXCEL spreadsheets easy to read by converting them to PDF.', 
+    icon: Table, 
+    tag: 'PDF', 
+    cat: 'Convert', 
+    mode: 'Standard', 
+    color: '#059669'
   },
   { 
     id: 'edit-pdf', 
@@ -85,46 +135,6 @@ export const ALL_UNITS: ServiceUnit[] = [
     cat: 'Security', 
     mode: 'Standard', 
     color: '#1F2937'
-  },
-  { 
-    id: 'ocr-pdf', 
-    name: 'OCR PDF', 
-    desc: 'Easily convert scanned PDF into searchable and selectable documents.', 
-    icon: Search, 
-    tag: 'OCR', 
-    cat: 'Optimize', 
-    mode: 'Advanced', 
-    color: '#065F46'
-  },
-  { 
-    id: 'compare-pdf', 
-    name: 'Compare PDF', 
-    desc: 'Show a side-by-side document comparison and easily spot changes between different file versions.', 
-    icon: GitCompare, 
-    tag: 'Compare', 
-    cat: 'Intelligence', 
-    mode: 'Advanced', 
-    color: '#1E40AF'
-  },
-  { 
-    id: 'protect-pdf', 
-    name: 'Protect PDF', 
-    desc: 'Protect PDF files with a password. Encrypt PDF documents to prevent unauthorized access.', 
-    icon: Lock, 
-    tag: 'Protect', 
-    cat: 'Security', 
-    mode: 'Standard', 
-    color: '#059669'
-  },
-  { 
-    id: 'pdf-word', 
-    name: 'PDF to Word', 
-    desc: 'Easily convert your PDF files into easy to edit DOC and DOCX documents. The converted WORD document is almost 100% accurate.', 
-    icon: FileText, 
-    tag: 'Word', 
-    cat: 'Export', 
-    mode: 'Standard', 
-    color: '#3B82F6'
   }
 ];
 

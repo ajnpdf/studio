@@ -9,13 +9,10 @@ import {
   CheckCircle2, 
   Loader2, 
   Zap, 
-  Lock, 
   Edit3,
   Settings2,
-  GitCompare,
   FileText,
-  ShieldCheck,
-  Info
+  ShieldCheck
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -27,7 +24,6 @@ import { cn } from '@/lib/utils';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
 import Link from 'next/link';
 
 if (typeof window !== 'undefined') {
@@ -52,7 +48,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const { phase, progress, logs, result, error, run, reset, setPhase } = useAJNTool(initialUnitId || 'merge-pdf');
   
   const [sourceFiles, setSourceFiles] = useState<File[]>([]);
-  const [secondFile, setSecondFile] = useState<File | null>(null);
   const [pages, setPages] = useState<PageNode[]>([]);
   const [selectedPages, setSelectedPages] = useState<Set<string>>(new Set());
   const [isInitializing, setIsInitializing] = useState(false);
@@ -60,32 +55,16 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [config, setConfig] = useState({
     quality: 50,
     targetSize: '',
-    targetUnit: 'KB',
-    password: '',
-    strongRepair: true,
-    compareMode: 'semantic' as 'semantic' | 'visual',
-    compareSensitivity: 50
+    targetUnit: 'KB'
   });
 
   const isCompressTool = tool?.id === 'compress-pdf';
-  const isProtectTool = tool?.id === 'protect-pdf';
-  const isCompareTool = tool?.id === 'compare-pdf';
-  const isRepairTool = tool?.id === 'repair-pdf';
+  const isDirectConvert = ['word-pdf', 'jpg-pdf', 'ppt-pdf', 'excel-pdf', 'pdf-word'].includes(tool?.id || '');
 
   const handleFilesAdded = async (files: File[]) => {
-    if (isCompareTool) {
-      if (sourceFiles.length === 0) {
-        setSourceFiles([files[0]]);
-      } else if (!secondFile) {
-        setSecondFile(files[0]);
-        setPhase('selecting');
-      }
-      return;
-    }
-
     setSourceFiles(files);
     
-    if (isCompressTool || isProtectTool || isRepairTool) {
+    if (isCompressTool || isDirectConvert) {
       setPhase('selecting'); 
     } 
     else if (files.some(f => f.type === 'application/pdf')) {
@@ -131,12 +110,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleConfirmedExecution = () => {
-    if (isCompareTool) {
-      run([sourceFiles[0], secondFile], config);
-      return;
-    }
-    const isConfigOnly = isCompressTool || isProtectTool || isRepairTool;
-    if (isConfigOnly) {
+    if (isCompressTool || isDirectConvert) {
       run(sourceFiles, config);
       return;
     }
@@ -165,46 +139,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             <AnimatePresence mode="wait">
               {phase === 'idle' && (
                 <motion.div key="idle" className="space-y-8">
-                  {isCompareTool ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3 px-2">
-                          <Badge className="bg-primary/10 text-primary border-none">Slot 1</Badge>
-                          <span className="text-xs font-black uppercase tracking-widest text-slate-950/40">Master Document</span>
-                        </div>
-                        {sourceFiles.length > 0 ? (
-                          <div className="p-10 bg-white/60 rounded-[2.5rem] border border-black/5 flex items-center justify-between group shadow-xl">
-                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary"><FileText className="w-6 h-6" /></div>
-                              <p className="font-black text-sm uppercase tracking-tighter truncate max-w-[180px]">{sourceFiles[0].name}</p>
-                            </div>
-                            <Button variant="ghost" onClick={() => setSourceFiles([])} className="text-red-500 hover:bg-red-50 transition-all uppercase text-[9px] font-black tracking-widest">Discard</Button>
-                          </div>
-                        ) : (
-                          <DropZone onFiles={handleFilesAdded} accept="application/pdf" />
-                        )}
-                      </div>
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3 px-2">
-                          <Badge className="bg-emerald-500/10 text-emerald-600 border-none">Slot 2</Badge>
-                          <span className="text-xs font-black uppercase tracking-widest text-slate-950/40">Modified Asset</span>
-                        </div>
-                        {secondFile ? (
-                          <div className="p-10 bg-white/60 rounded-[2.5rem] border border-black/5 flex items-center justify-between group shadow-xl">
-                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-600"><FileText className="w-6 h-6" /></div>
-                              <p className="font-black text-sm uppercase tracking-tighter truncate max-w-[180px]">{secondFile.name}</p>
-                            </div>
-                            <Button variant="ghost" onClick={() => setSecondFile(null)} className="text-red-500 hover:bg-red-50 transition-all uppercase text-[9px] font-black tracking-widest">Discard</Button>
-                          </div>
-                        ) : (
-                          <DropZone onFiles={handleFilesAdded} accept="application/pdf" />
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <DropZone onFiles={handleFilesAdded} />
-                  )}
+                  <DropZone onFiles={handleFilesAdded} />
                 </motion.div>
               )}
 
@@ -218,11 +153,11 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   ) : (
                     <div className="flex flex-col gap-8">
                       {/* CONFIGURATION PANELS */}
-                      {(isCompressTool || isProtectTool || isCompareTool || isRepairTool) && (
+                      {(isCompressTool || isDirectConvert) && (
                         <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10 max-w-4xl mx-auto w-full">
                           <div className="flex items-center gap-4 text-primary border-b border-black/5 pb-6">
                             <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-sm">
-                              {isCompareTool ? <GitCompare className="w-7 h-7" /> : <Settings2 className="w-7 h-7" />}
+                              <Settings2 className="w-7 h-7" />
                             </div>
                             <div>
                               <h3 className="text-3xl font-black uppercase tracking-tighter text-slate-950">{tool?.name}</h3>
@@ -232,25 +167,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                             <div className="space-y-8">
-                              {isCompareTool && (
-                                <>
-                                  <div className="space-y-3">
-                                    <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Comparison Mode</Label>
-                                    <div className="grid grid-cols-2 gap-2">
-                                      <Button variant="outline" onClick={() => setConfig({...config, compareMode: 'semantic'})} className={cn("h-11 text-[9px] font-black uppercase rounded-xl", config.compareMode === 'semantic' ? "bg-primary text-white" : "bg-black/5 border-none")}>Semantic</Button>
-                                      <Button variant="outline" onClick={() => setConfig({...config, compareMode: 'visual'})} className={cn("h-11 text-[9px] font-black uppercase rounded-xl", config.compareMode === 'visual' ? "bg-primary text-white" : "bg-black/5 border-none")}>Visual</Button>
-                                    </div>
-                                  </div>
-                                  <div className="space-y-3">
-                                    <Label className="text-[11px] font-black uppercase tracking-widest text-primary flex justify-between">
-                                      <span>Sensitivity</span>
-                                      <span>{config.compareSensitivity}%</span>
-                                    </Label>
-                                    <Slider value={[config.compareSensitivity]} onValueChange={([v]) => setConfig({...config, compareSensitivity: v})} max={100} />
-                                  </div>
-                                </>
-                              )}
-
                               {isCompressTool && (
                                 <>
                                   <div className="space-y-3">
@@ -271,21 +187,13 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                   </div>
                                 </>
                               )}
-                              
-                              {isProtectTool && (
+                              {isDirectConvert && (
                                 <div className="space-y-4">
-                                  <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Master Password</Label>
-                                  <Input type="password" placeholder="••••••••" value={config.password} onChange={(e) => setConfig({...config, password: e.target.value})} className="h-12 bg-black/5 border-none rounded-2xl font-bold" />
-                                </div>
-                              )}
-
-                              {isRepairTool && (
-                                <div className="space-y-4">
-                                  <div className="flex items-center justify-between">
-                                    <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Structural Recovery</Label>
-                                    <Switch checked={config.strongRepair} onCheckedChange={(v) => setConfig({...config, strongRepair: v})} />
+                                  <div className="flex items-center gap-3 p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl text-emerald-600">
+                                    <CheckCircle2 className="w-5 h-5" />
+                                    <span className="text-[9px] font-black uppercase tracking-widest">{sourceFiles.length} File(s) Staged</span>
                                   </div>
-                                  <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Enable deep binary walk for severe corruption.</p>
+                                  <p className="text-[10px] font-bold text-slate-950/40 uppercase leading-relaxed tracking-widest">Execute process to initiate binary transformation.</p>
                                 </div>
                               )}
                             </div>
@@ -298,17 +206,13 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                 </div>
                                 <p className="text-[9px] font-bold uppercase leading-relaxed text-slate-950/60">System executes high-fidelity binary reconstruction. No data leaves your browser sandbox.</p>
                               </div>
-                              <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-3xl flex items-center gap-4">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                                <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">Pipeline Synchronized</span>
-                              </div>
                             </div>
                           </div>
                         </section>
                       )}
 
                       {/* PAGE SELECTION GRID */}
-                      {pages.length > 0 && !isCompareTool && (
+                      {pages.length > 0 && (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 pb-20">
                           {pages.map((page, idx) => (
                             <Card key={page.id} onClick={() => {
@@ -332,7 +236,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                       <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-6 animate-in slide-in-from-bottom-10 duration-700">
                         <Button 
                           onClick={handleConfirmedExecution} 
-                          disabled={(pages.length > 0 && selectedPages.size === 0) || (isCompareTool && !secondFile)}
+                          disabled={(pages.length > 0 && selectedPages.size === 0) || (sourceFiles.length === 0)}
                           className="w-full h-16 bg-primary text-white font-black text-sm uppercase tracking-widest rounded-full shadow-[0_20px_50px_rgba(30,58,138,0.4)] hover:scale-105 transition-all gap-4 border-2 border-white/20"
                         >
                           <Zap className="w-5 h-5" /> EXECUTE PROCESS
