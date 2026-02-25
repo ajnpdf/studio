@@ -7,7 +7,6 @@ import { ConversionResult, ProgressCallback } from './pdf-converter';
 /**
  * AJN Master Manipulation Engine
  * Precision binary synchronization for document surgery.
- * Supports Vector Paths, Shapes, and Text Reconstruction.
  */
 export class PDFManipulator {
   private files: File[];
@@ -30,9 +29,9 @@ export class PDFManipulator {
     let { pageData = [] } = options;
 
     this.updateProgress(10, "Inhaling document binary structure...");
-    const masterDoc = await PDFDocument.create();
-    const standardFont = await masterDoc.embedFont(StandardFonts.Helvetica);
-
+    
+    // If we're editing an existing file, load it first
+    let masterDoc: PDFDocument;
     const sourceDocs = await Promise.all((this.files || []).map(async (f) => {
       try {
         if (!f) return null;
@@ -43,41 +42,39 @@ export class PDFManipulator {
       }
     }));
 
-    if (options.document?.pages) {
-      pageData = options.document.pages.map((p: any, idx: number) => ({
-        fileIdx: (this.files.length > 0) ? 0 : -1,
-        pageIdx: idx,
-        rotation: p.rotation || 0
-      }));
+    if (toolId === 'edit-pdf' && sourceDocs[0]) {
+      masterDoc = await PDFDocument.load(await this.files[0].arrayBuffer(), { ignoreEncryption: true });
+    } else {
+      masterDoc = await PDFDocument.create();
     }
 
-    this.updateProgress(30, `Executing process: ${pageData.length} segments...`);
-    
-    for (let i = 0; i < pageData.length; i++) {
-      const item = pageData[i];
-      const prog = 30 + Math.round((i / pageData.length) * 60);
-      this.updateProgress(prog, `Syncing segment ${i + 1}/${pageData.length}...`);
+    const standardFont = await masterDoc.embedFont(StandardFonts.Helvetica);
 
-      let copiedPage;
-      if (item.fileIdx !== -1 && sourceDocs[item.fileIdx]) {
-        const sourceDoc = sourceDocs[item.fileIdx]!;
-        if (item.pageIdx < sourceDoc.getPageCount()) {
-          [copiedPage] = await masterDoc.copyPages(sourceDoc, [item.pageIdx]);
-        } else {
-          copiedPage = masterDoc.addPage([595.28, 841.89]);
-        }
-      } else {
-        copiedPage = masterDoc.addPage([595.28, 841.89]);
-      }
+    if (options.document?.pages) {
+      // For the surgical editor, we handle page transformation and layer injection
+      this.updateProgress(30, `Executing surgical sync: ${options.document.pages.length} segments...`);
       
-      if (item.rotation !== 0) copiedPage.setRotation(degrees(item.rotation));
+      const editorPages = options.document.pages;
+      for (let i = 0; i < editorPages.length; i++) {
+        const pageNode = editorPages[i];
+        const prog = 30 + Math.round((i / editorPages.length) * 60);
+        this.updateProgress(prog, `Syncing segment ${i + 1}/${editorPages.length}...`);
 
-      // LAYER INJECTION
-      if (options.document?.pages?.[i]) {
-        const elements = options.document.pages[i].elements;
+        // If it's a new page (not in master), add it. Otherwise get existing.
+        let targetPage;
+        if (i < masterDoc.getPageCount()) {
+          targetPage = masterDoc.getPage(i);
+        } else {
+          targetPage = masterDoc.addPage([595.28, 841.89]);
+        }
+
+        if (pageNode.rotation !== 0) targetPage.setRotation(degrees(pageNode.rotation));
+
+        // Inject objects
+        const elements = pageNode.elements || [];
         for (const el of elements) {
           try {
-            const yFlipped = copiedPage.getHeight() - el.y - el.height;
+            const yFlipped = targetPage.getHeight() - el.y - el.height;
             const hexToRgb = (hex: string) => {
               const r = parseInt(hex.slice(1, 3), 16) / 255;
               const g = parseInt(hex.slice(3, 5), 16) / 255;
@@ -88,37 +85,26 @@ export class PDFManipulator {
             if (el.type === 'signature' && el.signatureData) {
               const sigBytes = await fetch(el.signatureData).then(res => res.arrayBuffer());
               const sigImage = await masterDoc.embedPng(sigBytes);
-              copiedPage.drawImage(sigImage, { x: el.x, y: yFlipped, width: el.width, height: el.height });
+              targetPage.drawImage(sigImage, { x: el.x, y: yFlipped, width: el.width, height: el.height });
             } else if (el.type === 'text' && el.content) {
-              copiedPage.drawText(el.content, { 
-                x: el.x, y: copiedPage.getHeight() - el.y - (el.fontSize || 12),
+              targetPage.drawText(el.content, { 
+                x: el.x, y: targetPage.getHeight() - el.y - (el.fontSize || 12),
                 size: el.fontSize || 12, 
                 font: standardFont, 
                 color: hexToRgb(el.color || '#000000'),
-                lineHeight: el.lineHeight ? (el.fontSize || 12) * el.lineHeight : undefined,
-                characterSpacing: el.letterSpacing || 0
+                lineHeight: el.lineHeight ? (el.fontSize || 12) * el.lineHeight : undefined
               });
-            } else if (el.type === 'shape') {
-              const color = hexToRgb(el.color || '#000000');
-              const fill = el.fillColor && el.fillColor !== 'transparent' ? hexToRgb(el.fillColor) : undefined;
-              if (el.shapeType === 'rect') copiedPage.drawRectangle({ x: el.x, y: yFlipped, width: el.width, height: el.height, borderColor: color, color: fill, borderWidth: el.strokeWidth });
-              else if (el.shapeType === 'circle') copiedPage.drawEllipse({ x: el.x + el.width/2, y: yFlipped + el.height/2, xRadius: el.width/2, yRadius: el.height/2, borderColor: color, color: fill, borderWidth: el.strokeWidth });
-            } else if (el.type === 'whiteout') {
-              copiedPage.drawRectangle({ x: el.x, y: yFlipped, width: el.width, height: el.height, color: hexToRgb(el.color || '#FFFFFF') });
             } else if (el.type === 'image' && el.content) {
               const imgBytes = await fetch(el.content).then(res => res.arrayBuffer());
               const img = el.content.includes('png') ? await masterDoc.embedPng(imgBytes) : await masterDoc.embedJpg(imgBytes);
-              copiedPage.drawImage(img, { x: el.x, y: yFlipped, width: el.width, height: el.height });
+              targetPage.drawImage(img, { x: el.x, y: yFlipped, width: el.width, height: el.height });
             }
           } catch (err) {
             console.warn("[Manipulator] Layer sync warning:", err);
           }
         }
       }
-      masterDoc.addPage(copiedPage);
     }
-
-    if (masterDoc.getPageCount() === 0) masterDoc.addPage([595.28, 841.89]);
 
     this.updateProgress(95, "Synchronizing binary buffer...");
     const pdfBytes = await masterDoc.save({ useObjectStreams: true });

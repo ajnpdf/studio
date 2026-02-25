@@ -17,7 +17,6 @@ import {
   Presentation,
   Table,
   Lock,
-  Unlock,
   Archive,
   Wrench,
   Scan,
@@ -46,8 +45,7 @@ export type ServiceUnit = {
 
 /**
  * AJN Major 10 Registry
- * Curated industrial units for 2026 standards.
- * Edit PDF is handled via the FAB Pen.
+ * Verified 2026 Industrial Standards.
  */
 export const ALL_UNITS: ServiceUnit[] = [
   { 
@@ -58,10 +56,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Merge', 
     cat: 'Organize', 
     mode: 'Standard', 
-    color: '#3B82F6',
-    benefits: ['Lossless page stitching', 'Multi-document synchronization', 'Custom segment ordering'],
-    instructions: ['Inhale source binaries into the buffer', 'Sequence segments via the visionary grid', 'Execute master merge'],
-    useCases: ['Academic portfolio assembly', 'Commercial report aggregation', 'Legal document bundling']
+    color: '#3B82F6'
   },
   { 
     id: 'split-pdf', 
@@ -71,10 +66,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Split', 
     cat: 'Organize', 
     mode: 'Standard', 
-    color: '#6366F1',
-    benefits: ['Surgical page extraction', 'Batch decomposition', 'Segment isolation'],
-    instructions: ['Select specific pages for extraction', 'Set interval parameters', 'Execute split protocol'],
-    useCases: ['Invoicing extraction', 'Chapter separation', 'Privacy redaction via exclusion']
+    color: '#6366F1'
   },
   { 
     id: 'compress-pdf', 
@@ -84,10 +76,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Compress', 
     cat: 'Optimize', 
     mode: 'Standard', 
-    color: '#10B981',
-    benefits: ['Optimized binary weight', 'High-fidelity raster preserving', 'Email-ready outputs'],
-    instructions: ['Ingest document into the optimizer', 'Adjust fidelity index', 'Execute compression'],
-    useCases: ['Email attachment preparation', 'Cloud storage optimization', 'Mobile bandwidth reduction']
+    color: '#10B981'
   },
   { 
     id: 'pdf-word', 
@@ -97,10 +86,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Word', 
     cat: 'Export', 
     mode: 'Standard', 
-    color: '#3B82F6',
-    benefits: ['High-accuracy layout mapping', 'Editable text layers', 'OOXML standard compliance'],
-    instructions: ['Ingest PDF source', 'Map semantic layers', 'Export to DOCX'],
-    useCases: ['Contract editing', 'Legacy document recovery', 'Academic text extraction']
+    color: '#3B82F6'
   },
   { 
     id: 'word-pdf', 
@@ -110,10 +96,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'PDF', 
     cat: 'Convert', 
     mode: 'Standard', 
-    color: '#2563EB',
-    benefits: ['Universal readability', 'Preserved formatting', 'Embedded font layers'],
-    instructions: ['Load OOXML document', 'Verify layout integrity', 'Execute conversion'],
-    useCases: ['Official document delivery', 'E-book publishing', 'Cross-platform distribution']
+    color: '#2563EB'
   },
   { 
     id: 'jpg-pdf', 
@@ -123,10 +106,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'PDF', 
     cat: 'Convert', 
     mode: 'Standard', 
-    color: '#4F46E5',
-    benefits: ['Image-to-document synthesis', 'Margin configuration', 'Batch frame stitching'],
-    instructions: ['Inhale JPG frames', 'Configure layout matrix', 'Execute raster-to-pdf'],
-    useCases: ['ID document scanning', 'Portfolio generation', 'Digital archiving']
+    color: '#4F46E5'
   },
   { 
     id: 'ppt-pdf', 
@@ -136,10 +116,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'PDF', 
     cat: 'Convert', 
     mode: 'Standard', 
-    color: '#D97706',
-    benefits: ['Slide-to-page mapping', 'Visual effect preservation', 'Universal presentation access'],
-    instructions: ['Load presentation file', 'Calibrate slide dimensions', 'Execute PDF assembly'],
-    useCases: ['Handout distribution', 'Slide deck archiving', 'Academic presentation sharing']
+    color: '#D97706'
   },
   { 
     id: 'excel-pdf', 
@@ -149,10 +126,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'PDF', 
     cat: 'Convert', 
     mode: 'Standard', 
-    color: '#059669',
-    benefits: ['Grid-to-layout rendering', 'Paging automation', 'Cell semantic mapping'],
-    instructions: ['Load worksheet data', 'Calculate print area bounds', 'Execute grid-to-pdf'],
-    useCases: ['Financial reporting', 'Data snapshotting', 'Invoice generation']
+    color: '#059669'
   },
   { 
     id: 'sign-pdf', 
@@ -162,10 +136,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Sign', 
     cat: 'Security', 
     mode: 'Standard', 
-    color: '#1F2937',
-    benefits: ['Digital signature injection', 'Multi-party request flows', 'AcroForm compliance'],
-    instructions: ['Identify signature areas', 'Place digital layers', 'Commit binary changes'],
-    useCases: ['Legal contract signing', 'Internal HR approval', 'B2B agreement execution']
+    color: '#1F2937'
   },
   {
     id: 'protect-pdf',
@@ -175,10 +146,7 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Secure',
     cat: 'Security',
     mode: 'Advanced',
-    color: '#ef4444',
-    benefits: ['256-bit AES encryption', 'Owner/User password lock', 'Permission restriction'],
-    instructions: ['Enter secure password', 'Set permission flags', 'Execute encryption'],
-    useCases: ['Sensitive financial delivery', 'Confidential project sharing', 'Private data storage']
+    color: '#ef4444'
   }
 ];
 
@@ -201,17 +169,6 @@ export function ServicesGrid({ query, category }: { query: string, category: str
       return matchesSearch && matchesCategory;
     });
   }, [query, category]);
-
-  if (filteredUnits.length === 0) {
-    return (
-      <div className="py-24 text-center space-y-4 opacity-30">
-        <div className="w-16 h-16 mx-auto flex items-center justify-center bg-black/5 rounded-3xl">
-          <Search className="w-8 h-8" />
-        </div>
-        <p className="text-xs font-black tracking-widest uppercase">Unit Not Calibrated</p>
-      </div>
-    );
-  }
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 pb-32">

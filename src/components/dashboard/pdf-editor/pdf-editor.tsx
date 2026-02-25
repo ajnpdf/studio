@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useCallback, useEffect } from 'react';
@@ -80,7 +81,6 @@ export function PDFEditor({ file }: Props) {
       
       const el = doc.pages.flatMap(p => p.elements).find(item => item.id === selectedElementId);
       
-      // Keyboard Shortcuts & Precision Nudging
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectedElementId) {
           const newDoc = { ...doc, pages: doc.pages.map(p => ({ ...p, elements: p.elements.filter(el => el.id !== selectedElementId) })) };
@@ -114,9 +114,7 @@ export function PDFEditor({ file }: Props) {
 
   const handleUpdateElement = (updatedElement: PDFElement, pageIdx: number) => {
     const newDoc = { ...doc, pages: doc.pages.map((p, idx) => idx === pageIdx ? { ...p, elements: p.elements.map(el => el.id === updatedElement.id ? updatedElement : el) } : p) };
-    // Throttled push to history for property changes could go here, but for now we push everything
     setDoc(newDoc);
-    // Only push to history if not currently dragging/rotating? Simplified for now.
     pushToHistory(newDoc);
   };
 
