@@ -12,6 +12,7 @@ interface Props {
   pages: PDFPage[];
   activeIdx: number;
   onSelect: (idx: number) => void;
+  onRotate: (idx: number) => void;
   onAdd: (files: File[]) => void;
   onReorder: (from: number, to: number) => void;
 }
@@ -20,7 +21,7 @@ interface Props {
  * AJN Advanced Thumbnail Explorer
  * Enhanced for Multi-Asset Assembly and Bulk Extraction.
  */
-export function PDFThumbnailStrip({ pages, activeIdx, onSelect, onAdd, onReorder }: Props) {
+export function PDFThumbnailStrip({ pages, activeIdx, onSelect, onRotate, onAdd, onReorder }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -84,7 +85,12 @@ export function PDFThumbnailStrip({ pages, activeIdx, onSelect, onAdd, onReorder
                 </div>
 
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <Button size="icon" variant="secondary" className="h-8 w-8 bg-white/20 backdrop-blur border-none text-white hover:bg-primary">
+                  <Button 
+                    size="icon" 
+                    variant="secondary" 
+                    onClick={(e) => { e.stopPropagation(); onRotate(idx); }}
+                    className="h-8 w-8 bg-white/20 backdrop-blur border-none text-white hover:bg-primary"
+                  >
                     <RotateCw className="w-4 h-4" />
                   </Button>
                   <Button size="icon" variant="secondary" className="h-8 w-8 bg-white/20 backdrop-blur border-none text-white hover:bg-red-500">

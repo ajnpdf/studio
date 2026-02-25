@@ -36,7 +36,6 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
   const canvasRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [isInteractionActive, setIsInteractionActive] = useState(false);
   const [interactionType, setInteractionActiveType] = useState<'drawing' | 'resizing' | 'dragging' | 'rotating' | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [elementStart, setElementStart] = useState({ x: 0, y: 0, w: 0, h: 0, r: 0 });
@@ -122,6 +121,13 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
       const dx = (e.clientX - dragStart.x) / scale;
       const dy = (e.clientY - dragStart.y) / scale;
       onUpdateElement({ ...el, width: Math.max(10, elementStart.w + dx), height: Math.max(10, elementStart.h + dy) });
+    } else if (interactionType === 'rotating') {
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const centerX = (el.x + el.width / 2) * scale + rect.left;
+      const centerY = (el.y + el.height / 2) * scale + rect.top;
+      const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI) + 90;
+      onUpdateElement({ ...el, rotation: angle });
     }
   };
 
@@ -198,7 +204,7 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
         "bg-white rounded-sm shadow-[0_0_100px_rgba(0,0,0,0.3)] relative transition-shadow duration-500 origin-center select-none overflow-hidden",
         activeTool !== 'select' && 'cursor-crosshair'
       )}
-      style={{ width: pageWidth * scale, height: pageHeight * scale }}
+      style={{ width: pageWidth * scale, height: pageHeight * scale, transform: `rotate(${page.rotation}deg)` }}
     >
       <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => {
         const file = e.target.files?.[0];

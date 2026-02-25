@@ -51,7 +51,13 @@ export function PDFEditor({ file }: Props) {
       const context = canvas.getContext('2d')!;
       canvas.height = viewport.height; canvas.width = viewport.width;
       await page.render({ canvasContext: context, viewport }).promise;
-      parsedPages.push({ id: `page-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 4)}`, pageNumber: i, rotation: 0, elements: [], previewUrl: canvas.toDataURL('image/jpeg', 0.85) });
+      parsedPages.push({ 
+        id: `page-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 4)}`, 
+        pageNumber: i, 
+        rotation: 0, 
+        elements: [], 
+        previewUrl: canvas.toDataURL('image/jpeg', 0.85) 
+      });
     }
     return parsedPages;
   };
@@ -104,6 +110,16 @@ export function PDFEditor({ file }: Props) {
     pushToHistory(newDoc); setSelectedElementId(element.id);
   };
 
+  const handleRotatePage = (pageIdx: number) => {
+    const newDoc = {
+      ...doc,
+      pages: doc.pages.map((p, idx) => 
+        idx === pageIdx ? { ...p, rotation: (p.rotation + 90) % 360 } : p
+      )
+    };
+    pushToHistory(newDoc);
+  };
+
   const handleSave = async () => {
     setIsProcessing(true);
     try {
@@ -127,29 +143,96 @@ export function PDFEditor({ file }: Props) {
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-slate-100 font-sans w-full">
-      <PDFToolbar activeTool={activeTool} setActiveTool={setActiveTool} zoom={zoom} setZoom={setZoom} onRotate={() => {}} onUndo={undo} onRedo={redo} canUndo={historyIndex > 0} canRedo={historyIndex < history.length - 1} onSave={handleSave} />
+      <PDFToolbar 
+        activeTool={activeTool} 
+        setActiveTool={setActiveTool} 
+        zoom={zoom} 
+        setZoom={setZoom} 
+        onRotate={() => handleRotatePage(activePageIdx)} 
+        onUndo={undo} 
+        onRedo={redo} 
+        canUndo={historyIndex > 0} 
+        canRedo={historyIndex < history.length - 1} 
+        onSave={handleSave} 
+      />
       <div className="flex-1 flex overflow-hidden relative">
-        <PDFThumbnailStrip pages={doc.pages} activeIdx={activePageIdx} onSelect={setActivePageIdx} onAdd={async (files) => {
-          setIsParsing(true);
-          try {
-            let combined = [...doc.pages];
-            for (const f of files) { const parsed = await parsePDFFile(f); combined = [...combined, ...parsed]; }
-            pushToHistory({ ...doc, pages: combined, totalPages: combined.length });
-          } catch (e) { toast({ title: "Assembly Error", variant: "destructive" }); }
-          finally { setIsParsing(false); }
-        }} onReorder={() => {}} />
+        <PDFThumbnailStrip 
+          pages={doc.pages} 
+          activeIdx={activePageIdx} 
+          onSelect={setActivePageIdx} 
+          onRotate={handleRotatePage}
+          onAdd={async (files) => {
+            setIsParsing(true);
+            try {
+              let combined = [...doc.pages];
+              for (const f of files) { const parsed = await parsePDFFile(f); combined = [...combined, ...parsed]; }
+              pushToHistory({ ...doc, pages: combined, totalPages: combined.length });
+            } catch (e) { toast({ title: "Assembly Error", variant: "destructive" }); }
+            finally { setIsParsing(false); }
+          }} 
+          onReorder={() => {}} 
+        />
         <main className="flex-1 overflow-y-auto scrollbar-hide p-12 flex flex-col items-center gap-16 bg-slate-200/50 relative">
           {doc.pages.map((page, idx) => (
-            <div key={page.id} className={cn("relative shadow-[0_30px_100px_rgba(0,0,0,0.2)] transition-all duration-500", activePageIdx === idx ? "ring-8 ring-primary/10 scale-[1.01]" : "opacity-90")} onMouseEnter={() => setActivePageIdx(idx)}>
-              <PDFCanvas page={page} zoom={zoom} activeTool={activeTool} selectedElementId={selectedElementId} onSelectElement={setSelectedElementId} onUpdateElement={(el) => handleUpdateElement(el, idx)} onAddElement={(el) => handleAddElement(el, idx)} onRequestSignature={(x, y, w, h) => { setPendingSigPos({ x, y, w, h }); setSigOpen(true); }} />
+            <div 
+              key={page.id} 
+              className={cn(
+                "relative shadow-[0_30px_100px_rgba(0,0,0,0.2)] transition-all duration-500", 
+                activePageIdx === idx ? "ring-8 ring-primary/10 scale-[1.01]" : "opacity-90"
+              )} 
+              onMouseEnter={() => setActivePageIdx(idx)}
+            >
+              <PDFCanvas 
+                page={page} 
+                zoom={zoom} 
+                activeTool={activeTool} 
+                selectedElementId={selectedElementId} 
+                onSelectElement={setSelectedElementId} 
+                onUpdateElement={(el) => handleUpdateElement(el, idx)} 
+                onAddElement={(el) => handleAddElement(el, idx)} 
+                onRequestSignature={(x, y, w, h) => { setPendingSigPos({ x, y, w, h }); setSigOpen(true); }} 
+              />
             </div>
           ))}
         </main>
         <div className="absolute right-0 top-0 bottom-0 pointer-events-none z-40">
-          <PDFPropertiesPanel element={doc.pages.flatMap(p => p.elements).find(el => el.id === selectedElementId) || null} onUpdate={(el) => { const pIdx = doc.pages.findIndex(p => p.elements.some(e => e.id === el.id)); if (pIdx !== -1) handleUpdateElement(el, pIdx); }} onDelete={() => { if (!selectedElementId) return; pushToHistory({ ...doc, pages: doc.pages.map(p => ({ ...p, elements: p.elements.filter(e => e.id !== selectedElementId) })) }); setSelectedElementId(null); }} />
+          <PDFPropertiesPanel 
+            element={doc.pages.flatMap(p => p.elements).find(el => el.id === selectedElementId) || null} 
+            onUpdate={(el) => { 
+              const pIdx = doc.pages.findIndex(p => p.elements.some(e => e.id === el.id)); 
+              if (pIdx !== -1) handleUpdateElement(el, pIdx); 
+            }} 
+            onDelete={() => { 
+              if (!selectedElementId) return; 
+              pushToHistory({ 
+                ...doc, 
+                pages: doc.pages.map(p => ({ ...p, elements: p.elements.filter(e => e.id !== selectedElementId) })) 
+              }); 
+              setSelectedElementId(null); 
+            }} 
+          />
         </div>
       </div>
-      <SignatureDialog open={sigOpen} onOpenChange={setSigOpen} onSave={(data, type) => { if (!pendingSigPos) return; handleAddElement({ id: `sig-${Date.now()}`, type: 'signature', x: pendingSigPos.x, y: pendingSigPos.y, width: pendingSigPos.w, height: pendingSigPos.h, signatureData: data, signatureType: type, zIndex: 100 }, activePageIdx); setPendingSigPos(null); setActiveTool('select'); }} />
+      <SignatureDialog 
+        open={sigOpen} 
+        onOpenChange={setSigOpen} 
+        onSave={(data, type) => { 
+          if (!pendingSigPos) return; 
+          handleAddElement({ 
+            id: `sig-${Date.now()}`, 
+            type: 'signature', 
+            x: pendingSigPos.x, 
+            y: pendingSigPos.y, 
+            width: pendingSigPos.w, 
+            height: pendingSigPos.h, 
+            signatureData: data, 
+            signatureType: type, 
+            zIndex: 100 
+          }, activePageIdx); 
+          setPendingSigPos(null); 
+          setActiveTool('select'); 
+        }} 
+      />
       {isProcessing && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[999] flex items-center justify-center">
           <div className="text-center space-y-8 animate-in zoom-in-95">
