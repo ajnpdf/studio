@@ -1,3 +1,4 @@
+
 'use client';
 
 import { PDFDocument, degrees, rgb, StandardFonts } from 'pdf-lib';
@@ -29,7 +30,6 @@ export class PDFManipulator {
     
     let masterDoc: PDFDocument;
     
-    // Load source documents
     const sourceDocs = await Promise.all((this.files || []).map(async (f) => {
       try {
         if (!f) return null;
@@ -50,7 +50,6 @@ export class PDFManipulator {
 
     const standardFont = await masterDoc.embedFont(StandardFonts.Helvetica);
 
-    // LOGIC: Surgical Editing
     if (toolId === 'edit-pdf' && options.document?.pages) {
       this.updateProgress(30, `Executing surgical sync: ${options.document.pages.length} segments...`);
       
@@ -80,11 +79,7 @@ export class PDFManipulator {
               return rgb(r || 0, g || 0, b || 0);
             };
 
-            if (el.type === 'signature' && el.signatureData) {
-              const sigBytes = await fetch(el.signatureData).then(res => res.arrayBuffer());
-              const sigImage = await masterDoc.embedPng(sigBytes);
-              targetPage.drawImage(sigImage, { x: el.x, y: yFlipped, width: el.width, height: el.height });
-            } else if (el.type === 'text' && el.content) {
+            if (el.type === 'text' && el.content) {
               targetPage.drawText(el.content, { 
                 x: el.x, y: targetPage.getHeight() - el.y - (el.fontSize || 12),
                 size: el.fontSize || 12, 
@@ -104,7 +99,6 @@ export class PDFManipulator {
       }
     }
 
-    // LOGIC: Rotation Unit
     if (toolId === 'rotate-pdf') {
       const direction = options.direction || 'right';
       this.updateProgress(50, `Executing bulk orientation sync (${direction})...`);
@@ -120,13 +114,7 @@ export class PDFManipulator {
     }
 
     this.updateProgress(95, "Synchronizing binary buffer...");
-    
-    const saveOptions: any = { 
-      useObjectStreams: true,
-      addDefaultPage: false 
-    };
-
-    const pdfBytes = await masterDoc.save(saveOptions);
+    const pdfBytes = await masterDoc.save({ useObjectStreams: true, addDefaultPage: false });
     
     return { 
       blob: new Blob([pdfBytes], { type: 'application/pdf' }), 

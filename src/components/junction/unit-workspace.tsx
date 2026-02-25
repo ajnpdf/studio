@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
@@ -9,20 +10,12 @@ import {
   CheckCircle2, 
   Loader2, 
   Zap, 
-  Edit3,
   Settings2,
-  FileText,
   ShieldCheck,
-  Type,
   RotateCw,
   RotateCcw,
   RefreshCcw,
-  Maximize2,
   ZoomIn,
-  PenTool,
-  Upload,
-  Eraser,
-  MousePointer2,
   ArrowRight,
   Eye,
   X
@@ -36,10 +29,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { cn } from '@/lib/utils';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import Link from 'next/link';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
@@ -60,7 +50,6 @@ interface Props {
 
 /**
  * AJN Unit Workspace - Professional Industrial Standard 2026
- * Enhanced with Visionary Grid, Full-View Inspection, and E-Sign Gateway.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const tool = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -72,24 +61,11 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [isInitializing, setIsInitializing] = useState(false);
   const [previewPage, setPreviewPage] = useState<PageNode | null>(null);
   
-  // Signature States
-  const [signatureData, setSignatureData] = useState<string | null>(null);
-  const [signatureMode, setSignatureMode] = useState<'draw' | 'upload'>('draw');
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-
   const [config, setConfig] = useState({
     quality: 50,
-    targetSize: '',
-    targetUnit: 'KB',
-    watermarkText: 'AJN Professional',
-    watermarkOpacity: 50,
-    password: '',
-    pageNumbers: true,
     direction: 'right' as 'left' | 'right'
   });
 
-  const isSignTool = tool?.id === 'sign-pdf';
   const isCompressTool = tool?.id === 'compress-pdf';
   const isDirectConvert = ['word-pdf', 'jpg-pdf', 'ppt-pdf', 'excel-pdf', 'pdf-word'].includes(tool?.id || '');
   const isRotateTool = tool?.id === 'rotate-pdf';
@@ -103,11 +79,10 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleFilesAdded = async (files: File[]) => {
-    // Industrial Validation for Multi-Asset tools
     if ((initialUnitId === 'merge-pdf' || initialUnitId === 'split-pdf') && files.length < 2) {
       toast({ 
         title: "Protocol Violation", 
-        description: `The ${tool?.name} unit requires a minimum of 2 PDF segments to establish a sequence.`, 
+        description: `The ${tool?.name} unit requires a minimum of 2 PDF segments.`, 
         variant: "destructive" 
       });
       return;
@@ -126,7 +101,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     try {
       for (let fIdx = 0; fIdx < files.length; fIdx++) {
         const file = files[fIdx];
-        if (file.type !== 'application/pdf' && !isDirectConvert && !isSignTool) continue;
         
         if (file.type === 'application/pdf') {
           const arrayBuffer = await file.arrayBuffer();
@@ -149,7 +123,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             initialSelected.add(pageId);
           }
         } else if (isDirectConvert && file.type.startsWith('image/')) {
-          // Visionary preview for image ingestion
           const url = URL.createObjectURL(file);
           const pageId = `img-${fIdx}-${Date.now()}`;
           allLoadedPages.push({ id: pageId, url, fileIdx: fIdx, pageIdx: 0, rotation: 0 });
@@ -171,7 +144,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
       pageIdx: p.pageIdx, 
       rotation: p.rotation 
     }));
-    run(sourceFiles, { ...config, pageData, signature: signatureData });
+    run(sourceFiles, { ...config, pageData });
   };
 
   const handleDownload = () => {
@@ -179,53 +152,14 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     const url = URL.createObjectURL(result.blob);
     const a = document.createElement('a');
     a.href = url; a.download = result.fileName; a.click();
-    toast({ title: "Asset Retrieved", description: "Binary exported to local filesystem." });
+    toast({ title: "Asset Retrieved", description: "Binary exported successfully." });
   };
 
   const handleReupload = () => {
     setSourceFiles([]);
     setPages([]);
     setSelectedPages(new Set());
-    setSignatureData(null);
     reset();
-  };
-
-  // Signature Drawing Logic
-  const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
-    setIsDrawing(true);
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = ('touches' in e) ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = ('touches' in e) ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-  };
-
-  const draw = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDrawing) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = ('touches' in e) ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = ('touches' in e) ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
-    ctx.lineWidth = 2.5;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#000';
-    ctx.lineTo(x, y);
-    ctx.stroke();
-  };
-
-  const adoptSignature = () => {
-    if (signatureMode === 'draw') {
-      const data = canvasRef.current?.toDataURL('image/png');
-      if (data) setSignatureData(data);
-    }
-    toast({ title: "Signature Registered", description: "Ready for document injection." });
   };
 
   const ToolIcon = tool?.icon;
@@ -248,221 +182,125 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   {isInitializing ? (
                     <div className="py-32 text-center opacity-40">
                       <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-                      <p className="text-[10px] font-black uppercase tracking-widest">Inhaling Binary Segments...</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest">Processing Segments...</p>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-12">
-                      {/* SIGNATURE PROTOCOL GATEWAY */}
-                      {isSignTool && !signatureData && (
-                        <section className="max-w-3xl mx-auto w-full space-y-8 animate-in zoom-in-95 duration-500">
-                          <div className="text-center space-y-2">
-                            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto border border-primary/20 shadow-xl mb-4">
-                              <PenTool className="w-8 h-8 text-primary" />
-                            </div>
-                            <h2 className="text-3xl font-black uppercase tracking-tighter">Signature Protocol</h2>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em]">Establish digital identity for injection</p>
+                      <div className="space-y-12">
+                        <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10 max-w-4xl mx-auto w-full relative">
+                          <div className="absolute top-8 right-10 flex gap-3">
+                            <Button 
+                              variant="outline" 
+                              onClick={handleReupload}
+                              className="h-10 px-5 text-[10px] font-black uppercase tracking-widest text-slate-400 border-black/5 hover:text-red-500 transition-all gap-2 rounded-xl shadow-sm"
+                            >
+                              <RefreshCcw className="w-3.5 h-3.5" /> Reset Session
+                            </Button>
                           </div>
 
-                          <Card className="bg-white/60 backdrop-blur-3xl border-black/5 rounded-[3rem] overflow-hidden shadow-2xl">
-                            <Tabs value={signatureMode} onValueChange={(v: any) => setSignatureMode(v)} className="w-full">
-                              <TabsList className="grid w-full grid-cols-2 h-14 bg-black/5 p-1 rounded-none border-b border-black/5">
-                                <TabsTrigger value="draw" className="text-[11px] font-black uppercase gap-2"><PenTool className="w-3.5 h-3.5" /> Draw Signature</TabsTrigger>
-                                <TabsTrigger value="upload" className="text-[11px] font-black uppercase gap-2"><Upload className="w-3.5 h-3.5" /> Upload File</TabsTrigger>
-                              </TabsList>
+                          <div className="flex items-center gap-4 text-primary border-b border-black/5 pb-6">
+                            <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20">
+                              {ToolIcon && <ToolIcon className="w-7 h-7" />}
+                            </div>
+                            <div>
+                              <h3 className="text-3xl font-black uppercase tracking-tighter text-slate-950">{tool?.name}</h3>
+                              <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">Operational Protocol</p>
+                            </div>
+                          </div>
 
-                              <div className="p-10">
-                                <TabsContent value="draw" className="m-0 space-y-6">
-                                  <div className="bg-slate-50 border-2 border-dashed border-black/10 rounded-3xl relative overflow-hidden shadow-inner cursor-crosshair">
-                                    <canvas
-                                      ref={canvasRef}
-                                      width={600}
-                                      height={250}
-                                      onMouseDown={startDrawing}
-                                      onMouseMove={draw}
-                                      onMouseUp={() => setIsDrawing(false)}
-                                      className="w-full h-[250px] touch-none"
-                                    />
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div className="space-y-8">
+                              {isRotateTool && (
+                                <div className="space-y-4">
+                                  <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Orientation Protocol</Label>
+                                  <div className="grid grid-cols-2 gap-3">
                                     <Button 
-                                      variant="ghost" 
-                                      onClick={() => {
-                                        const ctx = canvasRef.current?.getContext('2d');
-                                        ctx?.clearRect(0, 0, 600, 250);
-                                      }}
-                                      className="absolute bottom-4 right-4 h-9 text-[10px] font-black uppercase bg-white/80 backdrop-blur-md border border-black/5 rounded-xl hover:text-red-500"
+                                      variant="outline" 
+                                      onClick={() => setConfig({...config, direction: 'left'})}
+                                      className={cn("h-14 rounded-2xl border-black/5 gap-3 font-black text-[10px] uppercase transition-all", config.direction === 'left' ? "bg-primary text-white border-primary shadow-lg" : "bg-white/50")}
                                     >
-                                      <Eraser className="w-3.5 h-3.5 mr-2" /> Clear Pad
+                                      <RotateCcw className="w-4 h-4" /> Left Rotate
+                                    </Button>
+                                    <Button 
+                                      variant="outline" 
+                                      onClick={() => setConfig({...config, direction: 'right'})}
+                                      className={cn("h-14 rounded-2xl border-black/5 gap-3 font-black text-[10px] uppercase transition-all", config.direction === 'right' ? "bg-primary text-white border-primary shadow-lg" : "bg-white/50")}
+                                    >
+                                      <RotateCw className="w-4 h-4" /> Right Rotate
                                     </Button>
                                   </div>
-                                </TabsContent>
-
-                                <TabsContent value="upload" className="m-0">
-                                  <div className="flex flex-col items-center justify-center p-16 bg-slate-50 border-2 border-dashed border-black/10 rounded-[3rem] space-y-6 group hover:border-primary/40 transition-all cursor-pointer relative shadow-inner">
-                                    <input 
-                                      type="file" 
-                                      accept="image/*" 
-                                      className="absolute inset-0 opacity-0 cursor-pointer z-10" 
-                                      onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                          const reader = new FileReader();
-                                          reader.onload = (ev) => setSignatureData(ev.target?.result as string);
-                                          reader.readAsDataURL(file);
-                                        }
-                                      }}
-                                    />
-                                    <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-xl border border-black/5 group-hover:scale-110 transition-all">
-                                      <Upload className="w-8 h-8" />
-                                    </div>
-                                    <div className="text-center">
-                                      <p className="text-sm font-black uppercase tracking-tighter">Inhale Signature Asset</p>
-                                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">PNG or JPG Supported</p>
-                                    </div>
-                                  </div>
-                                </TabsContent>
-                              </div>
-                            </Tabs>
-                            
-                            <div className="p-8 border-t border-black/5 bg-slate-50/50 flex justify-center">
-                              <Button 
-                                onClick={adoptSignature}
-                                className="h-14 px-12 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl hover:scale-105 transition-all gap-3"
-                              >
-                                Adopt Signature <ArrowRight className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </Card>
-                        </section>
-                      )}
-
-                      {/* CONFIGURATION & VISIONARY GRID */}
-                      {(!isSignTool || (isSignTool && signatureData)) && (
-                        <div className="space-y-12">
-                          <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10 max-w-4xl mx-auto w-full relative">
-                            <div className="absolute top-8 right-10 flex gap-3">
-                              <Button 
-                                variant="outline" 
-                                onClick={handleReupload}
-                                className="h-10 px-5 text-[10px] font-black uppercase tracking-widest text-slate-400 border-black/5 hover:text-red-500 transition-all gap-2 rounded-xl shadow-sm"
-                              >
-                                <RefreshCcw className="w-3.5 h-3.5" /> Reupload Segment
-                              </Button>
-                            </div>
-
-                            <div className="flex items-center gap-4 text-primary border-b border-black/5 pb-6">
-                              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20">
-                                {ToolIcon && <ToolIcon className="w-7 h-7" />}
-                              </div>
-                              <div>
-                                <h3 className="text-3xl font-black uppercase tracking-tighter text-slate-950">{tool?.name}</h3>
-                                <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">Operational Protocol</p>
-                              </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                              <div className="space-y-8">
-                                {isSignTool && signatureData && (
-                                  <div className="space-y-4">
-                                    <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Active Digital Identity</Label>
-                                    <div className="p-6 bg-white/80 rounded-3xl border border-emerald-500/20 flex flex-col items-center justify-center min-h-[140px] shadow-inner relative group">
-                                      <img src={signatureData} className="max-h-24 object-contain" alt="Signature" />
-                                      <button onClick={() => setSignatureData(null)} className="absolute top-4 right-4 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <RefreshCcw className="w-4 h-4" />
-                                      </button>
-                                    </div>
-                                    <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-[0.2em] flex items-center gap-2">
-                                      <ShieldCheck className="w-3.5 h-3.5" /> Signature buffer ready for injection
-                                    </p>
-                                  </div>
-                                )}
-
-                                {isRotateTool && (
-                                  <div className="space-y-4">
-                                    <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Orientation Protocol</Label>
-                                    <div className="grid grid-cols-2 gap-3">
-                                      <Button 
-                                        variant="outline" 
-                                        onClick={() => setConfig({...config, direction: 'left'})}
-                                        className={cn("h-14 rounded-2xl border-black/5 gap-3 font-black text-[10px] uppercase transition-all", config.direction === 'left' ? "bg-primary text-white border-primary shadow-lg" : "bg-white/50")}
-                                      >
-                                        <RotateCcw className="w-4 h-4" /> Left Rotate
-                                      </Button>
-                                      <Button 
-                                        variant="outline" 
-                                        onClick={() => setConfig({...config, direction: 'right'})}
-                                        className={cn("h-14 rounded-2xl border-black/5 gap-3 font-black text-[10px] uppercase transition-all", config.direction === 'right' ? "bg-primary text-white border-primary shadow-lg" : "bg-white/50")}
-                                      >
-                                        <RotateCw className="w-4 h-4" /> Right Rotate
-                                      </Button>
-                                    </div>
-                                  </div>
-                                )}
-
-                                {isCompressTool && (
-                                  <div className="space-y-3">
-                                    <Label className="text-[11px] font-black uppercase tracking-widest text-primary flex justify-between">
-                                      <span>Reduction Strength</span>
-                                      <span>{config.quality}%</span>
-                                    </Label>
-                                    <Slider value={[config.quality]} onValueChange={([v]) => setConfig({...config, quality: v})} max={90} min={10} step={5} />
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className="space-y-6">
-                                <div className="p-8 bg-primary/5 border border-primary/10 rounded-[2rem] space-y-4 shadow-inner">
-                                  <div className="flex items-center gap-3 text-primary">
-                                    <ShieldCheck className="w-5 h-5" />
-                                    <p className="text-xs font-black uppercase tracking-widest">Local Buffer Secure</p>
-                                  </div>
-                                  <p className="text-[9px] font-bold uppercase leading-relaxed text-slate-950/60">Processes are strictly browser-native. No assets are transmitted or persisted externally during this session.</p>
                                 </div>
-                              </div>
-                            </div>
-                          </section>
+                              )}
 
-                          {/* VISIONARY HUB */}
-                          <div className="space-y-6">
-                            <div className="flex items-center justify-between px-2">
-                              <div className="flex items-center gap-3">
-                                <ZoomIn className="w-4 h-4 text-primary" />
-                                <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-950/40">Visionary Segment Grid</h4>
-                              </div>
-                              <p className="text-[9px] font-black text-slate-950/20 uppercase tracking-widest">Click segment for full inspection</p>
-                            </div>
-
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8 pb-32">
-                              {pages.map((page, idx) => (
-                                <div key={page.id} className="space-y-3">
-                                  <Card 
-                                    onClick={() => setPreviewPage(page)}
-                                    className={cn(
-                                      "relative aspect-[1/1.414] rounded-[2rem] border-4 transition-all duration-500 overflow-hidden shadow-xl cursor-pointer group hover:scale-[1.02]", 
-                                      selectedPages.has(page.id) ? "border-primary" : "border-transparent opacity-40"
-                                    )}
-                                  >
-                                    <img src={page.url} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                      <Eye className="w-8 h-8 text-white" />
-                                    </div>
-                                    <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-white text-[9px] font-black px-2 py-1 rounded-lg uppercase shadow-2xl">
-                                      Seg #{idx + 1}
-                                    </div>
-                                  </Card>
+                              {isCompressTool && (
+                                <div className="space-y-3">
+                                  <Label className="text-[11px] font-black uppercase tracking-widest text-primary flex justify-between">
+                                    <span>Reduction Strength</span>
+                                    <span>{config.quality}%</span>
+                                  </Label>
+                                  <Slider value={[config.quality]} onValueChange={([v]) => setConfig({...config, quality: v})} max={90} min={10} step={5} />
                                 </div>
-                              ))}
+                              )}
                             </div>
 
-                            <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-6 animate-in slide-in-from-bottom-10 duration-700">
-                              <Button 
-                                onClick={handleConfirmedExecution} 
-                                className="w-full h-16 bg-primary text-white font-black text-sm uppercase tracking-widest rounded-full shadow-[0_30px_60px_rgba(30,58,138,0.4)] hover:scale-105 transition-all gap-4 border-2 border-white/20"
-                              >
-                                <Zap className="w-5 h-5" /> EXECUTE PROCESS
-                              </Button>
+                            <div className="space-y-6">
+                              <div className="p-8 bg-primary/5 border border-primary/10 rounded-[2rem] space-y-4 shadow-inner">
+                                <div className="flex items-center gap-3 text-primary">
+                                  <ShieldCheck className="w-5 h-5" />
+                                  <p className="text-xs font-black uppercase tracking-widest">Local Buffer Secure</p>
+                                </div>
+                                <p className="text-[9px] font-bold uppercase leading-relaxed text-slate-950/60">Processes are strictly browser-native. Assets are never transmitted or stored externally.</p>
+                              </div>
                             </div>
                           </div>
+                        </section>
+
+                        <div className="space-y-6">
+                          <div className="flex items-center justify-between px-2">
+                            <div className="flex items-center gap-3">
+                              <ZoomIn className="w-4 h-4 text-primary" />
+                              <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-950/40">Visionary Segment Grid</h4>
+                            </div>
+                            <p className="text-[9px] font-black text-slate-950/20 uppercase tracking-widest">Click segment for inspection</p>
+                          </div>
+
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8 pb-32">
+                            {pages.map((page, idx) => (
+                              <div key={page.id} className="space-y-3">
+                                <Card 
+                                  onClick={() => setPreviewPage(page)}
+                                  className={cn(
+                                    "relative aspect-[1/1.414] rounded-[2rem] border-4 transition-all duration-500 overflow-hidden shadow-xl cursor-pointer group hover:scale-[1.02]", 
+                                    selectedPages.has(page.id) ? "border-primary" : "border-transparent opacity-40"
+                                  )}
+                                >
+                                  <img 
+                                    src={page.url} 
+                                    alt="" 
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                                    style={{ transform: `rotate(${page.rotation}deg)` }}
+                                  />
+                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <Eye className="w-8 h-8 text-white" />
+                                  </div>
+                                  <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-white text-[9px] font-black px-2 py-1 rounded-lg uppercase shadow-2xl">
+                                    Seg #{idx + 1}
+                                  </div>
+                                </Card>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-6 animate-in slide-in-from-bottom-10 duration-700">
+                            <Button 
+                              onClick={handleConfirmedExecution} 
+                              className="w-full h-16 bg-primary text-white font-black text-sm uppercase tracking-widest rounded-full shadow-[0_30px_60px_rgba(30,58,138,0.4)] hover:scale-105 transition-all gap-4 border-2 border-white/20"
+                            >
+                              <Zap className="w-5 h-5" /> EXECUTE PROCESS
+                            </Button>
+                          </div>
                         </div>
-                      )}
+                      </div>
                     </div>
                   )}
                 </motion.div>
@@ -504,7 +342,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
         </div>
       </main>
 
-      {/* FULL-VIEW INSPECTION DIALOG */}
       <Dialog open={!!previewPage} onOpenChange={() => setPreviewPage(null)}>
         <DialogContent className="max-w-4xl w-full h-[90vh] bg-white border-none p-0 overflow-hidden font-sans rounded-[3rem] shadow-2xl">
           <DialogHeader className="p-8 border-b border-black/5 flex items-center justify-between shrink-0">

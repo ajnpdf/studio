@@ -3,7 +3,7 @@
 
 /**
  * AJN Master Processing Engine
- * Optimized for Top 10 major professional tools.
+ * Optimized for major professional tools.
  */
 
 class AJNPDFEngine {
@@ -30,8 +30,8 @@ class AJNPDFEngine {
         const converter = new SpecializedConverter(files, (p, m) => onProgressCallback({ stage: "Optimizing", detail: m, pct: p }));
         result = await converter.convertTo('COMPRESS', options);
       } 
-      // 2. Surgical Binary Units (Merge, Split, Edit, Sign, Rotate)
-      else if (['merge-pdf', 'split-pdf', 'edit-pdf', 'sign-pdf', 'rotate-pdf'].includes(toolId)) {
+      // 2. Surgical Binary Units (Merge, Split, Edit, Rotate)
+      else if (['merge-pdf', 'split-pdf', 'edit-pdf', 'rotate-pdf'].includes(toolId)) {
         const { PDFManipulator } = await import('@/lib/converters/pdf-manipulator');
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Processing", detail: m, pct: p }));
         result = await manipulator.runOperation(toolId, options);

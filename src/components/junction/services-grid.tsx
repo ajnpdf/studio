@@ -9,7 +9,6 @@ import {
   Shrink, 
   FileText, 
   MousePointer2, 
-  PenTool, 
   Search,
   ArrowRight, 
   FileCode,
@@ -45,7 +44,7 @@ export type ServiceUnit = {
 };
 
 /**
- * AJN Major 10 Registry
+ * AJN Major Registry
  * Verified 2026 Industrial Standards.
  */
 export const ALL_UNITS: ServiceUnit[] = [
@@ -128,16 +127,6 @@ export const ALL_UNITS: ServiceUnit[] = [
     cat: 'Convert', 
     mode: 'Standard', 
     color: '#059669'
-  },
-  { 
-    id: 'sign-pdf', 
-    name: 'Sign PDF', 
-    desc: 'Sign yourself or request electronic signatures from others.', 
-    icon: PenTool, 
-    tag: 'Sign', 
-    cat: 'Security', 
-    mode: 'Standard', 
-    color: '#1F2937'
   },
   {
     id: 'rotate-pdf',

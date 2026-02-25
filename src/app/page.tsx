@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -22,7 +23,8 @@ import {
   Search,
   Shrink,
   MousePointer2,
-  FileText
+  FileText,
+  RotateCw
 } from 'lucide-react';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -38,9 +40,9 @@ export default function LandingPage() {
     { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple documents.', icon: Layout, color: 'text-blue-500' },
     { id: 'split-pdf', name: 'Split PDF', desc: 'Divide files by page range.', icon: Scissors, color: 'text-indigo-500' },
     { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce document size.', icon: Shrink, color: 'text-emerald-500' },
-    { id: 'ocr-pdf', name: 'Text Recognition', desc: 'Recognize text in scans.', icon: Search, color: 'text-orange-500' },
+    { id: 'pdf-word', name: 'PDF to Word', desc: 'Convert PDF to editable DOCX.', icon: FileText, color: 'text-blue-600' },
+    { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Change page orientation.', icon: RotateCw, color: 'text-orange-500' },
     { id: 'edit-pdf', name: 'Edit PDF', desc: 'Modify existing content.', icon: MousePointer2, color: 'text-pink-500' },
-    { id: 'sign-pdf', name: 'Sign PDF', desc: 'Add digital signatures.', icon: FileText, color: 'text-slate-900' },
   ];
 
   useEffect(() => {
