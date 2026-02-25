@@ -170,6 +170,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     reset();
   };
 
+  // Capitalized variable for ToolIcon to resolve JSX parsing error
   const ToolIcon = tool?.icon;
 
   return (
