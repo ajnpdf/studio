@@ -124,10 +124,16 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             });
             initialSelected.add(pageId);
           }
-        } else if (isDirectConvert && file.type.startsWith('image/')) {
-          const url = URL.createObjectURL(file);
-          const pageId = `img-${fIdx}-${Date.now()}`;
-          allLoadedPages.push({ id: pageId, url, fileIdx: fIdx, pageIdx: 0, rotation: 0 });
+        } else if (isDirectConvert && (file.type.startsWith('image/') || file.name.match(/\.(docx|pptx|xlsx)$/i))) {
+          // Placeholder preview for non-pdf office docs
+          const pageId = `seg-${fIdx}-${Date.now()}`;
+          allLoadedPages.push({ 
+            id: pageId, 
+            url: "https://picsum.photos/seed/doc/400/600", 
+            fileIdx: fIdx, 
+            pageIdx: 0, 
+            rotation: 0 
+          });
           initialSelected.add(pageId);
         }
       }
@@ -164,7 +170,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     reset();
   };
 
-  // Extract icon component safely
   const ToolIcon = tool?.icon;
 
   return (
