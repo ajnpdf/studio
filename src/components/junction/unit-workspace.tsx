@@ -20,8 +20,10 @@ import {
   Eye,
   EyeOff,
   RotateCw,
+  RotateCcw,
   RefreshCcw,
-  Trash2
+  Trash2,
+  ArrowRight
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -68,7 +70,8 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     watermarkText: 'AJN Professional',
     watermarkOpacity: 50,
     password: '',
-    pageNumbers: true
+    pageNumbers: true,
+    direction: 'right' as 'left' | 'right'
   });
 
   const isCompressTool = tool?.id === 'compress-pdf';
@@ -239,12 +242,31 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                               </>
                             )}
                             {isRotateTool && (
-                              <div className="space-y-4">
-                                <div className="flex items-center gap-3 p-4 bg-amber-500/5 border border-amber-500/10 rounded-2xl text-amber-600">
-                                  <RotateCw className="w-5 h-5" />
-                                  <span className="text-[9px] font-black uppercase tracking-widest">Global Rotation Mode</span>
+                              <div className="space-y-6">
+                                <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Rotation Direction</Label>
+                                <div className="grid grid-cols-2 gap-4">
+                                  <button 
+                                    onClick={() => setConfig({...config, direction: 'left'})}
+                                    className={cn(
+                                      "flex flex-col items-center justify-center p-6 rounded-3xl border-2 transition-all gap-3 group",
+                                      config.direction === 'left' ? "border-primary bg-primary/10" : "border-black/5 bg-black/5 hover:border-primary/20"
+                                    )}
+                                  >
+                                    <RotateCcw className={cn("w-8 h-8", config.direction === 'left' ? "text-primary" : "text-slate-400 group-hover:text-primary")} />
+                                    <span className={cn("text-[10px] font-black uppercase tracking-widest", config.direction === 'left' ? "text-primary" : "text-slate-400")}>Left Rotate</span>
+                                  </button>
+                                  <button 
+                                    onClick={() => setConfig({...config, direction: 'right'})}
+                                    className={cn(
+                                      "flex flex-col items-center justify-center p-6 rounded-3xl border-2 transition-all gap-3 group",
+                                      config.direction === 'right' ? "border-primary bg-primary/10" : "border-black/5 bg-black/5 hover:border-primary/20"
+                                    )}
+                                  >
+                                    <RotateCw className={cn("w-8 h-8", config.direction === 'right' ? "text-primary" : "text-slate-400 group-hover:text-primary")} />
+                                    <span className={cn("text-[10px] font-black uppercase tracking-widest", config.direction === 'right' ? "text-primary" : "text-slate-400")}>Right Rotate</span>
+                                  </button>
                                 </div>
-                                <p className="text-[10px] font-bold text-slate-950/40 uppercase leading-relaxed tracking-widest">All segments will be rotated 90° clockwise per execution cycle.</p>
+                                <p className="text-[10px] font-bold text-slate-950/40 uppercase leading-relaxed tracking-widest">Selected segments will be rotated 90° {config.direction === 'left' ? 'counter-clockwise' : 'clockwise'} per cycle.</p>
                               </div>
                             )}
                             {isDirectConvert && (

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { PDFDocument, degrees, rgb, StandardFonts } from 'pdf-lib';
@@ -107,11 +106,16 @@ export class PDFManipulator {
 
     // LOGIC: Rotation Unit
     if (toolId === 'rotate-pdf') {
-      this.updateProgress(50, "Executing bulk orientation sync...");
+      const direction = options.direction || 'right';
+      this.updateProgress(50, `Executing bulk orientation sync (${direction})...`);
       const pages = masterDoc.getPages();
       pages.forEach(p => {
         const currentRotation = p.getRotation().angle;
-        p.setRotation(degrees((currentRotation + 90) % 360));
+        if (direction === 'left') {
+          p.setRotation(degrees((currentRotation - 90 + 360) % 360));
+        } else {
+          p.setRotation(degrees((currentRotation + 90) % 360));
+        }
       });
     }
 
