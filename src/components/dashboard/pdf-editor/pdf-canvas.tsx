@@ -3,8 +3,19 @@
 
 import { PDFPage, PDFElement, PDFTool } from './types';
 import { cn } from '@/lib/utils';
-import { useState, useRef } from 'react';
-import { Type, Image as ImageIcon, Link as LinkIcon, Move, Crosshair, MousePointer2, Eraser, CheckSquare } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { 
+  Type, 
+  Image as ImageIcon, 
+  Link as LinkIcon, 
+  Move, 
+  Crosshair, 
+  MousePointer2, 
+  Eraser, 
+  CheckSquare, 
+  RotateCw,
+  Maximize2
+} from 'lucide-react';
 
 interface Props {
   page: PDFPage;
@@ -19,33 +30,46 @@ interface Props {
 
 /**
  * AJN High-Performance Surgical Canvas
- * Enhanced for real-time Form Injection, Whiteout, and Link Anchoring.
+ * Industrial Vector Engine supporting Shapes, Paths, and Advanced Transforms.
  */
 export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectElement, onUpdateElement, onAddElement, onRequestSignature }: Props) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isDrawingBox, setIsDrawingBox] = useState(false);
+  
+  const [isInteractionActive, setIsInteractionActive] = useState(false);
+  const [interactionType, setInteractionActiveType] = useState<'drawing' | 'resizing' | 'dragging' | 'rotating' | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [elementStart, setElementStart] = useState({ x: 0, y: 0 });
+  const [elementStart, setElementStart] = useState({ x: 0, y: 0, w: 0, h: 0, r: 0 });
   const [boxPreview, setBoxPreview] = useState<{x: number, y: number, w: number, h: number} | null>(null);
+  const [currentPath, setCurrentPath] = useState<string>("");
 
   const scale = zoom / 100;
   const pageWidth = 595; 
   const pageHeight = 842;
 
-  const handleCanvasMouseDown = (e: React.MouseEvent) => {
+  const getCoords = (e: React.MouseEvent | MouseEvent) => {
     const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const x = (e.clientX - rect.left) / scale;
-    const y = (e.clientY - rect.top) / scale;
+    if (!rect) return { x: 0, y: 0 };
+    return {
+      x: (e.clientX - rect.left) / scale,
+      y: (e.clientY - rect.top) / scale
+    };
+  };
 
-    const toolNeedsBox = ['signature', 'insert-image', 'link', 'form-field', 'whiteout'].includes(activeTool);
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const { x, y } = getCoords(e);
+    const toolNeedsBox = ['signature', 'insert-image', 'link', 'form-field', 'whiteout', 'shape-rect', 'shape-circle', 'shape-line'].includes(activeTool);
 
     if (toolNeedsBox) {
-      setIsDrawingBox(true);
+      setInteractionActiveType('drawing');
       setDragStart({ x: e.clientX, y: e.clientY });
       setBoxPreview({ x, y, w: 0, h: 0 });
+      return;
+    }
+
+    if (activeTool === 'draw' || activeTool === 'highlight') {
+      setInteractionActiveType('drawing');
+      setCurrentPath(`M ${x} ${y}`);
       return;
     }
 
@@ -55,13 +79,14 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
         type: 'text',
         x,
         y,
-        width: 180,
-        height: 40,
-        content: 'Type something...',
-        fontSize: 14,
+        width: 200,
+        height: 50,
+        content: 'Edit text...',
+        fontSize: 16,
         fontFamily: 'Arial',
         color: '#000000',
         zIndex: page.elements.length,
+        textAlign: 'left'
       });
       return;
     }
@@ -71,115 +96,135 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
     }
   };
 
-  const handleElementMouseDown = (e: React.MouseEvent, el: PDFElement) => {
-    if (activeTool !== 'select') return;
-    e.stopPropagation();
-    onSelectElement(el.id);
-    setIsDragging(true);
-    setDragStart({ x: e.clientX, y: e.clientY });
-    setElementStart({ x: el.x, y: el.y });
-  };
-
   const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
+    if (!interactionType) return;
+    const { x, y } = getCoords(e);
 
-    if (isDrawingBox && boxPreview) {
-      const w = (e.clientX - dragStart.x) / scale;
-      const h = (e.clientY - dragStart.y) / scale;
-      setBoxPreview({ ...boxPreview, w, h });
+    if (interactionType === 'drawing') {
+      if (boxPreview) {
+        const w = (e.clientX - dragStart.x) / scale;
+        const h = (e.clientY - dragStart.y) / scale;
+        setBoxPreview({ ...boxPreview, w, h });
+      } else if (currentPath) {
+        setCurrentPath(prev => `${prev} L ${x} ${y}`);
+      }
       return;
     }
 
-    if (!isDragging || !selectedElementId) return;
-    const dx = (e.clientX - dragStart.x) / scale;
-    const dy = (e.clientY - dragStart.y) / scale;
-    
     const el = page.elements.find(e => e.id === selectedElementId);
-    if (el) {
-      onUpdateElement({
-        ...el,
-        x: elementStart.x + dx,
-        y: elementStart.y + dy
-      });
+    if (!el) return;
+
+    if (interactionType === 'dragging') {
+      const dx = (e.clientX - dragStart.x) / scale;
+      const dy = (e.clientY - dragStart.y) / scale;
+      onUpdateElement({ ...el, x: elementStart.x + dx, y: elementStart.y + dy });
+    } else if (interactionType === 'resizing') {
+      const dx = (e.clientX - dragStart.x) / scale;
+      const dy = (e.clientY - dragStart.y) / scale;
+      onUpdateElement({ ...el, width: Math.max(10, elementStart.w + dx), height: Math.max(10, elementStart.h + dy) });
     }
   };
 
   const handleMouseUp = () => {
-    if (isDrawingBox && boxPreview) {
-      setIsDrawingBox(false);
-      const x = boxPreview.w < 0 ? boxPreview.x + boxPreview.w : boxPreview.x;
-      const y = boxPreview.h < 0 ? boxPreview.y + boxPreview.h : boxPreview.y;
-      const w = Math.abs(boxPreview.w);
-      const h = Math.abs(boxPreview.h);
-      
-      if (w > 5 && h > 5) {
-        const id = `${activeTool}-${Date.now()}`;
-        if (activeTool === 'signature') onRequestSignature(x, y, w, h);
-        else if (activeTool === 'insert-image') {
-          setPendingImageArea({ x, y, w, h });
-          fileInputRef.current?.click();
-        } else if (activeTool === 'link') {
-          onAddElement({ id, type: 'link', x, y, width: w, height: h, url: 'https://', zIndex: 100 });
-        } else if (activeTool === 'form-field') {
-          onAddElement({ id, type: 'form-field', x, y, width: w, height: h, fieldType: 'text', zIndex: 100 });
-        } else if (activeTool === 'whiteout') {
-          onAddElement({ id, type: 'whiteout', x, y, width: w, height: h, color: '#FFFFFF', zIndex: 100 });
+    if (interactionType === 'drawing') {
+      if (boxPreview) {
+        const x = boxPreview.w < 0 ? boxPreview.x + boxPreview.w : boxPreview.x;
+        const y = boxPreview.h < 0 ? boxPreview.y + boxPreview.h : boxPreview.y;
+        const w = Math.abs(boxPreview.w);
+        const h = Math.abs(boxPreview.h);
+        
+        if (w > 5 && h > 5) {
+          const id = `${activeTool}-${Date.now()}`;
+          if (activeTool === 'signature') onRequestSignature(x, y, w, h);
+          else if (activeTool === 'insert-image') {
+            setPendingImageArea({ x, y, w, h });
+            fileInputRef.current?.click();
+          } else if (activeTool.startsWith('shape-')) {
+            onAddElement({
+              id,
+              type: 'shape',
+              shapeType: activeTool.replace('shape-', '') as any,
+              x, y, width: w, height: h,
+              color: '#3B82F6',
+              fillColor: 'transparent',
+              strokeWidth: 2,
+              zIndex: 100
+            });
+          } else if (activeTool === 'link') {
+            onAddElement({ id, type: 'link', x, y, width: w, height: h, url: 'https://', zIndex: 100 });
+          } else if (activeTool === 'form-field') {
+            onAddElement({ id, type: 'form-field', x, y, width: w, height: h, fieldType: 'text', zIndex: 100 });
+          } else if (activeTool === 'whiteout') {
+            onAddElement({ id, type: 'whiteout', x, y, width: w, height: h, color: '#FFFFFF', zIndex: 100 });
+          }
         }
+        setBoxPreview(null);
+      } else if (currentPath) {
+        onAddElement({
+          id: `path-${Date.now()}`,
+          type: 'path',
+          x: 0, y: 0, width: pageWidth, height: pageHeight,
+          pathData: currentPath,
+          color: activeTool === 'highlight' ? '#FFFF00' : '#000000',
+          strokeWidth: activeTool === 'highlight' ? 15 : 3,
+          opacity: activeTool === 'highlight' ? 0.4 : 1,
+          isHighlighter: activeTool === 'highlight',
+          zIndex: 100
+        });
+        setCurrentPath("");
       }
-      setBoxPreview(null);
     }
-    setIsDragging(false);
+    setInteractionActiveType(null);
+  };
+
+  const handleElementInteraction = (e: React.MouseEvent, el: PDFElement, type: 'dragging' | 'resizing' | 'rotating') => {
+    e.stopPropagation();
+    onSelectElement(el.id);
+    setInteractionActiveType(type);
+    setDragStart({ x: e.clientX, y: e.clientY });
+    setElementStart({ x: el.x, y: el.y, w: el.width, h: el.height, r: el.rotation || 0 });
   };
 
   const [pendingImageArea, setPendingImageArea] = useState<{x: number, y: number, w: number, h: number} | null>(null);
 
-  const handleImageFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && pendingImageArea) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        if (ev.target?.result) {
-          onAddElement({
-            id: `img-${Date.now()}`,
-            type: 'image',
-            x: pendingImageArea.x,
-            y: pendingImageArea.y,
-            width: pendingImageArea.w,
-            height: pendingImageArea.h,
-            content: ev.target.result as string,
-            zIndex: page.elements.length,
-          });
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-    setPendingImageArea(null);
-  };
-
   return (
     <div 
       ref={canvasRef}
-      onMouseDown={handleCanvasMouseDown}
+      onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       className={cn(
-        "bg-white rounded-sm shadow-[0_0_100px_rgba(0,0,0,0.35)] relative transition-shadow duration-500 origin-center select-none overflow-hidden",
+        "bg-white rounded-sm shadow-[0_0_100px_rgba(0,0,0,0.3)] relative transition-shadow duration-500 origin-center select-none overflow-hidden",
         activeTool !== 'select' && 'cursor-crosshair'
       )}
       style={{ width: pageWidth * scale, height: pageHeight * scale }}
     >
-      <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageFileSelect} />
+      <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => {
+        const file = e.target.files?.[0];
+        if (file && pendingImageArea) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            if (ev.target?.result) {
+              onAddElement({
+                id: `img-${Date.now()}`,
+                type: 'image',
+                x: pendingImageArea.x, y: pendingImageArea.y,
+                width: pendingImageArea.w, height: pendingImageArea.h,
+                content: ev.target.result as string,
+                zIndex: page.elements.length,
+              });
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+        setPendingImageArea(null);
+      }} />
 
       {/* RASTERIZED PDF SOURCE LAYER */}
       {page.previewUrl && (
         <div className="absolute inset-0 pointer-events-none">
-          <img 
-            src={page.previewUrl} 
-            className="w-full h-full object-contain pointer-events-none" 
-            alt={`Buffer ${page.pageNumber}`} 
-          />
+          <img src={page.previewUrl} className="w-full h-full object-contain" alt="" />
         </div>
       )}
 
@@ -194,11 +239,22 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
             height: Math.abs(boxPreview.h) * scale
           }}
         >
-          <div className="flex flex-col items-center gap-1">
-            <Crosshair className="w-4 h-4 text-primary animate-pulse" />
-            <span className="text-[8px] font-black uppercase text-primary bg-white/90 px-1 rounded">Mapping</span>
-          </div>
+          <Crosshair className="w-4 h-4 text-primary animate-pulse" />
         </div>
+      )}
+
+      {/* PATH DRAWING PREVIEW */}
+      {currentPath && (
+        <svg className="absolute inset-0 z-[1000] pointer-events-none" style={{ width: '100%', height: '100%' }}>
+          <path 
+            d={currentPath} 
+            fill="none" 
+            stroke={activeTool === 'highlight' ? 'rgba(255,255,0,0.4)' : '#000000'} 
+            strokeWidth={activeTool === 'highlight' ? 15 * scale : 3 * scale} 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+          />
+        </svg>
       )}
 
       {/* INTERACTIVE OBJECT MODEL LAYER */}
@@ -210,8 +266,8 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
           <div
             key={el.id}
             className={cn(
-              "absolute group transition-all cursor-move",
-              selectedElementId === el.id ? "ring-2 ring-primary shadow-2xl z-[999] bg-primary/5" : "hover:ring-1 hover:ring-primary/40"
+              "absolute group transition-all",
+              selectedElementId === el.id ? "ring-2 ring-primary shadow-2xl z-[999]" : "hover:ring-1 hover:ring-primary/40 cursor-pointer"
             )}
             style={{
               left: el.x,
@@ -222,7 +278,7 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
               zIndex: el.zIndex,
               transform: `rotate(${el.rotation || 0}deg)`
             }}
-            onMouseDown={(e) => handleElementMouseDown(e, el)}
+            onMouseDown={(e) => handleElementInteraction(e, el, 'dragging')}
           >
             {el.type === 'text' && (
               <div 
@@ -236,42 +292,40 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
                   color: el.color,
                   fontWeight: el.bold ? 'bold' : 'normal',
                   fontStyle: el.italic ? 'italic' : 'normal',
+                  textAlign: el.textAlign
                 }}
               >
                 {el.content}
               </div>
             )}
 
-            {el.type === 'whiteout' && (
-              <div className="w-full h-full shadow-inner" style={{ backgroundColor: el.color || '#FFFFFF' }} />
+            {el.type === 'shape' && (
+              <svg width="100%" height="100%" viewBox={`0 0 ${el.width} ${el.height}`} preserveAspectRatio="none">
+                {el.shapeType === 'rect' && <rect x="0" y="0" width="100%" height="100%" fill={el.fillColor} stroke={el.color} strokeWidth={el.strokeWidth} />}
+                {el.shapeType === 'circle' && <ellipse cx="50%" cy="50%" rx="50%" ry="50%" fill={el.fillColor} stroke={el.color} strokeWidth={el.strokeWidth} />}
+                {el.shapeType === 'line' && <line x1="0" y1="0" x2="100%" y2="100%" stroke={el.color} strokeWidth={el.strokeWidth} />}
+              </svg>
             )}
 
-            {el.type === 'link' && (
-              <div className="w-full h-full border border-blue-500/40 bg-blue-500/10 flex items-center justify-center">
-                <LinkIcon className="w-4 h-4 text-blue-500 opacity-40" />
-              </div>
+            {el.type === 'path' && el.pathData && (
+              <svg className="absolute inset-0 overflow-visible" style={{ width: pageWidth, height: pageHeight, left: -el.x, top: -el.y }}>
+                <path d={el.pathData} fill="none" stroke={el.color} strokeWidth={el.strokeWidth} opacity={el.opacity} strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             )}
 
-            {el.type === 'form-field' && (
-              <div className="w-full h-full border-2 border-indigo-500/40 bg-indigo-500/5 flex items-center px-2">
-                <CheckSquare className="w-3 h-3 text-indigo-500 opacity-40 mr-2" />
-                <span className="text-[10px] font-black uppercase text-indigo-500/40 truncate">Interactive Field</span>
-              </div>
-            )}
+            {el.type === 'whiteout' && <div className="w-full h-full shadow-inner" style={{ backgroundColor: el.color || '#FFFFFF' }} />}
+            {el.type === 'link' && <div className="w-full h-full border border-blue-500/40 bg-blue-500/10 flex items-center justify-center"><LinkIcon className="w-4 h-4 text-blue-500 opacity-40" /></div>}
+            {el.type === 'image' && el.content && <img src={el.content} className="w-full h-full object-cover" alt="" />}
+            {el.type === 'signature' && el.signatureData && <img src={el.signatureData} className="w-full h-full object-contain" alt="" />}
 
-            {el.type === 'image' && el.content && (
-              <img src={el.content} className="w-full h-full object-cover pointer-events-none" alt="" />
-            )}
-
-            {el.type === 'signature' && el.signatureData && (
-              <img src={el.signatureData} className="w-full h-full object-contain pointer-events-none" alt="" />
-            )}
-
+            {/* HANDLES */}
             {selectedElementId === el.id && (
-              <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-primary text-white px-3 py-1.5 rounded-xl shadow-2xl whitespace-nowrap animate-in slide-in-from-bottom-2">
-                <Move className="w-3.5 h-3.5" />
-                <span className="text-[9px] font-black uppercase tracking-widest">{el.type} Unit</span>
-              </div>
+              <>
+                <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-primary rounded-full cursor-nwse-resize shadow-xl border-2 border-white z-[1001]" onMouseDown={(e) => handleElementInteraction(e, el, 'resizing')} />
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-xl border border-black/5 cursor-pointer hover:bg-primary hover:text-white transition-colors" onMouseDown={(e) => handleElementInteraction(e, el, 'rotating')}>
+                  <RotateCw className="w-3 h-3" />
+                </div>
+              </>
             )}
           </div>
         ))}

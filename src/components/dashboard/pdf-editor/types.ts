@@ -5,7 +5,9 @@ export type PDFTool =
   | 'add-text' 
   | 'insert-image' 
   | 'draw' 
-  | 'shape' 
+  | 'shape-rect' 
+  | 'shape-circle' 
+  | 'shape-line'
   | 'highlight' 
   | 'underline' 
   | 'strikethrough' 
@@ -23,6 +25,7 @@ export type PDFTool =
 export interface PDFElement {
   id: string;
   type: 'text' | 'image' | 'shape' | 'signature' | 'form-field' | 'link' | 'whiteout' | 'path';
+  shapeType?: 'rect' | 'circle' | 'line';
   x: number;
   y: number;
   width: number;
@@ -30,13 +33,17 @@ export interface PDFElement {
   content?: string;
   fontSize?: number;
   fontFamily?: string;
-  color?: string;
+  color?: string; // Text or Stroke color
+  fillColor?: string;
+  strokeWidth?: number;
+  borderRadius?: number;
   bold?: boolean;
   italic?: boolean;
   underline?: boolean;
   opacity?: number;
   rotation?: number;
   zIndex: number;
+  textAlign?: 'left' | 'center' | 'right';
   
   // Signature specific
   signatureType?: 'draw' | 'type' | 'upload';
@@ -50,9 +57,9 @@ export interface PDFElement {
   // Link specific
   url?: string;
 
-  // Path data for drawing
+  // Path data for drawing/highlighting
   pathData?: string;
-  strokeWidth?: number;
+  isHighlighter?: boolean;
 }
 
 export interface PDFPage {
