@@ -14,7 +14,8 @@ export interface LogEntry extends ProgressState {
 }
 
 /**
- * AJN Tool Lifecycle Hook
+ * AJN Tool Lifecycle Hook - Production Core
+ * Manages the full state machine for document processing units.
  */
 export function useAJNTool(toolId: string) {
   const [phase, setPhase] = useState<"idle" | "selecting" | "running" | "done" | "error">("idle");
@@ -45,7 +46,7 @@ export function useAJNTool(toolId: string) {
       }
     } catch (err: any) {
       if (!abortRef.current) { 
-        console.error(err);
+        console.error("[AJN Hook] Execution error:", err);
         setError(err.message || "Operation failed."); 
         setPhase("error"); 
       }
@@ -65,23 +66,23 @@ export function useAJNTool(toolId: string) {
 }
 
 /**
- * Professional Progress Bar
+ * Professional Progress Bar - Hardware Accelerated
  */
 export function ProgressBar({ pct, color = "#3B82F6", label }: { pct: number, color?: string, label?: string }) {
   return (
-    <div className="w-full font-mono">
+    <div className="w-full font-sans">
       {label && (
-        <div className="flex justify-between mb-1.5 text-[10px] font-black uppercase text-slate-950/40 tracking-widest">
+        <div className="flex justify-between mb-2 text-[10px] font-black uppercase text-slate-950/40 tracking-[0.2em]">
           <span>{label}</span>
-          <span>{Math.round(pct)}%</span>
+          <span className="tabular-nums">{Math.round(pct)}%</span>
         </div>
       )}
-      <div className="h-1 bg-black/5 rounded-full overflow-hidden">
+      <div className="h-1.5 bg-black/5 rounded-full overflow-hidden shadow-inner border border-black/5">
         <motion.div 
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className="h-full" 
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="h-full shadow-[0_0_10px_rgba(59,130,246,0.3)]" 
           style={{ backgroundColor: color }} 
         />
       </div>
@@ -90,7 +91,7 @@ export function ProgressBar({ pct, color = "#3B82F6", label }: { pct: number, co
 }
 
 /**
- * Live Process Log
+ * Live Process Log Stream
  */
 export function LogStream({ logs }: { logs: LogEntry[] }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -99,14 +100,14 @@ export function LogStream({ logs }: { logs: LogEntry[] }) {
   }, [logs]);
 
   return (
-    <div ref={ref} className="h-40 overflow-y-auto p-5 bg-black rounded-[1.5rem] border border-white/10 font-mono text-[10px] leading-relaxed scrollbar-hide">
+    <div ref={ref} className="h-44 overflow-y-auto p-6 bg-slate-950 rounded-[2rem] border border-white/10 font-mono text-[10px] leading-relaxed scrollbar-hide shadow-2xl">
       {logs.map((log, i) => (
-        <div key={i} className="mb-1 text-slate-400">
-          <span className="text-primary/60 mr-2">[{((log.ts - (logs[0]?.ts || log.ts)) / 1000).toFixed(2)}s]</span>
+        <div key={i} className="mb-1.5 text-slate-400 flex gap-3">
+          <span className="text-primary/60 shrink-0 select-none">[{((log.ts - (logs[0]?.ts || log.ts)) / 1000).toFixed(2)}s]</span>
           <span className={i === logs.length - 1 ? "text-white font-bold" : "text-slate-300"}>
             {log.stage}
+            {log.detail && <span className="text-slate-500 ml-2">→ {log.detail}</span>}
           </span>
-          {log.detail && <span className="text-slate-500 ml-2">→ {log.detail}</span>}
         </div>
       ))}
       <div className="text-primary animate-pulse inline-block ml-1">▋</div>
