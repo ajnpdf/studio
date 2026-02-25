@@ -21,6 +21,9 @@ export type ServiceUnit = {
   cat: 'Organize' | 'Optimize' | 'Convert' | 'Edit' | 'Security' | 'Export' | 'Intelligence';
   mode: 'Standard' | 'Advanced';
   color: string;
+  benefits?: string[];
+  instructions?: string[];
+  useCases?: string[];
 };
 
 export const ALL_UNITS: ServiceUnit[] = [
@@ -32,7 +35,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Merge', 
     cat: 'Organize', 
     mode: 'Standard', 
-    color: '#3B82F6'
+    color: '#3B82F6',
+    benefits: ['Universal segment combining', 'Logic-based page ordering', 'Industrial speed'],
+    instructions: ['Inhale source PDFs', 'Adjust visionary grid', 'Execute merge'],
+    useCases: ['Academic report assembly', 'Business document consolidation']
   },
   { 
     id: 'split-pdf', 

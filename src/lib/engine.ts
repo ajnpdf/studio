@@ -45,7 +45,7 @@ class AJNPDFEngine {
         const manipulator = new PDFManipulator(files, (p, m) => onProgressCallback({ stage: "Processing", detail: m, pct: p }));
         result = await manipulator.runOperation(toolId, options);
       }
-      // 3. Export Formats
+      // 3. Export Formats (PDF to Office/Image)
       else if (['pdf-jpg', 'pdf-png', 'pdf-webp', 'pdf-word', 'pdf-pptx', 'pdf-excel', 'pdf-txt', 'pdf-pdfa'].includes(toolId)) {
         if (!files[0]) throw new Error("No file selected.");
         const { PDFConverter } = await import('@/lib/converters/pdf-converter');
@@ -63,7 +63,7 @@ class AJNPDFEngine {
         };
         result = await converter.convertTo(map[toolId] || 'JPG', options);
       }
-      // 4. Inbound Conversions
+      // 4. Inbound Conversions (Office/Image to PDF)
       else if (toolId.endsWith('-pdf')) {
         if (!files[0]) throw new Error("No file selected.");
         const source = toolId.split('-')[0];
