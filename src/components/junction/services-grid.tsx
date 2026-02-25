@@ -3,10 +3,12 @@
 import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Layout, Scissors, Trash2, Copy, Search, Shrink, Wrench, Hash, Unlock, Lock, 
-  PenTool, EyeOff, GitCompare, Globe, FolderOpen, Presentation, ShieldCheck, 
-  MousePointer2, History, Paintbrush, Layers, ImageIcon, FileText, Table, ArrowRight,
-  FileCode, Plus, RotateCw, Type, ListChecks, Scan, Archive
+  Layout, Scissors, Shrink, FileText, MousePointer2, 
+  PenTool, Lock, Wrench, Search, GitCompare,
+  ArrowRight, Archive, Scan, Layers, Type, RotateCw, 
+  Trash2, Copy, Hash, Unlock, GitBranch, Globe, 
+  FolderOpen, Presentation, ShieldCheck, History,
+  Paintbrush, Table, FileCode, Plus, ListChecks
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -55,64 +57,14 @@ export const ALL_UNITS: ServiceUnit[] = [
     color: '#10B981'
   },
   { 
-    id: 'pdf-word', 
-    name: 'PDF to Word', 
-    desc: 'Easily convert your PDF files into easy to edit DOC and DOCX documents. The converted WORD document is almost 100% accurate.', 
-    icon: FileText, 
-    tag: 'Word', 
-    cat: 'Export', 
-    mode: 'Standard', 
-    color: '#3B82F6'
-  },
-  { 
-    id: 'pdf-pptx', 
-    name: 'PDF to PowerPoint', 
-    desc: 'Turn your PDF files into easy to edit PPT and PPTX slideshows.', 
-    icon: Presentation, 
-    tag: 'PPT', 
-    cat: 'Export', 
-    mode: 'Standard', 
-    color: '#D97706'
-  },
-  { 
-    id: 'pdf-excel', 
-    name: 'PDF to Excel', 
-    desc: 'Pull data straight from PDFs into Excel spreadsheets in a few short seconds.', 
-    icon: Table, 
-    tag: 'Excel', 
-    cat: 'Export', 
-    mode: 'Standard', 
-    color: '#059669'
-  },
-  { 
-    id: 'word-pdf', 
-    name: 'Word to PDF', 
-    desc: 'Make DOC and DOCX files easy to read by converting them to PDF.', 
-    icon: FileText, 
-    tag: 'PDF', 
-    cat: 'Convert', 
-    mode: 'Standard', 
-    color: '#2563EB'
-  },
-  { 
-    id: 'ppt-pdf', 
-    name: 'PowerPoint to PDF', 
-    desc: 'Make PPT and PPTX slideshows easy to view by converting them to PDF.', 
-    icon: Presentation, 
-    tag: 'PDF', 
-    cat: 'Convert', 
-    mode: 'Standard', 
-    color: '#EA580C'
-  },
-  { 
-    id: 'excel-pdf', 
-    name: 'Excel to PDF', 
-    desc: 'Make EXCEL spreadsheets easy to read by converting them to PDF.', 
-    icon: Table, 
-    tag: 'PDF', 
-    cat: 'Convert', 
-    mode: 'Standard', 
-    color: '#16A34A'
+    id: 'repair-pdf', 
+    name: 'Repair PDF', 
+    desc: 'Repair a damaged PDF and recover data from corrupt PDF. Fix PDF files with our Repair tool.', 
+    icon: Wrench, 
+    tag: 'Repair', 
+    cat: 'Optimize', 
+    mode: 'Advanced', 
+    color: '#B91C1C'
   },
   { 
     id: 'edit-pdf', 
@@ -125,26 +77,6 @@ export const ALL_UNITS: ServiceUnit[] = [
     color: '#BE185D'
   },
   { 
-    id: 'pdf-jpg', 
-    name: 'PDF to JPG', 
-    desc: 'Convert each PDF page into a JPG or extract all images contained in a PDF.', 
-    icon: ImageIcon, 
-    tag: 'JPG', 
-    cat: 'Export', 
-    mode: 'Standard', 
-    color: '#EF4444'
-  },
-  { 
-    id: 'jpg-pdf', 
-    name: 'JPG to PDF', 
-    desc: 'Convert JPG images to PDF in seconds. Easily adjust orientation and margins.', 
-    icon: ImageIcon, 
-    tag: 'PDF', 
-    cat: 'Convert', 
-    mode: 'Standard', 
-    color: '#3B82F6'
-  },
-  { 
     id: 'sign-pdf', 
     name: 'Sign PDF', 
     desc: 'Sign yourself or request electronic signatures from others.', 
@@ -153,106 +85,6 @@ export const ALL_UNITS: ServiceUnit[] = [
     cat: 'Security', 
     mode: 'Standard', 
     color: '#1F2937'
-  },
-  { 
-    id: 'watermark-pdf', 
-    name: 'Watermark', 
-    desc: 'Stamp an image or text over your PDF in seconds. Choose the typography, transparency and position.', 
-    icon: Type, 
-    tag: 'Watermark', 
-    cat: 'Edit', 
-    mode: 'Standard', 
-    color: '#6366F1'
-  },
-  { 
-    id: 'rotate-pdf', 
-    name: 'Rotate PDF', 
-    desc: 'Rotate your PDFs the way you need them. You can even rotate multiple PDFs at once!', 
-    icon: RotateCw, 
-    tag: 'Rotate', 
-    cat: 'Organize', 
-    mode: 'Standard', 
-    color: '#8B5CF6'
-  },
-  { 
-    id: 'html-pdf', 
-    name: 'HTML to PDF', 
-    desc: 'Convert webpages in HTML to PDF. Copy and paste the URL of the page you want and convert it to PDF with a click.', 
-    icon: Globe, 
-    tag: 'HTML', 
-    cat: 'Convert', 
-    mode: 'Advanced', 
-    color: '#0EA5E9'
-  },
-  { 
-    id: 'unlock-pdf', 
-    name: 'Unlock PDF', 
-    desc: 'Remove PDF password security, giving you the freedom to use your PDFs as you want.', 
-    icon: Unlock, 
-    tag: 'Unlock', 
-    cat: 'Security', 
-    mode: 'Standard', 
-    color: '#F59E0B'
-  },
-  { 
-    id: 'protect-pdf', 
-    name: 'Protect PDF', 
-    desc: 'Protect PDF files with a password. Encrypt PDF documents to prevent unauthorized access.', 
-    icon: Lock, 
-    tag: 'Protect', 
-    cat: 'Security', 
-    mode: 'Standard', 
-    color: '#059669'
-  },
-  { 
-    id: 'organize-pdf', 
-    name: 'Organize PDF', 
-    desc: 'Sort pages of your PDF file however you like. Delete PDF pages or add PDF pages to your document at your convenience.', 
-    icon: FolderOpen, 
-    tag: 'Organize', 
-    cat: 'Organize', 
-    mode: 'Standard', 
-    color: '#4F46E5'
-  },
-  { 
-    id: 'pdf-pdfa', 
-    name: 'PDF to PDF/A', 
-    desc: 'Transform your PDF to PDF/A, the ISO-standardized version of PDF for long-term archiving. Your PDF will preserve formatting when accessed in the future.', 
-    icon: Archive, 
-    tag: 'Archival', 
-    cat: 'Export', 
-    mode: 'Standard', 
-    color: '#111827'
-  },
-  { 
-    id: 'repair-pdf', 
-    name: 'Repair PDF', 
-    desc: 'Repair a damaged PDF and recover data from corrupt PDF. Fix PDF files with our Repair tool.', 
-    icon: Wrench, 
-    tag: 'Repair', 
-    cat: 'Optimize', 
-    mode: 'Advanced', 
-    color: '#B91C1C'
-  },
-  { 
-    id: 'add-page-numbers', 
-    name: 'Page numbers', 
-    desc: 'Add page numbers into PDFs with ease. Choose your positions, dimensions, typography.', 
-    icon: Hash, 
-    tag: 'Pages', 
-    cat: 'Organize', 
-    mode: 'Standard', 
-    color: '#4B5563'
-  },
-  { 
-    id: 'scan-pdf', 
-    name: 'Scan to PDF', 
-    desc: 'Capture document scans from your mobile device and send them instantly to your browser.', 
-    icon: Scan, 
-    tag: 'Scan', 
-    cat: 'Convert', 
-    mode: 'Advanced', 
-    color: '#047857'
   },
   { 
     id: 'ocr-pdf', 
@@ -274,6 +106,26 @@ export const ALL_UNITS: ServiceUnit[] = [
     mode: 'Advanced', 
     color: '#1E40AF'
   },
+  { 
+    id: 'protect-pdf', 
+    name: 'Protect PDF', 
+    desc: 'Protect PDF files with a password. Encrypt PDF documents to prevent unauthorized access.', 
+    icon: Lock, 
+    tag: 'Protect', 
+    cat: 'Security', 
+    mode: 'Standard', 
+    color: '#059669'
+  },
+  { 
+    id: 'pdf-word', 
+    name: 'PDF to Word', 
+    desc: 'Easily convert your PDF files into easy to edit DOC and DOCX documents. The converted WORD document is almost 100% accurate.', 
+    icon: FileText, 
+    tag: 'Word', 
+    cat: 'Export', 
+    mode: 'Standard', 
+    color: '#3B82F6'
+  }
 ];
 
 const containerVariants = {
@@ -302,7 +154,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
         <div className="w-16 h-16 mx-auto flex items-center justify-center bg-black/5 rounded-3xl">
           <Search className="w-8 h-8" />
         </div>
-        <p className="text-xs font-black tracking-widest uppercase">Tool Not Found</p>
+        <p className="text-xs font-black tracking-widest uppercase">Unit Not Calibrated</p>
       </div>
     );
   }

@@ -11,13 +11,8 @@ import {
   AlignLeft, 
   AlignCenter, 
   AlignRight,
-  ChevronDown,
   Trash2,
   Lock,
-  Link as LinkIcon,
-  CheckCircle2,
-  Wand2,
-  RotateCw,
   Eye
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -25,7 +20,6 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import { 
   Select, 
   SelectContent, 
@@ -33,7 +27,6 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -51,7 +44,7 @@ export function PDFPropertiesPanel({ element, onUpdate, onDelete }: Props) {
         </div>
         <div className="space-y-2">
           <h4 className="text-[11px] font-black uppercase tracking-[0.2em]">Layer Properties</h4>
-          <p className="text-[10px] font-medium leading-relaxed">Select any object on the canvas to edit its professional attributes and metadata.</p>
+          <p className="text-[10px] font-medium leading-relaxed">Select any object on the canvas to edit its professional attributes.</p>
         </div>
       </aside>
     );
@@ -74,102 +67,36 @@ export function PDFPropertiesPanel({ element, onUpdate, onDelete }: Props) {
       </div>
 
       <div className="p-6 space-y-10">
-        {/* Geometry Group */}
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <Label className="text-[9px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
               <Layers className="w-3.5 h-3.5" /> Geometry Engine
             </Label>
-            <span className="text-[8px] font-bold text-muted-foreground">ID: {element.id}</span>
           </div>
-          
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[8px] text-muted-foreground uppercase font-black">X-Pos</Label>
-              <Input 
-                type="number" 
-                value={Math.round(element.x)} 
-                onChange={(e) => handleFieldChange('x', parseInt(e.target.value))}
-                className="h-10 bg-white/5 border-white/10 text-xs font-bold font-mono"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[8px] text-muted-foreground uppercase font-black">Y-Pos</Label>
-              <Input 
-                type="number" 
-                value={Math.round(element.y)} 
-                onChange={(e) => handleFieldChange('y', parseInt(e.target.value))}
-                className="h-10 bg-white/5 border-white/10 text-xs font-bold font-mono"
-              />
-            </div>
-            <div className="space-y-2">
               <Label className="text-[8px] text-muted-foreground uppercase font-black">Width</Label>
-              <Input 
-                type="number" 
-                value={Math.round(element.width)} 
-                onChange={(e) => handleFieldChange('width', parseInt(e.target.value))}
-                className="h-10 bg-white/5 border-white/10 text-xs font-bold font-mono"
-              />
+              <Input type="number" value={Math.round(element.width)} onChange={(e) => handleFieldChange('width', parseInt(e.target.value))} className="h-10 bg-white/5 border-white/10 text-xs font-bold font-mono" />
             </div>
             <div className="space-y-2">
               <Label className="text-[8px] text-muted-foreground uppercase font-black">Height</Label>
-              <Input 
-                type="number" 
-                value={Math.round(element.height)} 
-                onChange={(e) => handleFieldChange('height', parseInt(e.target.value))}
-                className="h-10 bg-white/5 border-white/10 text-xs font-bold font-mono"
-              />
+              <Input type="number" value={Math.round(element.height)} onChange={(e) => handleFieldChange('height', parseInt(e.target.value))} className="h-10 bg-white/5 border-white/10 text-xs font-bold font-mono" />
             </div>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-              <span>Rotation</span>
-              <span className="text-primary">{element.rotation || 0}°</span>
-            </div>
-            <Slider 
-              value={[element.rotation || 0]} 
-              max={360} 
-              onValueChange={([v]) => handleFieldChange('rotation', v)} 
-            />
           </div>
         </section>
 
-        {/* Dynamic Contextual Panels */}
         {element.type === 'text' && (
           <section className="space-y-6 animate-in slide-in-from-right-2">
             <Label className="text-[9px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
               <Type className="w-3.5 h-3.5" /> Typography Matrix
             </Label>
-            
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label className="text-[8px] text-muted-foreground uppercase font-bold">Font Profile</Label>
-                <Select value={element.fontFamily} onValueChange={(v) => handleFieldChange('fontFamily', v)}>
-                  <SelectTrigger className="h-10 bg-white/5 border-white/10 text-xs font-bold">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-white/10">
-                    {['Inter', 'Arial', 'Helvetica', 'Caveat', 'Times New Roman'].map(f => (
-                      <SelectItem key={f} value={f} className="text-xs font-medium">{f}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                  <span>Size</span>
-                  <span className="text-primary">{element.fontSize}px</span>
-                </div>
-                <Slider 
-                  value={[element.fontSize || 14]} 
-                  max={120} 
-                  min={6} 
-                  onValueChange={([v]) => handleFieldChange('fontSize', v)}
-                />
-              </div>
-
+              <Select value={element.fontFamily} onValueChange={(v) => handleFieldChange('fontFamily', v)}>
+                <SelectTrigger className="h-10 bg-white/5 border-white/10 text-xs font-bold"><SelectValue /></SelectTrigger>
+                <SelectContent className="bg-card border-white/10">
+                  {['Inter', 'Arial', 'Helvetica', 'Times New Roman'].map(f => <SelectItem key={f} value={f} className="text-xs">{f}</SelectItem>)}
+                </SelectContent>
+              </Select>
               <div className="flex gap-1.5 p-1.5 bg-white/5 rounded-xl border border-white/5">
                 {[
                   { icon: Bold, key: 'bold', active: element.bold },
@@ -193,59 +120,23 @@ export function PDFPropertiesPanel({ element, onUpdate, onDelete }: Props) {
           </section>
         )}
 
-        {/* Universal Appearance */}
         <section className="space-y-6">
           <Label className="text-[9px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
-            <Palette className="w-3.5 h-3.5" /> Layer Aesthetics
+            <Palette className="w-3.5 h-3.5" /> Appearance
           </Label>
-          
-          <div className="space-y-6">
-            <div className="space-y-3">
-              <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                <span>Layer Opacity</span>
-                <span className="text-primary">{Math.round((element.opacity || 1) * 100)}%</span>
-              </div>
-              <Slider 
-                value={[(element.opacity || 1) * 100]} 
-                max={100} 
-                onValueChange={([v]) => handleFieldChange('opacity', v / 100)}
-              />
+          <div className="space-y-3">
+            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+              <span>Opacity</span>
+              <span className="text-primary">{Math.round((element.opacity || 1) * 100)}%</span>
             </div>
-            
-            <div className="space-y-3">
-              <Label className="text-[8px] text-muted-foreground uppercase font-black">Color Mapping</Label>
-              <div className="flex flex-wrap gap-2">
-                {['#000000', '#ffffff', '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#000080'].map(color => (
-                  <button
-                    key={color}
-                    className={cn(
-                      "w-7 h-7 rounded-full border-2 transition-all hover:scale-125 hover:shadow-xl",
-                      element.color === color ? "border-primary ring-2 ring-primary/20 scale-110" : "border-white/10"
-                    )}
-                    style={{ backgroundColor: color }}
-                    onClick={() => handleFieldChange('color', color)}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="space-y-4 pt-4 border-t border-white/5">
-          <div className="flex items-center gap-3 text-muted-foreground/40">
-            <Lock className="w-3.5 h-3.5" />
-            <span className="text-[9px] font-black uppercase tracking-tighter">Object Locked by Session</span>
-          </div>
-          <div className="flex items-center gap-3 text-muted-foreground/40">
-            <Eye className="w-3.5 h-3.5" />
-            <span className="text-[9px] font-black uppercase tracking-tighter">Visible to Platform Units</span>
+            <Slider value={[(element.opacity || 1) * 100]} max={100} onValueChange={([v]) => handleFieldChange('opacity', v / 100)} />
           </div>
         </section>
       </div>
 
       <div className="mt-auto p-6 border-t border-white/5 bg-background/20">
-        <Button className="w-full h-12 bg-white/5 hover:bg-red-500/10 text-red-400 border border-white/10 font-black text-[10px] uppercase tracking-widest gap-2 transition-all" onClick={onDelete}>
-          <Trash2 className="w-4 h-4" /> Purge from Canvas
+        <Button className="w-full h-12 bg-white/5 hover:bg-red-500/10 text-red-400 border border-white/10 font-black text-[10px] uppercase tracking-widest gap-2" onClick={onDelete}>
+          <Trash2 className="w-4 h-4" /> Purge Layer
         </Button>
       </div>
     </aside>
