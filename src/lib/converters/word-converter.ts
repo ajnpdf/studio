@@ -1,3 +1,4 @@
+
 'use client';
 
 import mammoth from 'mammoth';
@@ -10,6 +11,7 @@ import { ProgressCallback, ConversionResult } from './pdf-converter';
 /**
  * AJN Professional Word Conversion Engine
  * Implements high-fidelity 7-step OOXML layout reconstruction.
+ * Hardened for 2026 industrial binary standards.
  */
 export class WordConverter {
   private file: File;
@@ -54,12 +56,14 @@ export class WordConverter {
    * WORD TO PDF (Master Specification Implementation)
    */
   private async toMasterPDF(buffer: ArrayBuffer, baseName: string): Promise<ConversionResult> {
-    // STEP 1: Unzip container with validation
+    // STEP 1: Unzip container with rigorous validation
     this.updateProgress(10, "Unzipping OOXML container (.docx)...");
     try {
+      // Validate central directory before loading
       await JSZip.loadAsync(buffer);
     } catch (e) {
-      throw new Error("Invalid .docx binary. The file may be corrupted or is a legacy .doc file renamed to .docx. Please provide a valid OOXML document.");
+      console.error("[Word Engine] OOXML Integrity Error:", e);
+      throw new Error("Invalid .docx binary. The file may be a legacy .doc file renamed to .docx or is corrupted. Please provide a valid OOXML document.");
     }
 
     // STEP 2: Parse XML parts

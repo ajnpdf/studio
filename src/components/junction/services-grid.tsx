@@ -44,8 +44,8 @@ export type ServiceUnit = {
 };
 
 /**
- * AJN Major Registry
- * Verified 2026 Industrial Standards.
+ * AJN Major Registry - 2026 Industrial Standards
+ * Curated Top 9 Professional Units.
  */
 export const ALL_UNITS: ServiceUnit[] = [
   { 

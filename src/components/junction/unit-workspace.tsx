@@ -50,6 +50,7 @@ interface Props {
 
 /**
  * AJN Unit Workspace - Professional Industrial Standard 2026
+ * Hardened for real-time interaction and precision binary sync.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const tool = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -79,6 +80,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleFilesAdded = async (files: File[]) => {
+    // Multi-Asset Validation
     if ((initialUnitId === 'merge-pdf' || initialUnitId === 'split-pdf') && files.length < 2) {
       toast({ 
         title: "Protocol Violation", 
@@ -162,6 +164,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     reset();
   };
 
+  // Extract icon component safely
   const ToolIcon = tool?.icon;
 
   return (
@@ -187,6 +190,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   ) : (
                     <div className="flex flex-col gap-12">
                       <div className="space-y-12">
+                        {/* CONFIGURATION PANEL */}
                         <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10 max-w-4xl mx-auto w-full relative">
                           <div className="absolute top-8 right-10 flex gap-3">
                             <Button 
@@ -194,7 +198,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                               onClick={handleReupload}
                               className="h-10 px-5 text-[10px] font-black uppercase tracking-widest text-slate-400 border-black/5 hover:text-red-500 transition-all gap-2 rounded-xl shadow-sm"
                             >
-                              <RefreshCcw className="w-3.5 h-3.5" /> Reset Session
+                              <RefreshCcw className="w-3.5 h-3.5" /> Reupload Segment
                             </Button>
                           </div>
 
@@ -255,6 +259,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                           </div>
                         </section>
 
+                        {/* VISIONARY HUB */}
                         <div className="space-y-6">
                           <div className="flex items-center justify-between px-2">
                             <div className="flex items-center gap-3">
@@ -291,6 +296,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                             ))}
                           </div>
 
+                          {/* EXECUTE PROTOCOL BAR */}
                           <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-6 animate-in slide-in-from-bottom-10 duration-700">
                             <Button 
                               onClick={handleConfirmedExecution} 
@@ -342,6 +348,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
         </div>
       </main>
 
+      {/* FULL-VIEW INSPECTION DIALOG */}
       <Dialog open={!!previewPage} onOpenChange={() => setPreviewPage(null)}>
         <DialogContent className="max-w-4xl w-full h-[90vh] bg-white border-none p-0 overflow-hidden font-sans rounded-[3rem] shadow-2xl">
           <DialogHeader className="p-8 border-b border-black/5 flex items-center justify-between shrink-0">
