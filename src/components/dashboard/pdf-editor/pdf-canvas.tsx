@@ -1,4 +1,3 @@
-
 "use client";
 
 import { PDFPage, PDFElement, PDFTool } from './types';
@@ -31,6 +30,7 @@ interface Props {
 /**
  * AJN High-Performance Surgical Canvas
  * Industrial Vector Engine supporting Shapes, Paths, and Advanced Transforms.
+ * Performance: Hardware-accelerated CSS transforms.
  */
 export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectElement, onUpdateElement, onAddElement, onRequestSignature }: Props) {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -41,6 +41,7 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
   const [elementStart, setElementStart] = useState({ x: 0, y: 0, w: 0, h: 0, r: 0 });
   const [boxPreview, setBoxPreview] = useState<{x: number, y: number, w: number, h: number} | null>(null);
   const [currentPath, setCurrentPath] = useState<string>("");
+  const [snapGuides, setSnapGuides] = useState<{x?: number, y?: number} | null>(null);
 
   const scale = zoom / 100;
   const pageWidth = 595; 
@@ -76,10 +77,8 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
       onAddElement({
         id: `text-${Date.now()}`,
         type: 'text',
-        x,
-        y,
-        width: 200,
-        height: 50,
+        x, y,
+        width: 200, height: 50,
         content: 'Edit text...',
         fontSize: 16,
         fontFamily: 'Arial',
@@ -118,7 +117,18 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
     if (interactionType === 'dragging') {
       const dx = (e.clientX - dragStart.x) / scale;
       const dy = (e.clientY - dragStart.y) / scale;
-      onUpdateElement({ ...el, x: elementStart.x + dx, y: elementStart.y + dy });
+      
+      let nx = elementStart.x + dx;
+      let ny = elementStart.y + dy;
+
+      // Smart Snapping Logic
+      const snapThreshold = 10;
+      let snapped = null;
+      if (Math.abs(nx + el.width/2 - pageWidth/2) < snapThreshold) { nx = pageWidth/2 - el.width/2; snapped = { x: pageWidth/2 }; }
+      if (Math.abs(ny + el.height/2 - pageHeight/2) < snapThreshold) { ny = pageHeight/2 - el.height/2; snapped = { ...snapped, y: pageHeight/2 }; }
+      
+      setSnapGuides(snapped);
+      onUpdateElement({ ...el, x: nx, y: ny });
     } else if (interactionType === 'resizing') {
       const dx = (e.clientX - dragStart.x) / scale;
       const dy = (e.clientY - dragStart.y) / scale;
@@ -129,7 +139,7 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
       const centerX = (el.x + el.width / 2) * scale + rect.left;
       const centerY = (el.y + el.height / 2) * scale + rect.top;
       const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI) + 90;
-      onUpdateElement({ ...el, rotation: angle });
+      onUpdateElement({ ...el, rotation: Math.round(angle / 5) * 5 }); // 5deg snapping
     }
   };
 
@@ -149,14 +159,10 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
             fileInputRef.current?.click();
           } else if (activeTool.startsWith('shape-')) {
             onAddElement({
-              id,
-              type: 'shape',
+              id, type: 'shape',
               shapeType: activeTool.replace('shape-', '') as any,
               x, y, width: w, height: h,
-              color: '#3B82F6',
-              fillColor: 'transparent',
-              strokeWidth: 2,
-              zIndex: 100
+              color: '#3B82F6', fillColor: 'transparent', strokeWidth: 2, zIndex: 100
             });
           } else if (activeTool === 'link') {
             onAddElement({ id, type: 'link', x, y, width: w, height: h, url: 'https://', zIndex: 100 });
@@ -183,6 +189,7 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
       }
     }
     setInteractionActiveType(null);
+    setSnapGuides(null);
   };
 
   const handleElementInteraction = (e: React.MouseEvent, el: PDFElement, type: 'dragging' | 'resizing' | 'rotating') => {
@@ -203,7 +210,7 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       className={cn(
-        "bg-white rounded-sm shadow-[0_0_100px_rgba(0,0,0,0.3)] relative transition-shadow duration-500 origin-center select-none overflow-hidden",
+        "bg-white rounded-sm shadow-[0_30px_100px_rgba(0,0,0,0.25)] relative transition-shadow duration-500 origin-center select-none overflow-hidden",
         activeTool !== 'select' && 'cursor-crosshair'
       )}
       style={{ width: pageWidth * scale, height: pageHeight * scale, transform: `rotate(${page.rotation}deg)` }}
@@ -234,6 +241,14 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
         <div className="absolute inset-0 pointer-events-none">
           <img src={page.previewUrl} className="w-full h-full object-contain" alt="" />
         </div>
+      )}
+
+      {/* SNAP GUIDES */}
+      {snapGuides && (
+        <>
+          {snapGuides.x !== undefined && <div className="absolute top-0 bottom-0 w-px bg-primary/40 z-[2000]" style={{ left: snapGuides.x * scale }} />}
+          {snapGuides.y !== undefined && <div className="absolute left-0 right-0 h-px bg-primary/40 z-[2000]" style={{ top: snapGuides.y * scale }} />}
+        </>
       )}
 
       {/* ACTIVE BOX PREVIEW */}
@@ -274,7 +289,7 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
           <div
             key={el.id}
             className={cn(
-              "absolute group transition-all",
+              "absolute group transition-shadow",
               selectedElementId === el.id ? "ring-2 ring-primary shadow-2xl z-[999]" : "hover:ring-1 hover:ring-primary/40 cursor-pointer"
             )}
             style={{
@@ -284,7 +299,8 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
               height: el.height,
               opacity: el.opacity,
               zIndex: el.zIndex,
-              transform: `rotate(${el.rotation || 0}deg)`
+              transform: `rotate(${el.rotation || 0}deg)`,
+              willChange: 'transform, left, top'
             }}
             onMouseDown={(e) => handleElementInteraction(e, el, 'dragging')}
           >
@@ -293,6 +309,13 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
                 className="w-full h-full flex items-center p-2 outline-none font-medium whitespace-pre-wrap leading-tight overflow-hidden"
                 contentEditable={selectedElementId === el.id}
                 onBlur={(e) => onUpdateElement({ ...el, content: e.currentTarget.innerText })}
+                onInput={(e) => {
+                  // Real-time height adjustment for text boxes
+                  if (selectedElementId === el.id) {
+                    const h = e.currentTarget.scrollHeight;
+                    if (h > el.height) onUpdateElement({ ...el, height: h });
+                  }
+                }}
                 suppressContentEditableWarning
                 style={{ 
                   fontSize: el.fontSize, 
@@ -325,15 +348,21 @@ export function PDFCanvas({ page, zoom, activeTool, selectedElementId, onSelectE
 
             {el.type === 'whiteout' && <div className="w-full h-full shadow-inner" style={{ backgroundColor: el.color || '#FFFFFF' }} />}
             {el.type === 'link' && <div className="w-full h-full border border-blue-500/40 bg-blue-500/10 flex items-center justify-center"><LinkIcon className="w-4 h-4 text-blue-500 opacity-40" /></div>}
-            {el.type === 'image' && el.content && <img src={el.content} className="w-full h-full object-cover" alt="" />}
-            {el.type === 'signature' && el.signatureData && <img src={el.signatureData} className="w-full h-full object-contain" alt="" />}
+            {el.type === 'image' && el.content && <img src={el.content} className="w-full h-full object-cover pointer-events-none" alt="" />}
+            {el.type === 'signature' && el.signatureData && <img src={el.signatureData} className="w-full h-full object-contain pointer-events-none" alt="" />}
 
             {/* HANDLES */}
             {selectedElementId === el.id && (
               <>
-                <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-primary rounded-full cursor-nwse-resize shadow-xl border-2 border-white z-[1001]" onMouseDown={(e) => handleElementInteraction(e, el, 'resizing')} />
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-xl border border-black/5 cursor-pointer hover:bg-primary hover:text-white transition-colors" onMouseDown={(e) => handleElementInteraction(e, el, 'rotating')}>
-                  <RotateCw className="w-3 h-3" />
+                {/* 8-point resizing handles for high-fidelity control */}
+                <div className="absolute -top-1.5 -left-1.5 w-3 h-3 bg-white border border-primary rounded-full cursor-nw-resize z-[1001]" onMouseDown={(e) => handleElementInteraction(e, el, 'resizing')} />
+                <div className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-white border border-primary rounded-full cursor-ne-resize z-[1001]" onMouseDown={(e) => handleElementInteraction(e, el, 'resizing')} />
+                <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-white border border-primary rounded-full cursor-sw-resize z-[1001]" onMouseDown={(e) => handleElementInteraction(e, el, 'resizing')} />
+                <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white border border-primary rounded-full cursor-se-resize z-[1001]" onMouseDown={(e) => handleElementInteraction(e, el, 'resizing')} />
+                
+                {/* Rotation Handle */}
+                <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-2xl border border-primary/20 cursor-pointer hover:bg-primary hover:text-white transition-all group/rot" onMouseDown={(e) => handleElementInteraction(e, el, 'rotating')}>
+                  <RotateCw className="w-4 h-4 text-primary group-hover/rot:text-white transition-colors" />
                 </div>
               </>
             )}

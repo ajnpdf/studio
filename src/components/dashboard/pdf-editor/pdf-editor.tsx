@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useCallback, useEffect } from 'react';
@@ -78,18 +77,31 @@ export function PDFEditor({ file }: Props) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.getAttribute('contenteditable') === 'true') return;
+      
+      const el = doc.pages.flatMap(p => p.elements).find(item => item.id === selectedElementId);
+      
+      // Keyboard Shortcuts & Precision Nudging
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectedElementId) {
           const newDoc = { ...doc, pages: doc.pages.map(p => ({ ...p, elements: p.elements.filter(el => el.id !== selectedElementId) })) };
           pushToHistory(newDoc); setSelectedElementId(null);
         }
       }
+      
+      if (el && selectedElementId) {
+        const step = e.shiftKey ? 10 : 1;
+        if (e.key === 'ArrowUp') handleUpdateElement({ ...el, y: el.y - step }, activePageIdx);
+        if (e.key === 'ArrowDown') handleUpdateElement({ ...el, y: el.y + step }, activePageIdx);
+        if (e.key === 'ArrowLeft') handleUpdateElement({ ...el, x: el.x - step }, activePageIdx);
+        if (e.key === 'ArrowRight') handleUpdateElement({ ...el, x: el.x + step }, activePageIdx);
+      }
+
       if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); }
       if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [doc, selectedElementId]);
+  }, [doc, selectedElementId, activePageIdx]);
 
   const pushToHistory = useCallback((newDoc: PDFDocument) => {
     const newHistory = history.slice(0, historyIndex + 1);
@@ -102,6 +114,9 @@ export function PDFEditor({ file }: Props) {
 
   const handleUpdateElement = (updatedElement: PDFElement, pageIdx: number) => {
     const newDoc = { ...doc, pages: doc.pages.map((p, idx) => idx === pageIdx ? { ...p, elements: p.elements.map(el => el.id === updatedElement.id ? updatedElement : el) } : p) };
+    // Throttled push to history for property changes could go here, but for now we push everything
+    setDoc(newDoc);
+    // Only push to history if not currently dragging/rotating? Simplified for now.
     pushToHistory(newDoc);
   };
 
