@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -12,7 +13,10 @@ import {
   Edit3,
   Settings2,
   FileText,
-  ShieldCheck
+  ShieldCheck,
+  Type,
+  Layout,
+  Hash
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -55,16 +59,21 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const [config, setConfig] = useState({
     quality: 50,
     targetSize: '',
-    targetUnit: 'KB'
+    targetUnit: 'KB',
+    watermarkText: 'AJN Professional',
+    watermarkOpacity: 50,
+    password: '',
+    pageNumbers: true
   });
 
   const isCompressTool = tool?.id === 'compress-pdf';
+  const isSecurityTool = tool?.id === 'protect-pdf';
   const isDirectConvert = ['word-pdf', 'jpg-pdf', 'ppt-pdf', 'excel-pdf', 'pdf-word'].includes(tool?.id || '');
 
   const handleFilesAdded = async (files: File[]) => {
     setSourceFiles(files);
     
-    if (isCompressTool || isDirectConvert) {
+    if (isCompressTool || isDirectConvert || isSecurityTool) {
       setPhase('selecting'); 
     } 
     else if (files.some(f => f.type === 'application/pdf')) {
@@ -110,7 +119,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleConfirmedExecution = () => {
-    if (isCompressTool || isDirectConvert) {
+    if (isCompressTool || isDirectConvert || isSecurityTool) {
       run(sourceFiles, config);
       return;
     }
@@ -153,63 +162,74 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   ) : (
                     <div className="flex flex-col gap-8">
                       {/* CONFIGURATION PANELS */}
-                      {(isCompressTool || isDirectConvert) && (
-                        <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10 max-w-4xl mx-auto w-full">
-                          <div className="flex items-center gap-4 text-primary border-b border-black/5 pb-6">
-                            <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-sm">
-                              <Settings2 className="w-7 h-7" />
-                            </div>
-                            <div>
-                              <h3 className="text-3xl font-black uppercase tracking-tighter text-slate-950">{tool?.name}</h3>
-                              <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">Operational Protocol</p>
-                            </div>
+                      <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10 max-w-4xl mx-auto w-full">
+                        <div className="flex items-center gap-4 text-primary border-b border-black/5 pb-6">
+                          <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-sm">
+                            <Settings2 className="w-7 h-7" />
                           </div>
+                          <div>
+                            <h3 className="text-3xl font-black uppercase tracking-tighter text-slate-950">{tool?.name}</h3>
+                            <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.3em]">Operational Protocol</p>
+                          </div>
+                        </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                            <div className="space-y-8">
-                              {isCompressTool && (
-                                <>
-                                  <div className="space-y-3">
-                                    <Label className="text-[11px] font-black uppercase tracking-widest text-primary flex justify-between">
-                                      <span>Reduction Strength</span>
-                                      <span>{config.quality}%</span>
-                                    </Label>
-                                    <Slider value={[config.quality]} onValueChange={([v]) => setConfig({...config, quality: v})} max={90} min={10} step={5} />
-                                  </div>
-                                  <div className="space-y-3">
-                                    <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Max Output Size</Label>
-                                    <div className="flex gap-3">
-                                      <Input type="number" placeholder="e.g. 500" value={config.targetSize} onChange={(e) => setConfig({...config, targetSize: e.target.value})} className="h-12 bg-black/5 border-none rounded-2xl font-bold" />
-                                      <select value={config.targetUnit} onChange={(e) => setConfig({...config, targetUnit: e.target.value})} className="h-12 bg-black/5 border-none rounded-2xl font-black text-[10px] px-4">
-                                        <option value="KB">KB</option><option value="MB">MB</option>
-                                      </select>
-                                    </div>
-                                  </div>
-                                </>
-                              )}
-                              {isDirectConvert && (
-                                <div className="space-y-4">
-                                  <div className="flex items-center gap-3 p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl text-emerald-600">
-                                    <CheckCircle2 className="w-5 h-5" />
-                                    <span className="text-[9px] font-black uppercase tracking-widest">{sourceFiles.length} File(s) Staged</span>
-                                  </div>
-                                  <p className="text-[10px] font-bold text-slate-950/40 uppercase leading-relaxed tracking-widest">Execute process to initiate binary transformation.</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                          <div className="space-y-8">
+                            {isCompressTool && (
+                              <>
+                                <div className="space-y-3">
+                                  <Label className="text-[11px] font-black uppercase tracking-widest text-primary flex justify-between">
+                                    <span>Reduction Strength</span>
+                                    <span>{config.quality}%</span>
+                                  </Label>
+                                  <Slider value={[config.quality]} onValueChange={([v]) => setConfig({...config, quality: v})} max={90} min={10} step={5} />
                                 </div>
-                              )}
-                            </div>
-
-                            <div className="space-y-6">
-                              <div className="p-8 bg-primary/5 border border-primary/10 rounded-[2rem] space-y-4">
-                                <div className="flex items-center gap-3 text-primary">
-                                  <ShieldCheck className="w-5 h-5" />
-                                  <p className="text-xs font-black uppercase tracking-widest">Local Buffer Secure</p>
+                                <div className="space-y-3">
+                                  <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Max Output Size</Label>
+                                  <div className="flex gap-3">
+                                    <Input type="number" placeholder="e.g. 500" value={config.targetSize} onChange={(e) => setConfig({...config, targetSize: e.target.value})} className="h-12 bg-black/5 border-none rounded-2xl font-bold" />
+                                    <select value={config.targetUnit} onChange={(e) => setConfig({...config, targetUnit: e.target.value})} className="h-12 bg-black/5 border-none rounded-2xl font-black text-[10px] px-4">
+                                      <option value="KB">KB</option><option value="MB">MB</option>
+                                    </select>
+                                  </div>
                                 </div>
-                                <p className="text-[9px] font-bold uppercase leading-relaxed text-slate-950/60">System executes high-fidelity binary reconstruction. No data leaves your browser sandbox.</p>
+                              </>
+                            )}
+                            {isSecurityTool && (
+                              <div className="space-y-4">
+                                <Label className="text-[11px] font-black uppercase tracking-widest text-primary">Set Master Password</Label>
+                                <Input 
+                                  type="password" 
+                                  placeholder="••••••••" 
+                                  value={config.password} 
+                                  onChange={(e) => setConfig({...config, password: e.target.value})}
+                                  className="h-12 bg-black/5 border-none rounded-2xl font-bold"
+                                />
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">ENCRYPTION: AES-256 BIT</p>
                               </div>
+                            )}
+                            {isDirectConvert && (
+                              <div className="space-y-4">
+                                <div className="flex items-center gap-3 p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl text-emerald-600">
+                                  <CheckCircle2 className="w-5 h-5" />
+                                  <span className="text-[9px] font-black uppercase tracking-widest">{sourceFiles.length} File(s) Staged</span>
+                                </div>
+                                <p className="text-[10px] font-bold text-slate-950/40 uppercase leading-relaxed tracking-widest">Execute process to initiate binary transformation.</p>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-6">
+                            <div className="p-8 bg-primary/5 border border-primary/10 rounded-[2rem] space-y-4">
+                              <div className="flex items-center gap-3 text-primary">
+                                <ShieldCheck className="w-5 h-5" />
+                                <p className="text-xs font-black uppercase tracking-widest">Local Buffer Secure</p>
+                              </div>
+                              <p className="text-[9px] font-bold uppercase leading-relaxed text-slate-950/60">System executes high-fidelity binary reconstruction. No data leaves your browser sandbox.</p>
                             </div>
                           </div>
-                        </section>
-                      )}
+                        </div>
+                      </section>
 
                       {/* PAGE SELECTION GRID */}
                       {pages.length > 0 && (

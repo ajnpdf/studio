@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { engine } from '@/lib/engine';
 import * as pdfjsLib from 'pdfjs-dist';
+import { cn } from '@/lib/utils';
 
 // Configure PDF.js Worker
 if (typeof window !== 'undefined') {

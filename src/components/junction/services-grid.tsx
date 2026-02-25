@@ -46,8 +46,8 @@ export type ServiceUnit = {
 
 /**
  * AJN Major 10 Registry
- * High-Fidelity Industrial Standards for 2026.
- * Descriptions are synchronized verbatim with provided specifications.
+ * Curated industrial units for 2026 standards.
+ * Edit PDF is handled via the FAB Pen.
  */
 export const ALL_UNITS: ServiceUnit[] = [
   { 
