@@ -6,7 +6,6 @@ import { ConversionResult, ProgressCallback } from './pdf-converter';
 /**
  * AJN Master Manipulation Engine
  * Precision binary synchronization for document surgery.
- * Hardened for E-Sign injection, Image layering, and real-time execution.
  */
 export class PDFManipulator {
   private files: File[];
@@ -22,7 +21,7 @@ export class PDFManipulator {
   }
 
   async runOperation(toolId: string, options: any = {}): Promise<ConversionResult> {
-    const firstFile = this.files && this.files.length > 0 ? this.files[0] : null;
+    const firstFile = (this.files && this.files.length > 0) ? this.files[0] : null;
     const baseName = firstFile ? firstFile.name.split('.')[0] : (options.document?.name?.split('.')[0] || "Document");
     
     let { pageData = [] } = options;
@@ -31,18 +30,17 @@ export class PDFManipulator {
     const masterDoc = await PDFDocument.create();
     const font = await masterDoc.embedFont(StandardFonts.Helvetica);
 
-    // Safely load source documents if files exist
     const sourceDocs = await Promise.all((this.files || []).map(async (f) => {
       try {
+        if (!f) return null;
         const buf = await f.arrayBuffer();
         return await PDFDocument.load(buf, { ignoreEncryption: true });
       } catch (e) {
-        console.warn(`[Manipulator] Failed to load source file ${f.name}`, e);
+        console.warn(`[Manipulator] Failed to load source file`, e);
         return null;
       }
     }));
 
-    // If no specific page data was passed, default to all pages from all source docs
     if (pageData.length === 0 && sourceDocs.length > 0) {
       sourceDocs.forEach((doc, fIdx) => {
         if (!doc) return;
@@ -53,7 +51,6 @@ export class PDFManipulator {
       });
     }
 
-    // If still no page data (e.g. editor start), use the document object model if available
     if (pageData.length === 0 && options.document?.pages) {
       options.document.pages.forEach((p: any, idx: number) => {
         pageData.push({ fileIdx: -1, pageIdx: idx, rotation: p.rotation || 0 });
@@ -69,12 +66,10 @@ export class PDFManipulator {
 
       let copiedPage;
       
-      // If we have a source doc, copy the page
       if (item.fileIdx !== -1 && sourceDocs[item.fileIdx]) {
         const sourceDoc = sourceDocs[item.fileIdx]!;
         [copiedPage] = await masterDoc.copyPages(sourceDoc, [item.pageIdx]);
       } else {
-        // Otherwise create a blank page for the injection
         copiedPage = masterDoc.addPage([595.28, 841.89]);
       }
       
@@ -82,7 +77,6 @@ export class PDFManipulator {
         copiedPage.setRotation(degrees(item.rotation));
       }
 
-      // Add Page Numbers Logic
       if (toolId === 'add-page-numbers') {
         const { width } = copiedPage.getSize();
         const text = `Page ${i + 1} of ${pageData.length}`;
@@ -99,7 +93,6 @@ export class PDFManipulator {
         });
       }
 
-      // HIGH-FIDELITY LAYER INJECTION (SIGNATURES, IMAGES, TEXT)
       if (options.document?.pages?.[i]) {
         const elements = options.document.pages[i].elements;
         for (const el of elements) {
@@ -127,7 +120,6 @@ export class PDFManipulator {
         }
       }
       
-      // Ensure the page is attached if we copied it
       if (item.fileIdx !== -1) {
         masterDoc.addPage(copiedPage);
       }

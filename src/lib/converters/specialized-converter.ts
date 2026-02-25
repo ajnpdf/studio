@@ -16,8 +16,8 @@ export class SpecializedConverter {
   private files: File[];
   private onProgress?: ProgressCallback;
 
-  constructor(files: File[], onProgress?: ProgressCallback) {
-    this.files = files;
+  constructor(files: File | File[], onProgress?: ProgressCallback) {
+    this.files = Array.isArray(files) ? files : [files];
     this.onProgress = onProgress;
   }
 
@@ -45,7 +45,7 @@ export class SpecializedConverter {
   private async comparePdf(baseName: string, settings: any): Promise<ConversionResult> {
     this.updateProgress(10, "Initializing Dual-Buffer Comparison Sequence...");
     
-    if (this.files.length < 2) {
+    if (this.files.length < 2 || !this.files[1]) {
       throw new Error("Master asset and modified asset required for comparison.");
     }
 
@@ -59,8 +59,8 @@ export class SpecializedConverter {
     
     this.updateProgress(30, "Extracting semantic layers from source binaries...");
     
-    // Stage 1: Text extraction for both documents
     const texts = await Promise.all(this.files.map(async (file) => {
+      if (!file) return "";
       const buf = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
       let fullText = '';
@@ -74,13 +74,12 @@ export class SpecializedConverter {
 
     this.updateProgress(60, "Executing semantic differencing algorithm...");
     
-    // Very simple diff simulation for professional report generation
     const masterText = texts[0];
     const modifiedText = texts[1];
     
     page.drawText('AJN Professional Comparison Briefing', { x: 50, y: height - 50, size: 18, font: fontBold, color: rgb(0, 0, 0.5) });
-    page.drawText(`Master Source: ${this.files[0].name}`, { x: 50, y: height - 80, size: 10, font });
-    page.drawText(`Modified Asset: ${this.files[1].name}`, { x: 50, y: height - 95, size: 10, font });
+    page.drawText(`Master Source: ${this.files[0]?.name || 'N/A'}`, { x: 50, y: height - 80, size: 10, font });
+    page.drawText(`Modified Asset: ${this.files[1]?.name || 'N/A'}`, { x: 50, y: height - 95, size: 10, font });
     
     page.drawText('Analysis Status: High-Fidelity Differential Sync Completed.', { x: 50, y: height - 125, size: 11, font: fontBold });
     

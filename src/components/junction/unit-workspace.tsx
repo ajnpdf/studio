@@ -52,7 +52,6 @@ interface Props {
 
 /**
  * AJN Tools Workspace - Professional Industrial Setup 2026
- * Modelled after iLovePDF real-time comparison standards.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const tool = ALL_UNITS.find(u => u.id === initialUnitId);

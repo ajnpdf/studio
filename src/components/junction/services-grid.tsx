@@ -21,9 +21,6 @@ export type ServiceUnit = {
   cat: 'Organize' | 'Optimize' | 'Convert' | 'Edit' | 'Security' | 'Export' | 'Intelligence';
   mode: 'Standard' | 'Advanced';
   color: string;
-  benefits?: string[];
-  instructions?: string[];
-  useCases?: string[];
 };
 
 export const ALL_UNITS: ServiceUnit[] = [
