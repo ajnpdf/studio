@@ -5,7 +5,6 @@ import { PDFToolbar } from './pdf-toolbar';
 import { PDFCanvas } from './pdf-canvas';
 import { PDFPropertiesPanel } from './pdf-properties-panel';
 import { PDFThumbnailStrip } from './pdf-thumbnail-strip';
-import { SignatureDialog } from './signature-dialog';
 import { PDFDocument, PDFPage, PDFTool, PDFElement, PDFVersion } from './types';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, X, Eye } from 'lucide-react';
@@ -26,6 +25,11 @@ interface Props {
 
 const MOCK_VERSIONS: PDFVersion[] = [{ id: 'v1', versionNumber: 1, timestamp: '2026-01-15 10:00', editorName: 'System', summary: 'Original Ingestion' }];
 
+/**
+ * AJN Advanced Surgical Editor
+ * Production-hardened logic for real-time PDF object manipulation.
+ * Removed signature logic per network unit purge request.
+ */
 export function PDFEditor({ file }: Props) {
   const [doc, setDoc] = useState<PDFDocument>({ id: 'doc-initial', name: file?.name || 'Asset.pdf', totalPages: 0, pages: [], versions: MOCK_VERSIONS });
   const [history, setHistory] = useState<PDFDocument[]>([doc]);
@@ -36,8 +40,6 @@ export function PDFEditor({ file }: Props) {
   const [zoom, setZoom] = useState(100);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
-  const [sigOpen, setSigOpen] = useState(false);
-  const [pendingSigPos, setPendingSigPos] = useState<{x: number, y: number, w: number, h: number} | null>(null);
   const [previewPage, setPreviewPage] = useState<PDFPage | null>(null);
 
   const { toast } = useToast();
@@ -199,7 +201,7 @@ export function PDFEditor({ file }: Props) {
                 onSelectElement={setSelectedElementId} 
                 onUpdateElement={(el) => handleUpdateElement(el, idx)} 
                 onAddElement={(el) => handleAddElement(el, idx)} 
-                onRequestSignature={(x, y, w, h) => { setPendingSigPos({ x, y, w, h }); setSigOpen(true); }} 
+                onRequestSignature={() => {}} 
               />
             </div>
           ))}
@@ -241,26 +243,6 @@ export function PDFEditor({ file }: Props) {
         </DialogContent>
       </Dialog>
 
-      <SignatureDialog 
-        open={sigOpen} 
-        onOpenChange={setSigOpen} 
-        onSave={(data, type) => { 
-          if (!pendingSigPos) return; 
-          handleAddElement({ 
-            id: `sig-${Date.now()}`, 
-            type: 'signature', 
-            x: pendingSigPos.x, 
-            y: pendingSigPos.y, 
-            width: pendingSigPos.w, 
-            height: pendingSigPos.h, 
-            signatureData: data, 
-            signatureType: type, 
-            zIndex: 100 
-          }, activePageIdx); 
-          setPendingSigPos(null); 
-          setActiveTool('select'); 
-        }} 
-      />
       {isProcessing && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[999] flex items-center justify-center">
           <div className="text-center space-y-8 animate-in zoom-in-95">

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { 
@@ -24,7 +23,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { PDFTool, PDFVersion } from './types';
+import { PDFTool } from './types';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -40,6 +39,10 @@ interface Props {
   onSave: () => void;
 }
 
+/**
+ * AJN Surgical Toolbar - 2026 Production Standard
+ * Signature button removed per network purge request.
+ */
 export function PDFToolbar({ activeTool, setActiveTool, zoom, setZoom, onUndo, onRedo, canUndo, canRedo, onSave }: Props) {
   const ToolButton = ({ tool, icon: Icon, label }: { tool: PDFTool, icon: any, label: string }) => (
     <TooltipProvider delayDuration={0}>
@@ -85,7 +88,6 @@ export function PDFToolbar({ activeTool, setActiveTool, zoom, setZoom, onUndo, o
         <ToolButton tool="link" icon={LinkIcon} label="Links" />
         <ToolButton tool="form-field" icon={CheckSquare} label="Forms" />
         <ToolButton tool="insert-image" icon={ImageIcon} label="Images" />
-        <ToolButton tool="signature" icon={PenTool} label="Sign" />
         <ToolButton tool="draw" icon={Brush} label="Draw" />
         <ToolButton tool="highlight" icon={Highlighter} label="Mark" />
         <Separator orientation="vertical" className="h-10 opacity-40" />

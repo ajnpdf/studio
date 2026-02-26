@@ -48,7 +48,7 @@ interface Props {
 
 /**
  * AJN Unit Workspace - Professional Industrial Standard 2026
- * Refactored to resolve JSX parsing error and implement Visionary Inspection.
+ * Featuring Visionary Inspection and Directional Rotation.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const tool = ALL_UNITS.find(u => u.id === initialUnitId);
@@ -69,7 +69,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const isDirectConvert = ['word-pdf', 'jpg-pdf', 'ppt-pdf', 'excel-pdf', 'pdf-word'].includes(tool?.id || '');
   const isRotateTool = tool?.id === 'rotate-pdf';
 
-  // Capitalized ToolIcon to satisfy JSX parsing rules
+  // Capitalized ToolIcon to resolve EcmaScript parsing error
   const ToolIcon = tool?.icon || FileText;
 
   const getAcceptMime = () => {
@@ -85,7 +85,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     if ((initialUnitId === 'merge-pdf' || initialUnitId === 'split-pdf') && files.length < 2) {
       toast({ 
         title: "Protocol Violation", 
-        description: `The ${tool?.name} unit requires 2 or more PDF segments for high-fidelity assembly.`, 
+        description: `The ${tool?.name} unit requires 2 or more segments for industrial assembly.`, 
         variant: "destructive" 
       });
       return;
@@ -126,7 +126,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             initialSelected.add(pageId);
           }
         } else if (file.type.startsWith('image/')) {
-          // Real-time image preview via FileReader
           const pageId = `img-seg-${fIdx}-${Date.now()}`;
           const reader = new FileReader();
           const url = await new Promise<string>((resolve) => {
@@ -142,7 +141,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
           });
           initialSelected.add(pageId);
         } else if (isDirectConvert) {
-          // Office document placeholder
           const pageId = `seg-${fIdx}-${Date.now()}`;
           allLoadedPages.push({ 
             id: pageId, 
@@ -213,7 +211,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   {isInitializing ? (
                     <div className="py-32 text-center opacity-40">
                       <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-                      <p className="text-[10px] font-black uppercase tracking-widest">Generating Visual Segments...</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest">Inhaling Binary Segments...</p>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-12">
@@ -226,7 +224,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                               onClick={handleReupload}
                               className="h-10 px-5 text-[10px] font-black uppercase tracking-widest text-slate-400 border-black/5 hover:text-red-500 transition-all gap-2 rounded-xl shadow-sm"
                             >
-                              <RefreshCcw className="w-3.5 h-3.5" /> Reupload Segment
+                              <RefreshCcw className="w-3.5 h-3.5" /> Reupload Asset
                             </Button>
                           </div>
 
