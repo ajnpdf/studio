@@ -26,6 +26,8 @@ import {
 } from 'lucide-react';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useLanguage } from '@/lib/i18n/language-context';
+import { LanguageSelector } from '@/components/dashboard/language-selector';
 
 /**
  * All-in-one Junction Network - Landing Hub 2026
@@ -33,6 +35,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
  */
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
+  const { t } = useLanguage();
   const founderImage = PlaceHolderImages.find(img => img.id === 'founder-portrait');
 
   const popularTools = [
@@ -67,15 +70,16 @@ export default function LandingPage() {
                 href={`#${item.toLowerCase()}`} 
                 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-950/40 hover:text-primary transition-colors"
               >
-                {item}
+                {t(`nav${item}`)}
               </a>
             ))}
           </nav>
 
           <div className="flex items-center gap-4">
+            <LanguageSelector />
             <Link href="/ajn">
               <Button className="h-10 bg-primary text-white hover:bg-primary/90 font-black text-[10px] tracking-[0.2em] rounded-xl uppercase px-6 shadow-xl">
-                Open Tools
+                {t('openTools')}
               </Button>
             </Link>
           </div>
@@ -88,13 +92,13 @@ export default function LandingPage() {
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-950 leading-[0.9] uppercase">
-                All-in-one <br /> Junction Network
+                {t('heroTitle').split(' ').slice(0, 2).join(' ')} <br /> {t('heroTitle').split(' ').slice(2).join(' ')}
               </h1>
               <div className="flex flex-col items-center justify-center gap-4">
                 <div className="flex items-center justify-center gap-6">
                   <span className="w-12 h-px bg-slate-950/10"></span>
                   <p className="text-slate-950/60 text-[10px] md:text-[12px] font-black tracking-[0.4em] uppercase">
-                    Every File. One Simple Network.
+                    {t('tagline')}
                   </p>
                   <span className="w-12 h-px bg-slate-950/10"></span>
                 </div>
@@ -109,7 +113,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
               <Link href="/ajn">
                 <Button className="h-16 px-12 bg-primary text-white font-black text-xs rounded-2xl transition-all gap-4 shadow-2xl hover:scale-105 uppercase tracking-widest">
-                  Get Started <ArrowRight className="w-4 h-4" />
+                  {t('getStarted')} <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
             </div>
@@ -172,70 +176,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="solutions" className="py-24 bg-white/20 border-y border-black/5">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center space-y-4 mb-16">
-              <h2 className="text-4xl font-black uppercase tracking-tighter">Workflow <span className="text-primary">Solutions</span></h2>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-950/40">Professional toolsets for academic and commercial use</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <Card className="bg-white/40 backdrop-blur-xl border-black/5 p-12 rounded-[3.5rem] space-y-10 shadow-2xl hover:border-primary/30 transition-all">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center"><User className="w-7 h-7 text-primary" /></div>
-                  <div className="space-y-1">
-                    <h3 className="text-3xl font-black uppercase tracking-tighter">For Individuals</h3>
-                    <p className="text-[10px] font-bold text-primary uppercase tracking-widest leading-none">Optimized for academic and personal workflows</p>
-                  </div>
-                </div>
-                <ul className="space-y-5">
-                  {[
-                    'Universal PDF Merging', 
-                    'Text Recognition (OCR)', 
-                    'Visual Split & Extract', 
-                    'File Compression'
-                  ].map(item => (
-                    <li key={item} className="flex items-center gap-4 text-xs font-black uppercase tracking-widest text-slate-950/60">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-500" /> {item}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/ajn" className="block pt-4">
-                  <Button className="w-full h-16 bg-primary text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl shadow-xl">Start for Individuals</Button>
-                </Link>
-              </Card>
-
-              <Card className="bg-primary text-white border-none p-12 rounded-[3.5rem] space-y-10 shadow-2xl relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-700">
-                  <Globe className="w-64 h-64" />
-                </div>
-                <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center"><Globe className="w-7 h-7 text-white" /></div>
-                  <div className="space-y-1">
-                    <h3 className="text-3xl font-black uppercase tracking-tighter">For Business</h3>
-                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest leading-none">Scalable infrastructure for commercial operations</p>
-                  </div>
-                </div>
-                <ul className="space-y-5 relative z-10">
-                  {[
-                    'High-Speed Batching', 
-                    'Team Sync', 
-                    'API Management Portal', 
-                    'Audit Logs & Compliance'
-                  ].map(item => (
-                    <li key={item} className="flex items-center gap-4 text-xs font-black uppercase tracking-widest text-white/60">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-400" /> {item}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/ajn" className="block relative z-10 pt-4">
-                  <Button className="w-full h-16 bg-white text-primary hover:bg-white/90 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl">Start for Business</Button>
-                </Link>
-              </Card>
-            </div>
-          </div>
-        </section>
-
         <section id="story" className="py-24 px-6 bg-white/40 border-y border-black/5 overflow-hidden">
           <div className="max-w-7xl mx-auto space-y-20">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
@@ -251,7 +191,7 @@ export default function LandingPage() {
                     alt="Founder" 
                     fill 
                     className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                    data-ai-hint="portrait"
+                    data-ai-hint="founder portrait"
                   />
                   <div className="absolute bottom-8 left-8 right-8 p-6 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-white/60 shadow-2xl">
                     <p className="text-xl font-black tracking-tighter uppercase text-slate-950">Anjan Patel</p>
@@ -307,7 +247,7 @@ export default function LandingPage() {
             AJN Core • 2026
           </p>
           <div className="flex items-center gap-2.5 px-5 py-2 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
-            <span className="text-[10px] font-black text-primary uppercase tracking-widest">Made in INDIAN<span className="animate-heart-beat ml-1">❤️</span></span>
+            <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t('footerMadeIn')}<span className="animate-heart-beat ml-1">❤️</span></span>
           </div>
         </div>
       </footer>

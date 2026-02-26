@@ -17,12 +17,15 @@ import { Input } from '@/components/ui/input';
 import { ServicesGrid } from '@/components/junction/services-grid';
 import { UnitScroller } from '@/components/junction/unit-scroller';
 import { FABEdit } from '@/components/ui/fab-edit';
+import { useLanguage } from '@/lib/i18n/language-context';
+import { LanguageSelector } from '@/components/dashboard/language-selector';
 
 /**
  * AJN Hub Page - Professional Industrial Layout 2026
  */
 export default function AJNPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen w-full text-slate-950 relative font-body flex flex-col bg-transparent overflow-y-auto scrollbar-hide">
@@ -35,15 +38,16 @@ export default function AJNPage() {
         </Link>
         
         <div className="flex items-center gap-5">
+          <LanguageSelector />
           <Link href="/junction">
             <Button variant="outline" className="h-9 border-black/10 bg-white/40 hover:bg-primary hover:text-white font-black text-[10px] tracking-widest rounded-xl transition-all gap-2 px-4 shadow-sm text-slate-950">
-              <Workflow className="w-3.5 h-3.5" /> Tool Directory
+              <Workflow className="w-3.5 h-3.5" /> {t('toolDirectory')}
             </Button>
           </Link>
           <div className="h-6 w-px bg-black/5" />
           <div className="flex items-center gap-2 px-4 py-1.5 bg-emerald-500/5 rounded-xl border border-emerald-500/10 shadow-sm">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span className="text-[10px] font-black text-emerald-600 tracking-widest uppercase">Verified Secure</span>
+            <span className="text-[10px] font-black text-emerald-600 tracking-widest uppercase">{t('verifiedSecure')}</span>
           </div>
         </div>
       </header>
@@ -63,7 +67,7 @@ export default function AJNPage() {
               <Input 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search tools (e.g. 'OCR', 'Merge')..." 
+                placeholder={t('searchPlaceholder')} 
                 className="w-full h-16 bg-transparent pl-16 pr-20 text-base font-bold text-slate-950 border-none focus-visible:ring-0 placeholder:text-slate-950/20"
               />
               <div className="absolute right-7 flex items-center gap-2 px-2.5 py-1 bg-black/5 rounded-lg border border-black/5">
@@ -77,7 +81,7 @@ export default function AJNPage() {
         <section className="animate-in fade-in duration-1000 delay-300">
           <div className="flex items-center gap-3 px-8 mb-6">
             <Activity className="w-4 h-4 text-primary animate-pulse" />
-            <span className="text-[11px] font-black text-slate-950/40 uppercase tracking-[0.3em]">Featured Tools</span>
+            <span className="text-[11px] font-black text-slate-950/40 uppercase tracking-[0.3em]">{t('featuredTools')}</span>
           </div>
           <UnitScroller />
         </section>
@@ -85,7 +89,7 @@ export default function AJNPage() {
         <section className="space-y-10 pb-24">
           <div className="flex items-end justify-between px-6 border-b border-black/5 pb-6">
             <div className="space-y-1 text-left">
-              <h2 className="text-3xl font-black tracking-tighter text-slate-950 leading-none">Professional Tool Library</h2>
+              <h2 className="text-3xl font-black tracking-tighter text-slate-950 leading-none">{t('professionalLibrary')}</h2>
               <p className="text-[10px] font-bold text-slate-950/40 uppercase tracking-[0.4em]">Fast and secure document processing for global professional networks</p>
             </div>
             {searchQuery && (
@@ -102,7 +106,7 @@ export default function AJNPage() {
           <div className="flex gap-12 flex-wrap justify-center">
             {['Story', 'Blog', 'Privacy', 'Terms'].map((link) => (
               <Link key={link} href={`/${link.toLowerCase()}`} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-950/40 hover:text-primary transition-colors">
-                {link}
+                {t(`nav${link}`)}
               </Link>
             ))}
           </div>
@@ -111,7 +115,7 @@ export default function AJNPage() {
               AJN Core • 2026
             </p>
             <div className="flex items-center gap-2.5 px-4 py-1.5 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
-              <span className="text-[9px] font-black text-primary uppercase tracking-widest">Made in INDIAN<span className="animate-heart-beat ml-1">❤️</span></span>
+              <span className="text-[9px] font-black text-primary uppercase tracking-widest">{t('footerMadeIn')}<span className="animate-heart-beat ml-1">❤️</span></span>
             </div>
           </div>
         </footer>
