@@ -80,11 +80,11 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleFilesAdded = async (files: File[]) => {
-    // Multi-Asset Validation
+    // Multi-Asset Validation for Merge/Split
     if ((initialUnitId === 'merge-pdf' || initialUnitId === 'split-pdf') && files.length < 2) {
       toast({ 
         title: "Protocol Violation", 
-        description: `The ${tool?.name} unit requires a minimum of 2 PDF segments.`, 
+        description: `The ${tool?.name} unit requires a minimum of 2 PDF segments for high-fidelity assembly.`, 
         variant: "destructive" 
       });
       return;
@@ -125,6 +125,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             initialSelected.add(pageId);
           }
         } else if (isDirectConvert && (file.type.startsWith('image/') || file.name.match(/\.(docx|pptx|xlsx)$/i))) {
+          // Placeholder raster for non-PDF files in selecting phase
           const pageId = `seg-${fIdx}-${Date.now()}`;
           allLoadedPages.push({ 
             id: pageId, 
@@ -169,6 +170,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     reset();
   };
 
+  // Capitalize component for JSX rendering
   const ToolIcon = tool?.icon || FileText;
 
   return (
@@ -194,6 +196,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   ) : (
                     <div className="flex flex-col gap-12">
                       <div className="space-y-12">
+                        {/* CONFIGURATION PANEL */}
                         <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10 max-w-4xl mx-auto w-full relative">
                           <div className="absolute top-8 right-10 flex gap-3">
                             <Button 
@@ -262,6 +265,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                           </div>
                         </section>
 
+                        {/* VISIONARY GRID */}
                         <div className="space-y-6">
                           <div className="flex items-center justify-between px-2">
                             <div className="flex items-center gap-3">
@@ -298,6 +302,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                             ))}
                           </div>
 
+                          {/* FLOATING ACTION TRIGGER */}
                           <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-6 animate-in slide-in-from-bottom-10 duration-700">
                             <Button 
                               onClick={handleConfirmedExecution} 
@@ -349,6 +354,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
         </div>
       </main>
 
+      {/* FULL-VIEW INSPECTION DIALOG */}
       <Dialog open={!!previewPage} onOpenChange={() => setPreviewPage(null)}>
         <DialogContent className="max-w-4xl w-full h-[90vh] bg-white border-none p-0 overflow-hidden font-sans rounded-[3rem] shadow-2xl">
           <DialogHeader className="p-8 border-b border-black/5 flex items-center justify-between shrink-0">
