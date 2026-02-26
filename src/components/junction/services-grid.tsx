@@ -44,9 +44,19 @@ export type ServiceUnit = {
 
 /**
  * AJN Major Registry - 2026 Industrial Standards
- * Curated Top 9 Professional Units.
+ * Curated Top 10 Professional Units (Removed Sign PDF).
  */
 export const ALL_UNITS: ServiceUnit[] = [
+  { 
+    id: 'edit-pdf', 
+    name: 'Edit PDF', 
+    desc: 'Add text, images, shapes or freehand annotations to a PDF document. Edit PDF content in real-time.', 
+    icon: MousePointer2, 
+    tag: 'Edit', 
+    cat: 'Edit', 
+    mode: 'Advanced', 
+    color: '#EC4899'
+  },
   { 
     id: 'merge-pdf', 
     name: 'Merge PDF', 
@@ -80,7 +90,7 @@ export const ALL_UNITS: ServiceUnit[] = [
   { 
     id: 'pdf-word', 
     name: 'PDF to Word', 
-    desc: 'Easily convert your PDF files into easy to edit DOC and DOCX documents. The converted WORD document is almost 100% accurate.', 
+    desc: 'Easily convert your PDF files into easy to edit DOC and DOCX documents.', 
     icon: FileText, 
     tag: 'Word', 
     cat: 'Export', 
@@ -164,7 +174,7 @@ export function ServicesGrid({ query, category }: { query: string, category: str
       <AnimatePresence mode="popLayout">
         {filteredUnits.map((unit) => (
           <motion.div key={unit.id} layout variants={cardVariants} className="group h-full">
-            <Link href={`/tools/${unit.id}`} className="block h-full">
+            <Link href={unit.id === 'edit-pdf' ? '/tools/edit-pdf' : `/tools/${unit.id}`} className="block h-full">
               <Card className="h-full bg-white/40 border-black/5 hover:border-primary/40 transition-all duration-500 cursor-pointer overflow-hidden border backdrop-blur-xl shadow-md group/card rounded-[2rem] md:rounded-3xl">
                 <CardContent className="p-4 md:p-6 flex flex-col h-full text-slate-950 relative z-10">
                   <div className="flex items-start justify-between mb-4 md:mb-6">

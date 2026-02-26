@@ -71,6 +71,9 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const isDirectConvert = ['word-pdf', 'jpg-pdf', 'ppt-pdf', 'excel-pdf', 'pdf-word'].includes(tool?.id || '');
   const isRotateTool = tool?.id === 'rotate-pdf';
 
+  // Extract Icon to Capitalized Variable to avoid JSX parsing error
+  const ToolIcon = tool?.icon || FileText;
+
   const getAcceptMime = () => {
     if (initialUnitId === 'word-pdf') return ".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     if (initialUnitId === 'ppt-pdf') return ".ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation";
@@ -124,8 +127,23 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             });
             initialSelected.add(pageId);
           }
-        } else if (isDirectConvert && (file.type.startsWith('image/') || file.name.match(/\.(docx|pptx|xlsx)$/i))) {
-          // Placeholder raster for non-PDF files in selecting phase
+        } else if (file.type.startsWith('image/')) {
+          const pageId = `img-seg-${fIdx}-${Date.now()}`;
+          const reader = new FileReader();
+          const url = await new Promise<string>((resolve) => {
+            reader.onload = (e) => resolve(e.target?.result as string);
+            reader.readAsDataURL(file);
+          });
+          allLoadedPages.push({ 
+            id: pageId, 
+            url, 
+            fileIdx: fIdx, 
+            pageIdx: 0, 
+            rotation: 0 
+          });
+          initialSelected.add(pageId);
+        } else if (isDirectConvert) {
+          // Generic placeholder for non-visual office formats during selection
           const pageId = `seg-${fIdx}-${Date.now()}`;
           allLoadedPages.push({ 
             id: pageId, 
@@ -144,6 +162,14 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     } finally {
       setIsInitializing(false);
     }
+  };
+
+  const handleRotateAll = (dir: 'left' | 'right') => {
+    setPages(prev => prev.map(p => ({
+      ...p,
+      rotation: (p.rotation + (dir === 'right' ? 90 : -90) + 360) % 360
+    })));
+    setConfig(prev => ({ ...prev, direction: dir }));
   };
 
   const handleConfirmedExecution = () => {
@@ -169,9 +195,6 @@ export function UnitWorkspace({ initialUnitId }: Props) {
     setSelectedPages(new Set());
     reset();
   };
-
-  // Capitalize component for JSX rendering
-  const ToolIcon = tool?.icon || FileText;
 
   return (
     <div className="flex h-full bg-transparent overflow-hidden relative text-slate-950 font-sans">
@@ -226,17 +249,17 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                   <div className="grid grid-cols-2 gap-3">
                                     <Button 
                                       variant="outline" 
-                                      onClick={() => setConfig({...config, direction: 'left'})}
+                                      onClick={() => handleRotateAll('left')}
                                       className={cn("h-14 rounded-2xl border-black/5 gap-3 font-black text-[10px] uppercase transition-all", config.direction === 'left' ? "bg-primary text-white border-primary shadow-lg" : "bg-white/50")}
                                     >
-                                      <RotateCcw className="w-4 h-4" /> Left Rotate
+                                      <RotateCcw className="w-4 h-4" /> Rotate Left
                                     </Button>
                                     <Button 
                                       variant="outline" 
-                                      onClick={() => setConfig({...config, direction: 'right'})}
+                                      onClick={() => handleRotateAll('right')}
                                       className={cn("h-14 rounded-2xl border-black/5 gap-3 font-black text-[10px] uppercase transition-all", config.direction === 'right' ? "bg-primary text-white border-primary shadow-lg" : "bg-white/50")}
                                     >
-                                      <RotateCw className="w-4 h-4" /> Right Rotate
+                                      <RotateCw className="w-4 h-4" /> Rotate Right
                                     </Button>
                                   </div>
                                 </div>

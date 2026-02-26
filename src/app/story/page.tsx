@@ -11,7 +11,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 /**
  * AJN About Us Page - Professional Industrial Standard 2026
- * Updated with user-provided "Our Story" content.
+ * Updated with user-provided mission content.
  */
 export default function OurStoryPage() {
   const founderImage = PlaceHolderImages.find(img => img.id === 'founder-portrait');
@@ -41,7 +41,7 @@ export default function OurStoryPage() {
           >
             <div className="flex items-center justify-center gap-4">
               <div className="w-12 h-px bg-primary/20" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">About Us</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Our Mission</span>
               <div className="w-12 h-px bg-primary/20" />
             </div>
             <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.85] text-slate-950 uppercase">
@@ -161,7 +161,7 @@ export default function OurStoryPage() {
             </div>
             <div className="h-16 w-px bg-black/5" />
             <div className="text-center space-y-2">
-              <p className="text-4xl md:text-6xl font-black tracking-tighter">10</p>
+              <p className="text-4xl md:text-6xl font-black tracking-tighter">9</p>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-950/40">MAJOR UNITS</p>
             </div>
           </div>
