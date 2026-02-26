@@ -19,30 +19,29 @@ import {
   Globe, 
   Layout,
   Scissors,
-  Search,
   Shrink,
-  MousePointer2,
   FileText,
-  RotateCw
+  RotateCw,
+  MousePointer2
 } from 'lucide-react';
 import { NightSky } from '@/components/dashboard/night-sky';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 /**
  * All-in-one Junction Network - Landing Hub 2026
- * Strictly synchronized with the 9 Major Professional Units.
+ * Strictly synchronized with the Major Professional Units.
  */
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
   const founderImage = PlaceHolderImages.find(img => img.id === 'founder-portrait');
 
   const popularTools = [
+    { id: 'edit-pdf', name: 'Edit PDF', desc: 'Surgical object editing.', icon: MousePointer2, color: 'text-pink-500' },
     { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple documents.', icon: Layout, color: 'text-blue-500' },
     { id: 'split-pdf', name: 'Split PDF', desc: 'Divide files by page range.', icon: Scissors, color: 'text-indigo-500' },
     { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce document size.', icon: Shrink, color: 'text-emerald-500' },
-    { id: 'pdf-word', name: 'PDF to Word', desc: 'Convert PDF to editable DOCX.', icon: FileText, color: 'text-blue-600' },
-    { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Change page orientation.', icon: RotateCw, color: 'text-orange-500' },
-    { id: 'edit-pdf', name: 'Edit PDF', desc: 'Modify existing content.', icon: MousePointer2, color: 'text-pink-500' },
+    { id: 'pdf-word', name: 'PDF to Word', desc: 'Convert to editable DOCX.', icon: FileText, color: 'text-blue-600' },
+    { id: 'rotate-pdf', name: 'Rotate PDF', desc: 'Bulk orientation sync.', icon: RotateCw, color: 'text-orange-500' },
   ];
 
   useEffect(() => {
@@ -281,8 +280,8 @@ export default function LandingPage() {
                     <p className="text-[8px] font-black uppercase tracking-widest text-slate-950/40">PRIVACY</p>
                   </div>
                   <div className="text-center space-y-2">
-                    <p className="text-3xl font-black tracking-tighter">30+</p>
-                    <p className="text-[8px] font-black uppercase tracking-widest text-slate-950/40">TOOLS ACTIVE</p>
+                    <p className="text-3xl font-black tracking-tighter">10</p>
+                    <p className="text-[8px] font-black uppercase tracking-widest text-slate-950/40">UNITS ACTIVE</p>
                   </div>
                 </div>
               </div>

@@ -8,21 +8,12 @@ import {
   Shrink, 
   FileText, 
   MousePointer2, 
-  Search,
   ArrowRight, 
   FileCode,
   ImageIcon,
   Presentation,
   Table,
-  Lock,
-  Archive,
-  Wrench,
-  Scan,
-  GitCompare,
-  RotateCw,
-  Hash,
-  Globe,
-  RotateCcw
+  RotateCw
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -44,7 +35,7 @@ export type ServiceUnit = {
 
 /**
  * AJN Major Registry - 2026 Industrial Standards
- * Curated Top 10 Professional Units (Removed Sign PDF).
+ * Refined Suite of 10 Professional Units.
  */
 export const ALL_UNITS: ServiceUnit[] = [
   { 
@@ -55,7 +46,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Edit', 
     cat: 'Edit', 
     mode: 'Advanced', 
-    color: '#EC4899'
+    color: '#EC4899',
+    benefits: ['Real-time object manipulation', 'Native browser performance', 'Zero-latency sync'],
+    instructions: ['Inhale PDF binary', 'Apply surgical modifications', 'Export master output'],
+    useCases: ['Legal redaction', 'Dynamic annotations', 'Visual audits']
   },
   { 
     id: 'merge-pdf', 
@@ -65,7 +59,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Merge', 
     cat: 'Organize', 
     mode: 'Standard', 
-    color: '#3B82F6'
+    color: '#3B82F6',
+    benefits: ['Multi-asset synchronization', 'Binary order control', 'Optimized trailer handling'],
+    instructions: ['Select 2+ PDF segments', 'Arrange operational order', 'Stitch into master binary'],
+    useCases: ['Report assembly', 'Document grouping', 'Portfolio creation']
   },
   { 
     id: 'split-pdf', 
@@ -75,7 +72,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Split', 
     cat: 'Organize', 
     mode: 'Standard', 
-    color: '#6366F1'
+    color: '#6366F1',
+    benefits: ['Precision segment extraction', 'Dynamic page mapping', 'Lightweight output'],
+    instructions: ['Select source PDF', 'Identify target segments', 'Execute surgical extraction'],
+    useCases: ['Page isolation', 'Asset decomposition', 'Specific segment export']
   },
   { 
     id: 'compress-pdf', 
@@ -85,7 +85,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Compress', 
     cat: 'Optimize', 
     mode: 'Standard', 
-    color: '#10B981'
+    color: '#10B981',
+    benefits: ['Intelligent stream deflation', 'Image layer optimization', 'Fidelity preservation'],
+    instructions: ['Upload large asset', 'Adjust reduction strength', 'Download optimized binary'],
+    useCases: ['Email optimization', 'Web performance', 'Storage conservation']
   },
   { 
     id: 'pdf-word', 
@@ -95,7 +98,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'Word', 
     cat: 'Export', 
     mode: 'Standard', 
-    color: '#3B82F6'
+    color: '#3B82F6',
+    benefits: ['Neural text extraction', 'Layout reconstruction', 'Editable OOXML output'],
+    instructions: ['Load PDF binary', 'Analyze text layers', 'Export DOCX container'],
+    useCases: ['Content repurposing', 'Document editing', 'Text recovery']
   },
   { 
     id: 'word-pdf', 
@@ -105,7 +111,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'PDF', 
     cat: 'Convert', 
     mode: 'Standard', 
-    color: '#2563EB'
+    color: '#2563EB',
+    benefits: ['High-fidelity OOXML rendering', 'Font embedding sync', 'Universal readability'],
+    instructions: ['Inhale Word asset', 'Execute layout engine', 'Download master PDF'],
+    useCases: ['Official submissions', 'Clean sharing', 'Fixed layout archival']
   },
   { 
     id: 'jpg-pdf', 
@@ -115,7 +124,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'PDF', 
     cat: 'Convert', 
     mode: 'Standard', 
-    color: '#4F46E5'
+    color: '#4F46E5',
+    benefits: ['Raster to vector mapping', 'Multi-frame assembly', 'Margin calibration'],
+    instructions: ['Select image assets', 'Confirm visual order', 'Generate PDF document'],
+    useCases: ['Image archiving', 'Photo report assembly', 'Social media export']
   },
   { 
     id: 'ppt-pdf', 
@@ -125,7 +137,10 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'PDF', 
     cat: 'Convert', 
     mode: 'Standard', 
-    color: '#D97706'
+    color: '#D97706',
+    benefits: ['Slide-perfect rendering', 'Animation layer flattening', 'Universal viewing'],
+    instructions: ['Load presentation file', 'Parse slide indices', 'Export document binary'],
+    useCases: ['Handout generation', 'Presentation sharing', 'Archival snapshots']
   },
   { 
     id: 'excel-pdf', 
@@ -135,17 +150,23 @@ export const ALL_UNITS: ServiceUnit[] = [
     tag: 'PDF', 
     cat: 'Convert', 
     mode: 'Standard', 
-    color: '#059669'
+    color: '#059669',
+    benefits: ['Grid-aware reconstruction', 'Pagination calibration', 'Format preservation'],
+    instructions: ['Upload spreadsheet', 'Select worksheets', 'Generate grid-perfect PDF'],
+    useCases: ['Financial reporting', 'Data snapshots', 'Inventory exports']
   },
   {
     id: 'rotate-pdf',
     name: 'Rotate PDF',
-    desc: 'Rotate your PDFs the way you need them. You can even rotate multiple PDFs at once!',
+    desc: 'Rotate your PDFs the way you need them. Apply Right or Left orientation in bulk.',
     icon: RotateCw,
     tag: 'Rotate',
     cat: 'Organize',
     mode: 'Standard',
-    color: '#f59e0b'
+    color: '#f59e0b',
+    benefits: ['Real-time orientation sync', 'Bulk direction control', 'Binary degree hardening'],
+    instructions: ['Select PDF segments', 'Apply Right/Left rotate', 'Download oriented binary'],
+    useCases: ['Scan correction', 'Orientation audits', 'Layout alignment']
   }
 ];
 

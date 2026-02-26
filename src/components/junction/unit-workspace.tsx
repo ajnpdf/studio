@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DropZone } from '@/components/dashboard/conversion/drop-zone';
 import { useAJNTool, ProgressBar, LogStream } from '@/hooks/use-ajn-tool';
@@ -9,13 +9,11 @@ import {
   CheckCircle2, 
   Loader2, 
   Zap, 
-  Settings2,
   ShieldCheck,
   RotateCw,
   RotateCcw,
   RefreshCcw,
   ZoomIn,
-  ArrowRight,
   Eye,
   X,
   FileText
@@ -50,11 +48,11 @@ interface Props {
 
 /**
  * AJN Unit Workspace - Professional Industrial Standard 2026
- * Hardened for real-time interaction and precision binary sync.
+ * Refactored to resolve JSX parsing error and implement Visionary Inspection.
  */
 export function UnitWorkspace({ initialUnitId }: Props) {
   const tool = ALL_UNITS.find(u => u.id === initialUnitId);
-  const { phase, progress, logs, result, error, run, reset, setPhase } = useAJNTool(initialUnitId || 'merge-pdf');
+  const { phase, progress, logs, result, run, reset, setPhase } = useAJNTool(initialUnitId || 'merge-pdf');
   
   const [sourceFiles, setSourceFiles] = useState<File[]>([]);
   const [pages, setPages] = useState<PageNode[]>([]);
@@ -71,7 +69,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   const isDirectConvert = ['word-pdf', 'jpg-pdf', 'ppt-pdf', 'excel-pdf', 'pdf-word'].includes(tool?.id || '');
   const isRotateTool = tool?.id === 'rotate-pdf';
 
-  // Extract Icon to Capitalized Variable to avoid JSX parsing error
+  // Capitalized ToolIcon to satisfy JSX parsing rules
   const ToolIcon = tool?.icon || FileText;
 
   const getAcceptMime = () => {
@@ -83,11 +81,11 @@ export function UnitWorkspace({ initialUnitId }: Props) {
   };
 
   const handleFilesAdded = async (files: File[]) => {
-    // Multi-Asset Validation for Merge/Split
+    // Multi-Asset Validation Protocol
     if ((initialUnitId === 'merge-pdf' || initialUnitId === 'split-pdf') && files.length < 2) {
       toast({ 
         title: "Protocol Violation", 
-        description: `The ${tool?.name} unit requires a minimum of 2 PDF segments for high-fidelity assembly.`, 
+        description: `The ${tool?.name} unit requires 2 or more PDF segments for high-fidelity assembly.`, 
         variant: "destructive" 
       });
       return;
@@ -128,6 +126,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
             initialSelected.add(pageId);
           }
         } else if (file.type.startsWith('image/')) {
+          // Real-time image preview via FileReader
           const pageId = `img-seg-${fIdx}-${Date.now()}`;
           const reader = new FileReader();
           const url = await new Promise<string>((resolve) => {
@@ -143,7 +142,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
           });
           initialSelected.add(pageId);
         } else if (isDirectConvert) {
-          // Generic placeholder for non-visual office formats during selection
+          // Office document placeholder
           const pageId = `seg-${fIdx}-${Date.now()}`;
           allLoadedPages.push({ 
             id: pageId, 
@@ -214,12 +213,12 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                   {isInitializing ? (
                     <div className="py-32 text-center opacity-40">
                       <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-                      <p className="text-[10px] font-black uppercase tracking-widest">Processing Segments...</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest">Generating Visual Segments...</p>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-12">
                       <div className="space-y-12">
-                        {/* CONFIGURATION PANEL */}
+                        {/* CALIBRATION PANEL */}
                         <section className="bg-white/60 p-10 rounded-[3rem] border border-black/5 shadow-2xl backdrop-blur-3xl space-y-10 max-w-4xl mx-auto w-full relative">
                           <div className="absolute top-8 right-10 flex gap-3">
                             <Button 
@@ -282,7 +281,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                                   <ShieldCheck className="w-5 h-5" />
                                   <p className="text-xs font-black uppercase tracking-widest">Local Buffer Secure</p>
                                 </div>
-                                <p className="text-[9px] font-bold uppercase leading-relaxed text-slate-950/60">Processes are strictly browser-native. Assets are never transmitted or stored externally.</p>
+                                <p className="text-[9px] font-bold uppercase leading-relaxed text-slate-950/60">Binary orchestration is strictly browser-native. Assets are never transmitted or stored externally.</p>
                               </div>
                             </div>
                           </div>
@@ -325,7 +324,7 @@ export function UnitWorkspace({ initialUnitId }: Props) {
                             ))}
                           </div>
 
-                          {/* FLOATING ACTION TRIGGER */}
+                          {/* FLOATING EXECUTION HUB */}
                           <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-6 animate-in slide-in-from-bottom-10 duration-700">
                             <Button 
                               onClick={handleConfirmedExecution} 
